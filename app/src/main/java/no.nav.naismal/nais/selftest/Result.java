@@ -1,0 +1,12 @@
+package no.nav.naismal.nais.selftest;
+
+/**
+ * Created by T133804 on 15.08.2017.
+ */
+public enum Result {
+	
+	OK, WARNING, ERROR;
+
+
+	
+}
