@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="90b61fdf-6084-48ec-a828-39c9e172bd4e" name="Default Changelist" comment="MMA-2138 Lagt inn NaisContract, Dockerfile, Jenkinsfile og nais.yaml, og oppdatert pom-filer">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+    <list default="true" id="90b61fdf-6084-48ec-a828-39c9e172bd4e" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -28,7 +27,7 @@
           <entry key="Jenkinsfile" value="1" />
           <entry key="gitignore" value="1" />
           <entry key="iml" value="1" />
-          <entry key="java" value="1" />
+          <entry key="java" value="2" />
           <entry key="xml" value="2" />
           <entry key="yaml" value="1" />
         </counts>
@@ -36,7 +35,7 @@
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="IDEA_MODULE" value="1" />
-          <entry key="JAVA" value="1" />
+          <entry key="JAVA" value="2" />
           <entry key="PLAIN_TEXT" value="3" />
           <entry key="XML" value="2" />
           <entry key="YAML" value="1" />
@@ -45,16 +44,16 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Jenkinsfile" value="7" />
-          <entry key="java" value="15" />
-          <entry key="txt" value="172" />
+          <entry key="java" value="22" />
+          <entry key="txt" value="187" />
           <entry key="xml" value="10" />
           <entry key="yaml" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="15" />
-          <entry key="PLAIN_TEXT" value="179" />
+          <entry key="JAVA" value="22" />
+          <entry key="PLAIN_TEXT" value="194" />
           <entry key="XML" value="10" />
           <entry key="YAML" value="7" />
         </counts>
@@ -72,14 +71,23 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/no.nav.naismal/nais/NaisContract.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="27" lean-forward="true" selection-start-line="27" selection-end-line="27" />
+            <state relative-caret-position="187">
+              <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/no.nav.naismal/Application.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="153">
+              <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
             </state>
           </provider>
         </entry>
@@ -149,6 +157,7 @@
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/app/pom.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/no.nav.naismal/nais/NaisContract.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/no.nav.naismal/Application.java" />
       </list>
     </option>
   </component>
@@ -198,54 +207,6 @@
               <item name="naismal" type="b2602c69:ProjectViewProjectNode" />
               <item name="naismal" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="naismal" type="b2602c69:ProjectViewProjectNode" />
-              <item name="naismal" type="462c0819:PsiDirectoryNode" />
-              <item name="app" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="naismal" type="b2602c69:ProjectViewProjectNode" />
-              <item name="naismal" type="462c0819:PsiDirectoryNode" />
-              <item name="app" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="naismal" type="b2602c69:ProjectViewProjectNode" />
-              <item name="naismal" type="462c0819:PsiDirectoryNode" />
-              <item name="app" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="naismal" type="b2602c69:ProjectViewProjectNode" />
-              <item name="naismal" type="462c0819:PsiDirectoryNode" />
-              <item name="app" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="naismal" type="b2602c69:ProjectViewProjectNode" />
-              <item name="naismal" type="462c0819:PsiDirectoryNode" />
-              <item name="app" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="nais" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="naismal" type="b2602c69:ProjectViewProjectNode" />
-              <item name="naismal" type="462c0819:PsiDirectoryNode" />
-              <item name="app" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="naismal" type="b2602c69:ProjectViewProjectNode" />
-              <item name="naismal" type="462c0819:PsiDirectoryNode" />
-              <item name="app" type="462c0819:PsiDirectoryNode" />
-              <item name="target" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -257,7 +218,7 @@
     <property name="SONARLINT_PRECOMMIT_ANALYSIS" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="***gammelt_fnr***56" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="***gammelt_fnr***53" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="project.structure.last.edited" value="Project" />
@@ -295,7 +256,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>***gammelt_fnr***68</updated>
-      <workItem from="***gammelt_fnr***09" duration="3129000" />
+      <workItem from="***gammelt_fnr***09" duration="3374000" />
     </task>
     <task id="LOCAL-00001" summary="MMA-2138 Lagt inn .gitignore">
       <created>***gammelt_fnr***61</created>
@@ -311,11 +272,18 @@
       <option name="project" value="LOCAL" />
       <updated>***gammelt_fnr***18</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="MMA-2138 Lagt inn main class">
+      <created>***gammelt_fnr***48</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>***gammelt_fnr***48</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3129000" />
+    <option name="totallyTimeSpent" value="3374000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
@@ -329,10 +297,10 @@
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Spring" />
-      <window_info anchor="bottom" id="Terminal" visible="true" weight="0.32973504" />
+      <window_info anchor="bottom" id="Terminal" weight="0.32973504" />
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Messages" weight="0.32973504" />
-      <window_info anchor="bottom" id="SonarLint" />
+      <window_info anchor="bottom" id="SonarLint" visible="true" weight="0.32973504" />
       <window_info anchor="bottom" id="Java Enterprise" />
       <window_info anchor="bottom" id="Database Changes" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" show_stripe_button="false" />
@@ -364,7 +332,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="MMA-2138 Lagt inn .gitignore" />
     <MESSAGE value="MMA-2138 Lagt inn NaisContract, Dockerfile, Jenkinsfile og nais.yaml, og oppdatert pom-filer" />
-    <option name="LAST_COMMIT_MESSAGE" value="MMA-2138 Lagt inn NaisContract, Dockerfile, Jenkinsfile og nais.yaml, og oppdatert pom-filer" />
+    <MESSAGE value="MMA-2138 Lagt inn main class" />
+    <option name="LAST_COMMIT_MESSAGE" value="MMA-2138 Lagt inn main class" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/.idea/vcs.xml">
@@ -413,11 +382,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/no.nav.naismal/nais/NaisContract.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="27" lean-forward="true" selection-start-line="27" selection-end-line="27" />
+        <state relative-caret-position="187">
+          <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/no.nav.naismal/Application.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
         </state>
       </provider>
     </entry>

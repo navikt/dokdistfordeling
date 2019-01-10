@@ -13,7 +13,6 @@ public class NaisContract {
 
     public static final String APPLICATION_ALIVE = "Application is alive!";
     public static final String APPLICATION_READY = "Application is ready for traffic!";
-    private static final String APPLICATION_NOT_READY = "Application is not ready for traffic :-(";
 
     @GetMapping("/isAlive")
     public String isAlive() {
