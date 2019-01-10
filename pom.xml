@@ -7,6 +7,72 @@
 	<groupId>no.nav.naismal</groupId>
 	<artifactId>no.nav.naismal</artifactId>
 	<version>1.0-SNAPSHOT</version>
+	<modules>
+		<module>app</module>
+	</modules>
+	<packaging>pom</packaging>
+	<name>naismal</name>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.5.RELEASE</version>
+	</parent>
+
+	<distributionManagement>
+		<repository>
+			<id>m2internal</id>
+			<name>NAV Internal Repository</name>
+			<url>dav:http://maven.adeo.no/nexus/content/repositories/m2internal</url>
+		</repository>
+		<snapshotRepository>
+			<id>m2snapshot</id>
+			<name>NAV Snapshot Repository</name>
+			<url>dav:http://maven.adeo.no/nexus/content/repositories/m2snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<logstash-logback-encoder.version>5.1</logstash-logback-encoder.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>2.0.3.RELEASE</version>
+				<configuration>
+					<skip>false</skip>
+					<fork>true</fork>
+					<useTestClasspath>true</useTestClasspath>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+						<configuration>
+							<finalName>app</finalName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 
 </project>
