@@ -21,82 +21,21 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-		<javax.interceptor.version>3.1</javax.interceptor.version>
 		<javax.inject.version>1</javax.inject.version>
-		<aktoer.version>2.0.1</aktoer.version>
-		<cxf.version>3.2.7</cxf.version>
-		<graphql-java.version>11.0</graphql-java.version>
-		<abac-attribute-constants>3.4.4</abac-attribute-constants>
-		<pensjon-sak-v1.version>1.0.1</pensjon-sak-v1.version>
-		<rxjava.version>2.2.4</rxjava.version>
-		<java-jwt.version>3.4.1</java-jwt.version>
 		<logstash-logback-encoder.version>5.2</logstash-logback-encoder.version>
 		<logback-syslog4j.version>1.0.0</logback-syslog4j.version>
-		<io.springfox.version>2.9.2</io.springfox.version>
 		<lombok.version>1.18.4</lombok.version>
 		<junit5.version>5.3.2</junit5.version>
 		<junit5.mockito.version>2.23.0</junit5.mockito.version>
-		<freg.security.test.version>3.1.0</freg.security.test.version>
 		<resilience4j.version>0.11.0</resilience4j.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>io.reactivex.rxjava2</groupId>
-				<artifactId>rxjava</artifactId>
-				<version>${rxjava.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.graphql-java</groupId>
-				<artifactId>graphql-java</artifactId>
-				<version>${graphql-java.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>javax.inject</groupId>
 				<artifactId>javax.inject</artifactId>
 				<version>${javax.inject.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.interceptor</groupId>
-				<artifactId>javax.interceptor-api</artifactId>
-				<version>${javax.interceptor.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>no.nav.tjenester.fim</groupId>
-				<artifactId>nav-fim-aktoer-v2-tjenestespesifikasjon</artifactId>
-				<version>${aktoer.version}</version>
-				<classifier>jaxws</classifier>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.cxf</groupId>
-				<artifactId>cxf-spring-boot-starter-jaxws</artifactId>
-				<version>${cxf.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.cxf</groupId>
-				<artifactId>cxf-rt-ws-security</artifactId>
-				<version>${cxf.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.auth0</groupId>
-				<artifactId>java-jwt</artifactId>
-				<version>${java-jwt.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>no.nav.sbl</groupId>
-				<artifactId>pensjon-sak-v1-tjenestespesifikasjon</artifactId>
-				<version>1.0.3</version>
-			</dependency>
-			<dependency>
-				<groupId>no.nav.abac.policies</groupId>
-				<artifactId>abac-common-attributes-alfa</artifactId>
-				<version>4.0.3</version>
-			</dependency>
-			<dependency>
-				<groupId>no.nav.abac.policies</groupId>
-				<artifactId>abac-saf-policies-alfa</artifactId>
-				<version>4.1.1</version>
 			</dependency>
 			<dependency>
 				<groupId>net.logstash.logback</groupId>
@@ -113,16 +52,6 @@
 				<artifactId>lombok</artifactId>
 				<version>${lombok.version}</version>
 				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>io.springfox</groupId>
-				<artifactId>springfox-swagger2</artifactId>
-				<version>${io.springfox.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.springfox</groupId>
-				<artifactId>springfox-swagger-ui</artifactId>
-				<version>${io.springfox.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
@@ -146,12 +75,6 @@
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-contract-wiremock</artifactId>
 				<version>1.2.5.RELEASE</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<artifactId>freg-security-test-oidc-tools</artifactId>
-				<groupId>no.nav.freg</groupId>
-				<version>${freg.security.test.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -226,5 +149,23 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>2.22.1</version>
+				<reportSets>
+					<reportSet>
+						<id>integration-tests</id>
+						<reports>
+							<report>failsafe-report-only</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
 
 </project>

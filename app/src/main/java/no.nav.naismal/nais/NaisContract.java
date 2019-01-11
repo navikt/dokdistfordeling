@@ -37,7 +37,7 @@ public class NaisContract {
 	private final List<AbstractDependencyCheck> dependencyCheckList;
 
 	@Inject
-	public NaisContract(List<AbstractDependencyCheck> dependencyCheckList, @Value("dokmot") String appName, @Value("${APP_VERSION:0}") String version) {
+	public NaisContract(List<AbstractDependencyCheck> dependencyCheckList, @Value("naismal") String appName, @Value("${APP_VERSION:0}") String version) {
 		this.dependencyCheckList = new ArrayList<>(dependencyCheckList);
 		this.appName = appName;
 		this.version = version;
