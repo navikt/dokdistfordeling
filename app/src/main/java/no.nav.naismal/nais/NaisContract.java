@@ -1,15 +1,15 @@
 package no.nav.naismal.nais;
 
-import static no.nav.dokmot.prometheus.PrometheusMetrics.isReady;
+import static no.nav.naismal.prometheus.PrometheusMetrics.isReady;
 
 import io.reactivex.Flowable;
 import io.reactivex.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokmot.nais.selftest.AbstractDependencyCheck;
-import no.nav.dokmot.nais.selftest.DependencyCheckResult;
-import no.nav.dokmot.nais.selftest.Importance;
-import no.nav.dokmot.nais.selftest.Result;
-import no.nav.dokmot.nais.selftest.SelftestResult;
+import no.nav.naismal.nais.selftest.AbstractDependencyCheck;
+import no.nav.naismal.nais.selftest.DependencyCheckResult;
+import no.nav.naismal.nais.selftest.Importance;
+import no.nav.naismal.nais.selftest.Result;
+import no.nav.naismal.nais.selftest.SelftestResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

@@ -1,6 +1,6 @@
 package no.nav.naismal.nais.selftest;
 
-import static no.nav.dokmot.prometheus.PrometheusMetrics.dependencyPingable;
+import static no.nav.naismal.prometheus.PrometheusMetrics.dependencyPingable;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
