@@ -5,7 +5,7 @@ package no.nav.naismal.nais.selftest;
  */
 public enum Result {
 	
-	OK, WARNING, ERROR;
+	UNPINGABLE, OK, WARNING, ERROR;
 
 
 	

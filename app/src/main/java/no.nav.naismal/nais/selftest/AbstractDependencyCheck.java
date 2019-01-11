@@ -1,17 +1,16 @@
 package no.nav.naismal.nais.selftest;
 
-import static no.nav.naismal.prometheus.PrometheusMetrics.dependencyPingable;
-
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.timelimiter.TimeLimiter;
 import io.github.resilience4j.timelimiter.TimeLimiterConfig;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.vavr.control.Try;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.Callable;
@@ -19,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 /**
@@ -35,18 +35,28 @@ public abstract class AbstractDependencyCheck {
 	protected String address;
 	private final CircuitBreakerRegistry circuitBreakerRegistry;
 	private static final ExecutorService executor = Executors.newSingleThreadExecutor();
-	private final TimeLimiterConfig timeLimiterConfig = TimeLimiterConfig.custom().timeoutDuration(Duration.ofMillis(2800)).cancelRunningFuture(true).build();
+	private final TimeLimiterConfig timeLimiterConfig = TimeLimiterConfig.custom()
+			.timeoutDuration(Duration.ofMillis(2800))
+			.cancelRunningFuture(true)
+			.build();
 	private final TimeLimiter timeLimiter = TimeLimiter.of(timeLimiterConfig);
+	private AtomicInteger dependency_status = new AtomicInteger();
+	private Gauge gauge;
 
-	public AbstractDependencyCheck(DependencyType type, String name, String address, Importance importance) {
+	public AbstractDependencyCheck(DependencyType type, String name, String address, Importance importance, MeterRegistry registry) {
 		this.type = type;
 		this.name = name;
 		this.address = address;
 		this.importance = importance;
 		this.circuitBreakerRegistry = CircuitBreakerRegistry.ofDefaults();
+		this.gauge = Gauge.builder("dok_dependency_ping", dependency_status, AtomicInteger::get)
+				.tags("name", name)
+				.tags("type", type.name())
+				.tags("importance", importance.name())
+				.register(registry);
 	}
 
-	protected abstract void doCheck() throws IOException;
+	protected abstract void doCheck();
 
 	public Try<DependencyCheckResult> check() {
 		final String dependencyName = this.name;
@@ -55,9 +65,9 @@ public abstract class AbstractDependencyCheck {
 		CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(dependencyName);
 		Callable<DependencyCheckResult> chainedCallable = CircuitBreaker.decorateCallable(circuitBreaker, timeRestrictedCall);
 		return Try.ofCallable(chainedCallable)
-				.onSuccess(success -> dependencyPingable.labels(dependencyName).set(1))
+				.onSuccess(success -> dependency_status.set(1))
 				.onFailure(throwable -> {
-					dependencyPingable.labels(dependencyName).dec();
+					dependency_status.set(0);
 					log.error("Call to dependency={} with type={} at url={} timed out or circuitbreaker was tripped.", getName(), getType(), getAddress(), throwable);
 				})
 				.recover(throwable -> DependencyCheckResult.builder()
@@ -66,11 +76,10 @@ public abstract class AbstractDependencyCheck {
 						.type(getType())
 						.importance(getImportance())
 						.result(getImportance().equals(Importance.CRITICAL) ? Result.ERROR : Result.WARNING)
-						.errorMessage("Call to dependency=" + getName() + " timed out or circuitbreaker tripped: " + getErrorMessageFromThrowable(throwable))
+						.errorMessage("Call to dependency=" + getName() + " timed out or circuitbreaker tripped. ErrorMessage=" + getErrorMessageFromThrowable(throwable))
 						.throwable(throwable)
 						.build()
 				);
-
 	}
 
 	public Callable<DependencyCheckResult> getCheckCallable() {
@@ -97,16 +106,8 @@ public abstract class AbstractDependencyCheck {
 	}
 
 	protected String getErrorMessage(Exception e) {
-
 		String message = e.getMessage().trim();
-		String causeMessage;
-
-		if (e.getCause() == null) {
-			causeMessage = ": " + e.getCause().getMessage() + (e.getCause().getCause() == null ? "" : (" - " + e.getCause().getCause().getMessage()));
-		} else {
-			causeMessage = "" + e.getCause().getMessage() + (e.getCause().getCause() == null ? "" : (" - " + e.getCause().getCause().getMessage()));
-		}
-
+		String causeMessage = e.getCause() == null ? "" : ": " + e.getCause().getMessage();
 		return message + causeMessage;
 	}
 

@@ -1,7 +1,7 @@
 package no.nav.naismal.nais;
 
-import static no.nav.naismal.prometheus.PrometheusMetrics.isReady;
-
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.reactivex.Flowable;
 import io.reactivex.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,9 +37,12 @@ public class NaisContract {
 	private final String version;
 	private final List<AbstractDependencyCheck> dependencyCheckList;
 
+	private AtomicInteger app_status = new AtomicInteger();
+
 	@Inject
-	public NaisContract(List<AbstractDependencyCheck> dependencyCheckList, @Value("naismal") String appName, @Value("${APP_VERSION:0}") String version) {
+	public NaisContract(List<AbstractDependencyCheck> dependencyCheckList, MeterRegistry registry, @Value("${APP_NAME:naismal}") String appName, @Value("${APP_VERSION:0}") String version) {
 		this.dependencyCheckList = new ArrayList<>(dependencyCheckList);
+		Gauge.builder("dok_app_is_ready", app_status, AtomicInteger::get).register(registry);
 		this.appName = appName;
 		this.version = version;
 	}
@@ -49,7 +53,7 @@ public class NaisContract {
 	}
 
 	@RequestMapping(value = "/isReady", produces = MediaType.TEXT_PLAIN_VALUE)
-	public ResponseEntity isReady() throws Exception {
+	public ResponseEntity isReady() {
 		List<DependencyCheckResult> results = new ArrayList<>();
 
 		checkCriticalDependencies(results);
@@ -57,17 +61,17 @@ public class NaisContract {
 		if (isAnyVitalDependencyUnhealthy(results.stream()
 				.map(DependencyCheckResult::getResult)
 				.collect(Collectors.toList()))) {
-			isReady.set(-1.0);
+			app_status.set(0);
 			return new ResponseEntity<>(APPLICATION_NOT_READY, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		isReady.set(1.0);
+		app_status.set(1);
 
 		return new ResponseEntity<>(APPLICATION_READY, HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/internal/selftest", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping("/internal/selftest")
 	public @ResponseBody
-	SelftestResult selftest() throws Exception {
+	SelftestResult selftest() {
 		List<DependencyCheckResult> results = new ArrayList<>();
 		checkDependencies(results);
 		return SelftestResult.builder()
@@ -93,7 +97,8 @@ public class NaisContract {
 		return Result.OK;
 	}
 
-	private void checkCriticalDependencies(List<DependencyCheckResult> results) throws Exception {
+
+	private void checkCriticalDependencies(List<DependencyCheckResult> results) {
 
 		Flowable.fromIterable(dependencyCheckList)
 				.filter(dependency -> dependency.getImportance().equals(Importance.CRITICAL))
@@ -103,7 +108,7 @@ public class NaisContract {
 				.sequential().blockingSubscribe(results::add);
 	}
 
-	private void checkDependencies(List<DependencyCheckResult> results) throws Exception {
+	private void checkDependencies(List<DependencyCheckResult> results) {
 
 		Flowable.fromIterable(dependencyCheckList)
 				.parallel()
@@ -111,6 +116,5 @@ public class NaisContract {
 				.map(payload -> payload.check().get())
 				.sequential().blockingSubscribe(results::add);
 	}
-
 
 }
