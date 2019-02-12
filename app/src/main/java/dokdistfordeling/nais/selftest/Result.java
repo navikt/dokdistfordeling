@@ -1,4 +1,4 @@
-package no.nav.naismal.nais.selftest;
+package no.nav.dokdistfordeling.nais.selftest;
 
 /**
  * Created by T133804 on 15.08.2017.

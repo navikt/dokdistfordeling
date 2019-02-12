@@ -1,15 +1,15 @@
-package no.nav.naismal.nais;
+package no.nav.dokdistfordeling.nais;
 
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.reactivex.Flowable;
 import io.reactivex.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.naismal.nais.selftest.AbstractDependencyCheck;
-import no.nav.naismal.nais.selftest.DependencyCheckResult;
-import no.nav.naismal.nais.selftest.Importance;
-import no.nav.naismal.nais.selftest.Result;
-import no.nav.naismal.nais.selftest.SelftestResult;
+import no.nav.dokdistfordeling.nais.selftest.AbstractDependencyCheck;
+import no.nav.dokdistfordeling.nais.selftest.DependencyCheckResult;
+import no.nav.dokdistfordeling.nais.selftest.Importance;
+import no.nav.dokdistfordeling.nais.selftest.Result;
+import no.nav.dokdistfordeling.nais.selftest.SelftestResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,7 +40,7 @@ public class NaisContract {
 	private AtomicInteger app_status = new AtomicInteger();
 
 	@Inject
-	public NaisContract(List<AbstractDependencyCheck> dependencyCheckList, MeterRegistry registry, @Value("${APP_NAME:naismal}") String appName, @Value("${APP_VERSION:0}") String version) {
+	public NaisContract(List<AbstractDependencyCheck> dependencyCheckList, MeterRegistry registry, @Value("${APP_NAME:dokdistfordeling}") String appName, @Value("${APP_VERSION:0}") String version) {
 		this.dependencyCheckList = new ArrayList<>(dependencyCheckList);
 		Gauge.builder("dok_app_is_ready", app_status, AtomicInteger::get).register(registry);
 		this.appName = appName;

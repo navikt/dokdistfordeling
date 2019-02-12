@@ -1,10 +1,10 @@
-package no.nav.naismal.nais.checks;
+package no.nav.dokdistfordeling.nais.checks;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import no.nav.naismal.nais.selftest.AbstractDependencyCheck;
-import no.nav.naismal.nais.selftest.ApplicationNotReadyException;
-import no.nav.naismal.nais.selftest.DependencyType;
-import no.nav.naismal.nais.selftest.Importance;
+import no.nav.dokdistfordeling.nais.selftest.AbstractDependencyCheck;
+import no.nav.dokdistfordeling.nais.selftest.ApplicationNotReadyException;
+import no.nav.dokdistfordeling.nais.selftest.DependencyType;
+import no.nav.dokdistfordeling.nais.selftest.Importance;
 import org.springframework.stereotype.Component;
 @Component
 public class ExampleCheck extends AbstractDependencyCheck {

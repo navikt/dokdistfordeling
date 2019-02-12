@@ -1,4 +1,4 @@
-image: "docker.adeo.no:5000/dok/naismal"
+image: "docker.adeo.no:5000/dok/dokdistfordeling"
 replicas:
   min: 1
   max: 2

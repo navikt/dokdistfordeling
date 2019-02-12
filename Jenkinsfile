@@ -1,5 +1,5 @@
 naisPipeline {
-    applicationName = "naismal"
+    applicationName = "dokdistfordeling"
     dockerfileDir = "."
     deployEnvironmentT = "t6"
 }

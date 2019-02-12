@@ -1,4 +1,4 @@
-package no.nav.naismal.nais.selftest;
+package no.nav.dokdistfordeling.nais.selftest;
 
 public enum DependencyType {
 	SOAP,

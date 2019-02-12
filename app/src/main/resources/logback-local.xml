@@ -15,7 +15,7 @@
 	<logger name="io.lettuce" level="OFF" additivity="false">
 	</logger>
 
-	<logger name="no.nav.naismal" level="INFO" additivity="false">
+	<logger name="no.nav.dokdistfordeling" level="INFO" additivity="false">
 		<appender-ref ref="CONSOLE"/>
 	</logger>
 
