@@ -1,3 +1,4 @@
+team: teamdokumenthandtering
 image: "docker.adeo.no:5000/dok/dokdistfordeling"
 replicas:
   min: 1
