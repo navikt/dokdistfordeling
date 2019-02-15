@@ -14,7 +14,7 @@ import javax.xml.bind.JAXBContext;
  */
 public class Qdist008Route extends SpringRouteBuilder {
 
-	public static final String SERVICE_ID = "QDIST008";
+	public static final String SERVICE_ID = "qdist008";
 
 	private final Qdist008Service qdist008Service;
 	private final DistribuerForsendelseMapper distribuerForsendelseMapper;

@@ -33,6 +33,11 @@
 			<version>${camel.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-spring-boot-starter-jaxws</artifactId>
+			<version>${cxf.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-jaxb</artifactId>
 			<version>${camel.version}</version>
@@ -58,11 +63,20 @@
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<!--Tjenestegrensesnitt-->
 		<dependency>
 			<groupId>no.nav.meldinger.virksomhet</groupId>
 			<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>no.nav.tjenester.brevogarkiv</groupId>
+			<artifactId>arkiverdokumentproduksjon-tjenestespesifikasjon</artifactId>
+			<version>3.4.1</version>
+			<classifier>jaxws</classifier>
+		</dependency>
+
+		<!--test-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

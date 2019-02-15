@@ -30,6 +30,7 @@
 		<junit5.mockito.version>2.23.0</junit5.mockito.version>
 		<resilience4j.version>0.11.0</resilience4j.version>
 		<aws-java-sdk-s3.version>1.11.497</aws-java-sdk-s3.version>
+		<cxf.version>3.3.0</cxf.version>
 	</properties>
 
 	<dependencyManagement>
