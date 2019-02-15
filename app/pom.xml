@@ -38,6 +38,11 @@
 			<version>${cxf.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-ws-security</artifactId>
+			<version>${cxf.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-jaxb</artifactId>
 			<version>${camel.version}</version>
@@ -73,6 +78,12 @@
 			<groupId>no.nav.tjenester.brevogarkiv</groupId>
 			<artifactId>arkiverdokumentproduksjon-tjenestespesifikasjon</artifactId>
 			<version>3.4.1</version>
+			<classifier>jaxws</classifier>
+		</dependency>
+		<dependency>
+			<groupId>no.nav.tjenester.fim</groupId>
+			<artifactId>nav-fim-aktoer-v2-tjenestespesifikasjon</artifactId>
+			<version>${aktoer.version}</version>
 			<classifier>jaxws</classifier>
 		</dependency>
 
