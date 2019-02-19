@@ -20,10 +20,6 @@ resources:
     memory: 1024Mi
 fasitResources:
   used:
-  - alias: dokdistfordeling_qdist008_distribuer_forsendelse
-    resourceType: queue
-  - alias: dokdistsentralprint_qdist009_distribuer_til_sentralprint
-    resourceType: queue
   - alias: DokumenttypeInfo_v4
     resourceType: restservice
   - alias: Aktoer_v2
