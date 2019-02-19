@@ -25,6 +25,10 @@ fasitResources:
     propertyMap:
       username: serviceuser_username
       password: serviceuser_password
+  - alias: dokdistmellomlager_s3_creds
+    resourceType: credential
+  - alias: dokdistmellomlager_s3_storage_crypto
+    resourceType: credential
   - alias: DokumenttypeInfo_v4
     resourceType: restservice
   - alias: Aktoer_v2
