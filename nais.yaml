@@ -29,6 +29,8 @@ fasitResources:
     resourceType: restservice
   - alias: Aktoer_v2
     resourceType: webserviceendpoint
+  - alias: securityTokenService
+    resourceType: baseurl
   - alias: dokdistfordeling_channel
     resourceType: channel
     propertyMap:

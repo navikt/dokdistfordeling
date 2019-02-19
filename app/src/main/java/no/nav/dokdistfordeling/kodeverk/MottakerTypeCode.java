@@ -7,5 +7,5 @@ public enum MottakerTypeCode {
 
 	PERSON,
 	ORGANISASJON,
-	SAMHANDLER_HPR;
+	SAMHANDLER_HPR
 }
