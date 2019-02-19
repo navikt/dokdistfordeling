@@ -20,12 +20,15 @@ resources:
     memory: 1024Mi
 fasitResources:
   used:
+  - alias: srvdokprod
+    resourceType: credential
+    propertyMap:
+      username: serviceuser_username
+      password: serviceuser_password
   - alias: DokumenttypeInfo_v4
     resourceType: restservice
   - alias: Aktoer_v2
     resourceType: webserviceendpoint
-  - alias: dokdistfordelingconfig
-    resourceType: applicationproperties
   - alias: dokdistfordeling_channel
     resourceType: channel
     propertyMap:
