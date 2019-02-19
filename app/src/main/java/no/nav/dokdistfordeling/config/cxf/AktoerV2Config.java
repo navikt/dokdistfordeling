@@ -23,7 +23,7 @@ public class AktoerV2Config {
 
 	@Bean
 	public AktoerV2 aktoerV2(STSConfig stsConfig,
-							 @Value("${aktoerv2.v2.endpointurl}") String aktoerV2Url) {
+							 @Value("${aktoer.v2.endpointurl}") String aktoerV2Url) {
 		JaxWsProxyFactoryBean clientFactory = new JaxWsProxyFactoryBean();
 		clientFactory.setServiceClass(AktoerV2.class);
 		clientFactory.setAddress(aktoerV2Url);

@@ -3,8 +3,9 @@ package no.nav.dokdistfordeling.qdist008;
 import static java.lang.String.format;
 
 import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
-import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
+import no.nav.dokdistfordeling.kodeverk.MottakerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.TemaCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.Adresse;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 public class DistribuerForsendelseMapper {
 
 	@Handler
-	public DistribuerForsendelseTo map(DistribuerForsendelse distribuerForsendelse) throws DokdistfordelingFunctionalException {
+	public DistribuerForsendelseTo map(DistribuerForsendelse distribuerForsendelse) {
 		try {
 			return DistribuerForsendelseTo.builder()
 					.distribusjonbestilling(mapDokumentbestillingsinformasjon(distribuerForsendelse.getDistribusjonbestilling()))
@@ -65,7 +66,6 @@ public class DistribuerForsendelseMapper {
 				.build();
 	}
 
-
 	private DistribuerForsendelseTo.ArkivInformasjonTo mapArkivInformasjon(ArkivInformasjon arkivInformasjon) {
 		return DistribuerForsendelseTo.ArkivInformasjonTo.builder()
 				.arkivSystem(stringToEnum(ArkivSystemCode.class, arkivInformasjon.getArkivSystem()))
@@ -73,37 +73,43 @@ public class DistribuerForsendelseMapper {
 				.build();
 	}
 
-	private DistribuerForsendelseTo.AktoerTo mapAktoer(Aktoer mottaker) {
+	private DistribuerForsendelseTo.MottakerTo mapAktoer(Aktoer mottaker) {
 		if (mottaker instanceof Person) {
 			Person person = (Person) mottaker;
-			return DistribuerForsendelseTo.PersonTo.builder()
+			return DistribuerForsendelseTo.MottakerTo.builder()
 					.navn(person.getNavn())
-					.personidentifikator(person.getPersonidentifikator())
+					.identifikator(person.getPersonidentifikator())
+					.mottakerType(MottakerTypeCode.PERSON)
+					.identifikatorAktoerId(false)
 					.build();
 		} else if (mottaker instanceof Organisasjon) {
 			Organisasjon organisasjon = (Organisasjon) mottaker;
-			return DistribuerForsendelseTo.OrganisasjonTo.builder()
+			return DistribuerForsendelseTo.MottakerTo.builder()
 					.navn(organisasjon.getNavn())
-					.orgnummer(organisasjon.getOrgnummer())
+					.identifikator(organisasjon.getOrgnummer())
+					.mottakerType(MottakerTypeCode.ORGANISASJON)
+					.identifikatorAktoerId(false)
 					.build();
 		} else if (mottaker instanceof AktoerId) {
 			AktoerId aktoerId = (AktoerId) mottaker;
-			return DistribuerForsendelseTo.AktoerIdTo.builder()
+			return DistribuerForsendelseTo.MottakerTo.builder()
 					.navn(aktoerId.getNavn())
 					.identifikator(aktoerId.getAktoerId())
+					.mottakerType(MottakerTypeCode.PERSON)
+					.identifikatorAktoerId(true)
 					.build();
 		} else if (mottaker instanceof Samhandler) {
 			Samhandler samhandler = (Samhandler) mottaker;
-			return DistribuerForsendelseTo.SamhandlerTo.builder()
+			return DistribuerForsendelseTo.MottakerTo.builder()
 					.navn(samhandler.getNavn())
-					.samhandleridentifikator(samhandler.getSamhandleridentifikator())
-					.samhandlerkategori(stringToEnum(SamhandlerKategoriCode.class, samhandler.getSamhandlerkategori()))
+					.identifikator(samhandler.getSamhandleridentifikator())
+					.mottakerType(mapSamhandlerKategoriToSamhandlerType(samhandler.getSamhandlerkategori()))
+					.identifikatorAktoerId(false)
 					.build();
 		} else {
 			throw new IllegalArgumentException(format("Ugyldig type for mottaker %s", mottaker.getClass().getName()));
 		}
 	}
-
 
 	private DistribuerForsendelseTo.AdresseTo mapAdresse(Adresse adresse) {
 		if (adresse == null) {
@@ -127,7 +133,17 @@ public class DistribuerForsendelseMapper {
 					.land(utenlandskPostadresse.getLand())
 					.build();
 		} else {
-			throw new IllegalArgumentException(format("Ugyldig type for adresse %s", adresse.getClass().getName()));
+			throw new IllegalArgumentException("Ugyldig adressetype. Adresse er ikke en gyldig NorskPostadresse eller UtenlandskPostadresse");
+		}
+	}
+
+	private MottakerTypeCode mapSamhandlerKategoriToSamhandlerType(String samhandlerKategori) {
+		if (samhandlerKategori == null) {
+			throw new ValidationException("Ugyldig input: samhandlerkategori kan ikke være null");
+		} else if (SamhandlerKategoriCode.HPR.name().equals(samhandlerKategori)) {
+			return MottakerTypeCode.SAMHANDLER_HPR;
+		} else {
+			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
 		}
 	}
 
@@ -137,5 +153,9 @@ public class DistribuerForsendelseMapper {
 		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException(format("%s er ikke en gyldig kodeverdi for %s", enumName, enumClass));
 		}
+	}
+
+	private enum SamhandlerKategoriCode {
+		HPR
 	}
 }

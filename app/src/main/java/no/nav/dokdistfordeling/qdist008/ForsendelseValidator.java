@@ -7,6 +7,8 @@ import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
@@ -19,6 +21,7 @@ public class ForsendelseValidator {
 		assertThatForsendelseIsNotPreviouslyProcessed(distribusjonbestillingTo);
 		assertThatForsendelseContainsExactlyOneHoveddokument(distribusjonbestillingTo);
 		assertThatAdresseIsPresentIfMottakerIsSamhandler(distribusjonbestillingTo);
+		assertThatBestillingsIdIsAValidUuid(distribusjonbestillingTo.getBestillingsId());
 	}
 
 	private void assertThatForsendelseIsNotPreviouslyProcessed(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
@@ -39,11 +42,18 @@ public class ForsendelseValidator {
 	}
 
 	private void assertThatAdresseIsPresentIfMottakerIsSamhandler(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
-		if (distribusjonbestillingTo.getMottaker() instanceof DistribuerForsendelseTo.SamhandlerTo) {
-			if (distribusjonbestillingTo.getAdresse() == null) {
-				throw new ValidationException("Mottaker er av typen samhandler. Da er adresse et påkrevd felt i input til qdist008. Fant ingen adresse på bestilling");
-			}
+		if (distribusjonbestillingTo.getMottaker().isSamhandler() && distribusjonbestillingTo.getAdresse() == null) {
+			throw new ValidationException("Mottaker er av typen samhandler. Da er adresse et påkrevd felt i input til qdist008. Fant ingen adresse på bestilling");
 		}
+	}
+
+	private void assertThatBestillingsIdIsAValidUuid(String bestillingsId) {
+		try {
+			UUID.fromString(bestillingsId);
+		} catch (IllegalArgumentException exception) {
+			throw new IllegalArgumentException(format("bestillingsId er ikke en gyldig UUID (universally unique identifier). Fikk bestilling=%s", bestillingsId));
+		}
+
 	}
 
 }

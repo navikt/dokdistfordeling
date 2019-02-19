@@ -3,7 +3,9 @@ package no.nav.dokdistfordeling.kodeverk;
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
-public enum SamhandlerKategoriCode {
+public enum MottakerTypeCode {
 
-	HPR;
+	PERSON,
+	ORGANISASJON,
+	SAMHANDLER_HPR;
 }

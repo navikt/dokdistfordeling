@@ -1,16 +1,15 @@
 package no.nav.dokdistfordeling.consumer.tjoark110;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
-@Data
+@Value
 @Builder
-@AllArgsConstructor
 public class SettJournalpostAttributterRequestTo {
+
 	private final String journalpostId;
 	private final String utsendingskanal;
 }

@@ -7,6 +7,7 @@ import org.apache.camel.spring.SpringRouteBuilder;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -19,13 +20,15 @@ public class Qdist008Route extends SpringRouteBuilder {
 	private final Qdist008Service qdist008Service;
 	private final DistribuerForsendelseMapper distribuerForsendelseMapper;
 	private final ForsendelseValidator forsendelseValidator;
+	private final DokdistStatusUpdater dokdistStatusUpdater;
 
 	@Inject
 	public Qdist008Route(Qdist008Service qdist008Service,
-						 DistribuerForsendelseMapper distribuerForsendelseMapper, ForsendelseValidator forsendelseValidator) {
+						 DistribuerForsendelseMapper distribuerForsendelseMapper, ForsendelseValidator forsendelseValidator, DokdistStatusUpdater dokdistStatusUpdater) {
 		this.qdist008Service = qdist008Service;
 		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
 		this.forsendelseValidator = forsendelseValidator;
+		this.dokdistStatusUpdater = dokdistStatusUpdater;
 	}
 
 	@Override
@@ -43,16 +46,17 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.bean(distribuerForsendelseMapper)
 				.bean(forsendelseValidator)
 				.bean(qdist008Service)
-//				.setProperty(PROPERTY_FORSENDELSE_ID, simple("${body.forsendelseId}"))
-//				.marshal(new JaxbDataFormat(JAXBContext.newInstance(KlargjoerForArkivering.class)))
-//				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
+//				.setProperty(PROPERTY_FORSENDELSE_ID, simple("${body.bestillingsId}"))
+				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelseTilSentralPrint.class)))
+				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
 //				.inOnly("jms:" + qdok002 + "?messageConverter=#mdcMessageConverter")
+				.bean(dokdistStatusUpdater)
 				.log(LoggingLevel.INFO, log, "qdist008 har lagt dokumentbestilling med " + getIdsForLogging() + " på kø til qdist009 for print-distribusjon");
 	}
 
 	public static String getIdsForLogging() {
 		return "";
 //				"bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}, " +
-//				"forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "}";
+//				"bestillingsId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "}";
 	}
 }
