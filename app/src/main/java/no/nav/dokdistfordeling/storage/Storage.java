@@ -4,9 +4,9 @@ import java.util.Optional;
 
 public interface Storage {
 
-    void put(String directory, String key, String value);
+	void put(String key, String value);
 
-    Optional<String> get(String directory, String key);
+	Optional<String> get(String key);
 
-    void delete(String directory, String key);
+	void delete(String key);
 }

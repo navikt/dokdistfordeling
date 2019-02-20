@@ -87,7 +87,7 @@ public class DistribuerForsendelseTo {
 	@Builder
 	public static class ArkivInformasjonTo {
 		private final ArkivSystemCode arkivSystem;
-		private final String arkivKode;
+		private final String arkivId;
 	}
 
 	@Value

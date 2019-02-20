@@ -66,7 +66,7 @@ public class ForsendelseToRequestMapper {
 	private ForsendelseRequestTo.ArkivInformasjonTo mapArkivInformasjon(DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon) {
 		return arkivInformasjon == null ? null : ForsendelseRequestTo.ArkivInformasjonTo.builder()
 				.arkivSystem(arkivInformasjon.getArkivSystem())
-				.arkivId(arkivInformasjon.getArkivKode())
+				.arkivId(arkivInformasjon.getArkivId())
 				.build();
 	}
 

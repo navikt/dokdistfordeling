@@ -69,7 +69,7 @@ public class DistribuerForsendelseMapper {
 	private DistribuerForsendelseTo.ArkivInformasjonTo mapArkivInformasjon(ArkivInformasjon arkivInformasjon) {
 		return DistribuerForsendelseTo.ArkivInformasjonTo.builder()
 				.arkivSystem(stringToEnum(ArkivSystemCode.class, arkivInformasjon.getArkivSystem()))
-				.arkivKode(arkivInformasjon.getArkivKode())
+				.arkivId(arkivInformasjon.getArkivId())
 				.build();
 	}
 

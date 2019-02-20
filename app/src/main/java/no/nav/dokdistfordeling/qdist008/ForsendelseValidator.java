@@ -4,6 +4,7 @@ import static java.lang.String.format;
 
 import no.nav.dokdistfordeling.exception.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
+import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,12 @@ import java.util.UUID;
 @Component
 public class ForsendelseValidator {
 
+	private final Storage storage;
+
+	public ForsendelseValidator(Storage storage) {
+		this.storage = storage;
+	}
+
 	@Handler
 	public void validate(DistribuerForsendelseTo distribuerForsendelseTo) {
 		final DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo = distribuerForsendelseTo.getDistribusjonbestilling();
@@ -22,6 +29,7 @@ public class ForsendelseValidator {
 		assertThatForsendelseContainsExactlyOneHoveddokument(distribusjonbestillingTo);
 		assertThatAdresseIsPresentIfMottakerIsSamhandler(distribusjonbestillingTo);
 		assertThatBestillingsIdIsAValidUuid(distribusjonbestillingTo.getBestillingsId());
+		assertThatDocumentsAreAvailableInS3(distribusjonbestillingTo);
 	}
 
 	private void assertThatForsendelseIsNotPreviouslyProcessed(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
@@ -53,7 +61,17 @@ public class ForsendelseValidator {
 		} catch (IllegalArgumentException exception) {
 			throw new IllegalArgumentException(format("bestillingsId er ikke en gyldig UUID (universally unique identifier). Fikk bestilling=%s", bestillingsId));
 		}
+	}
 
+	private void assertThatDocumentsAreAvailableInS3(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
+		distribusjonbestillingTo.getDokumenter()
+				.forEach(dokumentInformasjonTo -> {
+					//Todo: Fjern put - kun for test!
+					storage.put(dokumentInformasjonTo.getDokumentObjektReferanse(),"TESTPUT22");
+					storage.get(dokumentInformasjonTo.getDokumentObjektReferanse())
+							.orElseThrow(() -> new ValidationException(format("Kunne ikke finne dokument i S3 på key=dokumentObjektReferanse=%s", dokumentInformasjonTo
+									.getDokumentObjektReferanse())));
+				});
 	}
 
 }

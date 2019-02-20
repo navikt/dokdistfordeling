@@ -16,6 +16,7 @@ import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import org.apache.camel.Handler;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
+@Service
 public class Qdist008Service {
 
 	private final Aktoer aktoer;
@@ -71,7 +73,7 @@ public class Qdist008Service {
 	}
 
 	private DokumenttypeInfoTo getTittelFromDokkkatIfNotProvided(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
-		if (!isEmpty(distribusjonbestilling.getForsendelseTittel())) {
+		if (isEmpty(distribusjonbestilling.getForsendelseTittel())) {
 			return dokumentkatalogAdmin.getDokumenttypeInfo(getDokumenttypeIdHoveddokument(distribusjonbestilling));
 		} else {
 			return null;
@@ -90,8 +92,8 @@ public class Qdist008Service {
 		final DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon = distribusjonbestilling.getArkivInformasjon();
 		if (arkivInformasjon != null && arkivInformasjon.getArkivSystem().equals(ArkivSystemCode.JOARK)) {
 			arkiverDokumentproduksjon.settJournalpostAttributter(SettJournalpostAttributterRequestTo.builder()
-					.journalpostId(arkivInformasjon.getArkivKode())
-					.utsendingskanal(distribusjonsKanal.name())
+					.journalpostId(arkivInformasjon.getArkivId())
+					.utsendingskanal(distribusjonsKanal.getJoarkUtsendingsKanal())
 					.build());
 		}
 	}

@@ -11,7 +11,7 @@ public class DokdistStatusUpdater {
 
 	@Handler
 	public void doUpdate(){
-		//Todo Update dokkat status
+		//Todo Update dokdist status
 	}
 
 }

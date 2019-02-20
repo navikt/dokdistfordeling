@@ -12,7 +12,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
-//TODO Fixme
 public class Crypto {
 
 	private final SecretKey key;

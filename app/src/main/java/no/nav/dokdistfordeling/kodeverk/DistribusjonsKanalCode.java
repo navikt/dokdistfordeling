@@ -2,13 +2,23 @@ package no.nav.dokdistfordeling.kodeverk;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
+ * <p>
+ * Distribusjonskanaler støttet av dokdistfordeling
  */
 public enum DistribusjonsKanalCode {
 
-	PRINT,
-	SDP,
-	SDP_PRINT,
-	E_HANDEL,
-	PRINT_DITTNAV,
-	DITTNAV
+	/**
+	 * Sentralprint
+	 */
+	PRINT("S");
+
+	private final String joarkUtsendingsKanal;
+
+	DistribusjonsKanalCode(String joarkUtsendingsKanal) {
+		this.joarkUtsendingsKanal = joarkUtsendingsKanal;
+	}
+
+	public String getJoarkUtsendingsKanal() {
+		return this.joarkUtsendingsKanal;
+	}
 }

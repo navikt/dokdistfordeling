@@ -33,7 +33,7 @@
 		<cxf.version>3.3.0</cxf.version>
 		<aktoer.version>2.0.1</aktoer.version>
 		<dokkat-api>10.4.0</dokkat-api>
-
+		<wmq.version>8.0.0.6</wmq.version>
 	</properties>
 
 	<dependencyManagement>

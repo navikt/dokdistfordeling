@@ -5,6 +5,7 @@ import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.exception.DokdistfordelingTechnicalException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -15,6 +16,7 @@ import java.time.Duration;
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
+@Component
 public class ForsendelseConsumer implements Forsendelse {
 
 	private final String forsendelseV1Url;

@@ -42,7 +42,7 @@ public class AktoerV2Consumer implements Aktoer {
 					.foedselsnr(response.getIdent())
 					.build();
 		} catch (HentIdentForAktoerIdPersonIkkeFunnet e) {
-			throw new DokdistfordelingFunctionalException(String.format("Ident ikke funnet for identifikatorAktoerId=%s", aktoerId), e);
+			throw new DokdistfordelingFunctionalException(String.format("Ident ikke funnet for aktoerId=%s", aktoerId), e);
 		} catch (Exception e) {
 			throw new DokdistfordelingTechnicalException(String.format("Teknisk feil mot aktoerV2:HentIdentForAktoerId. AktoerId=%s. Feilmelding=%s", aktoerId, e
 					.getMessage()), e);

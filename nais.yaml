@@ -20,7 +20,7 @@ resources:
     memory: 1024Mi
 fasitResources:
   used:
-  - alias: srvdokprod
+  - alias: srvdokdistfordeling
     resourceType: credential
     propertyMap:
       username: serviceuser_username
@@ -39,4 +39,10 @@ fasitResources:
     resourceType: channel
     propertyMap:
       name: dokdistfordeling_channel_name
+  - alias: mqGateway01
+    resourceType: queueManager
+  - alias: dokdistfordeling_qdist008_dist_forsendels
+    resourceType: queue
+
+
 
