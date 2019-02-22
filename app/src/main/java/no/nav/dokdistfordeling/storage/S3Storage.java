@@ -43,7 +43,6 @@ public class S3Storage implements Storage {
 		try {
 			String encryptedValue = encrypt(value, key);
 			writeString(key, encryptedValue);
-			log.info("persisterte dokument med key=" + key + " til s3");
 		} catch (Exception e) {
 			throw new DokdistfordelingTechnicalException(String.format("Feilet ved sending av dokument til S3. Nøkkel=%s", key), e);
 		}

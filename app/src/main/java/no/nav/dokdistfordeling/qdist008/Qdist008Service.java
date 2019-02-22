@@ -1,13 +1,14 @@
 package no.nav.dokdistfordeling.qdist008;
 
+import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 import static org.springframework.util.StringUtils.isEmpty;
 
 import no.nav.dokdistfordeling.consumer.aktoerv2.Aktoer;
 import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanal;
-import no.nav.dokdistfordeling.consumer.dokdist.rdist001.Forsendelse;
-import no.nav.dokdistfordeling.consumer.dokdist.rdist001.ForsendelseResponseTo;
-import no.nav.dokdistfordeling.consumer.dokdist.rdist001.ForsendelseToRequestMapper;
+import no.nav.dokdistfordeling.consumer.dokdist.rdist001.AdministrerForsendelse;
+import no.nav.dokdistfordeling.consumer.dokdist.rdist001.PersisterForsendelseResponseTo;
+import no.nav.dokdistfordeling.consumer.dokdist.rdist001.PersisterForsendelseToRequestMapper;
 import no.nav.dokdistfordeling.consumer.tjoark110.ArkiverDokumentproduksjon;
 import no.nav.dokdistfordeling.consumer.tjoark110.SettJournalpostAttributterRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
@@ -15,6 +16,7 @@ import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
+import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Service;
 
@@ -31,36 +33,39 @@ public class Qdist008Service {
 	private final ArkiverDokumentproduksjon arkiverDokumentproduksjon;
 	private final DokumentkatalogAdmin dokumentkatalogAdmin;
 	private final BestemDistribusjonskanal bestemDistribusjonskanal;
-	private final Forsendelse forsendelse;
-	private final ForsendelseToRequestMapper forsendelseToRequestMapper;
+	private final AdministrerForsendelse administrerForsendelse;
+	private final PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper;
 
 	@Inject
 	public Qdist008Service(Aktoer aktoer,
 						   ArkiverDokumentproduksjon arkiverDokumentproduksjon,
 						   DokumentkatalogAdmin dokumentkatalogAdmin,
 						   BestemDistribusjonskanal bestemDistribusjonskanal,
-						   Forsendelse forsendelse,
-						   ForsendelseToRequestMapper forsendelseToRequestMapper) {
+						   AdministrerForsendelse administrerForsendelse,
+						   PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper) {
 		this.aktoer = aktoer;
 		this.arkiverDokumentproduksjon = arkiverDokumentproduksjon;
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.bestemDistribusjonskanal = bestemDistribusjonskanal;
-		this.forsendelse = forsendelse;
-		this.forsendelseToRequestMapper = forsendelseToRequestMapper;
+		this.administrerForsendelse = administrerForsendelse;
+		this.persisterForsendelseToRequestMapper = persisterForsendelseToRequestMapper;
 	}
 
 	@Handler
-	public DistribuerForsendelseTilSentralPrint distribuerForsendelseService(DistribuerForsendelseTo distribuerForsendelseTo) {
+	public DistribuerForsendelseTilSentralPrint distribuerForsendelseService(DistribuerForsendelseTo distribuerForsendelseTo, Exchange exchange) {
 		DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling = distribuerForsendelseTo.getDistribusjonbestilling();
 
 		final DokumenttypeInfoTo dokumenttypeInfoTo = getTittelFromDokkkatIfNotProvided(distribusjonbestilling);
 		final HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo = getFoedselsnummerIfMottakerIdentifikatorIsAktoerId(distribusjonbestilling
 				.getMottaker());
 		final DistribusjonsKanalCode distribusjonsKanal = bestemDistribusjonskanal.bestemKanal();
-		ForsendelseResponseTo forsendelseResponseTo = forsendelse.persisterForsendelse(forsendelseToRequestMapper.map(distribusjonbestilling, dokumenttypeInfoTo, hentIdentForAktoerIdResponseTo, distribusjonsKanal));
+		PersisterForsendelseResponseTo persisterForsendelseResponseTo = administrerForsendelse.persisterForsendelse(persisterForsendelseToRequestMapper
+				.map(distribusjonbestilling, dokumenttypeInfoTo, hentIdentForAktoerIdResponseTo, distribusjonsKanal));
+		exchange.setProperty(PROPERTY_FORSENDELSE_ID, persisterForsendelseResponseTo.getForsendelseId());
+
 		updateArkivIfArkivsystemIsJoark(distribusjonbestilling, distribusjonsKanal);
 
-		return new DistribuerForsendelseTilSentralPrint(forsendelseResponseTo.getForsendelseId());
+		return new DistribuerForsendelseTilSentralPrint(persisterForsendelseResponseTo.getForsendelseId());
 	}
 
 	private String getDokumenttypeIdHoveddokument(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {

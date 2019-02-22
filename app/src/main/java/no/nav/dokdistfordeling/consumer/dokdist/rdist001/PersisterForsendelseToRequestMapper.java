@@ -13,18 +13,18 @@ import java.util.stream.Collectors;
  * @author Sigurd Midttun, Visma Consulting.
  */
 @Component
-public class ForsendelseToRequestMapper {
+public class PersisterForsendelseToRequestMapper {
 
-	public ForsendelseRequestTo map(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling,
-									DokumenttypeInfoTo dokumenttypeInfoTo,
-									HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo,
-									DistribusjonsKanalCode distribusjonsKanal) {
+	public PersisterForsendelseRequestTo map(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling,
+											 DokumenttypeInfoTo dokumenttypeInfoTo,
+											 HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo,
+											 DistribusjonsKanalCode distribusjonsKanal) {
 		final DistribuerForsendelseTo.MottakerTo mottaker = distribusjonbestilling.getMottaker();
 		final DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon = distribusjonbestilling.getArkivInformasjon();
 		final DistribuerForsendelseTo.AdresseTo adresse = distribusjonbestilling.getAdresse();
 		final List<DistribuerForsendelseTo.DokumentInformasjonTo> dokumentInformasjonToList = distribusjonbestilling.getDokumenter();
 
-		return ForsendelseRequestTo.builder()
+		return PersisterForsendelseRequestTo.builder()
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
 				.distribusjonsKanal(distribusjonsKanal)
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
@@ -46,8 +46,8 @@ public class ForsendelseToRequestMapper {
 				.getForsendelseTittel();
 	}
 
-	private ForsendelseRequestTo.DokumentTo mapDokument(DistribuerForsendelseTo.DokumentInformasjonTo dokumentInformasjon) {
-		return ForsendelseRequestTo.DokumentTo.builder()
+	private PersisterForsendelseRequestTo.DokumentTo mapDokument(DistribuerForsendelseTo.DokumentInformasjonTo dokumentInformasjon) {
+		return PersisterForsendelseRequestTo.DokumentTo.builder()
 				.tilknyttetSom(dokumentInformasjon.getTilknyttetSom())
 				.dokumentObjektReferanse(dokumentInformasjon.getDokumentObjektReferanse())
 				.arkivDokumentInfoId(dokumentInformasjon.getArkivDokumentInfoId())
@@ -55,23 +55,23 @@ public class ForsendelseToRequestMapper {
 				.build();
 	}
 
-	private ForsendelseRequestTo.MottakerTo mapMottaker(DistribuerForsendelseTo.MottakerTo mottaker, HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo) {
-		return ForsendelseRequestTo.MottakerTo.builder()
+	private PersisterForsendelseRequestTo.MottakerTo mapMottaker(DistribuerForsendelseTo.MottakerTo mottaker, HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo) {
+		return PersisterForsendelseRequestTo.MottakerTo.builder()
 				.mottakerId(getMottakerId(mottaker, hentIdentForAktoerIdResponseTo))
 				.mottakerNavn(mottaker.getNavn())
 				.mottakerType(mottaker.getMottakerType())
 				.build();
 	}
 
-	private ForsendelseRequestTo.ArkivInformasjonTo mapArkivInformasjon(DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon) {
-		return arkivInformasjon == null ? null : ForsendelseRequestTo.ArkivInformasjonTo.builder()
+	private PersisterForsendelseRequestTo.ArkivInformasjonTo mapArkivInformasjon(DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon) {
+		return arkivInformasjon == null ? null : PersisterForsendelseRequestTo.ArkivInformasjonTo.builder()
 				.arkivSystem(arkivInformasjon.getArkivSystem())
 				.arkivId(arkivInformasjon.getArkivId())
 				.build();
 	}
 
-	private ForsendelseRequestTo.PostadresseTo mapPostadresse(DistribuerForsendelseTo.AdresseTo adresse) {
-		return adresse == null ? null : ForsendelseRequestTo.PostadresseTo.builder()
+	private PersisterForsendelseRequestTo.PostadresseTo mapPostadresse(DistribuerForsendelseTo.AdresseTo adresse) {
+		return adresse == null ? null : PersisterForsendelseRequestTo.PostadresseTo.builder()
 				.adresselinje1(adresse.getAdresselinje1())
 				.adresselinje2(adresse.getAdresselinje2())
 				.adresselinje3(adresse.getAdresselinje3())

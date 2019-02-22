@@ -31,6 +31,11 @@ public class JmsConfig {
 		return new MQQueue(qdist008QueueName);
 	}
 
+	@Bean
+	public Queue qdist008FunksjonellFeil(@Value("${dokdistfordeling_qdist008_funk_feil.queuename}") String qdist008FunksjonellFeilQueueName) throws JMSException {
+		return new MQQueue(qdist008FunksjonellFeilQueueName);
+	}
+
 //	Todo: Uncomment when created
 //	@Bean
 //	public Queue qdist008FunksjonellFeil(@Value("${dokdistfordeling_qdist008_funksjonell_feil.queuename}") String qdist008FunksjonellFeil) throws JMSException {

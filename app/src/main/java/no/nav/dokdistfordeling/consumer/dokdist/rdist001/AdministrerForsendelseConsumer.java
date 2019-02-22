@@ -17,15 +17,15 @@ import java.time.Duration;
  * @author Sigurd Midttun, Visma Consulting.
  */
 @Component
-public class ForsendelseConsumer implements Forsendelse {
+public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 
 	private final String forsendelseV1Url;
 	private final RestTemplate restTemplate;
 
 	@Inject
-	public ForsendelseConsumer(@Value("${forsendelse.v1.url}") String forsendelseV1Url,
-							   RestTemplateBuilder restTemplateBuilder,
-							   final ServiceuserAlias serviceuserAlias) {
+	public AdministrerForsendelseConsumer(@Value("${administrerforsendelse.v1.url}") String forsendelseV1Url,
+										  RestTemplateBuilder restTemplateBuilder,
+										  final ServiceuserAlias serviceuserAlias) {
 		this.forsendelseV1Url = forsendelseV1Url;
 		this.restTemplate = restTemplateBuilder
 				.setReadTimeout(Duration.ofSeconds(20))
@@ -34,9 +34,9 @@ public class ForsendelseConsumer implements Forsendelse {
 				.build();
 	}
 
-	public ForsendelseResponseTo persisterForsendelse(final ForsendelseRequestTo forsendelseRequestTo) {
+	public PersisterForsendelseResponseTo persisterForsendelse(final PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
 		try {
-			return ForsendelseResponseTo.builder().forsendelseId("1234").build();
+			return PersisterForsendelseResponseTo.builder().forsendelseId("1234").build();
 			//todo Kommenter inn når tjeneste er på plass
 //			return restTemplate.getForObject(this.forsendelseV1Url, ForsendelseResponseTo.class);
 		} catch (HttpClientErrorException e) {

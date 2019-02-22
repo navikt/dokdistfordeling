@@ -1,13 +1,43 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import lombok.Builder;
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
-@Value
-@Builder
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(
+		name = "DistribuerForsendelseTilSentralPrint",
+		propOrder = {"bestillingsId"}
+)
+@XmlRootElement(
+		namespace = "http://nav.no/melding/virksomhet/dokdistsentralprint",
+		name = "distribuerForsendelseTilSentralPrint"
+)
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class DistribuerForsendelseTilSentralPrint {
-	private final String bestillingsId;
+	@XmlElement(
+			required = true
+	)
+	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+	@XmlSchemaType(
+			name = "bestillingsId"
+	)
+	protected String bestillingsId;
 }

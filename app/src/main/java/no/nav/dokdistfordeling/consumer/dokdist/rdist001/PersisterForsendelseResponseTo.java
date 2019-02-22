@@ -8,6 +8,6 @@ import lombok.Value;
  */
 @Value
 @Builder
-public class ForsendelseResponseTo {
+public class PersisterForsendelseResponseTo {
 	private final String forsendelseId;
 }

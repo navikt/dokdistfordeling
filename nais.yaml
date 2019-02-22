@@ -43,6 +43,8 @@ fasitResources:
     resourceType: queueManager
   - alias: dokdistfordeling_qdist008_dist_forsendels
     resourceType: queue
+  - alias: dokdistfordeling_qdist008_funk_feil
+    resourceType: queue
 
 
 

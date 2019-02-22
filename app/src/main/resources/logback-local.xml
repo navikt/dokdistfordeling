@@ -12,9 +12,6 @@
 		<appender-ref ref="CONSOLE"/>
 	</root>
 
-	<logger name="io.lettuce" level="OFF" additivity="false">
-	</logger>
-
 	<logger name="no.nav.dokdistfordeling" level="DEBUG" additivity="false">
 		<appender-ref ref="CONSOLE"/>
 	</logger>
