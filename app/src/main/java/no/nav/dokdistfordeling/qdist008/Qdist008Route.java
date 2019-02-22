@@ -65,11 +65,14 @@ public class Qdist008Route extends SpringRouteBuilder {
 		from("jms:" + qdist008.getQueueName())
 				.routeId(SERVICE_ID)
 				.setExchangePattern(ExchangePattern.InOnly)
+				.doTry()
+				.setProperty(PROPERTY_BESTILLINGS_ID, xpath("//bestillingsId/text()", String.class))
+				.log(LoggingLevel.INFO, log, "qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
 				.setProperty(PROPERTY_ORIGINAL_PAYLOAD, simple("${body}"))
+				.doCatch(Exception.class)
+				.end()
 				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/distribuerforsendelse.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
-				.setProperty(PROPERTY_BESTILLINGS_ID, simple("${body.distribusjonbestilling.bestillingsId}"))
-				.log(LoggingLevel.INFO, log, "qdist008 har mottatt og unmarshalled forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
 				.bean(distribuerForsendelseMapper)
 				.bean(forsendelseValidator)
 				.log(LoggingLevel.INFO, log, "qdist008 har validert forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} ok.")
@@ -84,7 +87,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 	}
 
 	public static String getIdsForLogging() {
-		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}, " +
+		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} og " +
 				"forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "}";
 	}
 }
