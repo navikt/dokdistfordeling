@@ -46,7 +46,7 @@ public class ArkiverDokumentproduksjonV1Config extends AbstractCxfEndpointConfig
 		setConnectTimeout(arkiverDokumentproduksjonV1Alias.getConnecttimeoutms());
 		addFeature(new WSAddressingFeature());
 		addOutInterceptor(wss4JOutInterceptor(serviceuserAlias));
-		addHandler(new MDCUsernameTokenOutHandler()); //Todo Fix mdc values in
+		addHandler(new MDCUsernameTokenOutHandler());
 
 		return createPort(ArkiverDokumentproduksjonV1.class);
 	}

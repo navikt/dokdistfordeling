@@ -1,9 +1,12 @@
-package no.nav.dokdistfordeling.util;
+package no.nav.dokdistfordeling.constants;
 
 /**
  * @author Ugur Alpay Cenar, Visma Consulting.
  */
-public class RetryConstants {
+public final class RetryConstants {
+
+	private RetryConstants() {
+	}
 
 	//retries: 2s, 10s, 50s, 4.2min, 20.8min, sum = max vente-tid = 26min. maxAttempts inkluderer første forsøk
 	public static final int MAX_ATTEMPTS_LONG = 6;

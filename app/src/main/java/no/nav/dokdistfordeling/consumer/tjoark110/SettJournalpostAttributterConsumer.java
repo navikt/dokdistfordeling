@@ -1,9 +1,9 @@
 package no.nav.dokdistfordeling.consumer.tjoark110;
 
+import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
+import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
+import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
-import static no.nav.dokdistfordeling.util.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.util.RetryConstants.MAX_ATTEMPTS_SHORT;
-import static no.nav.dokdistfordeling.util.RetryConstants.MULTIPLIER_SHORT;
 
 import no.nav.dokdistfordeling.exception.DokdistfordelingTechnicalException;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.ArkiverDokumentproduksjonV1;

@@ -1,10 +1,10 @@
 package no.nav.dokdistfordeling.storage;
 
 import static java.util.stream.Collectors.joining;
+import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
+import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
+import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static no.nav.dokdistfordeling.storage.config.StorageConfiguration.BUCKET_NAME;
-import static no.nav.dokdistfordeling.util.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.util.RetryConstants.MAX_ATTEMPTS_SHORT;
-import static no.nav.dokdistfordeling.util.RetryConstants.MULTIPLIER_SHORT;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AmazonS3Exception;

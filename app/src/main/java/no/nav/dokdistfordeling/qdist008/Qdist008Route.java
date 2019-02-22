@@ -1,5 +1,7 @@
 package no.nav.dokdistfordeling.qdist008;
 
+import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
+
 import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
 import org.apache.camel.ExchangePattern;
@@ -7,6 +9,7 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.ValidationException;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.spring.SpringRouteBuilder;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -25,7 +28,6 @@ public class Qdist008Route extends SpringRouteBuilder {
 	public static final String PROPERTY_ORIGINAL_PAYLOAD = "qdok008OriginalPayload";
 	public static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
 	public static final String PROPERTY_FORSENDELSE_ID = "forsendelseId";
-
 
 	private final Qdist008Service qdist008Service;
 	private final DistribuerForsendelseMapper distribuerForsendelseMapper;
@@ -68,6 +70,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.doTry()
 				.setProperty(PROPERTY_BESTILLINGS_ID, xpath("//bestillingsId/text()", String.class))
 				.log(LoggingLevel.INFO, log, "qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
+				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
 				.setProperty(PROPERTY_ORIGINAL_PAYLOAD, simple("${body}"))
 				.doCatch(Exception.class)
 				.end()
