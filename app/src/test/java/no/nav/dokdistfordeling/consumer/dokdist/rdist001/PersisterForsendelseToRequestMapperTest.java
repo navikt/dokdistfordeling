@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.consumer.dokdist.rdist001;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
@@ -23,7 +24,7 @@ class PersisterForsendelseToRequestMapperTest {
 	private static final String BESTILLENDE_FAGSYSTEM = "bestillendeFagsystem";
 	private static final String ARKIV_ID = "arkivId";
 	private static final String PERSON_IDENTIFIKATOR = "personId";
-	private static final String AKTOER_ID = "aktoerId";
+	private static final String AKTOER_IDENTIFIKATOR = "aktoerId";
 	private static final String ORGNUMMER = "orgnr";
 	private static final String SAMHANDLER_IDENTIFIKATOR = "samhandlerId";
 	private static final String ADRESSELINJE_1 = "adresselinje1";
@@ -56,50 +57,97 @@ class PersisterForsendelseToRequestMapperTest {
 
 	private PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper = new PersisterForsendelseToRequestMapper();
 
+	// Happy path: Person with norsk postaddresse
 	@Test
-	public void shouldMapWithPerson() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = createPersisterForsendelseRequestToWithPerson();
+	public void shouldMapHappyPath() {
+		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder().build(),
+				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
+				HentIdentForAktoerIdResponseTo.builder().build());
+
 		assertCommon(persisterForsendelseRequestTo);
-		assertResponseWithPerson(persisterForsendelseRequestTo);
+		assertMottakerIsPerson(persisterForsendelseRequestTo.getMottaker());
+		assertDokumentInformasjon(persisterForsendelseRequestTo.getDokumenter());
+		assertNorskPostaddresseTo(persisterForsendelseRequestTo.getPostadresse());
 	}
 
 	@Test
 	public void shouldMapWithAktoerId() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = createPersisterForsendelseRequestToWithAktoerId();
-		assertCommon(persisterForsendelseRequestTo);
-		assertResponseWithAktoer(persisterForsendelseRequestTo);
+		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+						.mottaker(createMottakerToWithAktoerId())
+						.build(),
+				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
+				HentIdentForAktoerIdResponseTo.builder().foedselsnr(AKTOER_IDENTIFIKATOR).build());
+
+		assertMottakerIsAktoerId(persisterForsendelseRequestTo.getMottaker());
 	}
+
 
 	@Test
 	public void shouldMapWithOrganisasjonsNr() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = createPersisterForsendelseRequestToWithOrganisasjonsNr();
-		assertCommon(persisterForsendelseRequestTo);
-		assertResponseWithOrganisasjon(persisterForsendelseRequestTo);
+		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+						.mottaker(createMottakerToWithOrganisasjonsNr())
+						.build(),
+				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
+				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
+
+		assertMottakerIsOrganisasjonNr(persisterForsendelseRequestTo.getMottaker());
 	}
 
 	@Test
 	public void shouldMapWithSamhandler() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = createPersisterForsendelseRequestToWithSamhandler();
-		assertCommon(persisterForsendelseRequestTo);
-		assertResponseWithSamhandler(persisterForsendelseRequestTo);
+		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+						.mottaker(createMottakerToWithSamhandler())
+						.build(),
+				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
+				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
+
+		assertMottakerWithSamhandler(persisterForsendelseRequestTo.getMottaker());
 	}
 
 	@Test
 	public void shouldMapWithUtenlandsPostaddresse() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = createPersisterForsendelseRequestToWithUtenlands();
-		assertCommon(persisterForsendelseRequestTo);
-		assertResponseWithPostaddresseUtenlands(persisterForsendelseRequestTo);
+		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+						.adresse(createUtenlandsPostadresseTo())
+						.build(),
+				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
+				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
 
+		assertResponseIsPostaddresseUtenlands(persisterForsendelseRequestTo.getPostadresse());
+	}
+
+	@Test
+	public void shouldMapWithNullAddresse() {
+		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+						.adresse(null)
+						.build(),
+				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
+				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
+
+		assertNull(persisterForsendelseRequestTo.getPostadresse());
 	}
 
 	@Test
 	public void shouldMapWithTomTittel() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = createPersisterForsendelseRequestToWithTomTittel();
-		assertCommon(persisterForsendelseRequestTo);
+		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+						.forsendelseTittel(null)
+						.build(),
+				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
+				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
 		assertResponseWithTomTittel(persisterForsendelseRequestTo);
 	}
 
-	// Common
+	@Test
+	public void shouldMapWithNullArkivinformasjon() {
+		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+						.arkivInformasjon(null)
+						.build(),
+				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
+				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
+
+		assertNull(persisterForsendelseRequestTo.getArkivInformasjon());
+	}
+
+
 	private void assertCommon(PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
 		assertEquals(BATCH_ID, persisterForsendelseRequestTo.getBatchId());
 		assertEquals(BESTILLENDE_FAGSYSTEM, persisterForsendelseRequestTo.getBestillendeFagsystem());
@@ -107,60 +155,26 @@ class PersisterForsendelseToRequestMapperTest {
 		assertEquals(DOKUMENT_PROD_APP, persisterForsendelseRequestTo.getDokumentProdApp());
 		assertEquals(TEMA, persisterForsendelseRequestTo.getTema());
 
-		assertArkivInformasjonTo(persisterForsendelseRequestTo.getArkivInformasjon());
+		assertEquals(ARKIV_ID, persisterForsendelseRequestTo.getArkivInformasjon().getArkivId());
+		assertEquals(ARKIV_SYSTEM_CODE, persisterForsendelseRequestTo.getArkivInformasjon().getArkivSystem());
 	}
 
-	private void assertArkivInformasjonTo(PersisterForsendelseRequestTo.ArkivInformasjonTo arkivInformasjonTo) {
-		assertEquals(ARKIV_ID, arkivInformasjonTo.getArkivId());
-		assertEquals(ARKIV_SYSTEM_CODE, arkivInformasjonTo.getArkivSystem());
-	}
-
-	// Person
-	private void assertResponseWithPerson(PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
-		assertMottakerWithPerson(persisterForsendelseRequestTo.getMottaker());
-		assertDokumentInformasjon(persisterForsendelseRequestTo.getDokumenter());
-		assertPostaddresseTo(persisterForsendelseRequestTo.getPostadresse());
-	}
-
-	private void assertMottakerWithPerson(PersisterForsendelseRequestTo.MottakerTo mottaker) {
+	private void assertMottakerIsPerson(PersisterForsendelseRequestTo.MottakerTo mottaker) {
 		assertEquals(PERSON_MOTTAKER_TYPE_CODE, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
 		assertEquals(PERSON_IDENTIFIKATOR, mottaker.getMottakerId());
 	}
 
-	// Aktoer
-	private void assertResponseWithAktoer(PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
-		assertMottakerWithAktoer(persisterForsendelseRequestTo.getMottaker());
-		assertDokumentInformasjon(persisterForsendelseRequestTo.getDokumenter());
-		assertPostaddresseTo(persisterForsendelseRequestTo.getPostadresse());
-	}
-
-	private void assertMottakerWithAktoer(PersisterForsendelseRequestTo.MottakerTo mottaker) {
+	private void assertMottakerIsAktoerId(PersisterForsendelseRequestTo.MottakerTo mottaker) {
 		assertEquals(PERSON_MOTTAKER_TYPE_CODE, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
-		assertEquals(PERSON_IDENTIFIKATOR, mottaker.getMottakerId());
+		assertEquals(AKTOER_IDENTIFIKATOR, mottaker.getMottakerId());
 	}
 
-	// Organisasjon
-	private void assertResponseWithOrganisasjon(PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
-		assertMottakerWithOrganisasjon(persisterForsendelseRequestTo.getMottaker());
-		assertDokumentInformasjon(persisterForsendelseRequestTo.getDokumenter());
-		assertPostaddresseTo(persisterForsendelseRequestTo.getPostadresse());
-		assertEquals(FORSENDELSE_TITTEL, persisterForsendelseRequestTo.getForsendelseTittel());
-	}
-
-	private void assertMottakerWithOrganisasjon(PersisterForsendelseRequestTo.MottakerTo mottaker) {
+	private void assertMottakerIsOrganisasjonNr(PersisterForsendelseRequestTo.MottakerTo mottaker) {
 		assertEquals(ORGANISASJON_MOTTAKER_TYPE_CODE, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
 		assertEquals(ORGNUMMER, mottaker.getMottakerId());
-	}
-
-	// Organisasjon
-	private void assertResponseWithSamhandler(PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
-		assertMottakerWithSamhandler(persisterForsendelseRequestTo.getMottaker());
-		assertDokumentInformasjon(persisterForsendelseRequestTo.getDokumenter());
-		assertPostaddresseTo(persisterForsendelseRequestTo.getPostadresse());
-		assertEquals(FORSENDELSE_TITTEL, persisterForsendelseRequestTo.getForsendelseTittel());
 	}
 
 	private void assertMottakerWithSamhandler(PersisterForsendelseRequestTo.MottakerTo mottaker) {
@@ -169,8 +183,7 @@ class PersisterForsendelseToRequestMapperTest {
 		assertEquals(SAMHANDLER_IDENTIFIKATOR, mottaker.getMottakerId());
 	}
 
-	// NorskPostAddresse
-	private void assertPostaddresseTo(PersisterForsendelseRequestTo.PostadresseTo postadresseTo) {
+	private void assertNorskPostaddresseTo(PersisterForsendelseRequestTo.PostadresseTo postadresseTo) {
 		assertEquals(ADRESSELINJE_1, postadresseTo.getAdresselinje1());
 		assertEquals(ADRESSELINJE_2, postadresseTo.getAdresselinje2());
 		assertEquals(ADRESSELINJE_3, postadresseTo.getAdresselinje3());
@@ -179,27 +192,16 @@ class PersisterForsendelseToRequestMapperTest {
 		assertEquals(LAND_NORGE, postadresseTo.getLandkode());
 	}
 
-	// UtenlandsPostAddresse
-	private void assertResponseWithPostaddresseUtenlands(PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
-		assertMottakerWithOrganisasjon(persisterForsendelseRequestTo.getMottaker());
-		assertDokumentInformasjon(persisterForsendelseRequestTo.getDokumenter());
-		assertPostaddresseUtenlandsTo(persisterForsendelseRequestTo.getPostadresse());
-		assertEquals(FORSENDELSE_TITTEL, persisterForsendelseRequestTo.getForsendelseTittel());
-	}
-
-	private void assertPostaddresseUtenlandsTo(PersisterForsendelseRequestTo.PostadresseTo postadresseTo) {
+	private void assertResponseIsPostaddresseUtenlands(PersisterForsendelseRequestTo.PostadresseTo postadresseTo) {
 		assertEquals(ADRESSELINJE_1, postadresseTo.getAdresselinje1());
 		assertEquals(ADRESSELINJE_2, postadresseTo.getAdresselinje2());
 		assertEquals(ADRESSELINJE_3, postadresseTo.getAdresselinje3());
 		assertEquals(UTLAND, postadresseTo.getLandkode());
 	}
 
-	// Tom tittel
 	private void assertResponseWithTomTittel(PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
-		assertMottakerWithPerson(persisterForsendelseRequestTo.getMottaker());
 		assertDokumentInformasjon(persisterForsendelseRequestTo.getDokumenter());
-		assertPostaddresseTo(persisterForsendelseRequestTo.getPostadresse());
-		assertEquals(FORSENDELSE_TITTEL, persisterForsendelseRequestTo.getForsendelseTittel());
+		assertEquals(DOKUMENTTITTEL, persisterForsendelseRequestTo.getForsendelseTittel());
 	}
 
 	private void assertDokumentInformasjon(List<PersisterForsendelseRequestTo.DokumentTo> dokumenter) {
@@ -218,171 +220,53 @@ class PersisterForsendelseToRequestMapperTest {
 	}
 
 	private List<DistribuerForsendelseTo.DokumentInformasjonTo> createDokumentInformasjonToListe() {
-		return Arrays.asList(DistribuerForsendelseTo.DokumentInformasjonTo.builder()
-						.dokumenttypeId(DOKUMENTTYPE_ID_1)
-						.dokumentObjektReferanse(OBJEKT_REFERANSE_1)
-						.tilknyttetSom(TILKNYTTET_SOM_CODE_1)
-						.arkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_1)
-						.rekkefolge(REKKEFOLGE_1)
-						.build(),
-				DistribuerForsendelseTo.DokumentInformasjonTo.builder()
-						.dokumenttypeId(DOKUMENTTYPE_ID_2)
-						.dokumentObjektReferanse(OBJEKT_REFERANSE_2)
-						.tilknyttetSom(TILKNYTTET_SOM_CODE_2)
-						.arkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_2)
-						.rekkefolge(REKKEFOLGE_2)
-						.build());
+		return Arrays.asList(createFirstDistribuerForsendelseToBuilder().build(),
+				createSecondDistribuerForsendelseToBuilder().build());
 	}
 
-	private PersisterForsendelseRequestTo createPersisterForsendelseRequestToWithPerson() {
+	private PersisterForsendelseRequestTo performMapping(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo,
+														 DokumenttypeInfoTo dokumenttypeInfoTo,
+														 HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo) {
 		return persisterForsendelseToRequestMapper.map(
-				DistribuerForsendelseTo.DistribusjonbestillingTo
-						.builder()
-						.adresse(createNorskPostadresseTo())
-						.arkivInformasjon(createArkivInformasjonTo())
-						.batchId(BATCH_ID)
-						.bestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
-						.bestillingsId(BESTILLINGS_ID)
-						.dokumenter(createDokumentInformasjonToListe())
-						.dokumentProdApp(DOKUMENT_PROD_APP)
-						.forsendelseTittel(FORSENDELSE_TITTEL)
-						.mottaker(createMottakerToWithPerson())
-						.tema(TemaCode.FS22)
-						.build()
-				,
-				DokumenttypeInfoTo.builder()
-						.dokumentTittel(DOKUMENTTITTEL)
-						.build(),
-				HentIdentForAktoerIdResponseTo.builder()
-						.foedselsnr(PERSON_IDENTIFIKATOR)
-						.build(),
+				distribusjonbestillingTo,
+				dokumenttypeInfoTo,
+				hentIdentForAktoerIdResponseTo,
 				DISTRIBUSJONS_KANAL_CODE);
 	}
 
-	private PersisterForsendelseRequestTo createPersisterForsendelseRequestToWithAktoerId() {
-		return persisterForsendelseToRequestMapper.map(
-				DistribuerForsendelseTo.DistribusjonbestillingTo
-						.builder()
-						.adresse(createNorskPostadresseTo())
-						.arkivInformasjon(createArkivInformasjonTo())
-						.batchId(BATCH_ID)
-						.bestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
-						.bestillingsId(BESTILLINGS_ID)
-						.dokumenter(createDokumentInformasjonToListe())
-						.dokumentProdApp(DOKUMENT_PROD_APP)
-						.forsendelseTittel(FORSENDELSE_TITTEL)
-						.mottaker(createMottakerToWithAktoerId())
-						.tema(TemaCode.FS22)
-						.build()
-				,
-				DokumenttypeInfoTo.builder()
-						.dokumentTittel(DOKUMENTTITTEL)
-						.build(),
-				HentIdentForAktoerIdResponseTo.builder()
-						.foedselsnr(PERSON_IDENTIFIKATOR)
-						.build(),
-				DISTRIBUSJONS_KANAL_CODE);
+	private DistribuerForsendelseTo.DistribusjonbestillingTo.DistribusjonbestillingToBuilder createDistribusjonbestillingToBuilder() {
+		return DistribuerForsendelseTo.DistribusjonbestillingTo.builder()
+				.adresse(createNorskPostadresseTo())
+				.arkivInformasjon(createArkivInformasjonTo())
+				.batchId(BATCH_ID)
+				.bestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
+				.bestillingsId(BESTILLINGS_ID)
+				.dokumenter(createDokumentInformasjonToListe())
+				.dokumentProdApp(DOKUMENT_PROD_APP)
+				.forsendelseTittel(FORSENDELSE_TITTEL)
+				.mottaker(createMottakerToWithPerson())
+				.tema(TemaCode.FS22);
 	}
 
-	private PersisterForsendelseRequestTo createPersisterForsendelseRequestToWithSamhandler() {
-		return persisterForsendelseToRequestMapper.map(
-				DistribuerForsendelseTo.DistribusjonbestillingTo
-						.builder()
-						.adresse(createNorskPostadresseTo())
-						.arkivInformasjon(createArkivInformasjonTo())
-						.batchId(BATCH_ID)
-						.bestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
-						.bestillingsId(BESTILLINGS_ID)
-						.dokumenter(createDokumentInformasjonToListe())
-						.dokumentProdApp(DOKUMENT_PROD_APP)
-						.forsendelseTittel(FORSENDELSE_TITTEL)
-						.mottaker(createMottakerToWithSamhandler())
-						.tema(TemaCode.FS22)
-						.build()
-				,
-				DokumenttypeInfoTo.builder()
-						.dokumentTittel(DOKUMENTTITTEL)
-						.build(),
-				HentIdentForAktoerIdResponseTo.builder()
-						.foedselsnr(PERSON_IDENTIFIKATOR)
-						.build(),
-				DISTRIBUSJONS_KANAL_CODE);
+	private DistribuerForsendelseTo.DokumentInformasjonTo.DokumentInformasjonToBuilder createFirstDistribuerForsendelseToBuilder() {
+		return DistribuerForsendelseTo.DokumentInformasjonTo.builder()
+				.dokumenttypeId(DOKUMENTTYPE_ID_1)
+				.dokumentObjektReferanse(OBJEKT_REFERANSE_1)
+				.tilknyttetSom(TILKNYTTET_SOM_CODE_1)
+				.arkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_1)
+				.rekkefolge(REKKEFOLGE_1);
+
+
 	}
 
-	private PersisterForsendelseRequestTo createPersisterForsendelseRequestToWithOrganisasjonsNr() {
-		return persisterForsendelseToRequestMapper.map(
-				DistribuerForsendelseTo.DistribusjonbestillingTo
-						.builder()
-						.adresse(createNorskPostadresseTo())
-						.arkivInformasjon(createArkivInformasjonTo())
-						.batchId(BATCH_ID)
-						.bestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
-						.bestillingsId(BESTILLINGS_ID)
-						.dokumenter(createDokumentInformasjonToListe())
-						.dokumentProdApp(DOKUMENT_PROD_APP)
-						.forsendelseTittel(FORSENDELSE_TITTEL)
-						.mottaker(createMottakerToWithOrganisasjonsNr())
-						.tema(TemaCode.FS22)
-						.build()
-				,
-				DokumenttypeInfoTo.builder()
-						.dokumentTittel(DOKUMENTTITTEL)
-						.build(),
-				HentIdentForAktoerIdResponseTo.builder()
-						.foedselsnr(PERSON_IDENTIFIKATOR)
-						.build(),
-				DISTRIBUSJONS_KANAL_CODE);
+	private DistribuerForsendelseTo.DokumentInformasjonTo.DokumentInformasjonToBuilder createSecondDistribuerForsendelseToBuilder() {
+		return DistribuerForsendelseTo.DokumentInformasjonTo.builder()
+				.dokumenttypeId(DOKUMENTTYPE_ID_2)
+				.dokumentObjektReferanse(OBJEKT_REFERANSE_2)
+				.tilknyttetSom(TILKNYTTET_SOM_CODE_2)
+				.arkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_2)
+				.rekkefolge(REKKEFOLGE_2);
 	}
-
-	private PersisterForsendelseRequestTo createPersisterForsendelseRequestToWithUtenlands() {
-		return persisterForsendelseToRequestMapper.map(
-				DistribuerForsendelseTo.DistribusjonbestillingTo
-						.builder()
-						.adresse(createUtenlandsPostadresseTo())
-						.arkivInformasjon(createArkivInformasjonTo())
-						.batchId(BATCH_ID)
-						.bestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
-						.bestillingsId(BESTILLINGS_ID)
-						.dokumenter(createDokumentInformasjonToListe())
-						.dokumentProdApp(DOKUMENT_PROD_APP)
-						.forsendelseTittel(FORSENDELSE_TITTEL)
-						.mottaker(createMottakerToWithOrganisasjonsNr())
-						.tema(TemaCode.FS22)
-						.build()
-				,
-				DokumenttypeInfoTo.builder()
-						.dokumentTittel(DOKUMENTTITTEL)
-						.build(),
-				HentIdentForAktoerIdResponseTo.builder()
-						.foedselsnr(PERSON_IDENTIFIKATOR)
-						.build(),
-				DISTRIBUSJONS_KANAL_CODE);
-	}
-
-	private PersisterForsendelseRequestTo createPersisterForsendelseRequestToWithTomTittel() {
-		return persisterForsendelseToRequestMapper.map(
-				DistribuerForsendelseTo.DistribusjonbestillingTo
-						.builder()
-						.adresse(createNorskPostadresseTo())
-						.arkivInformasjon(createArkivInformasjonTo())
-						.batchId(BATCH_ID)
-						.bestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
-						.bestillingsId(BESTILLINGS_ID)
-						.dokumenter(createDokumentInformasjonToListe())
-						.dokumentProdApp(DOKUMENT_PROD_APP)
-						.forsendelseTittel(FORSENDELSE_TITTEL)
-						.mottaker(createMottakerToWithPerson())
-						.tema(TemaCode.FS22)
-						.build()
-				,
-				DokumenttypeInfoTo.builder()
-						.build(),
-				HentIdentForAktoerIdResponseTo.builder()
-						.foedselsnr(PERSON_IDENTIFIKATOR)
-						.build(),
-				DISTRIBUSJONS_KANAL_CODE);
-	}
-
 
 	private DistribuerForsendelseTo.MottakerTo createMottakerToWithPerson() {
 		return DistribuerForsendelseTo.MottakerTo.builder()
@@ -395,9 +279,18 @@ class PersisterForsendelseToRequestMapperTest {
 
 	private DistribuerForsendelseTo.MottakerTo createMottakerToWithAktoerId() {
 		return DistribuerForsendelseTo.MottakerTo.builder()
-				.identifikator(AKTOER_ID)
+				.identifikator(AKTOER_IDENTIFIKATOR)
 				.identifikatorAktoerId(true)
 				.mottakerType(PERSON_MOTTAKER_TYPE_CODE)
+				.navn(MOTTAKERNAVN)
+				.build();
+	}
+
+	private DistribuerForsendelseTo.MottakerTo createMottakerToWithOrganisasjonsNr() {
+		return DistribuerForsendelseTo.MottakerTo.builder()
+				.identifikator(ORGNUMMER)
+				.identifikatorAktoerId(false)
+				.mottakerType(ORGANISASJON_MOTTAKER_TYPE_CODE)
 				.navn(MOTTAKERNAVN)
 				.build();
 	}
@@ -407,16 +300,6 @@ class PersisterForsendelseToRequestMapperTest {
 				.identifikator(SAMHANDLER_IDENTIFIKATOR)
 				.identifikatorAktoerId(false)
 				.mottakerType(SAMHANDLER_MOTTAKER_TYPE_CODE)
-				.navn(MOTTAKERNAVN)
-				.build();
-	}
-
-
-	private DistribuerForsendelseTo.MottakerTo createMottakerToWithOrganisasjonsNr() {
-		return DistribuerForsendelseTo.MottakerTo.builder()
-				.identifikator(ORGNUMMER)
-				.identifikatorAktoerId(false)
-				.mottakerType(ORGANISASJON_MOTTAKER_TYPE_CODE)
 				.navn(MOTTAKERNAVN)
 				.build();
 	}
