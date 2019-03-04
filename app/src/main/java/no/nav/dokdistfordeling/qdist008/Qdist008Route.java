@@ -2,7 +2,9 @@ package no.nav.dokdistfordeling.qdist008;
 
 import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.prometheus.Qdist008MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
@@ -24,10 +26,12 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class Qdist008Route extends SpringRouteBuilder {
 
+	public final MeterRegistry registry;
 	public static final String SERVICE_ID = "qdist008";
 	public static final String PROPERTY_ORIGINAL_PAYLOAD = "qdok008OriginalPayload";
 	public static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
 	public static final String PROPERTY_FORSENDELSE_ID = "forsendelseId";
+	public static final String PROPERTY_ORIGINAL_MESSAGE = "originalMessage";
 
 	private final Qdist008Service qdist008Service;
 	private final DistribuerForsendelseMapper distribuerForsendelseMapper;
@@ -41,13 +45,14 @@ public class Qdist008Route extends SpringRouteBuilder {
 						 DistribuerForsendelseMapper distribuerForsendelseMapper,
 						 ForsendelseValidator forsendelseValidator,
 						 DokdistStatusUpdater dokdistStatusUpdater,
-						 Queue qdist008, Queue qdist008FunksjonellFeil) {
+						 Queue qdist008, Queue qdist008FunksjonellFeil, MeterRegistry registry) {
 		this.qdist008Service = qdist008Service;
 		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
 		this.forsendelseValidator = forsendelseValidator;
 		this.dokdistStatusUpdater = dokdistStatusUpdater;
 		this.qdist008 = qdist008;
 		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
+		this.registry = registry;
 	}
 
 	@Override
@@ -66,6 +71,8 @@ public class Qdist008Route extends SpringRouteBuilder {
 
 		from("jms:" + qdist008.getQueueName())
 				.routeId(SERVICE_ID)
+				.routePolicy(new Qdist008MetricsRoutePolicy(registry))
+				.setProperty(PROPERTY_ORIGINAL_MESSAGE, simple("${body}"))
 				.setExchangePattern(ExchangePattern.InOnly)
 				.doTry()
 				.setProperty(PROPERTY_BESTILLINGS_ID, xpath("//bestillingsId/text()", String.class))
