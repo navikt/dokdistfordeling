@@ -50,6 +50,7 @@ public class PersisterForsendelseToRequestMapper {
 		return PersisterForsendelseRequestTo.DokumentTo.builder()
 				.tilknyttetSom(dokumentInformasjon.getTilknyttetSom())
 				.dokumentObjektReferanse(dokumentInformasjon.getDokumentObjektReferanse())
+				.rekkefolge(dokumentInformasjon.getRekkefolge())
 				.arkivDokumentInfoId(dokumentInformasjon.getArkivDokumentInfoId())
 				.dokumenttypeId(dokumentInformasjon.getDokumenttypeId())
 				.build();
