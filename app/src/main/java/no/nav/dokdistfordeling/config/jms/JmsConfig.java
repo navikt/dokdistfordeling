@@ -32,13 +32,13 @@ public class JmsConfig {
 	}
 
 	@Bean
-	public Queue qdist009(@Value("${dokdistfordeling_qdist009_dist_s_print.queuename}") String qdist009QueueName) throws JMSException {
-		return new MQQueue(qdist009QueueName);
+	public Queue qdist008FunksjonellFeil(@Value("${dokdistfordeling_qdist008_funk_feil.queuename}") String qdist008FunksjonellFeil) throws JMSException {
+		return new MQQueue(qdist008FunksjonellFeil);
 	}
 
 	@Bean
-	public Queue qdist008FunksjonellFeil(@Value("${dokdistfordeling_qdist008_funk_feil.queuename}") String qdist008FunksjonellFeil) throws JMSException {
-		return new MQQueue(qdist008FunksjonellFeil);
+	public Queue qdist009(@Value("${dokdistsentralprint_qdist009_dist_s_print.queuename}") String qdist009QueueName) throws JMSException {
+		return new MQQueue(qdist009QueueName);
 	}
 
 	@Bean
