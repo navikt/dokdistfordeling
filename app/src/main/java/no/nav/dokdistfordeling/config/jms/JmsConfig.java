@@ -26,12 +26,12 @@ public class JmsConfig {
 
 	private static final int UTF_8_WITH_PUA = 1208;
 
-	@Bean
+	@Bean(name="qdist008")
 	public Queue qdist008(@Value("${dokdistfordeling_qdist008_dist_forsendels.queuename}") String qdist008QueueName) throws JMSException {
 		return new MQQueue(qdist008QueueName);
 	}
 
-	@Bean
+	@Bean(name="qdist008FunksjonellFeilQueue")
 	public Queue qdist008FunksjonellFeil(@Value("${dokdistfordeling_qdist008_funk_feil.queuename}") String qdist008FunksjonellFeilQueueName) throws JMSException {
 		return new MQQueue(qdist008FunksjonellFeilQueueName);
 	}

@@ -2,6 +2,7 @@ package no.nav.dokdistfordeling.qdist008;
 
 import static java.lang.String.format;
 
+import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.exception.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.storage.Storage;
@@ -25,17 +26,10 @@ public class ForsendelseValidator {
 	@Handler
 	public void validate(DistribuerForsendelseTo distribuerForsendelseTo) {
 		final DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo = distribuerForsendelseTo.getDistribusjonbestilling();
-		assertThatForsendelseIsNotPreviouslyProcessed(distribusjonbestillingTo);
 		assertThatForsendelseContainsExactlyOneHoveddokument(distribusjonbestillingTo);
 		assertThatAdresseIsPresentIfMottakerIsSamhandler(distribusjonbestillingTo);
 		assertThatBestillingsIdIsAValidUuid(distribusjonbestillingTo.getBestillingsId());
 		assertThatDocumentsAreAvailableInS3(distribusjonbestillingTo);
-	}
-
-	private void assertThatForsendelseIsNotPreviouslyProcessed(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
-		/**
-		 * TODO Sjekk at det IKKE finnes innslag i database der DokumentInfo.DistribusjonsId = Distribusjonbestilling.bestillingsId OG DokumentInfo.DokumentStatus <> "OPPRETTET"
-		 */
 	}
 
 	private void assertThatForsendelseContainsExactlyOneHoveddokument(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
@@ -59,7 +53,7 @@ public class ForsendelseValidator {
 		try {
 			UUID.fromString(bestillingsId);
 		} catch (IllegalArgumentException exception) {
-			throw new IllegalArgumentException(format("bestillingsId er ikke en gyldig UUID (universally unique identifier). Fikk bestilling=%s", bestillingsId));
+			throw new DokdistfordelingFunctionalException(format("bestillingsId er ikke en gyldig UUID (universally unique identifier). Fikk bestilling=%s", bestillingsId));
 		}
 	}
 
