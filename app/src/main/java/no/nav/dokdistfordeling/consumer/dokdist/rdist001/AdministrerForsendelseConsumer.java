@@ -1,8 +1,9 @@
 package no.nav.dokdistfordeling.consumer.dokdist.rdist001;
 
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
-import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.exception.DokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.PersisterForsendelseFunctionalException;
+import no.nav.dokdistfordeling.exception.PersisterForsendelseTechnicalException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
@@ -40,10 +41,10 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 			//todo Kommenter inn når tjeneste er på plass
 //			return restTemplate.getForObject(this.forsendelseV1Url, ForsendelseResponseTo.class);
 		} catch (HttpClientErrorException e) {
-			throw new DokdistfordelingFunctionalException(String.format("Kall mot rdist001 feilet funksjonelt med statusKode=%s, feilmelding=%s", e
+			throw new PersisterForsendelseFunctionalException(String.format("Kall mot rdist001 feilet funksjonelt med statusKode=%s, feilmelding=%s", e
 					.getStatusCode(), e.getResponseBodyAsString()), e);
 		} catch (HttpServerErrorException e) {
-			throw new DokdistfordelingTechnicalException(String.format("Kall mot rdist001 feilet teknisk med statusKode=%s, feilmelding=%s", e
+			throw new PersisterForsendelseTechnicalException(String.format("Kall mot rdist001 feilet teknisk med statusKode=%s, feilmelding=%s", e
 					.getStatusCode(), e.getResponseBodyAsString()), e);
 		}
 	}

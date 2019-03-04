@@ -2,7 +2,7 @@ package no.nav.dokdistfordeling.qdist008;
 
 import static java.lang.String.format;
 
-import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.DistribuerForsendelseMapperIllegalArgumentException;
 import no.nav.dokdistfordeling.exception.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.MottakerTypeCode;
@@ -37,7 +37,7 @@ public class DistribuerForsendelseMapper {
 					.distribusjonbestilling(mapDokumentbestillingsinformasjon(distribuerForsendelse.getDistribusjonbestilling()))
 					.build();
 		} catch (IllegalArgumentException e) {
-			throw new DokdistfordelingFunctionalException("Kunne ikke mappe qdist008-XML til domene-objekter for bestillingsId=" +
+			throw new DistribuerForsendelseMapperIllegalArgumentException("Kunne ikke mappe qdist008-XML til domene-objekter for bestillingsId=" +
 					distribuerForsendelse.getDistribusjonbestilling().getBestillingsId(), e);
 		}
 	}
