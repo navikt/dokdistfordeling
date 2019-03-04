@@ -86,11 +86,10 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.bean(qdist008Service)
 				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelseTilSentralPrint.class)))
 				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
-				.log(LoggingLevel.INFO, log, body().toString())
 				.inOnly("jms:" + qdist009.getQueueName())
 				.log(LoggingLevel.INFO, log, "qdist008 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist009 for distribusjon via PRINT")
 				.bean(dokdistStatusUpdater)
-				.log(LoggingLevel.INFO, log, "qdist008 har oppdatert forsendelsestatus i dokdist og avslutter behandling av forsendelse med " + getIdsForLogging());
+				.log(LoggingLevel.INFO, log, "qdist008 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med " + getIdsForLogging());
 	}
 
 	public static String getIdsForLogging() {

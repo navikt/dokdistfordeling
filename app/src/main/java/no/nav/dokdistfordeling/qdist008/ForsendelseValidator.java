@@ -25,17 +25,10 @@ public class ForsendelseValidator {
 	@Handler
 	public void validate(DistribuerForsendelseTo distribuerForsendelseTo) {
 		final DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo = distribuerForsendelseTo.getDistribusjonbestilling();
-		assertThatForsendelseIsNotPreviouslyProcessed(distribusjonbestillingTo);
 		assertThatForsendelseContainsExactlyOneHoveddokument(distribusjonbestillingTo);
 		assertThatAdresseIsPresentIfMottakerIsSamhandler(distribusjonbestillingTo);
 		assertThatBestillingsIdIsAValidUuid(distribusjonbestillingTo.getBestillingsId());
 		assertThatDocumentsAreAvailableInS3(distribusjonbestillingTo);
-	}
-
-	private void assertThatForsendelseIsNotPreviouslyProcessed(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
-		/**
-		 * TODO Sjekk at det IKKE finnes innslag i database der DokumentInfo.DistribusjonsId = Distribusjonbestilling.bestillingsId OG DokumentInfo.DokumentStatus <> "OPPRETTET"
-		 */
 	}
 
 	private void assertThatForsendelseContainsExactlyOneHoveddokument(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
@@ -67,7 +60,7 @@ public class ForsendelseValidator {
 		distribusjonbestillingTo.getDokumenter()
 				.forEach(dokumentInformasjonTo -> {
 					//Todo: Fjern put - kun for test!
-					storage.put(dokumentInformasjonTo.getDokumentObjektReferanse(),"TESTPUT22");
+					storage.put(dokumentInformasjonTo.getDokumentObjektReferanse(), "TESTPUT22");
 					storage.get(dokumentInformasjonTo.getDokumentObjektReferanse())
 							.orElseThrow(() -> new ValidationException(format("Kunne ikke finne dokument i S3 på key=dokumentObjektReferanse=%s", dokumentInformasjonTo
 									.getDokumentObjektReferanse())));
