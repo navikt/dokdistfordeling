@@ -61,7 +61,7 @@ public class ForsendelseValidator {
 		distribusjonbestillingTo.getDokumenter()
 				.forEach(dokumentInformasjonTo -> {
 					//Todo: Fjern put - kun for test!
-					storage.put(dokumentInformasjonTo.getDokumentObjektReferanse(),"TESTPUT22");
+					storage.put(dokumentInformasjonTo.getDokumentObjektReferanse(), "TESTPUT22");
 					storage.get(dokumentInformasjonTo.getDokumentObjektReferanse())
 							.orElseThrow(() -> new ValidationException(format("Kunne ikke finne dokument i S3 på key=dokumentObjektReferanse=%s", dokumentInformasjonTo
 									.getDokumentObjektReferanse())));
