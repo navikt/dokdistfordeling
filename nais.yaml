@@ -31,6 +31,8 @@ fasitResources:
     resourceType: credential
   - alias: DokumenttypeInfo_v4
     resourceType: restservice
+  - alias: administrerforsendelse_v1
+    resourceType: restservice
   - alias: Aktoer_v2
     resourceType: webserviceendpoint
   - alias: securityTokenService
@@ -44,6 +46,8 @@ fasitResources:
   - alias: dokdistfordeling_qdist008_dist_forsendels
     resourceType: queue
   - alias: dokdistfordeling_qdist008_funk_feil
+    resourceType: queue
+  - alias: dokdistsentralprint_qdist009_dist_s_print
     resourceType: queue
 
 

@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.consumer.dokdist.rdist001;
+package no.nav.dokdistfordeling.consumer.rdist001;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -6,4 +6,6 @@ package no.nav.dokdistfordeling.consumer.dokdist.rdist001;
 public interface AdministrerForsendelse {
 
 	PersisterForsendelseResponseTo persisterForsendelse(final PersisterForsendelseRequestTo persisterForsendelseRequestTo);
+
+	void oppdaterForsendelseStatus(String forsendelseId, String forsendelseStatus, String bestillingsId);
 }

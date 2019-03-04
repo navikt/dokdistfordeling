@@ -25,15 +25,16 @@ import java.nio.charset.StandardCharsets;
 public class Qdist008Route extends SpringRouteBuilder {
 
 	public static final String SERVICE_ID = "qdist008";
-	public static final String PROPERTY_ORIGINAL_PAYLOAD = "qdok008OriginalPayload";
-	public static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
-	public static final String PROPERTY_FORSENDELSE_ID = "forsendelseId";
+	private static final String PROPERTY_ORIGINAL_PAYLOAD = "qdok008OriginalPayload";
+	static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
+	static final String PROPERTY_FORSENDELSE_ID = "forsendelseId";
 
 	private final Qdist008Service qdist008Service;
 	private final DistribuerForsendelseMapper distribuerForsendelseMapper;
 	private final ForsendelseValidator forsendelseValidator;
 	private final DokdistStatusUpdater dokdistStatusUpdater;
 	private final Queue qdist008;
+	private final Queue qdist009;
 	private final Queue qdist008FunksjonellFeil;
 
 	@Inject
@@ -41,12 +42,15 @@ public class Qdist008Route extends SpringRouteBuilder {
 						 DistribuerForsendelseMapper distribuerForsendelseMapper,
 						 ForsendelseValidator forsendelseValidator,
 						 DokdistStatusUpdater dokdistStatusUpdater,
-						 Queue qdist008, Queue qdist008FunksjonellFeil) {
+						 Queue qdist008,
+						 Queue qdist009,
+						 Queue qdist008FunksjonellFeil) {
 		this.qdist008Service = qdist008Service;
 		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
 		this.forsendelseValidator = forsendelseValidator;
 		this.dokdistStatusUpdater = dokdistStatusUpdater;
 		this.qdist008 = qdist008;
+		this.qdist009 = qdist009;
 		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
 	}
 
@@ -83,10 +87,10 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelseTilSentralPrint.class)))
 				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
 				.log(LoggingLevel.INFO, log, body().toString())
-//				.inOnly("jms:" + qdist009 + "?messageConverter=#mdcMessageConverter")
+				.inOnly("jms:" + qdist009.getQueueName())
 				.log(LoggingLevel.INFO, log, "qdist008 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist009 for distribusjon via PRINT")
 				.bean(dokdistStatusUpdater)
-				.log(LoggingLevel.INFO, log, "qdist008 har oppdatert status i dokdist og avslutter behandling av forsendelse med " + getIdsForLogging());
+				.log(LoggingLevel.INFO, log, "qdist008 har oppdatert forsendelsestatus i dokdist og avslutter behandling av forsendelse med " + getIdsForLogging());
 	}
 
 	public static String getIdsForLogging() {

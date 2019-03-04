@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.consumer.dokdist.rdist001;
+package no.nav.dokdistfordeling.consumer.rdist001;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
