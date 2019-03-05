@@ -37,19 +37,15 @@ public class Qdist008Route extends SpringRouteBuilder {
 	private final Queue qdist008;
 	private final Queue qdist009;
 	private final Queue qdist008FunksjonellFeil;
-	private final Queue resultQueue;
 
 	@Inject
 	public Qdist008Route(@Named("qdist008") Queue qdist008,
+						 @Named("qdist009") Queue qdist009,
 						 @Named("qdist008FunksjonellFeilQueue") Queue qdist008FunksjonellFeil,
-						 @Named("qdist008ResultQueue") Queue resultQueue,
 						 Qdist008Service qdist008Service,
 						 DistribuerForsendelseMapper distribuerForsendelseMapper,
 						 ForsendelseValidator forsendelseValidator,
-						 DokdistStatusUpdater dokdistStatusUpdater,
-						 Queue qdist008,
-						 Queue qdist009,
-						 Queue qdist008FunksjonellFeil) {
+						 DokdistStatusUpdater dokdistStatusUpdater) {
 		this.qdist008Service = qdist008Service;
 		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
 		this.forsendelseValidator = forsendelseValidator;
@@ -57,7 +53,6 @@ public class Qdist008Route extends SpringRouteBuilder {
 		this.qdist008 = qdist008;
 		this.qdist009 = qdist009;
 		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
-		this.resultQueue = resultQueue;
 	}
 
 	@Override

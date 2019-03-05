@@ -119,6 +119,9 @@ public class Qdist008IT {
 		stubFor(post("/aktoerv2")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(post("/administrerforsendelse/v1")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
 //		stubFor(post("/dokdiststatusupdater")
 //				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 //						.withBodyFile("brevogarkiv/arkiverDokumentProduksjonHappy.xml"))); // todo add when included

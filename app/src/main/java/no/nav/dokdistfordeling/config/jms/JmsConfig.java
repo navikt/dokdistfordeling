@@ -36,7 +36,7 @@ public class JmsConfig {
 		return new MQQueue(qdist008FunksjonellFeilQueueName);
 	}
 
-	@Bean
+	@Bean(name="qdist009")
 	public Queue qdist009(@Value("${dokdistsentralprint_qdist009_dist_s_print.queuename}") String qdist009QueueName) throws JMSException {
 		return new MQQueue(qdist009QueueName);
 	}
