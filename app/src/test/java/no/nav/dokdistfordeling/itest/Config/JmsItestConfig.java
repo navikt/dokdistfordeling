@@ -25,22 +25,17 @@ public class JmsItestConfig {
 		return new ActiveMQQueue(qdist008QueueName);
 	}
 
+	@Bean(name = "qdist009")
+	public Queue qdist009(@Value("${dokdistsentralprint_qdist009_dist_s_print.queuename}") String qdist008QueueName) {
+		return new ActiveMQQueue(qdist008QueueName);
+	}
+
 	@Bean(name = "qdist008FunksjonellFeilQueue")
 	public Queue qdist008FunksjonellFeilQueue(@Value("${dokdistfordeling_qdist008_funk_feil.queuename}") String qdist008FunksjonellFeil) {
 		return new ActiveMQQueue(qdist008FunksjonellFeil);
 	}
 
-	@Bean(name = "qdist008TekniskFeilQueue")
-	public Queue qdist008TekniskFeilQueue(@Value("${dokdistfordeling_qdist008_tekn_feil.queuename}") String qdist008TekniskFeil) {
-		return new ActiveMQQueue(qdist008TekniskFeil);
-	}
-
-	@Bean(name = "qdist008ResultQueue")
-	public Queue resultQueue(@Value("${dokdistfordeling_qdist008_result.queuename}") String qdist008Result) {
-		return new ActiveMQQueue(qdist008Result);
-	}
-
-	@Bean
+	@Bean(name = "qdist008BackoutQueue")
 	public Queue backoutQueue() {
 		return new ActiveMQQueue("ActiveMQ.DLQ");
 	}

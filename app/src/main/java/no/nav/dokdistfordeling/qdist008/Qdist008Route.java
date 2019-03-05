@@ -67,9 +67,6 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.handled(true)
 				.setBody(exchangeProperty(PROPERTY_ORIGINAL_PAYLOAD))
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
-				.process(exchange -> {
-					System.out.println("Should go here");
-				})
 				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
 
 		from("jms:" + qdist008.getQueueName())

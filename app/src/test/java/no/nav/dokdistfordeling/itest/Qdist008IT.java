@@ -5,18 +5,20 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.util.stream.Collectors.joining;
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.core.Is.is;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 import no.nav.dokdistfordeling.Application;
 import no.nav.dokdistfordeling.itest.Config.ApplicationTestConfig;
@@ -38,6 +40,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import wiremock.org.eclipse.jetty.util.annotation.Name;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -66,8 +69,8 @@ import java.util.concurrent.TimeUnit;
 public class Qdist008IT {
 
 	private static final String CALL_ID = "4321";
-	private static final String BESILLINGSID = "1234";
 	private static final String DOKUMENTTYPE_ID = "1111111";
+	private static final String FORSENDELSE_ID = "30818";
 
 	@Inject
 	private JmsTemplate jmsTemplate;
@@ -77,19 +80,15 @@ public class Qdist008IT {
 	private Queue qdist008;
 
 	@Inject
+	@Named("qdist009")
+	private Queue qdist009;
+
+	@Inject
 	@Named("qdist008FunksjonellFeilQueue")
 	private Queue qdist008FunksjonellFeil;
 
 	@Inject
-	@Named("qdist008TekniskFeilQueue")
-	private Queue qdist008TekniskFeil;
-
-	@Inject
-	@Named("qdist008ResultQueue")
-	private Queue resultQueue;
-
-	@Inject
-//	@Named("qdist008BackoutQueue")
+	@Named("qdist008BackoutQueue")
 	private Queue backoutQueue;
 
 	@Inject
@@ -119,28 +118,27 @@ public class Qdist008IT {
 		stubFor(post("/aktoerv2")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
-		stubFor(post("/administrerforsendelse/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
-//		stubFor(post("/dokdiststatusupdater")
-//				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-//						.withBodyFile("brevogarkiv/arkiverDokumentProduksjonHappy.xml"))); // todo add when included
 		stubFor(post("/arkiverdokumentproduksjon/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("brevogarkiv/arkiverDokumentProduksjonHappy.xml")));
+		stubFor(post("/administrerforsendelse/v1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.withBodyFile("rdist001/administrerForsendelseV1Happy.json")));
+		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"), CALL_ID);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			DistribuerForsendelseTilSentralPrint resultingForsendelse = (DistribuerForsendelseTilSentralPrint) receive(resultQueue);
+			DistribuerForsendelseTilSentralPrint resultingForsendelse = (DistribuerForsendelseTilSentralPrint) receive(qdist009);
 			assertNotNull(resultingForsendelse);
-			assertEquals(resultingForsendelse.getBestillingsId(), BESILLINGSID);
+			assertEquals(resultingForsendelse.getForsendelseId(), FORSENDELSE_ID);
 		});
 
 		verify(getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 		verify(postRequestedFor(urlEqualTo("/aktoerv2")));
-//		verify(postRequestedFor(urlEqualTo("/dokdiststatusupdater"))); // Todo: add when included
 		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1")));
+		verify(postRequestedFor(urlEqualTo("/administrerforsendelse/v1")));
 	}
 
 	@Test
@@ -242,25 +240,26 @@ public class Qdist008IT {
 		stubFor(post("/aktoerv2")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
-//		stubFor(post("/dokdiststatusupdater")
-//				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-//						.withBodyFile("brevogarkiv/arkiverDokumentProduksjonHappy.xml"))); // todo add when included
 		stubFor(post("/arkiverdokumentproduksjon/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
-						.withBody("")));
+						.withBodyFile("brevogarkiv/arkiverDokumentProduksjonTechicalFail.xml")));
+		stubFor(post("/administrerforsendelse/v1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.withBodyFile("rdist001/administrerForsendelseV1Happy.json")));
+		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"), CALL_ID);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			DistribuerForsendelseTilSentralPrint resultingForsendelse = (DistribuerForsendelseTilSentralPrint) receive(backoutQueue);
 			assertNotNull(resultingForsendelse);
-			assertEquals(resultingForsendelse.getBestillingsId(), BESILLINGSID);
+			assertEquals(resultingForsendelse.getForsendelseId(), FORSENDELSE_ID);
 		});
 
 		verify(getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 		verify(postRequestedFor(urlEqualTo("/aktoerv2")));
-//		verify(postRequestedFor(urlEqualTo("/dokdiststatusupdater"))); // Todo: add when included
-		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1")));
+
 	}
 
 	// todo: when included
@@ -286,7 +285,7 @@ public class Qdist008IT {
 		Object response = jmsTemplate.receiveAndConvert(queue);
 		try {
 			return unmarshaller.unmarshal(new StringReader(response.toString()));
-		} catch (Exception e){
+		} catch (Exception e) {
 			return response.toString();
 		}
 	}
