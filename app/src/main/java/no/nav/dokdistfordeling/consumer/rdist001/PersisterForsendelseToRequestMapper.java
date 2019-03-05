@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.consumer.dokdist.rdist001;
+package no.nav.dokdistfordeling.consumer.rdist001;
 
 import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
@@ -50,6 +50,7 @@ public class PersisterForsendelseToRequestMapper {
 		return PersisterForsendelseRequestTo.DokumentTo.builder()
 				.tilknyttetSom(dokumentInformasjon.getTilknyttetSom())
 				.dokumentObjektReferanse(dokumentInformasjon.getDokumentObjektReferanse())
+				.rekkefolge(dokumentInformasjon.getRekkefolge())
 				.arkivDokumentInfoId(dokumentInformasjon.getArkivDokumentInfoId())
 				.dokumenttypeId(dokumentInformasjon.getDokumenttypeId())
 				.build();
