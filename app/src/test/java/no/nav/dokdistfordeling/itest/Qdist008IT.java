@@ -81,9 +81,6 @@ public class Qdist008IT {
 	@Inject
 	private Storage storage;
 
-	public Qdist008IT() throws JAXBException {
-	}
-
 	@BeforeEach
 	public void setupBefore() {
 		reset(storage);
