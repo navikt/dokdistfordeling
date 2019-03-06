@@ -48,10 +48,10 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 					.getBody();
 		} catch (HttpClientErrorException e) {
 			throw new DokdistfordelingFunctionalException(String.format("Kall mot rdist001 feilet funksjonelt med statusKode=%s, feilmelding=%s", e
-					.getStatusCode(), e.getResponseBodyAsString()), e);
+					.getStatusCode(), e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
 			throw new DokdistfordelingTechnicalException(String.format("Kall mot rdist001 feilet teknisk med statusKode=%s, feilmelding=%s", e
-					.getStatusCode(), e.getResponseBodyAsString()), e);
+					.getStatusCode(), e.getMessage()), e);
 		}
 	}
 
@@ -65,10 +65,10 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 			restTemplate.exchange(uri, HttpMethod.PUT, entity, Object.class);
 		} catch (HttpClientErrorException e) {
 			throw new DokdistfordelingFunctionalException(String.format("Kall mot rdist001 feilet funksjonelt med statusKode=%s, feilmelding=%s", e
-					.getStatusCode(), e.getResponseBodyAsString()), e);
+					.getStatusCode(), e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
 			throw new DokdistfordelingTechnicalException(String.format("Kall mot rdist001 feilet teknisk med statusKode=%s, feilmelding=%s", e
-					.getStatusCode(), e.getResponseBodyAsString()), e);
+					.getStatusCode(),e.getMessage()), e);
 		}
 	}
 

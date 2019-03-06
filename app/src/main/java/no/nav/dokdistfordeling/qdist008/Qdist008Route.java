@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.qdist008;
 
 import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
+import static org.apache.camel.LoggingLevel.ERROR;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
@@ -66,15 +67,17 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.maximumRedeliveries(0)
 				.log(log)
 				.logExhaustedMessageBody(true)
-				.loggingLevel(LoggingLevel.ERROR));
+				.loggingLevel(ERROR));
 
 		onException(DokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
-				.setBody(exchangeProperty(PROPERTY_ORIGINAL_PAYLOAD))
+				.useOriginalMessage()
+//				.setBody(exchangeProperty(PROPERTY_ORIGINAL_PAYLOAD))
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
 
-		from("jms:" + qdist008.getQueueName())
+		from("jms:" + qdist008.getQueueName() +
+				"?transacted=true")
 				.routeId(SERVICE_ID)
 				.routePolicy(new Qdist008MetricsRoutePolicy(registry))
 				.setProperty(PROPERTY_ORIGINAL_MESSAGE, simple("${body}"))
