@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
-import no.nav.dokdistfordeling.exception.DokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.DokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.storage.crypto.Crypto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import java.io.ByteArrayInputStream;
 @ContextConfiguration(classes = S3StorageTest.Config.class)
 public class S3StorageTest {
 
-	private final byte[] pdf = "PDF test document" .getBytes();
+	private final byte[] pdf = "PDF test document".getBytes();
 	private static final String encryptPsw = "psw";
 	private final String key = "test_key-asdsdasdsad";
 
