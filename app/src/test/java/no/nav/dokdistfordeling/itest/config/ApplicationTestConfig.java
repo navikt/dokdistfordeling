@@ -1,10 +1,8 @@
-package no.nav.dokdistfordeling.itest.Config;
+package no.nav.dokdistfordeling.itest.config;
 
 import static org.mockito.Mockito.mock;
 
 import no.nav.dokdistfordeling.storage.Storage;
-import org.apache.camel.CamelContext;
-import org.apache.camel.ProducerTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;

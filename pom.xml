@@ -130,18 +130,6 @@
 				<version>${activemq.version}</version>
 				<scope>test</scope>
 			</dependency>
-			<dependency>
-				<groupId>org.apache.activemq</groupId>
-				<artifactId>activemq-spring</artifactId>
-				<version>${activemq.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.activemq</groupId>
-				<artifactId>activemq-client</artifactId>
-				<version>${activemq.version}</version>
-				<scope>test</scope>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

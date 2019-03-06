@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.itest.Config;
+package no.nav.dokdistfordeling.itest.config;
 
 
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;

@@ -39,20 +39,20 @@ public class Qdist008Route extends SpringRouteBuilder {
 	private final Queue qdist008FunksjonellFeil;
 
 	@Inject
-	public Qdist008Route(@Named("qdist008") Queue qdist008,
-						 @Named("qdist009") Queue qdist009,
-						 @Named("qdist008FunksjonellFeilQueue") Queue qdist008FunksjonellFeil,
+	public Qdist008Route(Queue qdist008,
+						 Queue qdist009,
+						 Queue qdist008FunksjonellFeil,
 						 Qdist008Service qdist008Service,
 						 DistribuerForsendelseMapper distribuerForsendelseMapper,
 						 ForsendelseValidator forsendelseValidator,
 						 DokdistStatusUpdater dokdistStatusUpdater) {
+		this.qdist008 = qdist008;
+		this.qdist009 = qdist009;
+		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
 		this.qdist008Service = qdist008Service;
 		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
 		this.forsendelseValidator = forsendelseValidator;
 		this.dokdistStatusUpdater = dokdistStatusUpdater;
-		this.qdist008 = qdist008;
-		this.qdist009 = qdist009;
-		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
 	}
 
 	@Override
@@ -69,7 +69,8 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
 
-		from("jms:" + qdist008.getQueueName())
+		from("jms:" + qdist008.getQueueName()+
+				"?transacted=true")
 				.routeId(SERVICE_ID)
 				.setExchangePattern(ExchangePattern.InOnly)
 				.doTry()

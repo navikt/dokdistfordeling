@@ -20,23 +20,24 @@ import javax.jms.Queue;
 /**
  * @author Sigurd Midttun, Visma Consulting AS
  */
-@Configuration
 @Profile("nais")
+@Configuration
 public class JmsConfig {
 
 	private static final int UTF_8_WITH_PUA = 1208;
 
-	@Bean(name="qdist008")
+
+	@Bean
 	public Queue qdist008(@Value("${dokdistfordeling_qdist008_dist_forsendels.queuename}") String qdist008QueueName) throws JMSException {
 		return new MQQueue(qdist008QueueName);
 	}
 
-	@Bean(name="qdist008FunksjonellFeilQueue")
+	@Bean
 	public Queue qdist008FunksjonellFeil(@Value("${dokdistfordeling_qdist008_funk_feil.queuename}") String qdist008FunksjonellFeilQueueName) throws JMSException {
 		return new MQQueue(qdist008FunksjonellFeilQueueName);
 	}
 
-	@Bean(name="qdist009")
+	@Bean
 	public Queue qdist009(@Value("${dokdistsentralprint_qdist009_dist_s_print.queuename}") String qdist009QueueName) throws JMSException {
 		return new MQQueue(qdist009QueueName);
 	}

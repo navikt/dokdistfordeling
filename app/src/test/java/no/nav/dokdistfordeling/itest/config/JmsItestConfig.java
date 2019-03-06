@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.itest.Config;
+package no.nav.dokdistfordeling.itest.config;
 
 
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -20,31 +20,30 @@ import javax.jms.Queue;
 @Profile("itest")
 public class JmsItestConfig {
 
-	@Bean(name = "qdist008")
+	@Bean
 	public Queue qdist008(@Value("${dokdistfordeling_qdist008_dist_forsendels.queuename}") String qdist008QueueName) {
 		return new ActiveMQQueue(qdist008QueueName);
 	}
 
-	@Bean(name = "qdist009")
-	public Queue qdist009(@Value("${dokdistsentralprint_qdist009_dist_s_print.queuename}") String qdist008QueueName) {
-		return new ActiveMQQueue(qdist008QueueName);
-	}
-
-	@Bean(name = "qdist008FunksjonellFeilQueue")
-	public Queue qdist008FunksjonellFeilQueue(@Value("${dokdistfordeling_qdist008_funk_feil.queuename}") String qdist008FunksjonellFeil) {
+	@Bean
+	public Queue qdist008FunksjonellFeil(@Value("${dokdistfordeling_qdist008_funk_feil.queuename}") String qdist008FunksjonellFeil) {
 		return new ActiveMQQueue(qdist008FunksjonellFeil);
 	}
 
-	@Bean(name = "qdist008BackoutQueue")
+	@Bean
+	public Queue qdist009(@Value("${dokdistsentralprint_qdist009_dist_s_print.queuename}") String qdist009QueueName) {
+		return new ActiveMQQueue(qdist009QueueName);
+	}
+
+	@Bean
 	public Queue backoutQueue() {
 		return new ActiveMQQueue("ActiveMQ.DLQ");
 	}
 
 	@Bean(initMethod = "start", destroyMethod = "stop")
-	public BrokerService broker() throws Exception {
+	public BrokerService broker() {
 		BrokerService service = new BrokerService();
 		service.setPersistent(false);
-
 		return service;
 	}
 
