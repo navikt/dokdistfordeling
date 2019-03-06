@@ -36,6 +36,7 @@
 		<wmq.version>8.0.0.6</wmq.version>
 		<awaitility.version>3.1.2</awaitility.version>
 		<activemq.version>5.15.2</activemq.version>
+		<commons-io.version>2.4</commons-io.version>
 	</properties>
 
 	<dependencyManagement>

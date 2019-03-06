@@ -2,7 +2,7 @@ package no.nav.dokdistfordeling.qdist008;
 
 import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
 
-import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.DokdistfordelingFunctionalException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
@@ -13,7 +13,6 @@ import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
 import java.nio.charset.StandardCharsets;
@@ -69,7 +68,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
 
-		from("jms:" + qdist008.getQueueName()+
+		from("jms:" + qdist008.getQueueName() +
 				"?transacted=true")
 				.routeId(SERVICE_ID)
 				.setExchangePattern(ExchangePattern.InOnly)

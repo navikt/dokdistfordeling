@@ -3,8 +3,10 @@ package no.nav.dokdistfordeling.consumer.rdist001;
 import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
 
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
-import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
-import no.nav.dokdistfordeling.exception.DokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.functional.OppdaterForsendelseFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.PersisterForsendelseFunctionalException;
+import no.nav.dokdistfordeling.exception.technical.OppdaterForsendelseTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.PersisterForsendelseTechnicalException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -30,7 +32,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	private final RestTemplate restTemplate;
 
 	@Inject
-	public AdministrerForsendelseConsumer(@Value("${administrerforsendelse}") String administrerforsendelseV1Url,
+	public AdministrerForsendelseConsumer(@Value("${administrerforsendelse.v1.url}") String administrerforsendelseV1Url,
 										  RestTemplateBuilder restTemplateBuilder,
 										  final ServiceuserAlias serviceuserAlias) {
 		this.administrerforsendelseV1Url = administrerforsendelseV1Url;
@@ -47,11 +49,10 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 			return restTemplate.exchange(this.administrerforsendelseV1Url, HttpMethod.POST, entity, PersisterForsendelseResponseTo.class)
 					.getBody();
 		} catch (HttpClientErrorException e) {
-			throw new DokdistfordelingFunctionalException(String.format("Kall mot rdist001 feilet funksjonelt med statusKode=%s, feilmelding=%s", e
+			throw new PersisterForsendelseFunctionalException(String.format("Kall mot rdist001 feilet funksjonelt med statusKode=%s, feilmelding=%s", e
 					.getStatusCode(), e.getResponseBodyAsString()), e);
 		} catch (HttpServerErrorException e) {
-			throw new DokdistfordelingTechnicalException(String.format("Kall mot rdist001 feilet teknisk med statusKode=%s, feilmelding=%s", e
-					.getStatusCode(), e.getResponseBodyAsString()), e);
+			throw new PersisterForsendelseTechnicalException(String.format("Kall mot rdist001 feilet teknisk med statusKode=%s, feilmelding=%s", e.getStatusCode(), e.getResponseBodyAsString()), e);
 		}
 	}
 
@@ -64,11 +65,10 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 					.toUriString();
 			restTemplate.exchange(uri, HttpMethod.PUT, entity, Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new DokdistfordelingFunctionalException(String.format("Kall mot rdist001 feilet funksjonelt med statusKode=%s, feilmelding=%s", e
+			throw new OppdaterForsendelseFunctionalException(String.format("Kall mot rdist001 feilet funksjonelt med statusKode=%s, feilmelding=%s", e
 					.getStatusCode(), e.getResponseBodyAsString()), e);
 		} catch (HttpServerErrorException e) {
-			throw new DokdistfordelingTechnicalException(String.format("Kall mot rdist001 feilet teknisk med statusKode=%s, feilmelding=%s", e
-					.getStatusCode(), e.getResponseBodyAsString()), e);
+			throw new OppdaterForsendelseTechnicalException(String.format("Kall mot rdist001 feilet teknisk med statusKode=%s, feilmelding=%s", e.getStatusCode(), e.getResponseBodyAsString()), e);
 		}
 	}
 

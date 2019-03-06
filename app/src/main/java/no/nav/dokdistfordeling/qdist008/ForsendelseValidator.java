@@ -2,8 +2,8 @@ package no.nav.dokdistfordeling.qdist008;
 
 import static java.lang.String.format;
 
-import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
-import no.nav.dokdistfordeling.exception.ValidationException;
+import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.camel.Handler;
@@ -53,7 +53,7 @@ public class ForsendelseValidator {
 		try {
 			UUID.fromString(bestillingsId);
 		} catch (IllegalArgumentException exception) {
-			throw new DokdistfordelingFunctionalException(format("bestillingsId er ikke en gyldig UUID (universally unique identifier). Fikk bestilling=%s", bestillingsId));
+			throw new BestillingsIdInvalidUuidFunctionalException(format("bestillingsId er ikke en gyldig UUID (universally unique identifier). Fikk bestilling=%s", bestillingsId));
 		}
 	}
 

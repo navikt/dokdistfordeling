@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.exception;
+package no.nav.dokdistfordeling.exception.technical;
 
 /**
  * @author Jarl Øystein Samseth, Visma Consulting

@@ -10,7 +10,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.S3Object;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.exception.DokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.DokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.storage.crypto.Crypto;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;

@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.storage.crypto;
 
-import no.nav.dokdistfordeling.exception.CryptoException;
+import no.nav.dokdistfordeling.exception.functional.CryptoException;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;
