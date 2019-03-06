@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 
 import no.nav.dokdistfordeling.Application;
 import no.nav.dokdistfordeling.itest.config.ApplicationTestConfig;
-import no.nav.dokdistfordeling.qdist008.DistribuerForsendelseTilSentralPrint;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.http.HttpHeaders;
@@ -41,10 +40,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import javax.inject.Inject;
 import javax.jms.Queue;
 import javax.jms.TextMessage;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -92,9 +89,6 @@ public class Qdist008IT {
 		reset(storage);
 		when(storage.get(any(String.class))).thenReturn(Optional.of(" "));
 	}
-
-	private JAXBContext jaxbContext = JAXBContext.newInstance(DistribuerForsendelseTilSentralPrint.class);
-	private Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
 	@Test
 	public void shouldProcessForsendelse() throws Exception {
