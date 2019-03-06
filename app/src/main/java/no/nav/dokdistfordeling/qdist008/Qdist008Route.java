@@ -57,7 +57,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
-		errorHandler(transactionErrorHandler()
+		errorHandler(defaultErrorHandler()
 				.maximumRedeliveries(0)
 				.log(log)
 				.logExhaustedMessageBody(true)
@@ -69,8 +69,8 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
 
-		from("jms:" + qdist008.getQueueName())
-				.transacted()
+		from("jms:" + qdist008.getQueueName() +
+				"?transacted=true")
 				.routeId(SERVICE_ID)
 				.setExchangePattern(ExchangePattern.InOnly)
 				.doTry()
