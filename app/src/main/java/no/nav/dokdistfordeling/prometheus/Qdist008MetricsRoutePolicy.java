@@ -22,7 +22,7 @@ public class Qdist008MetricsRoutePolicy extends RoutePolicySupport {
 	public static final String QDIST008 = "Qdist008";
 	private final String QDIST008_START = "Qdist008_start";
 	private final String QDIST008_END = "Qdist008_end";
-	private final String QDIST008_EXCEPTION = "request_exception_total_counter";
+	private final String QDIST008_EXCEPTION = "request_exception_total";
 
 	private final MeterRegistry registry;
 	private Timer.Sample timer;
@@ -44,7 +44,7 @@ public class Qdist008MetricsRoutePolicy extends RoutePolicySupport {
 		if (exception == null) {
 			timer.stop(Timer.builder(route.getId())
 					.description(route.getDescription())
-					.tags("process", "distribuerForsendelse")
+					.tags(LABEL_PROCESS, QDIST008)
 					.publishPercentileHistogram(true)
 					.register(registry));
 			registry.counter(QDIST008_END,
@@ -59,7 +59,7 @@ public class Qdist008MetricsRoutePolicy extends RoutePolicySupport {
 			} else {
 				registry.counter(QDIST008_EXCEPTION,
 						LABEL_ERROR_TYPE, TYPE_TECHNICAL_EXCEPTION,
-						LABEL_EXCEPTION_NAME, exception.getClass().getSimpleName(),
+						LABEL_EXCEPTION_NAME, exception.getClass().getCanonicalName(),
 						LABEL_PROCESS, QDIST008).increment();
 			}
 		}
