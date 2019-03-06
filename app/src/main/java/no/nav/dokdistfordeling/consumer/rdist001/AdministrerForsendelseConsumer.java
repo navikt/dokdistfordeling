@@ -30,7 +30,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	private final RestTemplate restTemplate;
 
 	@Inject
-	public AdministrerForsendelseConsumer(@Value("${administrerforsendelse.v1.url}") String administrerforsendelseV1Url,
+	public AdministrerForsendelseConsumer(@Value("${administrerforsendelse}") String administrerforsendelseV1Url,
 										  RestTemplateBuilder restTemplateBuilder,
 										  final ServiceuserAlias serviceuserAlias) {
 		this.administrerforsendelseV1Url = administrerforsendelseV1Url;

@@ -1,6 +1,5 @@
 package no.nav.dokdistfordeling;
 
-import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import no.nav.dokdistfordeling.config.alias.ArkiverDokumentproduksjonV1Alias;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;

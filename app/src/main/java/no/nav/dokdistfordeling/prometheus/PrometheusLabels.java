@@ -1,0 +1,14 @@
+package no.nav.dokdistfordeling.prometheus;
+
+/**
+ * @author Jakob A. Libak, NAV.
+ */
+public class PrometheusLabels {
+
+	public static final String TYPE_TECHNICAL_EXCEPTION = "technical";
+	public static final String TYPE_FUNCTIONAL_EXCEPTION = "functional";
+
+	public static final String LABEL_PROCESS = "process";
+	public static final String LABEL_ERROR_TYPE = "error_type";
+	public static final String LABEL_EXCEPTION_NAME = "exception_name";
+}

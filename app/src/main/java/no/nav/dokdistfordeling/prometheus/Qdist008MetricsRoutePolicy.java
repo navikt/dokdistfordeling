@@ -1,5 +1,11 @@
 package no.nav.dokdistfordeling.prometheus;
 
+import static no.nav.dokdistfordeling.prometheus.PrometheusLabels.LABEL_ERROR_TYPE;
+import static no.nav.dokdistfordeling.prometheus.PrometheusLabels.LABEL_EXCEPTION_NAME;
+import static no.nav.dokdistfordeling.prometheus.PrometheusLabels.LABEL_PROCESS;
+import static no.nav.dokdistfordeling.prometheus.PrometheusLabels.TYPE_FUNCTIONAL_EXCEPTION;
+import static no.nav.dokdistfordeling.prometheus.PrometheusLabels.TYPE_TECHNICAL_EXCEPTION;
+
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
@@ -13,26 +19,22 @@ import org.apache.camel.support.RoutePolicySupport;
  */
 public class Qdist008MetricsRoutePolicy extends RoutePolicySupport {
 
-	private final String QDIST008_SLUTT = "Qdist008_slutt";
+	public static final String QDIST008 = "Qdist008";
 	private final String QDIST008_START = "Qdist008_start";
-	private final String QDIST008_TECHNICAL = "Qdist008_technical_exception";
-	private final String QDIST008_FUNCTIONAL = "Qdist008_functional_exception";
+	private final String QDIST008_END = "Qdist008_end";
+	private final String QDIST008_EXCEPTION = "request_exception_total_counter";
 
 	private final MeterRegistry registry;
 	private Timer.Sample timer;
 
 	public Qdist008MetricsRoutePolicy(MeterRegistry registry) {
 		this.registry = registry;
-		registry.counter(QDIST008_START);
-		registry.counter(QDIST008_SLUTT);
-		registry.counter(QDIST008_TECHNICAL);
-		registry.counter(QDIST008_FUNCTIONAL);
 	}
 
 	@Override
 	public void onExchangeBegin(Route route, Exchange exchange) {
 		timer = Timer.start(registry);
-		registry.counter(QDIST008_START);
+		registry.counter(QDIST008_START).increment();
 	}
 
 	@Override
@@ -42,15 +44,23 @@ public class Qdist008MetricsRoutePolicy extends RoutePolicySupport {
 		if (exception == null) {
 			timer.stop(Timer.builder(route.getId())
 					.description(route.getDescription())
-					.tags("process", "distribuerForsendelseMapper")
+					.tags("process", "distribuerForsendelse")
 					.publishPercentileHistogram(true)
 					.register(registry));
-			registry.counter(QDIST008_SLUTT).increment();
+			registry.counter(QDIST008_END,
+					LABEL_PROCESS, QDIST008
+			).increment();
 		} else {
 			if (isFunctionalException(exception)) {
-				registry.counter(QDIST008_FUNCTIONAL).increment();
+				registry.counter(QDIST008_EXCEPTION,
+						LABEL_ERROR_TYPE, TYPE_FUNCTIONAL_EXCEPTION,
+						LABEL_EXCEPTION_NAME, exception.getClass().getSimpleName(),
+						LABEL_PROCESS, QDIST008).increment();
 			} else {
-				registry.counter(QDIST008_TECHNICAL).increment();
+				registry.counter(QDIST008_EXCEPTION,
+						LABEL_ERROR_TYPE, TYPE_TECHNICAL_EXCEPTION,
+						LABEL_EXCEPTION_NAME, exception.getClass().getSimpleName(),
+						LABEL_PROCESS, QDIST008).increment();
 			}
 		}
 	}
