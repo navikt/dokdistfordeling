@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.qdist008;
 
 import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
+import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
@@ -56,11 +57,11 @@ public class Qdist008Route extends SpringRouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
-		errorHandler(defaultErrorHandler()
+		errorHandler(transactionErrorHandler()
 				.maximumRedeliveries(0)
 				.log(log)
 				.logExhaustedMessageBody(true)
-				.loggingLevel(LoggingLevel.ERROR));
+				.loggingLevel(ERROR));
 
 		onException(DokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
@@ -69,6 +70,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
 
 		from("jms:" + qdist008.getQueueName())
+				.transacted()
 				.routeId(SERVICE_ID)
 				.setExchangePattern(ExchangePattern.InOnly)
 				.doTry()
