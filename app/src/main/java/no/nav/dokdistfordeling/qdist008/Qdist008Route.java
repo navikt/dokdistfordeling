@@ -65,7 +65,8 @@ public class Qdist008Route extends SpringRouteBuilder {
 
 		onException(DokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
-				.setBody(exchangeProperty(PROPERTY_ORIGINAL_PAYLOAD))
+				.useOriginalMessage()
+//				.setBody(exchangeProperty(PROPERTY_ORIGINAL_PAYLOAD))
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
 
