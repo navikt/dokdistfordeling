@@ -118,9 +118,8 @@ public class Qdist008IT {
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"), CALL_ID);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			DistribuerForsendelseTilSentralPrint resultingForsendelse = (DistribuerForsendelseTilSentralPrint) receive(qdist009);
-			assertNotNull(resultingForsendelse);
-			assertEquals(resultingForsendelse.getBestillingsId(), BESILLINGSID);
+			String response = receive(qdist009);
+			assertThat(response, is(classpathToString("qdist009/qdist009-happy.xml")));
 		});
 
 		verify(getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
