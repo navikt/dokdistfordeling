@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling.consumer.aktoerv2;
 
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,7 @@ public class AktoerV2Consumer implements Aktoer {
 		this.aktoerV2 = aktoerV2;
 	}
 
-	@Retryable(include = DokdistfordelingTechnicalException.class, maxAttempts = MAX_ATTEMPTS_SHORT, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(include = DokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public HentIdentForAktoerIdResponseTo hentIdentForAktoerId(final String aktoerId) {
 		if (log.isDebugEnabled()) {
 			log.debug("henter ident for identifikatorAktoerId={}", aktoerId);
