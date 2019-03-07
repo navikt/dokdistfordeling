@@ -3,9 +3,8 @@ package no.nav.dokdistfordeling.qdist008;
 import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
-import io.micrometer.core.instrument.MeterRegistry;
 import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
-import no.nav.dokdistfordeling.prometheus.Qdist008MetricsRoutePolicy;
+import no.nav.dokdistfordeling.metrics.Qdist008MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
@@ -27,12 +26,10 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class Qdist008Route extends SpringRouteBuilder {
 
-	public final MeterRegistry registry;
 	public static final String SERVICE_ID = "qdist008";
-	private static final String PROPERTY_ORIGINAL_PAYLOAD = "qdok008OriginalPayload";
+	static final String PROPERTY_ORIGINAL_PAYLOAD = "qdok008OriginalPayload";
 	static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
 	static final String PROPERTY_FORSENDELSE_ID = "forsendelseId";
-	public static final String PROPERTY_ORIGINAL_MESSAGE = "originalMessage";
 
 	private final Qdist008Service qdist008Service;
 	private final DistribuerForsendelseMapper distribuerForsendelseMapper;
@@ -41,13 +38,15 @@ public class Qdist008Route extends SpringRouteBuilder {
 	private final Queue qdist008;
 	private final Queue qdist009;
 	private final Queue qdist008FunksjonellFeil;
+	private final Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy;
+
 
 	@Inject
 	public Qdist008Route(Qdist008Service qdist008Service,
 						 DistribuerForsendelseMapper distribuerForsendelseMapper,
 						 ForsendelseValidator forsendelseValidator,
 						 DokdistStatusUpdater dokdistStatusUpdater,
-						 MeterRegistry registry,
+						 Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy,
 						 Queue qdist008,
 						 Queue qdist009,
 						 Queue qdist008FunksjonellFeil) {
@@ -58,7 +57,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 		this.qdist008 = qdist008;
 		this.qdist009 = qdist009;
 		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
-		this.registry = registry;
+		this.qdist008MetricsRoutePolicy = qdist008MetricsRoutePolicy;
 	}
 
 	@Override
@@ -79,8 +78,8 @@ public class Qdist008Route extends SpringRouteBuilder {
 		from("jms:" + qdist008.getQueueName() +
 				"?transacted=true")
 				.routeId(SERVICE_ID)
-				.routePolicy(new Qdist008MetricsRoutePolicy(registry))
-				.setProperty(PROPERTY_ORIGINAL_MESSAGE, simple("${body}"))
+				.routePolicy(qdist008MetricsRoutePolicy)
+				.setProperty(PROPERTY_ORIGINAL_PAYLOAD, simple("${body}"))
 				.setExchangePattern(ExchangePattern.InOnly)
 				.doTry()
 				.setProperty(PROPERTY_BESTILLINGS_ID, xpath("//bestillingsId/text()", String.class))

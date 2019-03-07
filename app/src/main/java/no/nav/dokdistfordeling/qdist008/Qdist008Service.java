@@ -1,11 +1,9 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import static no.nav.dokdistfordeling.prometheus.PrometheusLabels.LABEL_PROCESS;
-import static no.nav.dokdistfordeling.prometheus.Qdist008MetricsRoutePolicy.QDIST008;
+import static no.nav.dokdistfordeling.metrics.MetricUpdater.updateQdist008Metrics;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 import static org.springframework.util.StringUtils.isEmpty;
 
-import io.micrometer.core.instrument.MeterRegistry;
 import no.nav.dokdistfordeling.consumer.aktoerv2.Aktoer;
 import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanal;
@@ -33,21 +31,12 @@ import java.util.stream.Collectors;
 @Service
 public class Qdist008Service {
 
-	private final String QDIST008_SERVICE = "service";
-	private final String QDIST008_HOVEDDOKUMENT = "hoveddokument";
-	private final String QDIST008_VEDLEGG = "vedlegg";
-	private final String LABEL_TEMA = "tema";
-	private final String LABEL_DOKUMENTTYPEID = "dokumenttypeid";
-	private final String LABEL_BESTILLENDE_FAGSYSTEM = "bestillende_fagsystem";
-
-
 	private final Aktoer aktoer;
 	private final ArkiverDokumentproduksjon arkiverDokumentproduksjon;
 	private final DokumentkatalogAdmin dokumentkatalogAdmin;
 	private final BestemDistribusjonskanal bestemDistribusjonskanal;
 	private final AdministrerForsendelse administrerForsendelse;
 	private final PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper;
-	private final MeterRegistry registry;
 
 	@Inject
 	public Qdist008Service(Aktoer aktoer,
@@ -55,15 +44,13 @@ public class Qdist008Service {
 						   DokumentkatalogAdmin dokumentkatalogAdmin,
 						   BestemDistribusjonskanal bestemDistribusjonskanal,
 						   AdministrerForsendelse administrerForsendelse,
-						   PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper,
-						   MeterRegistry registry) {
+						   PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper) {
 		this.aktoer = aktoer;
 		this.arkiverDokumentproduksjon = arkiverDokumentproduksjon;
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.bestemDistribusjonskanal = bestemDistribusjonskanal;
 		this.administrerForsendelse = administrerForsendelse;
 		this.persisterForsendelseToRequestMapper = persisterForsendelseToRequestMapper;
-		this.registry = registry;
 	}
 
 	@Handler
@@ -78,12 +65,13 @@ public class Qdist008Service {
 		final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
 				.map(distribusjonbestilling, dokumenttypeInfoTo, hentIdentForAktoerIdResponseTo, distribusjonsKanal);
 
-		updateMetrics(persisterForsendelseRequestTo, distribusjonbestilling);
 
 		PersisterForsendelseResponseTo persisterForsendelseResponseTo = administrerForsendelse.persisterForsendelse(persisterForsendelseRequestTo);
 		exchange.setProperty(PROPERTY_FORSENDELSE_ID, persisterForsendelseResponseTo.getForsendelseId());
 
 		updateArkivIfArkivsystemIsJoark(distribusjonbestilling, distribusjonsKanal);
+
+		updateQdist008Metrics(persisterForsendelseRequestTo, distribusjonbestilling);
 
 		return new DistribuerForsendelseTilSentralPrint(persisterForsendelseResponseTo.getForsendelseId());
 	}
@@ -122,27 +110,4 @@ public class Qdist008Service {
 					.build());
 		}
 	}
-
-	private void updateMetrics(PersisterForsendelseRequestTo persisterForsendelseRequestTo,
-							   DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
-		registry.counter(QDIST008_SERVICE,
-				LABEL_PROCESS, QDIST008,
-				LABEL_DOKUMENTTYPEID, getDokumenttypeIdHoveddokument(distribusjonbestilling),
-				LABEL_TEMA, persisterForsendelseRequestTo.getTema() == null ? "mangler_tema" : persisterForsendelseRequestTo.getTema().toString(),
-				LABEL_BESTILLENDE_FAGSYSTEM, persisterForsendelseRequestTo.getBestillendeFagsystem()).increment();
-
-		registry.counter(QDIST008_HOVEDDOKUMENT,
-				LABEL_PROCESS, QDIST008).increment();
-
-		registry.counter(QDIST008_VEDLEGG,
-				LABEL_PROCESS, QDIST008).increment(countVedlegg(distribusjonbestilling));
-	}
-
-	private int countVedlegg(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
-		return distribusjonbestilling.getDokumenter().stream()
-				.filter(dokumentInformasjonTo -> dokumentInformasjonTo.getTilknyttetSom()
-						.equals(TilknyttetSomCode.VEDLEGG))
-				.collect(Collectors.toList()).size();
-	}
-
 }

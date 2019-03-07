@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.prometheus;
+package no.nav.dokdistfordeling.metrics;
 
 /**
  * @author Jakob A. Libak, NAV.
