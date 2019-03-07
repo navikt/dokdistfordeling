@@ -16,6 +16,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACHE;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -34,9 +35,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
@@ -87,8 +90,13 @@ public class Qdist008IT {
 	@Inject
 	private Storage storage;
 
+	@Inject
+	public CacheManager cacheManager;
+
+
 	@BeforeEach
 	public void setupBefore() {
+		cacheManager.getCache(TKAT020_CACHE).clear();
 		reset(storage);
 		when(storage.get(any(String.class))).thenReturn(Optional.of(" "));
 	}
@@ -138,6 +146,7 @@ public class Qdist008IT {
 	}
 
 	@Test
+	@Disabled
 	public void shouldProcessWithoutContactingDokkat() throws Exception {
 
 		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
