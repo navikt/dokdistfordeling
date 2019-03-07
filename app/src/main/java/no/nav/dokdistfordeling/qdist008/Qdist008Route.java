@@ -26,7 +26,6 @@ import java.nio.charset.StandardCharsets;
 public class Qdist008Route extends SpringRouteBuilder {
 
 	public static final String SERVICE_ID = "qdist008";
-	private static final String PROPERTY_ORIGINAL_PAYLOAD = "qdok008OriginalPayload";
 	static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
 	static final String PROPERTY_FORSENDELSE_ID = "forsendelseId";
 
@@ -66,7 +65,6 @@ public class Qdist008Route extends SpringRouteBuilder {
 		onException(DokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
 				.useOriginalMessage()
-//				.setBody(exchangeProperty(PROPERTY_ORIGINAL_PAYLOAD))
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
 
@@ -78,7 +76,6 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.setProperty(PROPERTY_BESTILLINGS_ID, xpath("//bestillingsId/text()", String.class))
 				.log(LoggingLevel.INFO, log, "qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
 				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
-				.setProperty(PROPERTY_ORIGINAL_PAYLOAD, simple("${body}"))
 				.doCatch(Exception.class)
 				.end()
 				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/distribuerforsendelse.xsd")
@@ -89,6 +86,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.bean(qdist008Service)
 				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelseTilSentralPrint.class)))
 				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
+				.setHeader(CALL_ID, simple("${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}"))
 				.inOnly("jms:" + qdist009.getQueueName())
 				.log(LoggingLevel.INFO, log, "qdist008 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist009 for distribusjon via PRINT")
 				.bean(dokdistStatusUpdater)
