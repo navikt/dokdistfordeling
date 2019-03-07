@@ -5,6 +5,7 @@ import no.nav.dokdistfordeling.config.sts.STSConfig;
 import no.nav.tjeneste.virksomhet.aktoer.v2.binding.AktoerV2;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
@@ -28,6 +29,11 @@ public class AktoerV2Config {
 		clientFactory.setServiceClass(AktoerV2.class);
 		clientFactory.setAddress(aktoerV2Url);
 		clientFactory.setFeatures(Collections.singletonList(new WSAddressingFeature()));
+
+		LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
+		loggingOutInterceptor.setPrettyLogging(true);
+		clientFactory.getOutInterceptors().add(loggingOutInterceptor);
+
 		AktoerV2 aktoerV2 = (AktoerV2) clientFactory.create();
 		stsConfig.configureSTS(aktoerV2);
 		Client client = ClientProxy.getClient(aktoerV2);

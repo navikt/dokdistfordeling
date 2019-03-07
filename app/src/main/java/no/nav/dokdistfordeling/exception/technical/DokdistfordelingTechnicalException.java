@@ -3,7 +3,7 @@ package no.nav.dokdistfordeling.exception.technical;
 /**
  * @author Jarl Øystein Samseth, Visma Consulting
  */
-public class DokdistfordelingTechnicalException extends RuntimeException {
+public abstract class DokdistfordelingTechnicalException extends RuntimeException {
 
 	public DokdistfordelingTechnicalException(String message) {
 		super(message);

@@ -63,7 +63,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.logExhaustedMessageBody(true)
 				.loggingLevel(ERROR));
 
-		onException(DokdistfordelingFunctionalException.class, ValidationException.class, IllegalArgumentException.class)
+		onException(DokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
 				.useOriginalMessage()
 //				.setBody(exchangeProperty(PROPERTY_ORIGINAL_PAYLOAD))
