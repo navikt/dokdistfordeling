@@ -7,6 +7,7 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
 import no.nav.dokdistfordeling.exception.functional.OppdaterForsendelseFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.PersisterForsendelseFunctionalException;
+import no.nav.dokdistfordeling.exception.technical.DokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.OppdaterForsendelseTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.PersisterForsendelseTechnicalException;
 import org.springframework.beans.factory.annotation.Value;
