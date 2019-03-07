@@ -30,10 +30,6 @@ public class AktoerV2Config {
 		clientFactory.setAddress(aktoerV2Url);
 		clientFactory.setFeatures(Collections.singletonList(new WSAddressingFeature()));
 
-		LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
-		loggingOutInterceptor.setPrettyLogging(true);
-		clientFactory.getOutInterceptors().add(loggingOutInterceptor);
-
 		AktoerV2 aktoerV2 = (AktoerV2) clientFactory.create();
 		stsConfig.configureSTS(aktoerV2);
 		Client client = ClientProxy.getClient(aktoerV2);

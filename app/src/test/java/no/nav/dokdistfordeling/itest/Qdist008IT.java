@@ -1,11 +1,11 @@
 package no.nav.dokdistfordeling.itest;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.matchingXPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
@@ -48,6 +48,8 @@ import javax.inject.Inject;
 import javax.jms.Queue;
 import javax.jms.TextMessage;
 import javax.xml.bind.JAXBElement;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
@@ -125,8 +127,43 @@ public class Qdist008IT {
 		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
 
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
+
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("S"))));
+
 		verify(postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
-				.withRequestBody(matchingJsonPath("$.bestillingsId", containing("7882d37e-34f7-11e9-b210-d663bd873d93"))));
+				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseOutHappy.json"))));
+	}
+
+	@Test
+	public void shouldProcessWithoutContactingDokkat() throws Exception {
+
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
+		stubFor(post("/aktoerv2")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(post("/arkiverdokumentproduksjon/v1")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
+		stubFor(post("/administrerforsendelse/v1")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_har_tittel_happypath.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			String response = receive(qdist009);
+			assertThat(response.replaceAll("\r", "").replaceAll("\t", ""), is(classpathToString("qdist009/qdist009-happy.txt").replaceAll("\r", "").replaceAll("\t", "")));
+		});
+
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 	}
 
 	@Test
@@ -410,6 +447,15 @@ public class Qdist008IT {
 		return (T) response;
 	}
 
+	private String getRequestAsJson(String filename) throws IOException {
+
+		File file = new ClassPathResource(filename).getFile();
+		byte[] data = new byte[(int) file.length()];
+		FileInputStream fileInputStream = new FileInputStream(file);
+		fileInputStream.read(data);
+		fileInputStream.close();
+		return new String(data);
+	}
 }
 
 
