@@ -5,6 +5,9 @@ package no.nav.dokdistfordeling.metrics;
  */
 public class PrometheusLabels {
 
+	private PrometheusLabels() {
+	}
+
 	public static final String TYPE_TECHNICAL_EXCEPTION = "technical";
 	public static final String TYPE_FUNCTIONAL_EXCEPTION = "functional";
 

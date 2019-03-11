@@ -9,7 +9,7 @@ import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
-import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.DokdistfordelingFunctionalException;
 import org.apache.camel.Exchange;
 import org.apache.camel.Route;
 import org.apache.camel.ValidationException;
@@ -24,13 +24,13 @@ import javax.inject.Inject;
 @Component
 public class Qdist008MetricsRoutePolicy extends RoutePolicySupport {
 
-	private final String QDIST008_PROCESS_TIMER = "dok_request_latency_histogram";
-	private final String QDIST008_PROCESS_TIMER_DESCRIPTION = "prosesseringstid for kall inn til qdist008";
-	private final String QDIST008_START = "Qdist008_start";
-	private final String QDIST008_EXCEPTION = "request_exception_total";
-
 	private final MeterRegistry registry;
 	private Timer.Sample timer;
+
+	private static final String QDIST008_PROCESS_TIMER = "dok_request_latency_histogram";
+	private static final String QDIST008_PROCESS_TIMER_DESCRIPTION = "prosesseringstid for kall inn til qdist008";
+	private static final String QDIST008_START = "Qdist008_start";
+	private static final String QDIST008_EXCEPTION = "request_exception_total";
 
 	@Inject
 	public Qdist008MetricsRoutePolicy(MeterRegistry registry) {
