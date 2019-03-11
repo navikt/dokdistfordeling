@@ -6,7 +6,7 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
-import no.nav.dokdistfordeling.exception.technical.DokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.DokkatGetDokumenttypeInfoTechnicalException;
 import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,7 +45,7 @@ class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 	}
 
 	@Cacheable(TKAT020_CACHE)
-	@Retryable(include = DokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public DokumenttypeInfoTo getDokumenttypeInfo(final String dokumenttypeId) {
 		try {
 			DokumentTypeInfoToV4 response = restTemplate.getForObject(this.dokumenttypeInfoV4Url + "/" + dokumenttypeId, DokumentTypeInfoToV4.class);

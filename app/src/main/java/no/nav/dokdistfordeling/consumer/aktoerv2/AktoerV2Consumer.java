@@ -6,7 +6,7 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.exception.functional.AktoerV2PersonIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AktoerV2HentIdentForAktoerIdTechnicalException;
-import no.nav.dokdistfordeling.exception.technical.DokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.tjeneste.virksomhet.aktoer.v2.binding.AktoerV2;
 import no.nav.tjeneste.virksomhet.aktoer.v2.binding.HentIdentForAktoerIdPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.aktoer.v2.meldinger.HentIdentForAktoerIdRequest;
@@ -29,7 +29,7 @@ public class AktoerV2Consumer implements Aktoer {
 		this.aktoerV2 = aktoerV2;
 	}
 
-	@Retryable(include = DokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public HentIdentForAktoerIdResponseTo hentIdentForAktoerId(final String aktoerId) {
 		if (log.isDebugEnabled()) {
 			log.debug("henter ident for identifikatorAktoerId={}", aktoerId);

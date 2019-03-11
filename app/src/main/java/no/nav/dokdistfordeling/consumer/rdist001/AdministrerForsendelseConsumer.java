@@ -7,7 +7,7 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
 import no.nav.dokdistfordeling.exception.functional.OppdaterForsendelseFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.PersisterForsendelseFunctionalException;
-import no.nav.dokdistfordeling.exception.technical.DokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.OppdaterForsendelseTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.PersisterForsendelseTechnicalException;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +48,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.build();
 	}
 
-	@Retryable(include = DokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public PersisterForsendelseResponseTo persisterForsendelse(final PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
 		try {
 			HttpEntity entity = new HttpEntity<>(persisterForsendelseRequestTo, createHeaders(persisterForsendelseRequestTo.getBestillingsId()));
@@ -62,7 +62,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 		}
 	}
 
-	@Retryable(include = DokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void oppdaterForsendelseStatus(String forsendelseId, String forsendelseStatus, String bestillingsId) {
 		try {
 			HttpEntity entity = new HttpEntity<>(createHeaders(bestillingsId));

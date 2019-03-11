@@ -1,5 +1,6 @@
 package no.nav.dokdistfordeling.qdist008;
 
+import static no.nav.dokdistfordeling.metrics.MetricUpdater.updateQdist008Metrics;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 import static org.springframework.util.StringUtils.isEmpty;
 
@@ -7,6 +8,7 @@ import no.nav.dokdistfordeling.consumer.aktoerv2.Aktoer;
 import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanal;
 import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
+import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseResponseTo;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseToRequestMapper;
 import no.nav.dokdistfordeling.consumer.tjoark110.ArkiverDokumentproduksjon;
@@ -59,11 +61,17 @@ public class Qdist008Service {
 		final HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo = getFoedselsnummerIfMottakerIdentifikatorIsAktoerId(distribusjonbestilling
 				.getMottaker());
 		final DistribusjonsKanalCode distribusjonsKanal = bestemDistribusjonskanal.bestemKanal();
-		PersisterForsendelseResponseTo persisterForsendelseResponseTo = administrerForsendelse.persisterForsendelse(persisterForsendelseToRequestMapper
-				.map(distribusjonbestilling, dokumenttypeInfoTo, hentIdentForAktoerIdResponseTo, distribusjonsKanal));
+
+		final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
+				.map(distribusjonbestilling, dokumenttypeInfoTo, hentIdentForAktoerIdResponseTo, distribusjonsKanal);
+
+
+		PersisterForsendelseResponseTo persisterForsendelseResponseTo = administrerForsendelse.persisterForsendelse(persisterForsendelseRequestTo);
 		exchange.setProperty(PROPERTY_FORSENDELSE_ID, persisterForsendelseResponseTo.getForsendelseId());
 
 		updateArkivIfArkivsystemIsJoark(distribusjonbestilling, distribusjonsKanal);
+
+		updateQdist008Metrics(persisterForsendelseRequestTo, distribusjonbestilling);
 
 		return new DistribuerForsendelseTilSentralPrint(persisterForsendelseResponseTo.getForsendelseId());
 	}
@@ -102,5 +110,4 @@ public class Qdist008Service {
 					.build());
 		}
 	}
-
 }

@@ -5,7 +5,7 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHOR
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
 
-import no.nav.dokdistfordeling.exception.technical.DokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SettJournalpostAttributterTechnicalException;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.ArkiverDokumentproduksjonV1;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.meldinger.SettJournalpostAttributterRequest;
@@ -27,7 +27,7 @@ public class SettJournalpostAttributterConsumer implements ArkiverDokumentproduk
 		this.arkiverDokumentproduksjonV1 = arkiverDokumentproduksjonV1;
 	}
 
-	@Retryable(include = DokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void settJournalpostAttributter(final SettJournalpostAttributterRequestTo settJournalpostAttributterRequestTo) {
 		try {
 			arkiverDokumentproduksjonV1.settJournalpostAttributter(mapRequest(settJournalpostAttributterRequestTo));

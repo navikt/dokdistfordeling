@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import no.nav.dokdistfordeling.exception.functional.DokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.MottakerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.Aktoer;
@@ -166,9 +166,9 @@ class DistribuerForsendelseMapperTest {
 		distribuerForsendelse.getDistribusjonbestilling()
 				.withMottaker(((Samhandler) createMottakerSamhandlerHpr()).withSamhandlerkategori("NO_SUCH_KATEGORI"));
 
-		assertThrows(DokdistfordelingFunctionalException.class,
+		assertThrows(AbstractDokdistfordelingFunctionalException.class,
 				() -> distribuerForsendelseMapper.map(distribuerForsendelse),
-				"Expected distribuerForsendelseMapper.map() to throw DokdistfordelingFunctionalException, but it didn't");
+				"Expected distribuerForsendelseMapper.map() to throw AbstractDokdistfordelingFunctionalException, but it didn't");
 	}
 
 	@Test
@@ -176,9 +176,9 @@ class DistribuerForsendelseMapperTest {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
 		distribuerForsendelse.getDistribusjonbestilling().getArkivInformasjon().setArkivSystem("NO_SUCH_ARKIVSYSTEM");
 
-		assertThrows(DokdistfordelingFunctionalException.class,
+		assertThrows(AbstractDokdistfordelingFunctionalException.class,
 				() -> distribuerForsendelseMapper.map(distribuerForsendelse),
-				"Expected distribuerForsendelseMapper.map() to throw DokdistfordelingFunctionalException, but it didn't");
+				"Expected distribuerForsendelseMapper.map() to throw AbstractDokdistfordelingFunctionalException, but it didn't");
 	}
 
 	@Test
@@ -186,9 +186,9 @@ class DistribuerForsendelseMapperTest {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
 		distribuerForsendelse.getDistribusjonbestilling().setTema("NO_SUCH_TEMA");
 
-		assertThrows(DokdistfordelingFunctionalException.class,
+		assertThrows(AbstractDokdistfordelingFunctionalException.class,
 				() -> distribuerForsendelseMapper.map(distribuerForsendelse),
-				"Expected distribuerForsendelseMapper.map() to throw DokdistfordelingFunctionalException, but it didn't");
+				"Expected distribuerForsendelseMapper.map() to throw AbstractDokdistfordelingFunctionalException, but it didn't");
 	}
 
 	@Test
@@ -196,9 +196,9 @@ class DistribuerForsendelseMapperTest {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
 		distribuerForsendelse.getDistribusjonbestilling().getDokumenter().get(0).setTilknyttetSom("NO_SUCH_TILKNYTNING");
 
-		assertThrows(DokdistfordelingFunctionalException.class,
+		assertThrows(AbstractDokdistfordelingFunctionalException.class,
 				() -> distribuerForsendelseMapper.map(distribuerForsendelse),
-				"Expected distribuerForsendelseMapper.map() to throw DokdistfordelingFunctionalException, but it didn't");
+				"Expected distribuerForsendelseMapper.map() to throw AbstractDokdistfordelingFunctionalException, but it didn't");
 	}
 
 

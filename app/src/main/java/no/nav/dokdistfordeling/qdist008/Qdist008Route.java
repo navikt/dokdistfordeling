@@ -3,7 +3,8 @@ package no.nav.dokdistfordeling.qdist008;
 import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
-import no.nav.dokdistfordeling.exception.functional.DokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.metrics.Qdist008MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
@@ -26,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 public class Qdist008Route extends SpringRouteBuilder {
 
 	public static final String SERVICE_ID = "qdist008";
+	static final String PROPERTY_ORIGINAL_PAYLOAD = "qdok008OriginalPayload";
 	static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
 	static final String PROPERTY_FORSENDELSE_ID = "forsendelseId";
 
@@ -36,12 +38,15 @@ public class Qdist008Route extends SpringRouteBuilder {
 	private final Queue qdist008;
 	private final Queue qdist009;
 	private final Queue qdist008FunksjonellFeil;
+	private final Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy;
+
 
 	@Inject
 	public Qdist008Route(Queue qdist008,
 						 Queue qdist009,
 						 Queue qdist008FunksjonellFeil,
 						 Qdist008Service qdist008Service,
+						 Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy,
 						 DistribuerForsendelseMapper distribuerForsendelseMapper,
 						 ForsendelseValidator forsendelseValidator,
 						 DokdistStatusUpdater dokdistStatusUpdater) {
@@ -52,6 +57,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
 		this.forsendelseValidator = forsendelseValidator;
 		this.dokdistStatusUpdater = dokdistStatusUpdater;
+		this.qdist008MetricsRoutePolicy = qdist008MetricsRoutePolicy;
 	}
 
 	@Override
@@ -62,7 +68,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.logExhaustedMessageBody(true)
 				.loggingLevel(ERROR));
 
-		onException(DokdistfordelingFunctionalException.class, ValidationException.class)
+		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
 				.useOriginalMessage()
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
@@ -71,6 +77,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 		from("jms:" + qdist008.getQueueName() +
 				"?transacted=true")
 				.routeId(SERVICE_ID)
+				.routePolicy(qdist008MetricsRoutePolicy)
 				.setExchangePattern(ExchangePattern.InOnly)
 				.doTry()
 				.setProperty(PROPERTY_BESTILLINGS_ID, xpath("//bestillingsId/text()", String.class))
