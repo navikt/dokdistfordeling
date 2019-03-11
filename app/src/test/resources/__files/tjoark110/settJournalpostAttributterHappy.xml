@@ -1,0 +1,5 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+	<soapenv:Body>
+		<a:settJournalpostAttributterResponse xmlns:a="http://nav.no/tjeneste/domene/brevogarkiv/arkiverdokumentproduksjon/v1/"/>
+	</soapenv:Body>
+</soapenv:Envelope>

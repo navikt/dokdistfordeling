@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.exception;
+package no.nav.dokdistfordeling.exception.functional;
 
 /**
  * @author Sigurd Midttun, Visma Consulting AS

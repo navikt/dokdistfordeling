@@ -34,6 +34,9 @@
 		<aktoer.version>2.0.1</aktoer.version>
 		<dokkat-api>10.4.0</dokkat-api>
 		<wmq.version>8.0.0.6</wmq.version>
+		<awaitility.version>3.1.2</awaitility.version>
+		<activemq.version>5.15.2</activemq.version>
+		<commons-io.version>2.4</commons-io.version>
 		<micrometer.version>1.1.3</micrometer.version>
 	</properties>
 
@@ -122,6 +125,18 @@
 				<groupId>io.github.resilience4j</groupId>
 				<artifactId>resilience4j-circuitbreaker</artifactId>
 				<version>${resilience4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.awaitility</groupId>
+				<artifactId>awaitility</artifactId>
+				<version>${awaitility.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.activemq</groupId>
+				<artifactId>activemq-broker</artifactId>
+				<version>${activemq.version}</version>
+				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

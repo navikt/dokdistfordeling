@@ -3,7 +3,7 @@ package no.nav.dokdistfordeling.qdist008;
 import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
-import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.DokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.metrics.Qdist008MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
 import org.apache.camel.ExchangePattern;
@@ -42,21 +42,21 @@ public class Qdist008Route extends SpringRouteBuilder {
 
 
 	@Inject
-	public Qdist008Route(Qdist008Service qdist008Service,
+	public Qdist008Route(Queue qdist008,
+						 Queue qdist009,
+						 Queue qdist008FunksjonellFeil,
+						 Qdist008Service qdist008Service,
+						 Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy,
 						 DistribuerForsendelseMapper distribuerForsendelseMapper,
 						 ForsendelseValidator forsendelseValidator,
-						 DokdistStatusUpdater dokdistStatusUpdater,
-						 Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy,
-						 Queue qdist008,
-						 Queue qdist009,
-						 Queue qdist008FunksjonellFeil) {
+						 DokdistStatusUpdater dokdistStatusUpdater) {
+		this.qdist008 = qdist008;
+		this.qdist009 = qdist009;
+		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
 		this.qdist008Service = qdist008Service;
 		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
 		this.forsendelseValidator = forsendelseValidator;
 		this.dokdistStatusUpdater = dokdistStatusUpdater;
-		this.qdist008 = qdist008;
-		this.qdist009 = qdist009;
-		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
 		this.qdist008MetricsRoutePolicy = qdist008MetricsRoutePolicy;
 	}
 
@@ -83,7 +83,6 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.setProperty(PROPERTY_BESTILLINGS_ID, xpath("//bestillingsId/text()", String.class))
 				.log(LoggingLevel.INFO, log, "qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
 				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
-				.setProperty(PROPERTY_ORIGINAL_PAYLOAD, simple("${body}"))
 				.doCatch(Exception.class)
 				.end()
 				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/distribuerforsendelse.xsd")

@@ -13,15 +13,17 @@ import static org.mockito.Mockito.when;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
-import no.nav.dokdistfordeling.exception.DokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.S3FailedToGetDocumentTechnicalException;
 import no.nav.dokdistfordeling.storage.crypto.Crypto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -31,11 +33,12 @@ import java.io.ByteArrayInputStream;
 /**
  * @author Ugur Alpay Cenar, Visma Consulting.
  */
+@ActiveProfiles("unittest")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = S3StorageTest.Config.class)
 public class S3StorageTest {
 
-	private final byte[] pdf = "PDF test document" .getBytes();
+	private final byte[] pdf = "PDF test document".getBytes();
 	private static final String encryptPsw = "psw";
 	private final String key = "test_key-asdsdasdsad";
 
@@ -71,7 +74,7 @@ public class S3StorageTest {
 
 	@Test
 	public void shouldRetryGetWhenFailed() {
-		when(s3.getObject(any(String.class), any(String.class))).thenThrow(new DokdistfordelingTechnicalException("asd"));
+		when(s3.getObject(any(String.class), any(String.class))).thenThrow(new S3FailedToGetDocumentTechnicalException("asd"));
 
 		try {
 			storage.get(key);
@@ -103,6 +106,7 @@ public class S3StorageTest {
 				.build();
 	}
 
+	@Profile("unittest")
 	@EnableRetry
 	@Configuration
 	public static class Config {

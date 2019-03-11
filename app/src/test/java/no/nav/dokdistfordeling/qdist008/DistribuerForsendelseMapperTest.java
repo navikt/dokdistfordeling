@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.DokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.MottakerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.Aktoer;
