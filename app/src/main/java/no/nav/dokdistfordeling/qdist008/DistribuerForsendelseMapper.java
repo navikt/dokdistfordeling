@@ -2,8 +2,8 @@ package no.nav.dokdistfordeling.qdist008;
 
 import static java.lang.String.format;
 
-import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
-import no.nav.dokdistfordeling.exception.functional.ValidationException;
+import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalExceptionAbstract;
+import no.nav.dokdistfordeling.exception.functional.ValidationExceptionAbstract;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.MottakerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.TemaCode;
@@ -37,7 +37,7 @@ public class DistribuerForsendelseMapper {
 					.distribusjonbestilling(mapDokumentbestillingsinformasjon(distribuerForsendelse.getDistribusjonbestilling()))
 					.build();
 		} catch (IllegalArgumentException e) {
-			throw new DistrubuerForsendelseMapFunctionalException("Kunne ikke mappe qdist008-XML til domene-objekter for bestillingsId=" +
+			throw new DistrubuerForsendelseMapFunctionalExceptionAbstract("Kunne ikke mappe qdist008-XML til domene-objekter for bestillingsId=" +
 					distribuerForsendelse.getDistribusjonbestilling().getBestillingsId(), e);
 		}
 	}
@@ -139,7 +139,7 @@ public class DistribuerForsendelseMapper {
 
 	private MottakerTypeCode mapSamhandlerKategoriToSamhandlerType(String samhandlerKategori) {
 		if (samhandlerKategori == null) {
-			throw new ValidationException("Ugyldig input: samhandlerkategori kan ikke være null");
+			throw new ValidationExceptionAbstract("Ugyldig input: samhandlerkategori kan ikke være null");
 		} else if (SamhandlerKategoriCode.HPR.name().equals(samhandlerKategori)) {
 			return MottakerTypeCode.SAMHANDLER_HPR;
 		} else {

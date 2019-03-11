@@ -9,7 +9,7 @@ import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
-import no.nav.dokdistfordeling.exception.functional.DokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import org.apache.camel.Exchange;
 import org.apache.camel.Route;
 import org.apache.camel.ValidationException;
@@ -69,7 +69,7 @@ public class Qdist008MetricsRoutePolicy extends RoutePolicySupport {
 	}
 
 	private boolean isFunctionalException(Exception e) {
-		return (e instanceof DokdistfordelingFunctionalException) || (e instanceof ValidationException);
+		return (e instanceof AbstractDokdistfordelingFunctionalException) || (e instanceof ValidationException);
 	}
 
 	private Exception getException(Exchange exchange) {

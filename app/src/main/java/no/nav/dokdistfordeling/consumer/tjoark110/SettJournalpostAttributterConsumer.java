@@ -5,8 +5,8 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHOR
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
 
-import no.nav.dokdistfordeling.exception.technical.DokdistfordelingTechnicalException;
-import no.nav.dokdistfordeling.exception.technical.SettJournalpostAttributterTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.SettJournalpostAttributterTechnicalExceptionAbstract;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.ArkiverDokumentproduksjonV1;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.meldinger.SettJournalpostAttributterRequest;
 import org.springframework.retry.annotation.Backoff;
@@ -27,12 +27,12 @@ public class SettJournalpostAttributterConsumer implements ArkiverDokumentproduk
 		this.arkiverDokumentproduksjonV1 = arkiverDokumentproduksjonV1;
 	}
 
-	@Retryable(include = DokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void settJournalpostAttributter(final SettJournalpostAttributterRequestTo settJournalpostAttributterRequestTo) {
 		try {
 			arkiverDokumentproduksjonV1.settJournalpostAttributter(mapRequest(settJournalpostAttributterRequestTo));
 		} catch (Exception e) {
-			throw new SettJournalpostAttributterTechnicalException("teknisk feil ved kall mot arkiverDokumentproduksjonV1:settJournalpostAttributter. Antall retries=" + MAX_ATTEMPTS_SHORT + ", journalpostId=" + settJournalpostAttributterRequestTo.getJournalpostId(), e);
+			throw new SettJournalpostAttributterTechnicalExceptionAbstract("teknisk feil ved kall mot arkiverDokumentproduksjonV1:settJournalpostAttributter. Antall retries=" + MAX_ATTEMPTS_SHORT + ", journalpostId=" + settJournalpostAttributterRequestTo.getJournalpostId(), e);
 		}
 	}
 

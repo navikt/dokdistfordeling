@@ -9,8 +9,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.S3Object;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.exception.technical.DokdistfordelingTechnicalException;
-import no.nav.dokdistfordeling.exception.technical.S3FailedToGetDocumentTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.S3FailedToGetDocumentTechnicalExceptionAbstract;
 import no.nav.dokdistfordeling.storage.crypto.Crypto;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -33,7 +33,7 @@ public class S3Storage implements Storage {
 	}
 
 //	@Override
-//	@Retryable(include = DokdistfordelingTechnicalException.class, maxAttempts = MAX_ATTEMPTS_SHORT, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+//	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, maxAttempts = MAX_ATTEMPTS_SHORT, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 //	public void put(String key, String value) {
 //		throw new UnsupportedOperationException("dokdistfordeling støtter ikke persistering av objekter til dokdistmellomlager");
 //	}
@@ -44,13 +44,13 @@ public class S3Storage implements Storage {
 			String encryptedValue = encrypt(value, key);
 			writeString(key, encryptedValue);
 		} catch (Exception e) {
-			throw new S3FailedToGetDocumentTechnicalException(String.format("Feilet ved sending av dokument til S3. Nøkkel=%s", key), e);
+			throw new S3FailedToGetDocumentTechnicalExceptionAbstract(String.format("Feilet ved sending av dokument til S3. Nøkkel=%s", key), e);
 		}
 
 	}
 
 	@Override
-	@Retryable(include = DokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public Optional<String> get(String key) {
 		try {
 			String encryptedValue = readString(key);
@@ -59,7 +59,7 @@ public class S3Storage implements Storage {
 			}
 			return Optional.ofNullable(decrypt(encryptedValue, key));
 		} catch (Exception e) {
-			throw new S3FailedToGetDocumentTechnicalException(String.format("Feilet ved henting av dokument fra S3-bucketen dokdistmellomlager. Nøkkel=%s", key), e);
+			throw new S3FailedToGetDocumentTechnicalExceptionAbstract(String.format("Feilet ved henting av dokument fra S3-bucketen dokdistmellomlager. Nøkkel=%s", key), e);
 		}
 	}
 

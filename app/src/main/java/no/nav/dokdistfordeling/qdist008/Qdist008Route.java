@@ -3,7 +3,7 @@ package no.nav.dokdistfordeling.qdist008;
 import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
-import no.nav.dokdistfordeling.exception.functional.DokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.metrics.Qdist008MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
 import org.apache.camel.ExchangePattern;
@@ -68,7 +68,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.logExhaustedMessageBody(true)
 				.loggingLevel(ERROR));
 
-		onException(DokdistfordelingFunctionalException.class, ValidationException.class)
+		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
 				.useOriginalMessage()
 				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())

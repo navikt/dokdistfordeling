@@ -5,11 +5,11 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
-import no.nav.dokdistfordeling.exception.functional.OppdaterForsendelseFunctionalException;
-import no.nav.dokdistfordeling.exception.functional.PersisterForsendelseFunctionalException;
-import no.nav.dokdistfordeling.exception.technical.DokdistfordelingTechnicalException;
-import no.nav.dokdistfordeling.exception.technical.OppdaterForsendelseTechnicalException;
-import no.nav.dokdistfordeling.exception.technical.PersisterForsendelseTechnicalException;
+import no.nav.dokdistfordeling.exception.functional.OppdaterForsendelseFunctionalExceptionAbstract;
+import no.nav.dokdistfordeling.exception.functional.PersisterForsendelseFunctionalExceptionAbstract;
+import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.OppdaterForsendelseTechnicalExceptionAbstract;
+import no.nav.dokdistfordeling.exception.technical.PersisterForsendelseTechnicalExceptionAbstract;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -48,21 +48,21 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.build();
 	}
 
-	@Retryable(include = DokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public PersisterForsendelseResponseTo persisterForsendelse(final PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
 		try {
 			HttpEntity entity = new HttpEntity<>(persisterForsendelseRequestTo, createHeaders(persisterForsendelseRequestTo.getBestillingsId()));
 			return restTemplate.exchange(this.administrerforsendelseV1Url, HttpMethod.POST, entity, PersisterForsendelseResponseTo.class)
 					.getBody();
 		} catch (HttpClientErrorException e) {
-			throw new PersisterForsendelseFunctionalException(String.format("Kall mot rdist001 feilet funksjonelt med statusKode=%s, feilmelding=%s", e
+			throw new PersisterForsendelseFunctionalExceptionAbstract(String.format("Kall mot rdist001 feilet funksjonelt med statusKode=%s, feilmelding=%s", e
 					.getStatusCode(), e.getResponseBodyAsString()), e);
 		} catch (HttpServerErrorException e) {
-			throw new PersisterForsendelseTechnicalException(String.format("Kall mot rdist001 feilet teknisk med statusKode=%s, feilmelding=%s", e.getStatusCode(), e.getResponseBodyAsString()), e);
+			throw new PersisterForsendelseTechnicalExceptionAbstract(String.format("Kall mot rdist001 feilet teknisk med statusKode=%s, feilmelding=%s", e.getStatusCode(), e.getResponseBodyAsString()), e);
 		}
 	}
 
-	@Retryable(include = DokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void oppdaterForsendelseStatus(String forsendelseId, String forsendelseStatus, String bestillingsId) {
 		try {
 			HttpEntity entity = new HttpEntity<>(createHeaders(bestillingsId));
@@ -72,10 +72,10 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 					.toUriString();
 			restTemplate.exchange(uri, HttpMethod.PUT, entity, Object.class);
 		} catch (HttpClientErrorException e) {
-			throw new OppdaterForsendelseFunctionalException(String.format("Kall mot rdist001 feilet funksjonelt med statusKode=%s, feilmelding=%s", e
+			throw new OppdaterForsendelseFunctionalExceptionAbstract(String.format("Kall mot rdist001 feilet funksjonelt med statusKode=%s, feilmelding=%s", e
 					.getStatusCode(), e.getResponseBodyAsString()), e);
 		} catch (HttpServerErrorException e) {
-			throw new OppdaterForsendelseTechnicalException(String.format("Kall mot rdist001 feilet teknisk med statusKode=%s, feilmelding=%s", e.getStatusCode(), e.getResponseBodyAsString()), e);
+			throw new OppdaterForsendelseTechnicalExceptionAbstract(String.format("Kall mot rdist001 feilet teknisk med statusKode=%s, feilmelding=%s", e.getStatusCode(), e.getResponseBodyAsString()), e);
 		}
 	}
 

@@ -6,6 +6,10 @@ import no.nav.dokdistfordeling.qdist008.DistribuerForsendelseTo;
 import java.util.stream.Collectors;
 
 public class Qdist008Util {
+
+	private Qdist008Util() {
+	}
+
 	public static int countVedlegg(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
 		return (int) distribusjonbestilling.getDokumenter().stream()
 				.filter(dokumentInformasjonTo -> dokumentInformasjonTo.getTilknyttetSom()
