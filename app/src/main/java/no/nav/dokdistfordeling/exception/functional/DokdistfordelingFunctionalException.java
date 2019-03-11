@@ -1,9 +1,9 @@
-package no.nav.dokdistfordeling.exception;
+package no.nav.dokdistfordeling.exception.functional;
 
 /**
  * @author Jarl Øystein Samseth, Visma Consulting
  */
-public class DokdistfordelingFunctionalException extends RuntimeException {
+public abstract class DokdistfordelingFunctionalException extends RuntimeException {
 
 	public DokdistfordelingFunctionalException(String message) {
 		super(message);

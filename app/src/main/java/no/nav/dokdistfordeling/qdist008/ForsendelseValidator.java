@@ -2,7 +2,9 @@ package no.nav.dokdistfordeling.qdist008;
 
 import static java.lang.String.format;
 
-import no.nav.dokdistfordeling.exception.ValidationException;
+import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.DocumentNotFoundInS3FunctionalException;
+import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.camel.Handler;
@@ -52,7 +54,7 @@ public class ForsendelseValidator {
 		try {
 			UUID.fromString(bestillingsId);
 		} catch (IllegalArgumentException exception) {
-			throw new IllegalArgumentException(format("bestillingsId er ikke en gyldig UUID (universally unique identifier). Fikk bestilling=%s", bestillingsId));
+			throw new BestillingsIdInvalidUuidFunctionalException(format("bestillingsId er ikke en gyldig UUID (universally unique identifier). Fikk bestilling=%s", bestillingsId));
 		}
 	}
 
@@ -62,7 +64,7 @@ public class ForsendelseValidator {
 					//Todo: Fjern put - kun for test!
 					storage.put(dokumentInformasjonTo.getDokumentObjektReferanse(), "TESTPUT22");
 					storage.get(dokumentInformasjonTo.getDokumentObjektReferanse())
-							.orElseThrow(() -> new ValidationException(format("Kunne ikke finne dokument i S3 på key=dokumentObjektReferanse=%s", dokumentInformasjonTo
+							.orElseThrow(() -> new DocumentNotFoundInS3FunctionalException(format("Kunne ikke finne dokument i S3 på key=dokumentObjektReferanse=%s", dokumentInformasjonTo
 									.getDokumentObjektReferanse())));
 				});
 	}

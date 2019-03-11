@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(
 		name = "DistribuerForsendelseTilSentralPrint",
-		propOrder = {"bestillingsId"}
+		propOrder = {"forsendelseId"}
 )
 @XmlRootElement(
 		namespace = "http://nav.no/melding/virksomhet/dokdistsentralprint",
@@ -37,7 +37,7 @@ public class DistribuerForsendelseTilSentralPrint {
 	)
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(
-			name = "bestillingsId"
+			name = "forsendelseId"
 	)
-	protected String bestillingsId;
+	protected String forsendelseId;
 }

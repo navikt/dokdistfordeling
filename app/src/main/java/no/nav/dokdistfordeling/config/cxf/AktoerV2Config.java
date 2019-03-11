@@ -28,6 +28,7 @@ public class AktoerV2Config {
 		clientFactory.setServiceClass(AktoerV2.class);
 		clientFactory.setAddress(aktoerV2Url);
 		clientFactory.setFeatures(Collections.singletonList(new WSAddressingFeature()));
+
 		AktoerV2 aktoerV2 = (AktoerV2) clientFactory.create();
 		stsConfig.configureSTS(aktoerV2);
 		Client client = ClientProxy.getClient(aktoerV2);

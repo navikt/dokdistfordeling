@@ -3,7 +3,7 @@ package no.nav.dokdistfordeling.qdist008;
 import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
-import no.nav.dokdistfordeling.exception.DokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.DokdistfordelingFunctionalException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
@@ -38,20 +38,20 @@ public class Qdist008Route extends SpringRouteBuilder {
 	private final Queue qdist008FunksjonellFeil;
 
 	@Inject
-	public Qdist008Route(Qdist008Service qdist008Service,
+	public Qdist008Route(Queue qdist008,
+						 Queue qdist009,
+						 Queue qdist008FunksjonellFeil,
+						 Qdist008Service qdist008Service,
 						 DistribuerForsendelseMapper distribuerForsendelseMapper,
 						 ForsendelseValidator forsendelseValidator,
-						 DokdistStatusUpdater dokdistStatusUpdater,
-						 Queue qdist008,
-						 Queue qdist009,
-						 Queue qdist008FunksjonellFeil) {
+						 DokdistStatusUpdater dokdistStatusUpdater) {
+		this.qdist008 = qdist008;
+		this.qdist009 = qdist009;
+		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
 		this.qdist008Service = qdist008Service;
 		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
 		this.forsendelseValidator = forsendelseValidator;
 		this.dokdistStatusUpdater = dokdistStatusUpdater;
-		this.qdist008 = qdist008;
-		this.qdist009 = qdist009;
-		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
 	}
 
 	@Override
