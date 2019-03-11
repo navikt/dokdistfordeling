@@ -83,6 +83,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.setProperty(PROPERTY_BESTILLINGS_ID, xpath("//bestillingsId/text()", String.class))
 				.log(LoggingLevel.INFO, log, "qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
 				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
+				.setProperty(PROPERTY_ORIGINAL_PAYLOAD, simple("${body}"))
 				.doCatch(Exception.class)
 				.end()
 				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/distribuerforsendelse.xsd")
