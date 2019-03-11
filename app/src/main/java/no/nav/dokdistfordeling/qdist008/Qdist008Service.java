@@ -2,6 +2,7 @@ package no.nav.dokdistfordeling.qdist008;
 
 import static no.nav.dokdistfordeling.metrics.MetricUpdater.updateQdist008Metrics;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
+import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
 import static org.springframework.util.StringUtils.isEmpty;
 
 import no.nav.dokdistfordeling.consumer.aktoerv2.Aktoer;
@@ -70,19 +71,9 @@ public class Qdist008Service {
 		exchange.setProperty(PROPERTY_FORSENDELSE_ID, persisterForsendelseResponseTo.getForsendelseId());
 
 		updateArkivIfArkivsystemIsJoark(distribusjonbestilling, distribusjonsKanal);
-
 		updateQdist008Metrics(persisterForsendelseRequestTo, distribusjonbestilling);
 
 		return new DistribuerForsendelseTilSentralPrint(persisterForsendelseResponseTo.getForsendelseId());
-	}
-
-	private String getDokumenttypeIdHoveddokument(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
-		return distribusjonbestilling.getDokumenter().stream()
-				.filter(dokumentInformasjonTo -> dokumentInformasjonTo.getTilknyttetSom()
-						.equals(TilknyttetSomCode.HOVEDDOKUMENT))
-				.map(DistribuerForsendelseTo.DokumentInformasjonTo::getDokumenttypeId)
-				.collect(Collectors.toList())
-				.get(0);
 	}
 
 	private DokumenttypeInfoTo getTittelFromDokkkatIfNotProvided(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {

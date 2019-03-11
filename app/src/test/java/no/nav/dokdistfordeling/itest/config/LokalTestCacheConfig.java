@@ -4,7 +4,6 @@ import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACH
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
@@ -18,11 +17,10 @@ import java.util.concurrent.TimeUnit;
  * @author Joakim Bjørnstad, Jbit AS
  */
 @Configuration
-@EnableCaching
+@Profile({"itest"})
 public class LokalTestCacheConfig {
 
 	@Bean
-	@Profile({"itest"})
 	CacheManager cacheManager() {
 		SimpleCacheManager manager = new SimpleCacheManager();
 		manager.setCaches(Arrays.asList(

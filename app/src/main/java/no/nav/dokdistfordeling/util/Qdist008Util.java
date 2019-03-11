@@ -10,6 +10,13 @@ public class Qdist008Util {
 	private Qdist008Util() {
 	}
 
+	public static int countHoveddokument(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
+		return (int) distribusjonbestilling.getDokumenter().stream()
+				.filter(dokumentInformasjonTo -> dokumentInformasjonTo.getTilknyttetSom()
+						.equals(TilknyttetSomCode.HOVEDDOKUMENT))
+				.count();
+	}
+
 	public static int countVedlegg(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
 		return (int) distribusjonbestilling.getDokumenter().stream()
 				.filter(dokumentInformasjonTo -> dokumentInformasjonTo.getTilknyttetSom()

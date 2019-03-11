@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 public class Qdist008Route extends SpringRouteBuilder {
 
 	public static final String SERVICE_ID = "qdist008";
-	static final String PROPERTY_ORIGINAL_PAYLOAD = "qdok008OriginalPayload";
 	static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
 	static final String PROPERTY_FORSENDELSE_ID = "forsendelseId";
 

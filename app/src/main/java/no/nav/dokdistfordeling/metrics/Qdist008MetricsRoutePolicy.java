@@ -1,10 +1,10 @@
 package no.nav.dokdistfordeling.metrics;
 
-import static no.nav.dokdistfordeling.metrics.PrometheusLabels.LABEL_ERROR_TYPE;
-import static no.nav.dokdistfordeling.metrics.PrometheusLabels.LABEL_EXCEPTION_NAME;
-import static no.nav.dokdistfordeling.metrics.PrometheusLabels.LABEL_PROCESS;
-import static no.nav.dokdistfordeling.metrics.PrometheusLabels.TYPE_FUNCTIONAL_EXCEPTION;
-import static no.nav.dokdistfordeling.metrics.PrometheusLabels.TYPE_TECHNICAL_EXCEPTION;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_ERROR_TYPE;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_EXCEPTION_NAME;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_PROCESS;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.TYPE_FUNCTIONAL_EXCEPTION;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.TYPE_TECHNICAL_EXCEPTION;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
 
 import io.micrometer.core.instrument.MeterRegistry;

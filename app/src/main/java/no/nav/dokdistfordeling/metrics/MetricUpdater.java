@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.metrics;
 
-import static no.nav.dokdistfordeling.metrics.PrometheusLabels.LABEL_PROCESS;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_PROCESS;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
 import static no.nav.dokdistfordeling.util.Qdist008Util.countVedlegg;
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
@@ -44,6 +44,7 @@ public class MetricUpdater {
 				LABEL_DOKUMENTTYPEID, getDokumenttypeIdHoveddokument(distribusjonbestilling),
 				LABEL_TEMA, persisterForsendelseRequestTo.getTema().toString(),
 				LABEL_TILKNYTNING, VEDLEGG,
-				LABEL_BESTILLENDE_FAGSYSTEM, persisterForsendelseRequestTo.getBestillendeFagsystem()).increment(countVedlegg(distribusjonbestilling));
+				LABEL_BESTILLENDE_FAGSYSTEM, persisterForsendelseRequestTo.getBestillendeFagsystem())
+				.increment(countVedlegg(distribusjonbestilling));
 	}
 }

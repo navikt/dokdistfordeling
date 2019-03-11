@@ -2,7 +2,6 @@ package no.nav.dokdistfordeling.config.cxf;
 
 import no.nav.dokdistfordeling.config.alias.ArkiverDokumentproduksjonV1Alias;
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
-import no.nav.dokdistfordeling.config.sts.STSConfig;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.ArkiverDokumentproduksjonV1;
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
@@ -31,8 +30,8 @@ public class ArkiverDokumentproduksjonV1Config extends AbstractCxfEndpointConfig
 	private static final String WSDL_URL = "wsdl/no/nav/tjeneste/domene/brevogarkiv/arkiverdokumentproduksjon/v1/arkiverdokumentproduksjon.wsdl";
 
 	@Inject
-	public ArkiverDokumentproduksjonV1Config(Bus bus, STSConfig stsConfig) {
-		super(bus, stsConfig);
+	public ArkiverDokumentproduksjonV1Config(Bus bus) {
+		super(bus);
 	}
 
 	@Bean

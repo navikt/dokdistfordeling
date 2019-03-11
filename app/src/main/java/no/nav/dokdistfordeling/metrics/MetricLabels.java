@@ -3,7 +3,7 @@ package no.nav.dokdistfordeling.metrics;
 /**
  * @author Jakob A. Libak, NAV.
  */
-public final class PrometheusLabels {
+public final class MetricLabels {
 
 	public static final String TYPE_TECHNICAL_EXCEPTION = "technical";
 	public static final String TYPE_FUNCTIONAL_EXCEPTION = "functional";
@@ -11,6 +11,6 @@ public final class PrometheusLabels {
 	public static final String LABEL_ERROR_TYPE = "error_type";
 	public static final String LABEL_EXCEPTION_NAME = "exception_name";
 
-	private PrometheusLabels() {
+	private MetricLabels() {
 	}
 }
