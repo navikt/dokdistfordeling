@@ -2,7 +2,6 @@ package no.nav.dokdistfordeling.storage;
 
 import static java.util.stream.Collectors.joining;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static no.nav.dokdistfordeling.storage.config.StorageConfiguration.BUCKET_NAME;
 
@@ -50,7 +49,7 @@ public class S3Storage implements Storage {
 	}
 
 	@Override
-	@Retryable(include = DokdistfordelingTechnicalException.class, maxAttempts = MAX_ATTEMPTS_SHORT, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(include = DokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public Optional<String> get(String key) {
 		try {
 			String encryptedValue = readString(key);
