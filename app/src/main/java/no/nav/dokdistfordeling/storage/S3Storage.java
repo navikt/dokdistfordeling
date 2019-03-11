@@ -32,20 +32,17 @@ public class S3Storage implements Storage {
 		this.encryptionPassphrase = encryptionPassphrase;
 	}
 
+
+	//	Bare brukt for testing dersom vi ønsker å persistere dummy-data til bucket. Også brukt for å verifisere s3-oppsett
 	@Override
 	public void put(String key, String value) {
-		throw new UnsupportedOperationException("dokdistfordeling støtter ikke persistering av objekter til dokdistmellomlager");
+		try {
+			String encryptedValue = encrypt(value, key);
+			writeString(key, encryptedValue);
+		} catch (Exception e) {
+			throw new S3FailedToGetDocumentTechnicalException(String.format("Feilet ved sending av dokument til S3. Nøkkel=%s", key), e);
+		}
 	}
-
-//	Bare brukt for testing dersom vi ønsker å persistere dummy-data til bucket
-//	public void put(String key, String value) {
-//		try {
-//			String encryptedValue = encrypt(value, key);
-//			writeString(key, encryptedValue);
-//		} catch (Exception e) {
-//			throw new S3FailedToGetDocumentTechnicalException(String.format("Feilet ved sending av dokument til S3. Nøkkel=%s", key), e);
-//		}
-//	}
 
 	@Override
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
