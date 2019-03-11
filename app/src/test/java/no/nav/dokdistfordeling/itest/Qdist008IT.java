@@ -35,7 +35,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -146,7 +145,6 @@ public class Qdist008IT {
 	}
 
 	@Test
-	@Disabled
 	public void shouldProcessWithoutContactingDokkat() throws Exception {
 
 		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
@@ -172,7 +170,7 @@ public class Qdist008IT {
 			assertThat(response.replaceAll("\r", "").replaceAll("\t", ""), is(classpathToString("qdist009/qdist009-happy.txt").replaceAll("\r", "").replaceAll("\t", "")));
 		});
 
-		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/2222222")));
 	}
 
 	@Test

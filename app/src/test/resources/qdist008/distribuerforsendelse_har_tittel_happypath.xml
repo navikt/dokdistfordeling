@@ -28,7 +28,7 @@
 		<dokumentProdApp>token</dokumentProdApp>
 		<dokumenter>
 			<dokumentInformasjon>
-				<dokumenttypeId>1111111</dokumenttypeId>
+				<dokumenttypeId>2222222</dokumenttypeId>
 				<dokumentObjektReferanse>testKey</dokumentObjektReferanse>
 				<tilknyttetSom>HOVEDDOKUMENT</tilknyttetSom>
 				<!--Optional:-->
