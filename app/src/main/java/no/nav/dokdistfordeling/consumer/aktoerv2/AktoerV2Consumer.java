@@ -4,8 +4,8 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.exception.functional.AktoerV2PersonIkkeFunnetFunctionalExceptionAbstract;
-import no.nav.dokdistfordeling.exception.technical.AktoerV2HentIdentForAktoerIdTechnicalExceptionAbstract;
+import no.nav.dokdistfordeling.exception.functional.AktoerV2PersonIkkeFunnetFunctionalException;
+import no.nav.dokdistfordeling.exception.technical.AktoerV2HentIdentForAktoerIdTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.tjeneste.virksomhet.aktoer.v2.binding.AktoerV2;
 import no.nav.tjeneste.virksomhet.aktoer.v2.binding.HentIdentForAktoerIdPersonIkkeFunnet;
@@ -42,9 +42,9 @@ public class AktoerV2Consumer implements Aktoer {
 					.foedselsnr(response.getIdent())
 					.build();
 		} catch (HentIdentForAktoerIdPersonIkkeFunnet e) {
-			throw new AktoerV2PersonIkkeFunnetFunctionalExceptionAbstract(String.format("Ident ikke funnet for aktoerId=%s", aktoerId), e);
+			throw new AktoerV2PersonIkkeFunnetFunctionalException(String.format("Ident ikke funnet for aktoerId=%s", aktoerId), e);
 		} catch (Exception e) {
-			throw new AktoerV2HentIdentForAktoerIdTechnicalExceptionAbstract(String.format("Teknisk feil mot aktoerv2:HentIdentForAktoerId. AktoerId=%s. Feilmelding=%s", aktoerId, e
+			throw new AktoerV2HentIdentForAktoerIdTechnicalException(String.format("Teknisk feil mot aktoerv2:HentIdentForAktoerId. AktoerId=%s. Feilmelding=%s", aktoerId, e
 					.getMessage()), e);
 		}
 	}

@@ -2,9 +2,9 @@ package no.nav.dokdistfordeling.qdist008;
 
 import static java.lang.String.format;
 
-import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalExceptionAbstract;
-import no.nav.dokdistfordeling.exception.functional.DocumentNotFoundInS3FunctionalExceptionAbstract;
-import no.nav.dokdistfordeling.exception.functional.ValidationExceptionAbstract;
+import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.DocumentNotFoundInS3FunctionalException;
+import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.camel.Handler;
@@ -40,13 +40,13 @@ public class ForsendelseValidator {
 				.count();
 
 		if (numberOfHoveddokumenter != 1) {
-			throw new ValidationExceptionAbstract(format("Forsendelsen må inneholde nøyaktig ett hoveddokument. Fant %s hoveddokument(er) på forsendelsen", numberOfHoveddokumenter));
+			throw new ValidationException(format("Forsendelsen må inneholde nøyaktig ett hoveddokument. Fant %s hoveddokument(er) på forsendelsen", numberOfHoveddokumenter));
 		}
 	}
 
 	private void assertThatAdresseIsPresentIfMottakerIsSamhandler(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
 		if (distribusjonbestillingTo.getMottaker().isSamhandler() && distribusjonbestillingTo.getAdresse() == null) {
-			throw new ValidationExceptionAbstract("Mottaker er av typen samhandler. Da er adresse et påkrevd felt i input til qdist008. Fant ingen adresse på bestilling");
+			throw new ValidationException("Mottaker er av typen samhandler. Da er adresse et påkrevd felt i input til qdist008. Fant ingen adresse på bestilling");
 		}
 	}
 
@@ -54,7 +54,7 @@ public class ForsendelseValidator {
 		try {
 			UUID.fromString(bestillingsId);
 		} catch (IllegalArgumentException exception) {
-			throw new BestillingsIdInvalidUuidFunctionalExceptionAbstract(format("bestillingsId er ikke en gyldig UUID (universally unique identifier). Fikk bestilling=%s", bestillingsId));
+			throw new BestillingsIdInvalidUuidFunctionalException(format("bestillingsId er ikke en gyldig UUID (universally unique identifier). Fikk bestilling=%s", bestillingsId));
 		}
 	}
 
@@ -64,7 +64,7 @@ public class ForsendelseValidator {
 					//Todo: Fjern put - kun for test!
 					storage.put(dokumentInformasjonTo.getDokumentObjektReferanse(), "TESTPUT22");
 					storage.get(dokumentInformasjonTo.getDokumentObjektReferanse())
-							.orElseThrow(() -> new DocumentNotFoundInS3FunctionalExceptionAbstract(format("Kunne ikke finne dokument i S3 på key=dokumentObjektReferanse=%s", dokumentInformasjonTo
+							.orElseThrow(() -> new DocumentNotFoundInS3FunctionalException(format("Kunne ikke finne dokument i S3 på key=dokumentObjektReferanse=%s", dokumentInformasjonTo
 									.getDokumentObjektReferanse())));
 				});
 	}

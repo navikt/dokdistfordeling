@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.storage.crypto;
 
-import no.nav.dokdistfordeling.exception.functional.CryptoExceptionAbstract;
+import no.nav.dokdistfordeling.exception.functional.CryptoException;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;
@@ -40,7 +40,7 @@ public class Crypto {
 			cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv.getBytes()));
 			return Base64.getEncoder().encodeToString(cipher.doFinal(plainText.getBytes()));
 		} catch (Exception ex) {
-			throw new CryptoExceptionAbstract("Feilet ved kryptering av tekst", ex);
+			throw new CryptoException("Feilet ved kryptering av tekst", ex);
 		}
 	}
 
@@ -50,7 +50,7 @@ public class Crypto {
 			cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv.getBytes()));
 			return new String(cipher.doFinal(Base64.getDecoder().decode(encrypted)));
 		} catch (Exception ex) {
-			throw new CryptoExceptionAbstract("Feilet ved dekryptering av tekst", ex);
+			throw new CryptoException("Feilet ved dekryptering av tekst", ex);
 		}
 	}
 
@@ -62,7 +62,7 @@ public class Crypto {
 			SecretKey key = factory.generateSecret(spec);
 			return new SecretKeySpec(key.getEncoded(), "AES");
 		} catch (Exception ex) {
-			throw new CryptoExceptionAbstract("Feilet ved generering av krypteringsnøkkel", ex);
+			throw new CryptoException("Feilet ved generering av krypteringsnøkkel", ex);
 		}
 	}
 
