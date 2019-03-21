@@ -37,8 +37,8 @@ public class DistribuerForsendelseMapper {
 					.distribusjonbestilling(mapDokumentbestillingsinformasjon(distribuerForsendelse.getDistribusjonbestilling()))
 					.build();
 		} catch (IllegalArgumentException e) {
-			throw new DistrubuerForsendelseMapFunctionalException("Kunne ikke mappe qdist008-XML til domene-objekter for bestillingsId=" +
-					distribuerForsendelse.getDistribusjonbestilling().getBestillingsId(), e);
+			throw new DistrubuerForsendelseMapFunctionalException(format("Kunne ikke mappe qdist008-XML til domene-objekter. Feilmelding=" ,
+					distribuerForsendelse.getDistribusjonbestilling().getBestillingsId(), e.getMessage()), e);
 		}
 	}
 
