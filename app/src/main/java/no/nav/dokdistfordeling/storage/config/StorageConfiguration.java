@@ -31,10 +31,10 @@ import java.util.List;
 @Profile("nais")
 public class StorageConfiguration {
 
-	@Value("${dokdistmellomlager_s3_creds_username}")
+	@Value("${dokdistfordeling_s3_creds_username}")
 	private String accessKey;
 
-	@Value("${dokdistmellomlager_s3_creds_password}")
+	@Value("${dokdistfordeling_s3_creds_password}")
 	private String secretKey;
 
 	@Value("${storage_s3_url}")
