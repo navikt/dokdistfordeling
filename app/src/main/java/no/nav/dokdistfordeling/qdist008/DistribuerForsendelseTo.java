@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
-import no.nav.dokdistfordeling.kodeverk.MottakerTypeCode;
+import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.TemaCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 
@@ -31,7 +31,8 @@ public class DistribuerForsendelseTo {
 		private final TemaCode tema;
 		private final String forsendelseTittel;
 		private final ArkivInformasjonTo arkivInformasjon;
-		private final MottakerTo mottaker;
+		private final AktoerTo mottaker;
+		private final AktoerTo bruker;
 		private final AdresseTo adresse;
 		private final String dokumentProdApp;
 		private final List<DokumentInformasjonTo> dokumenter;
@@ -39,14 +40,14 @@ public class DistribuerForsendelseTo {
 
 	@Value
 	@Builder
-	public static class MottakerTo {
+	public static class AktoerTo {
 		private final String identifikator;
 		private final String navn;
 		private final boolean identifikatorAktoerId;
-		private final MottakerTypeCode mottakerType;
+		private final AktoerTypeCode aktoerType;
 
 		public boolean isSamhandler() {
-			return this.getMottakerType().equals(MottakerTypeCode.SAMHANDLER_HPR);
+			return this.getAktoerType().equals(AktoerTypeCode.SAMHANDLER_HPR);
 		}
 
 	}

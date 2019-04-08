@@ -4,8 +4,8 @@ import static java.lang.String.format;
 
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
+import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
-import no.nav.dokdistfordeling.kodeverk.MottakerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.TemaCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.Adresse;
@@ -52,6 +52,7 @@ public class DistribuerForsendelseMapper {
 				.arkivInformasjon(distribusjonbestilling.getArkivInformasjon() == null ? null :
 						mapArkivInformasjon(distribusjonbestilling.getArkivInformasjon()))
 				.mottaker(mapAktoer(distribusjonbestilling.getMottaker()))
+				.bruker(mapAktoer(distribusjonbestilling.getBruker()))
 				.adresse(mapAdresse(distribusjonbestilling.getAdresse()))
 				.dokumentProdApp(distribusjonbestilling.getDokumentProdApp())
 				.dokumenter(distribusjonbestilling.getDokumenter().stream()
@@ -73,41 +74,41 @@ public class DistribuerForsendelseMapper {
 				.build();
 	}
 
-	private DistribuerForsendelseTo.MottakerTo mapAktoer(Aktoer mottaker) {
-		if (mottaker instanceof Person) {
-			Person person = (Person) mottaker;
-			return DistribuerForsendelseTo.MottakerTo.builder()
+	private DistribuerForsendelseTo.AktoerTo mapAktoer(Aktoer aktoer) {
+		if (aktoer instanceof Person) {
+			Person person = (Person) aktoer;
+			return DistribuerForsendelseTo.AktoerTo.builder()
 					.navn(person.getNavn())
 					.identifikator(person.getPersonidentifikator())
-					.mottakerType(MottakerTypeCode.PERSON)
+					.aktoerType(AktoerTypeCode.PERSON)
 					.identifikatorAktoerId(false)
 					.build();
-		} else if (mottaker instanceof Organisasjon) {
-			Organisasjon organisasjon = (Organisasjon) mottaker;
-			return DistribuerForsendelseTo.MottakerTo.builder()
+		} else if (aktoer instanceof Organisasjon) {
+			Organisasjon organisasjon = (Organisasjon) aktoer;
+			return DistribuerForsendelseTo.AktoerTo.builder()
 					.navn(organisasjon.getNavn())
 					.identifikator(organisasjon.getOrgnummer())
-					.mottakerType(MottakerTypeCode.ORGANISASJON)
+					.aktoerType(AktoerTypeCode.ORGANISASJON)
 					.identifikatorAktoerId(false)
 					.build();
-		} else if (mottaker instanceof AktoerId) {
-			AktoerId aktoerId = (AktoerId) mottaker;
-			return DistribuerForsendelseTo.MottakerTo.builder()
+		} else if (aktoer instanceof AktoerId) {
+			AktoerId aktoerId = (AktoerId) aktoer;
+			return DistribuerForsendelseTo.AktoerTo.builder()
 					.navn(aktoerId.getNavn())
 					.identifikator(aktoerId.getAktoerId())
-					.mottakerType(MottakerTypeCode.PERSON)
+					.aktoerType(AktoerTypeCode.PERSON)
 					.identifikatorAktoerId(true)
 					.build();
-		} else if (mottaker instanceof Samhandler) {
-			Samhandler samhandler = (Samhandler) mottaker;
-			return DistribuerForsendelseTo.MottakerTo.builder()
+		} else if (aktoer instanceof Samhandler) {
+			Samhandler samhandler = (Samhandler) aktoer;
+			return DistribuerForsendelseTo.AktoerTo.builder()
 					.navn(samhandler.getNavn())
 					.identifikator(samhandler.getSamhandleridentifikator())
-					.mottakerType(mapSamhandlerKategoriToSamhandlerType(samhandler.getSamhandlerkategori()))
+					.aktoerType(mapSamhandlerKategoriToSamhandlerType(samhandler.getSamhandlerkategori()))
 					.identifikatorAktoerId(false)
 					.build();
 		} else {
-			throw new IllegalArgumentException(format("Ugyldig type for mottaker %s", mottaker.getClass().getName()));
+			throw new IllegalArgumentException(format("Ugyldig type for mottaker %s", aktoer.getClass().getName()));
 		}
 	}
 
@@ -137,11 +138,11 @@ public class DistribuerForsendelseMapper {
 		}
 	}
 
-	private MottakerTypeCode mapSamhandlerKategoriToSamhandlerType(String samhandlerKategori) {
+	private AktoerTypeCode mapSamhandlerKategoriToSamhandlerType(String samhandlerKategori) {
 		if (samhandlerKategori == null) {
 			throw new ValidationException("Ugyldig input: samhandlerkategori kan ikke være null");
 		} else if (SamhandlerKategoriCode.HPR.name().equals(samhandlerKategori)) {
-			return MottakerTypeCode.SAMHANDLER_HPR;
+			return AktoerTypeCode.SAMHANDLER_HPR;
 		} else {
 			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
 		}

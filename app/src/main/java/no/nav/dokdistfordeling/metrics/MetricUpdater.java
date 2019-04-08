@@ -15,7 +15,7 @@ import javax.inject.Inject;
 @Component
 public class MetricUpdater {
 
-	private static final String QDIST008_SERVICE = "service";
+	private static final String QDIST008_SERVICE = "dok_business_counter";
 	private static final String HOVEDDOKUMENT = "hoveddokument";
 	private static final String VEDLEGG = "vedlegg";
 	private static final String LABEL_TEMA = "tema";

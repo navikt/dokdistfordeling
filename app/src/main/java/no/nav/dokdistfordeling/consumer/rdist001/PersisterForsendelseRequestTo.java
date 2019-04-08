@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Value;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
-import no.nav.dokdistfordeling.kodeverk.MottakerTypeCode;
+import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.TemaCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 
@@ -34,7 +34,7 @@ public class PersisterForsendelseRequestTo {
 	static class MottakerTo {
 		private final String mottakerId;
 		private final String mottakerNavn;
-		private final MottakerTypeCode mottakerType;
+		private final AktoerTypeCode mottakerType;
 	}
 
 	@Value

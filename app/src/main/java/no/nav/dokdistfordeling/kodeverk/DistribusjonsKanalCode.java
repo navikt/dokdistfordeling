@@ -7,10 +7,11 @@ package no.nav.dokdistfordeling.kodeverk;
  */
 public enum DistribusjonsKanalCode {
 
-	/**
-	 * Sentralprint
-	 */
-	PRINT("S");
+	PRINT("S"),
+	SDP("SDP"),
+	DITT_NAV("NAV_NO"),
+	LOKAL_PRINT("L"),
+	INGEN_DISTRIBUSJON("INGEN_DISTRIBUSJON");
 
 	private final String joarkUtsendingsKanal;
 

@@ -19,7 +19,7 @@ public class PersisterForsendelseToRequestMapper {
 											 DokumenttypeInfoTo dokumenttypeInfoTo,
 											 HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo,
 											 DistribusjonsKanalCode distribusjonsKanal) {
-		final DistribuerForsendelseTo.MottakerTo mottaker = distribusjonbestilling.getMottaker();
+		final DistribuerForsendelseTo.AktoerTo mottaker = distribusjonbestilling.getMottaker();
 		final DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon = distribusjonbestilling.getArkivInformasjon();
 		final DistribuerForsendelseTo.AdresseTo adresse = distribusjonbestilling.getAdresse();
 		final List<DistribuerForsendelseTo.DokumentInformasjonTo> dokumentInformasjonToList = distribusjonbestilling.getDokumenter();
@@ -56,11 +56,11 @@ public class PersisterForsendelseToRequestMapper {
 				.build();
 	}
 
-	private PersisterForsendelseRequestTo.MottakerTo mapMottaker(DistribuerForsendelseTo.MottakerTo mottaker, HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo) {
+	private PersisterForsendelseRequestTo.MottakerTo mapMottaker(DistribuerForsendelseTo.AktoerTo mottaker, HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo) {
 		return PersisterForsendelseRequestTo.MottakerTo.builder()
 				.mottakerId(getMottakerId(mottaker, hentIdentForAktoerIdResponseTo))
 				.mottakerNavn(mottaker.getNavn())
-				.mottakerType(mottaker.getMottakerType())
+				.mottakerType(mottaker.getAktoerType())
 				.build();
 	}
 
@@ -82,7 +82,7 @@ public class PersisterForsendelseToRequestMapper {
 				.build();
 	}
 
-	private String getMottakerId(DistribuerForsendelseTo.MottakerTo mottaker, HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo) {
+	private String getMottakerId(DistribuerForsendelseTo.AktoerTo mottaker, HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo) {
 		return mottaker.isIdentifikatorAktoerId() ? hentIdentForAktoerIdResponseTo.getFoedselsnr() : mottaker.getIdentifikator();
 	}
 

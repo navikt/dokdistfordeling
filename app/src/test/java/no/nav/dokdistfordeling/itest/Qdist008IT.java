@@ -27,6 +27,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import no.nav.dokdistfordeling.Application;
 import no.nav.dokdistfordeling.itest.config.ApplicationTestConfig;
 import no.nav.dokdistfordeling.storage.Storage;
@@ -98,6 +99,10 @@ public class Qdist008IT {
 		cacheManager.getCache(TKAT020_CACHE).clear();
 		reset(storage);
 		when(storage.get(any(String.class))).thenReturn(Optional.of(" "));
+
+		WireMock.reset();
+		WireMock.resetAllRequests();
+		WireMock.removeAllMappings();
 	}
 
 	@Test
@@ -109,6 +114,9 @@ public class Qdist008IT {
 		stubFor(post("/aktoerv2")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
 		stubFor(post("/arkiverdokumentproduksjon/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
@@ -127,19 +135,16 @@ public class Qdist008IT {
 		});
 
 		verify(getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-
-		verify(postRequestedFor(urlEqualTo("/aktoerv2"))
+		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
 				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
-
 		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-
+		verify(postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//bestemkanal/bestemkanal-happy.json"))));
 		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-
 		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("S"))));
-
 		verify(postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseOutHappy.json"))));
 	}
@@ -153,6 +158,9 @@ public class Qdist008IT {
 		stubFor(post("/aktoerv2")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
 		stubFor(post("/arkiverdokumentproduksjon/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
@@ -170,7 +178,19 @@ public class Qdist008IT {
 			assertThat(response.replaceAll("\r", "").replaceAll("\t", ""), is(classpathToString("qdist009/qdist009-happy.txt").replaceAll("\r", "").replaceAll("\t", "")));
 		});
 
-		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/2222222")));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
+		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
+				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
+		verify(postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//bestemkanal/bestemkanal-happy.json"))));
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("S"))));
+		verify(postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseOutWithTittelHappy.json"))));
 	}
 
 	@Test
@@ -253,31 +273,6 @@ public class Qdist008IT {
 	}
 
 	@Test
-	public void shouldThrowSettJournalpostAttributterTechnicalException() throws Exception {
-
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
-		stubFor(post("/administrerforsendelse/v1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
-						.withBody("tjoark110/settJournalpostAttributterHappy.xml")));
-
-		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
-
-
-		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
-			String resultOnQdist008BackoutQueue = receive(backoutQueue);
-			assertThat(resultOnQdist008BackoutQueue, is(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml")));
-		});
-	}
-
-	@Test
 	public void shouldThrowAktoerV2FunctionalException() throws Exception {
 
 		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
@@ -322,7 +317,7 @@ public class Qdist008IT {
 	}
 
 	@Test
-	public void shouldThrowPersisterForsendelseFunctionalException() throws Exception {
+	public void shouldThrowBestemDokdistKanalFunctionalException() throws Exception {
 
 		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
@@ -330,9 +325,86 @@ public class Qdist008IT {
 		stubFor(post("/aktoerv2")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
+		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.BAD_REQUEST.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBody("")));
+
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			String resultOnQdist008FunksjonellFeilQueue = receive(qdist008FunksjonellFeil);
+			assertThat(resultOnQdist008FunksjonellFeilQueue.replaceAll("\r", "").replaceAll("\t", ""), is(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml").replaceAll("\r", "").replaceAll("\t", "")));
+		});
+
+		verify(getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
+		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
+				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(postRequestedFor(urlEqualTo("/bestemDistribusjonKanal")));
+	}
+
+	@Test
+	public void shouldThrowBestemDokdistKanalTechnicalException() throws Exception {
+
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
+		stubFor(post("/aktoerv2")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
+						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBody("")));
+
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			String resultOnQdist008BackoutQueue = receive(backoutQueue);
+			assertThat(resultOnQdist008BackoutQueue, is(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml")));
+		});
+
+		verify(getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
+		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
+				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(postRequestedFor(urlEqualTo("/bestemDistribusjonKanal")));
+	}
+
+	@Test
+	public void shouldThrowBestemDokdistKanalMappingException() throws Exception {
+
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
+		stubFor(post("/aktoerv2")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("bestemkanal/distribusjonsKanalPrint-mappingException.json")));
+
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			String resultOnQdist008FunksjonellFeilQueue = receive(qdist008FunksjonellFeil);
+			assertThat(resultOnQdist008FunksjonellFeilQueue.replaceAll("\r", "").replaceAll("\t", ""), is(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml").replaceAll("\r", "").replaceAll("\t", "")));
+		});
+
+		verify(getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
+		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
+				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(postRequestedFor(urlEqualTo("/bestemDistribusjonKanal")));
+	}
+
+	@Test
+	public void shouldThrowPersisterForsendelseFunctionalException() throws Exception {
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
+		stubFor(post("/aktoerv2")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.BAD_REQUEST.value())));
 
@@ -343,7 +415,13 @@ public class Qdist008IT {
 			assertThat(resultOnQdist008FunksjonellFeilQueue.replaceAll("\r", "").replaceAll("\t", ""), is(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml").replaceAll("\r", "").replaceAll("\t", "")));
 		});
 
-		verify(postRequestedFor(urlEqualTo("/administrerforsendelse/v1")));
+		verify(getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
+		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
+				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//bestemkanal/bestemkanal-happy.json"))));
+		verify(postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseOutHappy.json"))));
 	}
 
 
@@ -356,9 +434,9 @@ public class Qdist008IT {
 		stubFor(post("/aktoerv2")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
+		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
@@ -369,7 +447,52 @@ public class Qdist008IT {
 			assertThat(resultOnQdist008BackoutQueue.replaceAll("\r", "").replaceAll("\t", ""), is(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml").replaceAll("\r", "").replaceAll("\t", "")));
 		});
 
-		verify(postRequestedFor(urlEqualTo("/administrerforsendelse/v1")));
+		verify(getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
+		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
+				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//bestemkanal/bestemkanal-happy.json"))));
+		verify(postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseOutHappy.json"))));
+	}
+
+	@Test
+	public void shouldThrowSettJournalpostAttributterTechnicalException() throws Exception {
+
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
+		stubFor(post("/aktoerv2")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
+		stubFor(post("/administrerforsendelse/v1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubFor(post("/arkiverdokumentproduksjon/v1")
+				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+						.withBody("tjoark110/settJournalpostAttributterHappy.xml")));
+
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
+
+		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+			String resultOnQdist008BackoutQueue = receive(backoutQueue);
+			assertThat(resultOnQdist008BackoutQueue, is(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml")));
+		});
+
+		verify(getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
+		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
+				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
+		verify(postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//bestemkanal/bestemkanal-happy.json"))));
+		verify(postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseOutHappy.json"))));
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
 	}
 
 	@Test
@@ -381,6 +504,9 @@ public class Qdist008IT {
 		stubFor(post("/aktoerv2")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
 		stubFor(post("/arkiverdokumentproduksjon/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
@@ -398,6 +524,19 @@ public class Qdist008IT {
 			assertEquals(resultOnQdist008FunksjonellFeilQueue, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 		});
 
+		verify(getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
+		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
+				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
+		verify(postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//bestemkanal/bestemkanal-happy.json"))));
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("S"))));
+		verify(postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseOutHappy.json"))));
 		verify(putRequestedFor(urlEqualTo(("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST"))));
 	}
 
@@ -410,6 +549,9 @@ public class Qdist008IT {
 		stubFor(post("/aktoerv2")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
 		stubFor(post("/arkiverdokumentproduksjon/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
@@ -426,6 +568,19 @@ public class Qdist008IT {
 			assertThat(resultOnQdist008BackoutQueue, is(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml")));
 		});
 
+		verify(getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
+		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
+				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
+		verify(postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//bestemkanal/bestemkanal-happy.json"))));
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
+		verify(postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("S"))));
+		verify(postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseOutHappy.json"))));
 		verify(putRequestedFor(urlEqualTo(("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST"))));
 	}
 

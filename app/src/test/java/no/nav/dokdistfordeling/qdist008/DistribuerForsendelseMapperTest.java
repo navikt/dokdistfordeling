@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
-import no.nav.dokdistfordeling.kodeverk.MottakerTypeCode;
+import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.AktoerId;
@@ -39,12 +39,14 @@ class DistribuerForsendelseMapperTest {
 	private static final String FORSENDELSE_TITTEL = "forsendelseTittel";
 	private static final String ARKIV_SYSTEM = "JOARK";
 	private static final String ARKIV_ID = "arkivId";
-	private static final String PERSON_NAVN = "personNavn";
-	private static final String AKTOER_ID_NAVN = "aktoerIdNavn";
+	private static final String PERSON_NAVN_MOTTAKER = "personNavnMottaker";
+	private static final String PERSON_NAVN_BRUKER = "personNavnBruker";
+	private static final String MOTTAKER_ID_NAVN = "mottakerIdNavn";
 	private static final String ORGANISASJON_NAVN = "organisasjonNavn";
 	private static final String SAMHANDLER_NAVN = "samhandlerNavn";
-	private static final String PERSON_IDENTIFIKATOR = "personId";
-	private static final String AKTOER_ID = "aktoerId";
+	private static final String PERSON_IDENTIFIKATOR_MOTTAKER = "personIdMottaker";
+	private static final String PERSON_IDENTIFIKATOR_BRUKER = "personIdBruker";
+	private static final String MOTTAKER_ID = "mottakerId";
 	private static final String ORGNUMMER = "orgnr";
 	private static final String SAMHANDLER_IDENTIFIKATOR = "samhandlerId";
 	private static final String SAMHANDLER_KATEGORI_HPR = "HPR";
@@ -67,7 +69,6 @@ class DistribuerForsendelseMapperTest {
 	private static final int REKKEFOLGE_2 = 2;
 
 	private DistribuerForsendelseMapper distribuerForsendelseMapper = new DistribuerForsendelseMapper();
-
 
 	@Test
 	public void shouldMap() {
@@ -93,40 +94,41 @@ class DistribuerForsendelseMapperTest {
 
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
-		final DistribuerForsendelseTo.MottakerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
-		assertEquals(mottakerTo.getIdentifikator(), AKTOER_ID);
-		assertEquals(mottakerTo.getNavn(), AKTOER_ID_NAVN);
-		assertEquals(mottakerTo.getMottakerType(), MottakerTypeCode.PERSON);
+		final DistribuerForsendelseTo.AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
+		assertEquals(mottakerTo.getIdentifikator(), MOTTAKER_ID);
+		assertEquals(mottakerTo.getNavn(), MOTTAKER_ID_NAVN);
+		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.PERSON);
 		assertTrue(mottakerTo.isIdentifikatorAktoerId());
 	}
 
 	@Test
 	public void shouldMapOrganisasjon() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().withMottaker(createMottakerOrganisasjon());
+		distribuerForsendelse.getDistribusjonbestilling().withMottaker(createAktoerOrganisasjon());
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
-		final DistribuerForsendelseTo.MottakerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getBruker());
+		final DistribuerForsendelseTo.AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
 		assertEquals(mottakerTo.getIdentifikator(), ORGNUMMER);
 		assertEquals(mottakerTo.getNavn(), ORGANISASJON_NAVN);
-		assertEquals(mottakerTo.getMottakerType(), MottakerTypeCode.ORGANISASJON);
+		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.ORGANISASJON);
 		assertFalse(mottakerTo.isIdentifikatorAktoerId());
 	}
 
 	@Test
 	public void shouldMapSamhandlerHpr() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().withMottaker(createMottakerSamhandlerHpr());
+		distribuerForsendelse.getDistribusjonbestilling().withMottaker(createAktoerSamhandlerHpr());
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
-		final DistribuerForsendelseTo.MottakerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
+		final DistribuerForsendelseTo.AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
 		assertEquals(mottakerTo.getIdentifikator(), SAMHANDLER_IDENTIFIKATOR);
 		assertEquals(mottakerTo.getNavn(), SAMHANDLER_NAVN);
-		assertEquals(mottakerTo.getMottakerType(), MottakerTypeCode.SAMHANDLER_HPR);
+		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.SAMHANDLER_HPR);
 		assertFalse(mottakerTo.isIdentifikatorAktoerId());
 	}
 
@@ -164,7 +166,7 @@ class DistribuerForsendelseMapperTest {
 	public void shouldFailUgyldigSamhandlerKategori() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
 		distribuerForsendelse.getDistribusjonbestilling()
-				.withMottaker(((Samhandler) createMottakerSamhandlerHpr()).withSamhandlerkategori("NO_SUCH_KATEGORI"));
+				.withMottaker(((Samhandler) createAktoerSamhandlerHpr()).withSamhandlerkategori("NO_SUCH_KATEGORI"));
 
 		assertThrows(AbstractDokdistfordelingFunctionalException.class,
 				() -> distribuerForsendelseMapper.map(distribuerForsendelse),
@@ -201,7 +203,6 @@ class DistribuerForsendelseMapperTest {
 				"Expected distribuerForsendelseMapper.map() to throw AbstractDokdistfordelingFunctionalException, but it didn't");
 	}
 
-
 	private void assertResponse(DistribuerForsendelseTo distribuerForsendelseTo) {
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
 
@@ -221,10 +222,18 @@ class DistribuerForsendelseMapperTest {
 
 		//assert mottaker Person
 		assertNotNull(distBestilling.getMottaker());
-		assertEquals(distBestilling.getMottaker().getIdentifikator(), PERSON_IDENTIFIKATOR);
-		assertEquals(distBestilling.getMottaker().getNavn(), PERSON_NAVN);
-		assertEquals(distBestilling.getMottaker().getMottakerType(), MottakerTypeCode.PERSON);
+		assertEquals(distBestilling.getMottaker().getIdentifikator(), PERSON_IDENTIFIKATOR_MOTTAKER);
+		assertEquals(distBestilling.getMottaker().getNavn(), PERSON_NAVN_MOTTAKER);
+		assertEquals(distBestilling.getMottaker().getAktoerType(), AktoerTypeCode.PERSON);
 		assertFalse(distBestilling.getMottaker().isIdentifikatorAktoerId());
+
+		//assert bruker Person
+		assertNotNull(distBestilling.getBruker());
+		assertEquals(distBestilling.getBruker().getIdentifikator(), PERSON_IDENTIFIKATOR_BRUKER);
+		assertEquals(distBestilling.getBruker().getNavn(), PERSON_NAVN_BRUKER);
+		assertEquals(distBestilling.getBruker().getAktoerType(), AktoerTypeCode.PERSON);
+		assertFalse(distBestilling.getBruker().isIdentifikatorAktoerId());
+
 
 		//assert norsk postadresse
 		assertNorskPostadresseTo(distBestilling.getAdresse());
@@ -277,7 +286,8 @@ class DistribuerForsendelseMapperTest {
 						.withArkivInformasjon(new ArkivInformasjon()
 								.withArkivId(ARKIV_ID)
 								.withArkivSystem(ARKIV_SYSTEM))
-						.withMottaker(createMottakerPerson())
+						.withMottaker(createAktoerPerson(PERSON_NAVN_MOTTAKER, PERSON_IDENTIFIKATOR_MOTTAKER))
+						.withBruker(createAktoerPerson(PERSON_NAVN_BRUKER, PERSON_IDENTIFIKATOR_BRUKER))
 						.withAdresse(createNorskPostadresse())
 						.withDokumentProdApp(DOKUMENT_PROD_APP)
 						.withDokumenter(Arrays.asList(new DokumentInformasjon()
@@ -314,25 +324,25 @@ class DistribuerForsendelseMapperTest {
 				.withLand(LAND);
 	}
 
-	private Aktoer createMottakerPerson() {
+	private Aktoer createAktoerPerson(String navn, String identifikator) {
 		return new Person()
-				.withNavn(PERSON_NAVN)
-				.withPersonidentifikator(PERSON_IDENTIFIKATOR);
+				.withNavn(navn)
+				.withPersonidentifikator(identifikator);
 	}
 
 	private Aktoer createMottakerAktoerId() {
 		return new AktoerId()
-				.withNavn(AKTOER_ID_NAVN)
-				.withAktoerId(AKTOER_ID);
+				.withNavn(MOTTAKER_ID_NAVN)
+				.withAktoerId(MOTTAKER_ID);
 	}
 
-	private Aktoer createMottakerOrganisasjon() {
+	private Aktoer createAktoerOrganisasjon() {
 		return new Organisasjon()
 				.withNavn(ORGANISASJON_NAVN)
 				.withOrgnummer(ORGNUMMER);
 	}
 
-	private Aktoer createMottakerSamhandlerHpr() {
+	private Aktoer createAktoerSamhandlerHpr() {
 		return new Samhandler()
 				.withNavn(SAMHANDLER_NAVN)
 				.withSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR)

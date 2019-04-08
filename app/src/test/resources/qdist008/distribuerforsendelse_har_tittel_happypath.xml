@@ -6,7 +6,7 @@
 		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
 		<tema>FS22</tema>
 		<!--Optional:-->
-		<forsendelseTittel>tittel</forsendelseTittel>
+		<forsendelseTittel>harTittelUtenDokkat</forsendelseTittel>
 		<!--Optional:-->
 		<arkivInformasjon>
 			<arkivSystem>JOARK</arkivSystem>
@@ -16,6 +16,10 @@
 			<aktoerId>***gammelt_fnr***01</aktoerId>
 			<navn>Bjarne Betjent</navn>
 		</mottaker>
+		<bruker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
+			<aktoerId>***gammelt_fnr***01</aktoerId>
+			<navn>Bjarne Betjent</navn>
+		</bruker>
 		<!--Optional:-->
 		<adresse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:NorskPostadresse">
 			<adresselinje1>Adresslinje 1</adresselinje1>
@@ -28,7 +32,7 @@
 		<dokumentProdApp>token</dokumentProdApp>
 		<dokumenter>
 			<dokumentInformasjon>
-				<dokumenttypeId>2222222</dokumenttypeId>
+				<dokumenttypeId>1111111</dokumenttypeId>
 				<dokumentObjektReferanse>testKey</dokumentObjektReferanse>
 				<tilknyttetSom>HOVEDDOKUMENT</tilknyttetSom>
 				<!--Optional:-->

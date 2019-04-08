@@ -13,11 +13,6 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
-		<!--<dependency>-->
-			<!--<groupId>org.jvnet.jaxb2_commons</groupId>-->
-			<!--<artifactId>jaxb2-basics-runtime</artifactId>-->
-			<!--<version>1.11.1</version>-->
-		<!--</dependency>-->
 		<dependency>
 			<groupId>org.jvnet.jaxb2_commons</groupId>
 			<artifactId>jaxb2-basics-runtime</artifactId>
@@ -114,7 +109,7 @@
 		<dependency>
 			<groupId>no.nav.meldinger.virksomhet</groupId>
 			<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
-			<version>1.0.1</version>
+			<version>1.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>no.nav.tjenester.brevogarkiv</groupId>

@@ -15,6 +15,10 @@
 			<navn>Bjarne Betjent</navn>
 			<samhandlerkategori>HPR</samhandlerkategori>
 		</mottaker>
+		<bruker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
+			<aktoerId>***gammelt_fnr***01</aktoerId>
+			<navn>Bjarne Betjent</navn>
+		</bruker>
 		<!--Optional:-->
 		<dokumentProdApp>token</dokumentProdApp>
 		<dokumenter>

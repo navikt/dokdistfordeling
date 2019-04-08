@@ -7,7 +7,7 @@ import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
-import no.nav.dokdistfordeling.kodeverk.MottakerTypeCode;
+import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.TemaCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.DistribuerForsendelseTo;
@@ -44,9 +44,9 @@ class PersisterForsendelseToRequestMapperTest {
 	private static final int REKKEFOLGE_1 = 1;
 	private static final int REKKEFOLGE_2 = 2;
 	private static final String MOTTAKERNAVN = "mottakernavn";
-	private static final MottakerTypeCode PERSON_MOTTAKER_TYPE_CODE = MottakerTypeCode.PERSON;
-	private static final MottakerTypeCode SAMHANDLER_MOTTAKER_TYPE_CODE = MottakerTypeCode.SAMHANDLER_HPR;
-	private static final MottakerTypeCode ORGANISASJON_MOTTAKER_TYPE_CODE = MottakerTypeCode.ORGANISASJON;
+	private static final AktoerTypeCode PERSON_TYPE_CODE = AktoerTypeCode.PERSON;
+	private static final AktoerTypeCode SAMHANDLER_TYPE_CODE = AktoerTypeCode.SAMHANDLER_HPR;
+	private static final AktoerTypeCode ORGANISASJON_TYPE_CODE = AktoerTypeCode.ORGANISASJON;
 	private static final TemaCode TEMA = TemaCode.FS22;
 	private static final TilknyttetSomCode TILKNYTTET_SOM_CODE_1 = TilknyttetSomCode.HOVEDDOKUMENT;
 	private static final TilknyttetSomCode TILKNYTTET_SOM_CODE_2 = TilknyttetSomCode.VEDLEGG;
@@ -160,25 +160,25 @@ class PersisterForsendelseToRequestMapperTest {
 	}
 
 	private void assertMottakerIsPerson(PersisterForsendelseRequestTo.MottakerTo mottaker) {
-		assertEquals(PERSON_MOTTAKER_TYPE_CODE, mottaker.getMottakerType());
+		assertEquals(PERSON_TYPE_CODE, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
 		assertEquals(PERSON_IDENTIFIKATOR, mottaker.getMottakerId());
 	}
 
 	private void assertMottakerIsAktoerId(PersisterForsendelseRequestTo.MottakerTo mottaker) {
-		assertEquals(PERSON_MOTTAKER_TYPE_CODE, mottaker.getMottakerType());
+		assertEquals(PERSON_TYPE_CODE, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
 		assertEquals(AKTOER_IDENTIFIKATOR, mottaker.getMottakerId());
 	}
 
 	private void assertMottakerIsOrganisasjonNr(PersisterForsendelseRequestTo.MottakerTo mottaker) {
-		assertEquals(ORGANISASJON_MOTTAKER_TYPE_CODE, mottaker.getMottakerType());
+		assertEquals(ORGANISASJON_TYPE_CODE, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
 		assertEquals(ORGNUMMER, mottaker.getMottakerId());
 	}
 
 	private void assertMottakerWithSamhandler(PersisterForsendelseRequestTo.MottakerTo mottaker) {
-		assertEquals(SAMHANDLER_MOTTAKER_TYPE_CODE, mottaker.getMottakerType());
+		assertEquals(SAMHANDLER_TYPE_CODE, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
 		assertEquals(SAMHANDLER_IDENTIFIKATOR, mottaker.getMottakerId());
 	}
@@ -268,38 +268,38 @@ class PersisterForsendelseToRequestMapperTest {
 				.rekkefolge(REKKEFOLGE_2);
 	}
 
-	private DistribuerForsendelseTo.MottakerTo createMottakerToWithPerson() {
-		return DistribuerForsendelseTo.MottakerTo.builder()
+	private DistribuerForsendelseTo.AktoerTo createMottakerToWithPerson() {
+		return DistribuerForsendelseTo.AktoerTo.builder()
 				.identifikator(PERSON_IDENTIFIKATOR)
 				.identifikatorAktoerId(false)
-				.mottakerType(PERSON_MOTTAKER_TYPE_CODE)
+				.aktoerType(PERSON_TYPE_CODE)
 				.navn(MOTTAKERNAVN)
 				.build();
 	}
 
-	private DistribuerForsendelseTo.MottakerTo createMottakerToWithAktoerId() {
-		return DistribuerForsendelseTo.MottakerTo.builder()
+	private DistribuerForsendelseTo.AktoerTo createMottakerToWithAktoerId() {
+		return DistribuerForsendelseTo.AktoerTo.builder()
 				.identifikator(AKTOER_IDENTIFIKATOR)
 				.identifikatorAktoerId(true)
-				.mottakerType(PERSON_MOTTAKER_TYPE_CODE)
+				.aktoerType(PERSON_TYPE_CODE)
 				.navn(MOTTAKERNAVN)
 				.build();
 	}
 
-	private DistribuerForsendelseTo.MottakerTo createMottakerToWithOrganisasjonsNr() {
-		return DistribuerForsendelseTo.MottakerTo.builder()
+	private DistribuerForsendelseTo.AktoerTo createMottakerToWithOrganisasjonsNr() {
+		return DistribuerForsendelseTo.AktoerTo.builder()
 				.identifikator(ORGNUMMER)
 				.identifikatorAktoerId(false)
-				.mottakerType(ORGANISASJON_MOTTAKER_TYPE_CODE)
+				.aktoerType(ORGANISASJON_TYPE_CODE)
 				.navn(MOTTAKERNAVN)
 				.build();
 	}
 
-	private DistribuerForsendelseTo.MottakerTo createMottakerToWithSamhandler() {
-		return DistribuerForsendelseTo.MottakerTo.builder()
+	private DistribuerForsendelseTo.AktoerTo createMottakerToWithSamhandler() {
+		return DistribuerForsendelseTo.AktoerTo.builder()
 				.identifikator(SAMHANDLER_IDENTIFIKATOR)
 				.identifikatorAktoerId(false)
-				.mottakerType(SAMHANDLER_MOTTAKER_TYPE_CODE)
+				.aktoerType(SAMHANDLER_TYPE_CODE)
 				.navn(MOTTAKERNAVN)
 				.build();
 	}

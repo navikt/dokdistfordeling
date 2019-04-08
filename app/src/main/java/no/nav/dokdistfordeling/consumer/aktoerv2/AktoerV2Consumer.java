@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class AktoerV2Consumer implements Aktoer {
+public class AktoerV2Consumer implements AktoerConsumerInterface {
 
 	private final AktoerV2 aktoerV2;
 

@@ -3,7 +3,7 @@ package no.nav.dokdistfordeling.kodeverk;
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
-public enum MottakerTypeCode {
+public enum AktoerTypeCode {
 
 	PERSON,
 	ORGANISASJON,
