@@ -13,10 +13,12 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableCaching
 @EnableRetry
 @SpringBootApplication
-@EnableConfigurationProperties({ServiceuserAlias.class,
+@EnableConfigurationProperties({
+		ServiceuserAlias.class,
 		ArkiverDokumentproduksjonV1Alias.class,
 		MqGatewayAlias.class,
-		SrvAppserverProperties.class})
+		SrvAppserverProperties.class,
+		CoreConfig.class})
 public class Application {
 
 	public static void main(String[] args) {
