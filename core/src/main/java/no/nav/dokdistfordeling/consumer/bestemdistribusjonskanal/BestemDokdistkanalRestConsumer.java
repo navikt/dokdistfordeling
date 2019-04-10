@@ -11,6 +11,7 @@ import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalFunctional
 import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalMappingException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.BestemDokdistKanalTechnicalException;
+import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,7 @@ import javax.inject.Inject;
 import java.time.Duration;
 
 @Component
-public class BestemDokdistkanalRestConsumer {
+public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal {
 
 	private final RestTemplate restTemplate;
 
@@ -47,9 +48,16 @@ public class BestemDokdistkanalRestConsumer {
 	}
 
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	public DistribusjonsKanalCode bestemKanal(DokDistKanalRequestTo dokDistKanalRequestTo) {
+	public DistribusjonsKanalCode bestemKanal(String mottakerId, String dokumentTypeId, AktoerTypeCode mottakerTypeCode, String brukerId) {
+
 		try {
-			DokDistKanalRequest request = mapToDokDistKanalRequest(dokDistKanalRequestTo);
+			DokDistKanalRequest request = DokDistKanalRequest.builder()
+					.dokumentTypeId(dokumentTypeId)
+					.mottakerId(mottakerId)
+					.mottakerType(mottakerTypeCode.name())
+					.brukerId(brukerId)
+					.build();
+
 			HttpEntity<DokDistKanalRequest> httpEntity = new HttpEntity<>(request, httpHeaders());
 
 			DokDistKanalResponseTo dokDistKanalResponseTo = restTemplate.postForObject(bestemDokdistKanalUrl, httpEntity, DokDistKanalResponseTo.class);
@@ -62,16 +70,6 @@ public class BestemDokdistkanalRestConsumer {
 			throw new BestemDokdistKanalTechnicalException("BestemDokdistkanal feilet med statusCode=" + e.getRawStatusCode() + ", melding=" + e
 					.getResponseBodyAsString(), e);
 		}
-	}
-
-	private DokDistKanalRequest mapToDokDistKanalRequest(DokDistKanalRequestTo dokDistKanalRequestTo) {
-		return DokDistKanalRequest.builder()
-				.dokumentTypeId(dokDistKanalRequestTo.getDokumentTypeId())
-				.mottakerId(dokDistKanalRequestTo.getMottakerId())
-				.mottakerType(dokDistKanalRequestTo.getMottakerType() == null ? null : dokDistKanalRequestTo.getMottakerType()
-						.name())
-				.brukerId(dokDistKanalRequestTo.getBrukerId())
-				.build();
 	}
 
 	private DistribusjonsKanalCode mapToDistribusjonKanalCode(String distribusjonKanalCodeTo) {

@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.exception.functional.AktoerV2PersonIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AktoerV2HentIdentForAktoerIdTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
-import no.nav.tjeneste.virksomhet.aktoer.v2.binding.AktoerV2;
 import no.nav.tjeneste.virksomhet.aktoer.v2.binding.HentIdentForAktoerIdPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.aktoer.v2.meldinger.HentIdentForAktoerIdRequest;
 import no.nav.tjeneste.virksomhet.aktoer.v2.meldinger.HentIdentForAktoerIdResponse;
@@ -21,11 +20,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class AktoerV2Consumer implements AktoerConsumerInterface {
+public class AktoerV2Consumer implements AktoerV2 {
 
-	private final AktoerV2 aktoerV2;
+	private final no.nav.tjeneste.virksomhet.aktoer.v2.binding.AktoerV2 aktoerV2;
 
-	public AktoerV2Consumer(AktoerV2 aktoerV2) {
+	public AktoerV2Consumer(no.nav.tjeneste.virksomhet.aktoer.v2.binding.AktoerV2 aktoerV2) {
 		this.aktoerV2 = aktoerV2;
 	}
 

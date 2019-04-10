@@ -6,15 +6,13 @@ import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
 import static org.springframework.util.StringUtils.isEmpty;
 
-import no.nav.dokdistfordeling.consumer.aktoerv2.AktoerConsumerInterface;
+import no.nav.dokdistfordeling.consumer.aktoerv2.AktoerV2;
 import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanal;
-
 import no.nav.dokdistfordeling.consumer.tjoark110.ArkiverDokumentproduksjon;
 import no.nav.dokdistfordeling.consumer.tjoark110.SettJournalpostAttributterRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
-import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.rdist001.AdministrerForsendelse;
@@ -33,7 +31,7 @@ import javax.inject.Inject;
 @Service
 public class Qdist008Service {
 
-	private final AktoerConsumerInterface aktoerConsumerInterface;
+	private final AktoerV2 aktoerV2;
 	private final ArkiverDokumentproduksjon arkiverDokumentproduksjon;
 	private final DokumentkatalogAdmin dokumentkatalogAdmin;
 	private final BestemDistribusjonskanal bestemDistribusjonskanal;
@@ -41,13 +39,13 @@ public class Qdist008Service {
 	private final PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper;
 
 	@Inject
-	public Qdist008Service(AktoerConsumerInterface aktoerConsumerInterface,
+	public Qdist008Service(AktoerV2 aktoerV2,
 						   ArkiverDokumentproduksjon arkiverDokumentproduksjon,
 						   DokumentkatalogAdmin dokumentkatalogAdmin,
 						   BestemDistribusjonskanal bestemDistribusjonskanal,
 						   AdministrerForsendelse administrerForsendelse,
 						   PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper) {
-		this.aktoerConsumerInterface = aktoerConsumerInterface;
+		this.aktoerV2 = aktoerV2;
 		this.arkiverDokumentproduksjon = arkiverDokumentproduksjon;
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.bestemDistribusjonskanal = bestemDistribusjonskanal;
@@ -61,14 +59,14 @@ public class Qdist008Service {
 
 		final DokumenttypeInfoTo dokumenttypeInfoTo = getTittelFromDokkkatIfNotProvided(distribusjonbestilling);
 
-		final HentIdentForAktoerIdResponseTo mottakerHentIdentForAktoerIdResponseTo = getFoedselsnummerIfAktoerIdentifikatorIsAktoerId(distribusjonbestilling.getMottaker());
-		final HentIdentForAktoerIdResponseTo brukerHentIdentForAktoerIdResponseTo = getFoedselsnummerIfAktoerIdentifikatorIsAktoerId(distribusjonbestilling.getBruker());
+		final HentIdentForAktoerIdResponseTo mottakerHentIdentForAktoerIdResponseTo = getFoedselsnummerIfIdentifikatorIsAktoerId(distribusjonbestilling.getMottaker());
+		final HentIdentForAktoerIdResponseTo brukerHentIdentForAktoerIdResponseTo = getFoedselsnummerIfIdentifikatorIsAktoerId(distribusjonbestilling.getBruker());
 
 		final DistribusjonsKanalCode distribusjonsKanal = bestemDistribusjonskanal.bestemKanal(
-				useFoedselsnrIfPerson(distribusjonbestilling.getMottaker(), mottakerHentIdentForAktoerIdResponseTo),
+				getIdentifikator(distribusjonbestilling.getMottaker(), mottakerHentIdentForAktoerIdResponseTo),
 				getDokumenttypeIdHoveddokument(distribusjonbestilling),
 				distribusjonbestilling.getMottaker().getAktoerType(),
-				useFoedselsnrIfPerson(distribusjonbestilling.getBruker(), brukerHentIdentForAktoerIdResponseTo));
+				getIdentifikator(distribusjonbestilling.getBruker(), brukerHentIdentForAktoerIdResponseTo));
 
 		final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
 				.map(distribusjonbestilling, dokumenttypeInfoTo, mottakerHentIdentForAktoerIdResponseTo, distribusjonsKanal);
@@ -91,11 +89,11 @@ public class Qdist008Service {
 		}
 	}
 
-	private HentIdentForAktoerIdResponseTo getFoedselsnummerIfAktoerIdentifikatorIsAktoerId(DistribuerForsendelseTo.AktoerTo aktoer) {
+	private HentIdentForAktoerIdResponseTo getFoedselsnummerIfIdentifikatorIsAktoerId(DistribuerForsendelseTo.AktoerTo aktoer) {
 		if (aktoer.isIdentifikatorAktoerId()) {
-			return aktoerConsumerInterface.hentIdentForAktoerId(aktoer.getIdentifikator());
+			return aktoerV2.hentIdentForAktoerId(aktoer.getIdentifikator());
 		} else {
-			return HentIdentForAktoerIdResponseTo.builder().foedselsnr(aktoer.getIdentifikator()).build();
+			return null;
 		}
 	}
 
@@ -103,17 +101,17 @@ public class Qdist008Service {
 		final DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon = distribusjonbestilling.getArkivInformasjon();
 		if (arkivInformasjon != null && arkivInformasjon.getArkivSystem().equals(ArkivSystemCode.JOARK)) {
 			arkiverDokumentproduksjon.settJournalpostAttributter(SettJournalpostAttributterRequestTo.builder()
-					.journalpostId(arkivInformasjon.getArkivId())
-					.utsendingskanal(distribusjonsKanal.getJoarkUtsendingsKanal())
-					.build(),
+							.journalpostId(arkivInformasjon.getArkivId())
+							.utsendingskanal(distribusjonsKanal.getJoarkUtsendingsKanal())
+							.build(),
 					SERVICE_ID);
 		}
 	}
 
-	private String useFoedselsnrIfPerson(DistribuerForsendelseTo.AktoerTo mottakerTo, HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo) {
-		if (AktoerTypeCode.PERSON.equals(mottakerTo.getAktoerType()) && hentIdentForAktoerIdResponseTo != null) {
+	private String getIdentifikator(DistribuerForsendelseTo.AktoerTo aktoerTo, HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo) {
+		if (aktoerTo.isIdentifikatorAktoerId()) {
 			return hentIdentForAktoerIdResponseTo.getFoedselsnr();
 		}
-		return mottakerTo.getIdentifikator();
+		return aktoerTo.getIdentifikator();
 	}
 }

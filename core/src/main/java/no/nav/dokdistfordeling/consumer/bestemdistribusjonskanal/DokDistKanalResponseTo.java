@@ -1,16 +1,12 @@
 package no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 @Builder
 public class DokDistKanalResponseTo {
 	private String distribusjonsKanal;
