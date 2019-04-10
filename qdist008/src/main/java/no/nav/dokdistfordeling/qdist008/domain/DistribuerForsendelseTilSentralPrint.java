@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.qdist008;
+package no.nav.dokdistfordeling.qdist008.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

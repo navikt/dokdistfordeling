@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.rdist001;
+package no.nav.dokdistfordeling.consumer.rdist001;
 
 import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;

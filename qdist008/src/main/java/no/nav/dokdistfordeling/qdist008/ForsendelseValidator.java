@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.qdist008;
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.util.Qdist008Util.countHoveddokument;
 
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.DocumentNotFoundInS3FunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;

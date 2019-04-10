@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.rdist001;
+package no.nav.dokdistfordeling.consumer.rdist001;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.

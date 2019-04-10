@@ -2,6 +2,7 @@ package no.nav.dokdistfordeling.qdist008;
 
 import static java.lang.String.format;
 
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;

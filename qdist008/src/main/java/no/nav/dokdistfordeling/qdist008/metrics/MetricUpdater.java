@@ -6,8 +6,8 @@ import static no.nav.dokdistfordeling.util.Qdist008Util.countVedlegg;
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import no.nav.dokdistfordeling.rdist001.PersisterForsendelseRequestTo;
-import no.nav.dokdistfordeling.qdist008.DistribuerForsendelseTo;
+import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;

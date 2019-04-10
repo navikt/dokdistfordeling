@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.rdist001;
+package no.nav.dokdistfordeling.consumer.rdist001;
 
 import lombok.Builder;
 import lombok.Value;
@@ -31,7 +31,7 @@ public class PersisterForsendelseRequestTo {
 
 	@Value
 	@Builder
-	static class MottakerTo {
+	public static class MottakerTo {
 		private final String mottakerId;
 		private final String mottakerNavn;
 		private final AktoerTypeCode mottakerType;
@@ -39,14 +39,14 @@ public class PersisterForsendelseRequestTo {
 
 	@Value
 	@Builder
-	static class ArkivInformasjonTo {
+	public static class ArkivInformasjonTo {
 		private final ArkivSystemCode arkivSystem;
 		private final String arkivId;
 	}
 
 	@Value
 	@Builder
-	static class PostadresseTo {
+	public static class PostadresseTo {
 		private final String adresselinje1;
 		private final String adresselinje2;
 		private final String adresselinje3;
@@ -57,7 +57,7 @@ public class PersisterForsendelseRequestTo {
 
 	@Value
 	@Builder
-	static class DokumentTo {
+	public static class DokumentTo {
 		private final TilknyttetSomCode tilknyttetSom;
 		private final String dokumentObjektReferanse;
 		private final int rekkefolge;

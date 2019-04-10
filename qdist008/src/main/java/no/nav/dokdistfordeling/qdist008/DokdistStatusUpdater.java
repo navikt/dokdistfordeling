@@ -3,7 +3,7 @@ package no.nav.dokdistfordeling.qdist008;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 
-import no.nav.dokdistfordeling.rdist001.AdministrerForsendelse;
+import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;

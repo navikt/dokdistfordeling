@@ -4,13 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
+import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
+import no.nav.dokdistfordeling.qdist008.domain.PersisterForsendelseToRequestMapper;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.TemaCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
-import no.nav.dokdistfordeling.qdist008.DistribuerForsendelseTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

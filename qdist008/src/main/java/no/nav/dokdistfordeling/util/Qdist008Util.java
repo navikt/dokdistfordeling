@@ -1,7 +1,7 @@
 package no.nav.dokdistfordeling.util;
 
 
-import no.nav.dokdistfordeling.qdist008.DistribuerForsendelseTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 
 import java.util.stream.Collectors;

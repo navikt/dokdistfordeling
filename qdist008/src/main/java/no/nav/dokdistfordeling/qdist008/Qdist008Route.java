@@ -4,6 +4,7 @@ import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTilSentralPrint;
 import no.nav.dokdistfordeling.qdist008.metrics.Qdist008MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
 import org.apache.camel.ExchangePattern;

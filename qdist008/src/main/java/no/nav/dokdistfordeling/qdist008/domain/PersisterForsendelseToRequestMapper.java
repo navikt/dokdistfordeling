@@ -1,9 +1,9 @@
-package no.nav.dokdistfordeling.rdist001;
+package no.nav.dokdistfordeling.qdist008.domain;
 
 import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
+import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
-import no.nav.dokdistfordeling.qdist008.DistribuerForsendelseTo;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

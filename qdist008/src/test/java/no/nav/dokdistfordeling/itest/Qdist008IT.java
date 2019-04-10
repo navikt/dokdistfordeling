@@ -28,11 +28,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import no.nav.dokdistfordeling.config.alias.ArkiverDokumentproduksjonV1Alias;
-import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
-import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
-import no.nav.dokdistfordeling.config.props.SrvAppserverProperties;
-import no.nav.dokdistfordeling.itest.config.ApplicationTestConfig;
+import no.nav.dokdistfordeling.itest.config.Qdist008TestConfig;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.io.IOUtils;
@@ -41,7 +37,7 @@ import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
@@ -67,12 +63,8 @@ import java.util.concurrent.TimeUnit;
  */
 
 @ExtendWith(SpringExtension.class)
-@EnableConfigurationProperties({
-		ServiceuserAlias.class,
-		ArkiverDokumentproduksjonV1Alias.class,
-		MqGatewayAlias.class,
-		SrvAppserverProperties.class})
-@SpringBootTest(classes = {ApplicationTestConfig.class},
+@EnableAutoConfiguration
+@SpringBootTest(classes = {Qdist008TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
@@ -428,7 +420,7 @@ public class Qdist008IT {
 						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("bestemkanal/distribusjonsKanalPrint-mappingException.json")));
+				.withBodyFile("bestemkanal/bestemkanal-invalidCodeValue.json")));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
