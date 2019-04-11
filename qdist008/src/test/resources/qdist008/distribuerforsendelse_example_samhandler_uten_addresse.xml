@@ -1,0 +1,35 @@
+<dok:distribuerForsendelse xmlns:dok="http://nav.no/melding/virksomhet/dokdistfordeling">
+	<distribusjonbestilling>
+		<bestillingsId>7882d37e-34f7-11e9-b210-d663bd873d93</bestillingsId>
+		<!--Optional:-->
+		<batchId>batchId</batchId>
+		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
+		<tema>FS22</tema>
+		<!--Optional:-->
+		<arkivInformasjon>
+			<arkivSystem>JOARK</arkivSystem>
+			<arkivId>1234</arkivId>
+		</arkivInformasjon>
+		<mottaker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:Samhandler">
+			<samhandleridentifikator>***gammelt_fnr***01</samhandleridentifikator>
+			<navn>Bjarne Betjent</navn>
+			<samhandlerkategori>HPR</samhandlerkategori>
+		</mottaker>
+		<bruker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
+			<aktoerId>***gammelt_fnr***01</aktoerId>
+			<navn>Bjarne Betjent</navn>
+		</bruker>
+		<!--Optional:-->
+		<dokumentProdApp>token</dokumentProdApp>
+		<dokumenter>
+			<dokumentInformasjon>
+				<dokumenttypeId>1111111</dokumenttypeId>
+				<dokumentObjektReferanse>testKey</dokumentObjektReferanse>
+				<tilknyttetSom>VEDLEGG</tilknyttetSom>
+				<!--Optional:-->
+				<arkivDokumentInfoId>1234</arkivDokumentInfoId>
+				<rekkefolge>1</rekkefolge>
+			</dokumentInformasjon>
+		</dokumenter>
+	</distribusjonbestilling>
+</dok:distribuerForsendelse>

@@ -8,15 +8,18 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Import;
 import org.springframework.retry.annotation.EnableRetry;
 
 @EnableCaching
 @EnableRetry
 @SpringBootApplication
-@EnableConfigurationProperties({ServiceuserAlias.class,
+@EnableConfigurationProperties({
+		ServiceuserAlias.class,
 		ArkiverDokumentproduksjonV1Alias.class,
 		MqGatewayAlias.class,
 		SrvAppserverProperties.class})
+@Import(CoreConfig.class)
 public class Application {
 
 	public static void main(String[] args) {
