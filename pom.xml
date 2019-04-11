@@ -26,21 +26,21 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<javax.inject.version>1</javax.inject.version>
-		<logstash-logback-encoder.version>5.2</logstash-logback-encoder.version>
 		<logback-syslog4j.version>1.0.0</logback-syslog4j.version>
-		<lombok.version>1.18.4</lombok.version>
+		<logstash-logback-encoder.version>5.3</logstash-logback-encoder.version>
 		<junit5.version>5.3.2</junit5.version>
-		<junit5.mockito.version>2.23.0</junit5.mockito.version>
 		<resilience4j.version>0.11.0</resilience4j.version>
-		<aws-java-sdk-s3.version>1.11.497</aws-java-sdk-s3.version>
+		<lombok.version>1.18.6</lombok.version>
+		<junit5.mockito.version>2.23.0</junit5.mockito.version>
+		<aws-java-sdk-s3.version>1.11.534</aws-java-sdk-s3.version>
 		<cxf.version>3.3.0</cxf.version>
 		<aktoer.version>2.0.1</aktoer.version>
 		<dokkat-api>10.4.0</dokkat-api>
 		<wmq.version>8.0.0.6</wmq.version>
-		<awaitility.version>3.1.2</awaitility.version>
-		<activemq.version>5.15.2</activemq.version>
+		<awaitility.version>3.1.6</awaitility.version>
+		<activemq.version>5.15.9</activemq.version>
 		<commons-io.version>2.4</commons-io.version>
-		<micrometer.version>1.1.3</micrometer.version>
+		<micrometer.version>1.1.4</micrometer.version>
 		<spring-wiremock.version>1.2.5.RELEASE</spring-wiremock.version>
 		<wiremock-standalone.version>2.19.0</wiremock-standalone.version>
 	</properties>
