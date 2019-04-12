@@ -1,0 +1,31 @@
+<dok:hentDokumenterFraJoark xmlns:dok="http://nav.no/melding/virksomhet/dokdistfordeling">
+  <distribusjonbestilling>
+    <bestillingsId>token</bestillingsId>
+    <!--Optional:-->
+    <batchId>token</batchId>
+    <bestillendeFagsystem>token</bestillendeFagsystem>
+    <tema>token</tema>
+    <!--Optional:-->
+    <forsendelseTittel>token</forsendelseTittel>
+    <!--Optional:-->
+    <arkivInformasjon>
+      <arkivSystem>token</arkivSystem>
+      <arkivId>token</arkivId>
+    </arkivInformasjon>
+    <mottaker/>
+    <!--Optional:-->
+    <adresse/>
+    <dokumentProdApp>token</dokumentProdApp>
+    <dokumenter>
+      <!--1 or more repetitions:-->
+      <dokumentInformasjon>
+        <dokumenttypeId>token</dokumenttypeId>
+        <variantFormat>token</variantFormat>
+        <tilknyttetSom>token</tilknyttetSom>
+        <!--Optional:-->
+        <arkivDokumentInfoId>token</arkivDokumentInfoId>
+        <rekkefolge>3</rekkefolge>
+      </dokumentInformasjon>
+    </dokumenter>
+  </distribusjonbestilling>
+</dok:hentDokumenterFraJoark>
