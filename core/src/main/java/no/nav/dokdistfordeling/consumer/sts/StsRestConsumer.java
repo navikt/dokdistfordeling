@@ -15,15 +15,15 @@ import java.time.Duration;
  * @author Sigurd Midttun, Visma Consulting.
  */
 @Component
-public class StsConsumer {
+public class StsRestConsumer {
 
 	private final RestTemplate restTemplate;
 	private final String stsUrl;
 
 	@Inject
-	public StsConsumer(@Value("${security-token-service-token.url}") String stsUrl,
-					   RestTemplateBuilder restTemplateBuilder,
-					   final ServiceuserAlias serviceuserAlias) {
+	public StsRestConsumer(@Value("${security-token-service-token.url}") String stsUrl,
+						   RestTemplateBuilder restTemplateBuilder,
+						   final ServiceuserAlias serviceuserAlias) {
 		this.stsUrl = stsUrl;
 		this.restTemplate = restTemplateBuilder
 				.setReadTimeout(Duration.ofSeconds(20))

@@ -3,7 +3,7 @@ package no.nav.dokdistfordeling.consumer.saf.hentdokument;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
-import no.nav.dokdistfordeling.consumer.sts.StsConsumer;
+import no.nav.dokdistfordeling.consumer.sts.StsRestConsumer;
 import no.nav.dokdistfordeling.exception.functional.SafHentDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafHentDokumentTechnicalException;
@@ -32,14 +32,14 @@ public class HentDokumentConsumer implements HentDokument {
 
 	private final String hentDokumentUrl;
 	private final RestTemplate restTemplate;
-	private final StsConsumer stsConsumer;
+	private final StsRestConsumer stsRestConsumer;
 
 	@Inject
 	public HentDokumentConsumer(@Value("${hentdokument.url}") String hentDokumentUrl,
 								RestTemplateBuilder restTemplateBuilder,
-								StsConsumer stsConsumer) {
+								StsRestConsumer stsRestConsumer) {
 		this.hentDokumentUrl = hentDokumentUrl;
-		this.stsConsumer = stsConsumer;
+		this.stsRestConsumer = stsRestConsumer;
 		this.restTemplate = restTemplateBuilder
 				.setReadTimeout(Duration.ofSeconds(20))
 				.setConnectTimeout(Duration.ofSeconds(5))
@@ -76,7 +76,7 @@ public class HentDokumentConsumer implements HentDokument {
 	private HttpHeaders createAuthorizationHeader() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set(HttpHeaders.AUTHORIZATION, "bearer " + stsConsumer.getOidcToken());
+		headers.set(HttpHeaders.AUTHORIZATION, "bearer " + stsRestConsumer.getOidcToken());
 		return headers;
 	}
 
