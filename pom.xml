@@ -13,6 +13,7 @@
 		<module>app</module>
 		<module>core</module>
 		<module>qdist008</module>
+		<module>rdist002</module>
 	</modules>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -57,6 +58,12 @@
 				<artifactId>qdist008</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>no.nav.dokdistfordeling</groupId>
+				<artifactId>rdist002</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>javax.inject</groupId>
 				<artifactId>javax.inject</artifactId>
