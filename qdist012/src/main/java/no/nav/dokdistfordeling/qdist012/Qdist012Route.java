@@ -25,7 +25,8 @@ import java.nio.charset.StandardCharsets;
  */
 //FIXME
 @Component
-public class Qdist012Route extends SpringRouteBuilder {
+public class Qdist012Route { // todo bring back once queues have been created
+//		extends SpringRouteBuilder {
 
 	public static final String QDIST012_SERVICE_ID = "qdist012";
 	static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
@@ -51,41 +52,41 @@ public class Qdist012Route extends SpringRouteBuilder {
 		this.qdist012MetricsRoutePolicy = qdist012MetricsRoutePolicy;
 	}
 
-	@Override
-	public void configure() throws Exception {
-		errorHandler(defaultErrorHandler()
-				.maximumRedeliveries(0)
-				.log(log)
-				.logExhaustedMessageBody(true)
-				.loggingLevel(ERROR));
-
-		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
-				.handled(true)
-				.useOriginalMessage()
-				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
-				.to("jms:" + qdist012FunksjonellFeil.getQueueName());
-
-		from("jms:" + qdist012.getQueueName() +
-				"?transacted=true")
-				.routeId(QDIST012_SERVICE_ID)
-				.routePolicy(qdist012MetricsRoutePolicy)
-				.setExchangePattern(ExchangePattern.InOnly)
-				.doTry()
-				.setProperty(PROPERTY_BESTILLINGS_ID, xpath("//bestillingsId/text()", String.class))
-				.log(LoggingLevel.INFO, log, "qdist012 har mottatt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
-				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
-				.doCatch(Exception.class)
-				.end()
-				.to("validator:no/nav/dokdistfordeling/hentdokumenterfrajoark/no/nav/dokdistfordeling/qdist012/HentDokumenterFraJoark.java")
-				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(HentDokumenterFraJoark.class)))
-				.bean(qdist012Service)
-				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
-				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
-				.setHeader(CALL_ID, simple("${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}"))
-				.inOnly("jms:" + qdist008.getQueueName())
-				.log(LoggingLevel.INFO, log, "qdist012 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist008 for distribusjon av forsendelse")
-				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/distribuerforsendelse.xsd");
-	}
+//	@Override
+//	public void configure() throws Exception {
+//		errorHandler(defaultErrorHandler()
+//				.maximumRedeliveries(0)
+//				.log(log)
+//				.logExhaustedMessageBody(true)
+//				.loggingLevel(ERROR));
+//
+//		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
+//				.handled(true)
+//				.useOriginalMessage()
+//				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
+//				.to("jms:" + qdist012FunksjonellFeil.getQueueName());
+//
+//		from("jms:" + qdist012.getQueueName() +
+//				"?transacted=true")
+//				.routeId(QDIST012_SERVICE_ID)
+//				.routePolicy(qdist012MetricsRoutePolicy)
+//				.setExchangePattern(ExchangePattern.InOnly)
+//				.doTry()
+//				.setProperty(PROPERTY_BESTILLINGS_ID, xpath("//bestillingsId/text()", String.class))
+//				.log(LoggingLevel.INFO, log, "qdist012 har mottatt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
+//				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
+//				.doCatch(Exception.class)
+//				.end()
+//				.to("validator:no/nav/dokdistfordeling/hentdokumenterfrajoark/no/nav/dokdistfordeling/qdist012/HentDokumenterFraJoark.java")
+//				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(HentDokumenterFraJoark.class)))
+//				.bean(qdist012Service)
+//				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
+//				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
+//				.setHeader(CALL_ID, simple("${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}"))
+//				.inOnly("jms:" + qdist008.getQueueName())
+//				.log(LoggingLevel.INFO, log, "qdist012 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist008 for distribusjon av forsendelse")
+//				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/distribuerforsendelse.xsd");
+//	}
 
 	public static String getIdsForLogging() {
 		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} og " +

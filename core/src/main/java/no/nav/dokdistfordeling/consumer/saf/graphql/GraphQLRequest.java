@@ -19,7 +19,7 @@ public class GraphQLRequest {
 
 	@JsonCreator
 	public GraphQLRequest(@JsonProperty("query") String query,
-						  @JsonProperty("operationName") String operationName, // todo what is operationname, and why do we need it?
+						  @JsonProperty("operationName") String operationName,
 						  @JsonProperty("variables") Map<String, Object> variables) {
 		this.query = query;
 		this.operationName = operationName;

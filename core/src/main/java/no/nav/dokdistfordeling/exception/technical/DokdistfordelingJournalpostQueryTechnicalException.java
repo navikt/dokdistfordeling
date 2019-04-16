@@ -1,6 +1,4 @@
-package no.nav.dokdistfordeling.consumer.saf.graphql;
-
-import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
+package no.nav.dokdistfordeling.exception.technical;
 
 public class DokdistfordelingJournalpostQueryTechnicalException extends AbstractDokdistfordelingTechnicalException {
 

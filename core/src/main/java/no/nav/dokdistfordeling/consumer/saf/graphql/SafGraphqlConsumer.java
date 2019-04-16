@@ -1,7 +1,12 @@
 package no.nav.dokdistfordeling.consumer.saf.graphql;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonJournalpost;
+import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
+import no.nav.dokdistfordeling.exception.technical.DokdistFordelingConvertToJsonTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.DokdistfordelingJournalpostQueryTechnicalException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -40,21 +45,24 @@ public class SafGraphqlConsumer {
 	public Journalpost performQuery(GraphQLRequest graphQLRequest, String authorizationHeader) {
 		try {
 			HttpHeaders httpHeaders = createAuthHeaderFromToken(authorizationHeader);
-			ResponseEntity<SafJsonJournalpost> result = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(graphQLRequest, httpHeaders), SafJsonJournalpost.class);
 
-			if (result.getStatusCodeValue() > HttpStatus.OK.value()) {
-				throw new DokdistfordelingJournalpostQueryTechnicalException(String.format("Saf respons var ikke OK. Statuskode: %s", result.getStatusCode()));
+			ResponseEntity<SafJsonJournalpost> responseEntity = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(requestToJson(graphQLRequest), httpHeaders), SafJsonJournalpost.class);
+
+			if (responseEntity.getStatusCodeValue() > HttpStatus.OK.value()) {
+				throw new DokdistfordelingJournalpostQueryTechnicalException(String.format("Saf respons var ikke OK. Statuskode: %s", responseEntity.getStatusCode()));
 			}
-			if (result.getBody() == null) { // todo specify exception
-				throw new DokdistfordelingJournalpostQueryTechnicalException("Tom responsebody fra motatt fra saf.");
+			if (responseEntity.getBody() == null) {
+				throw new SafJournalpostIkkeFunnetFunctionalException(String.format("Datafeltet mottatt fra saf var null, responsen var: %s", responseEntity.toString()));
 			}
 
-			return result.getBody().getJournalpost();
+			return responseEntity.getBody().getJournalpost();
 
-		} catch (HttpClientErrorException e) { // todo two technical exceptions, correct?
+		} catch (HttpClientErrorException e) { // todo two technical exceptions, as in joarkadmin, is this correct?
 			throw new DokdistfordelingJournalpostQueryTechnicalException(String.format("Kallet til SAF (graphQL) feilet med status=%s feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
 			throw new DokdistfordelingJournalpostQueryTechnicalException(String.format("Tjenesten SAF (graphQL) feilet med status=%s feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
+		} catch (JsonProcessingException e) {
+			throw new DokdistFordelingConvertToJsonTechnicalException(String.format("Kunne ikke konvertere graphqlrequest objekt til json, feilmelding=%s", e.getMessage()), e);
 		}
 	}
 
@@ -63,5 +71,9 @@ public class SafGraphqlConsumer {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.add(HttpHeaders.AUTHORIZATION, authorizationHeader);
 		return headers;
+	}
+
+	private String requestToJson(GraphQLRequest graphQLRequest) throws JsonProcessingException {
+		return new ObjectMapper().writeValueAsString(graphQLRequest);
 	}
 }
