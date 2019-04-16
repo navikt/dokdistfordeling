@@ -17,17 +17,10 @@
 		</dependency>
 
 		<dependency>
-			<groupId>no.nav.meldinger.virksomhet</groupId>
-			<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
-			<version>1.0.2</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-spring-boot-starter</artifactId>
 			<version>${camel.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-jms</artifactId>
@@ -37,6 +30,12 @@
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-jaxb</artifactId>
 			<version>${camel.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>no.nav.meldinger.virksomhet</groupId>
+			<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
+			<version>1.0.2</version>
 		</dependency>
 
 		<dependency>

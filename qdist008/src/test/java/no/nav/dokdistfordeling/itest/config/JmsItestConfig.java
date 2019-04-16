@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.config;
+package no.nav.dokdistfordeling.itest.config;
 
 
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -41,7 +41,7 @@ public class JmsItestConfig {
 	}
 
 	@Bean
-	public Queue qdist012qdist008FunksjonellFeil(@Value("${dokdistfordeling_qdist012_funk_feil.queuename}") String qdist012FunksjonellFeilQueueName) {
+	public Queue qdist012FunksjonellFeil(@Value("${dokdistfordeling_qdist012_funk_feil.queuename}") String qdist012FunksjonellFeilQueueName) {
 		return new ActiveMQQueue(qdist012FunksjonellFeilQueueName);
 	}
 

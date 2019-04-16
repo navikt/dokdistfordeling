@@ -2,13 +2,14 @@ package no.nav.dokdistfordeling.endpoints;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import no.nav.dokdistfordeling.consumer.qdist012.BestillBehandlingService;
+import no.nav.dokdistfordeling.config.jms.HentDokumenterFraJoarkProducer;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.DokumentInfo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.Dokumentstatus;
 import no.nav.dokdistfordeling.kodeverk.Journalstatus;
+import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoark;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.informasjon.arkiverdokumentproduksjon.JournalpostType;
 import org.springframework.stereotype.Component;
 
@@ -20,12 +21,11 @@ public class DistribuerJournalpostService {
 	private static final String NORSK_POSTADRESSE = "norskPostadresse";
 	private static final String UTENLANDSK_POSTADRESSE = "utenlandskPostadresse";
 
-	private BestillBehandlingService bestillBehandlingService;
 	private SafJournalpostQueryService safJournalpostQueryService;
+	private HentDokumenterFraJoarkProducer hentDokumenterFraJoarkProducer;
 
-	public DistribuerJournalpostService(BestillBehandlingService bestillBehandlingService,
-										SafJournalpostQueryService safJournalpostQueryService) {
-		this.bestillBehandlingService = bestillBehandlingService;
+
+	public DistribuerJournalpostService(SafJournalpostQueryService safJournalpostQueryService) {
 		this.safJournalpostQueryService = safJournalpostQueryService;
 	}
 
@@ -43,8 +43,10 @@ public class DistribuerJournalpostService {
 		// steg 5, kontroller dokumenttype
 
 		// todo steg 6, bestillJournalpotsDistribusjon
-		String bestillingsId = bestillBehandlingService.bestillJournalpostDistribusjon(distribuerJournalpostRequestTo);
 
+		hentDokumenterFraJoarkProducer.produce(new HentDokumenterFraJoark()); // todo populate
+
+		String bestillingsId = "this has to be received back, but how?";
 		//todo steg 7, returner bestillingsid til bestiller
 		return bestillingsId;
 	}

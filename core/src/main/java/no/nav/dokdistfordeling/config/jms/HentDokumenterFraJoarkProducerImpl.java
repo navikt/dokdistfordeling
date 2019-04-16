@@ -8,11 +8,8 @@ import org.springframework.messaging.converter.SimpleMessageConverter;
 import javax.inject.Inject;
 import javax.jms.Message;
 import javax.jms.Queue;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
-public class HentDokumenterFraJoarkInternalProducer implements HentDokumenterFraJoarkProducer {
+public class HentDokumenterFraJoarkProducerImpl implements HentDokumenterFraJoarkProducer {
 
 	@Inject
 	private JmsTemplate jmsTemplate;
@@ -21,9 +18,7 @@ public class HentDokumenterFraJoarkInternalProducer implements HentDokumenterFra
 
 	private ObjectFactory objectFactory = new ObjectFactory();
 
-	private Marshaller marshaller = JAXBContext.newInstance(HentDokumenterFraJoark.class).createMarshaller();
-
-	public HentDokumenterFraJoarkInternalProducer(Queue queue) throws JAXBException {
+	public HentDokumenterFraJoarkProducerImpl(Queue queue) {
 		this.queue = queue;
 	}
 

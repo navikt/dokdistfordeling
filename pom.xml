@@ -65,6 +65,16 @@
 				<artifactId>rdist002</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>no.nav.dokdistfordeling</groupId>
+				<artifactId>qdist012</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokdistfordeling</groupId>
+				<artifactId>schemas</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>javax.inject</groupId>

@@ -26,7 +26,6 @@ public class JmsConfig {
 
 	private static final int UTF_8_WITH_PUA = 1208;
 
-
 	@Bean
 	public Queue qdist008(@Value("${dokdistfordeling_qdist008_dist_forsendels.queuename}") String qdist008QueueName) throws JMSException {
 		return new MQQueue(qdist008QueueName);
@@ -40,6 +39,16 @@ public class JmsConfig {
 	@Bean
 	public Queue qdist009(@Value("${dokdistsentralprint_qdist009_dist_s_print.queuename}") String qdist009QueueName) throws JMSException {
 		return new MQQueue(qdist009QueueName);
+	}
+
+	@Bean
+	public Queue qdist012(@Value("${dokdistfordeling_qdist012_hent_dok_fra_joark.queuename}") String qdist012QueueName) throws JMSException {
+		return new MQQueue(qdist012QueueName);
+	}
+
+	@Bean
+	public Queue qdist012FunksjonellFeil(@Value("${dokdistfordeling_qdist012_funk_feil.queuename}") String qdist012FunksjonellFeilQueueName) throws JMSException {
+		return new MQQueue(qdist012FunksjonellFeilQueueName);
 	}
 
 	@Bean
