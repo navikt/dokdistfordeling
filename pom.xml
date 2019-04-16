@@ -14,6 +14,8 @@
 		<module>core</module>
 		<module>qdist008</module>
 		<module>rdist002</module>
+		<module>qdist012</module>
+		<module>schemas</module>
 	</modules>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
