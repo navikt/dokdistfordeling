@@ -7,7 +7,7 @@ import javax.inject.Inject;
 import javax.jms.Queue;
 
 public class DefaultInternalProducer  {
-//public class HentDokumenterFraJoarkProducerImpl implements HentDokumenterFraJoarkProducer {
+//public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseProducer {
 //
 //	@Inject
 //	private ViderebehandlingMapper mapper;
@@ -17,7 +17,7 @@ public class DefaultInternalProducer  {
 //	private Queue queue;
 //	private ObjectFactory objectFactory = new ObjectFactory();
 //
-//	public HentDokumenterFraJoarkProducerImpl(Queue queue) {
+//	public DistribuerForsendelseProducerImpl(Queue queue) {
 //		this.queue = queue;
 //	}
 //

@@ -5,7 +5,6 @@ import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.metrics.Qdist012MetricsRoutePolicy;
-import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.ValidationException;
@@ -25,8 +24,8 @@ import java.nio.charset.StandardCharsets;
  */
 //FIXME
 @Component
-public class Qdist012Route { // todo bring back once queues have been created
-//		extends SpringRouteBuilder {
+public class Qdist012Route {
+//	extends SpringRouteBuilder {
 
 	public static final String QDIST012_SERVICE_ID = "qdist012";
 	static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
@@ -77,15 +76,15 @@ public class Qdist012Route { // todo bring back once queues have been created
 //				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
 //				.doCatch(Exception.class)
 //				.end()
-//				.to("validator:no/nav/dokdistfordeling/hentdokumenterfrajoark/no/nav/dokdistfordeling/qdist012/HentDokumenterFraJoark.java")
+//				.to("validator:no/nav/dokdistfordeling/qdist012/xsd/hentdokumenterfrajoark.xsd")
 //				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(HentDokumenterFraJoark.class)))
 //				.bean(qdist012Service)
-//				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
+//				.marshal(new JaxbDataFormat(JAXBContext.newInstance(HentDokumenterFraJoark.class)))
 //				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
 //				.setHeader(CALL_ID, simple("${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}"))
 //				.inOnly("jms:" + qdist008.getQueueName())
 //				.log(LoggingLevel.INFO, log, "qdist012 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist008 for distribusjon av forsendelse")
-//				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/distribuerforsendelse.xsd");
+//				.to("validator:no/nav/dokdistfordeling/qdist012/xsd/hentdokumenterfrajoark.xsd");
 //	}
 
 	public static String getIdsForLogging() {

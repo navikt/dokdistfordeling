@@ -17,6 +17,7 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 					"  journalpost(journalpostId: $queryJournalpostId) {\n" +
 					"    journalposttype\n" +
 					"    journalstatus\n" +
+					"    tema\n" +
 					"    bruker {\n" +
 					"      id\n" +
 					"      type\n" +
@@ -28,6 +29,7 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 					"      erLikBruker\n" +
 					"    }\n" +
 					"    dokumenter {\n" +
+					"      dokumentInfoId\n" +
 					"      tittel\n" +
 					"      brevkode\n" +
 					"      dokumentstatus\n" +

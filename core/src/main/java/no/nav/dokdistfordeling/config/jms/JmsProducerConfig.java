@@ -15,8 +15,8 @@ public class JmsProducerConfig {
 	}
 
 	@Bean
-	public HentDokumenterFraJoarkProducer qdist012Producer() {
-		return new HentDokumenterFraJoarkProducerImpl(qdist012);
+	public DistribuerForsendelseProducer qdist012Producer() {
+		return new DistribuerForsendelseProducerImpl(qdist012);
 	}
 
 }

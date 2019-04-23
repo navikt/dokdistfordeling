@@ -15,6 +15,7 @@ import java.util.List;
 @Builder
 
 public class DokumentInfo {
+	private final String dokumentInfoId;
 	private final String tittel;
 	private final String brevkode;
 	private final Dokumentstatus dokumentstatus;

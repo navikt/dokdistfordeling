@@ -2,7 +2,7 @@ package no.nav.dokdistfordeling.config.jms;
 
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoark;
 
-public interface HentDokumenterFraJoarkProducer {
+public interface DistribuerForsendelseProducer {
 
 	void produce(HentDokumenterFraJoark hentDokumenterFraJoark);
 }

@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import javax.jms.Message;
 import javax.jms.Queue;
 
-public class HentDokumenterFraJoarkProducerImpl implements HentDokumenterFraJoarkProducer {
+public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseProducer {
 
 	@Inject
 	private JmsTemplate jmsTemplate;
@@ -18,7 +18,7 @@ public class HentDokumenterFraJoarkProducerImpl implements HentDokumenterFraJoar
 
 	private ObjectFactory objectFactory = new ObjectFactory();
 
-	public HentDokumenterFraJoarkProducerImpl(Queue queue) {
+	public DistribuerForsendelseProducerImpl(Queue queue) {
 		this.queue = queue;
 	}
 
@@ -26,7 +26,7 @@ public class HentDokumenterFraJoarkProducerImpl implements HentDokumenterFraJoar
 	public void produce(HentDokumenterFraJoark hentDokumenterFraJoark) {
 		jmsTemplate.convertAndSend(
 				queue,
-				objectFactory.createHentDokumenterFraJoark(hentDokumenterFraJoark),
+				objectFactory.createHentDokumenterFraJoark(),
 				message -> (Message) new SimpleMessageConverter().toMessage(message, null));
 
 	}
