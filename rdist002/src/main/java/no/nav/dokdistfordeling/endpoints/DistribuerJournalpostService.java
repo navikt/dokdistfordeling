@@ -2,7 +2,6 @@ package no.nav.dokdistfordeling.endpoints;
 
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
-import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
@@ -14,7 +13,6 @@ import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.AvsenderMottaker;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Bruker;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.DokumentInfo;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Dokumentvariant;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
@@ -181,10 +179,10 @@ public class DistribuerJournalpostService {
 											return new DokumentInformasjon()
 													.withDokumenttypeId(dokumenter.get(0).getBrevkode())
 													.withTilknyttetSom(i == 0 ? HOVEDDOKUMENT.name() : VEDLEGG.name())
-													.withVariantFormat(dokumentInfo
-															.getDokumentvarianter().stream()
-															.map(Dokumentvariant::getVariantformat)
-															.anyMatch(SLADDET::equals) ? SLADDET.name() : ARKIV.name())
+													.withVariantFormat(
+															dokumentInfo.getDokumentvarianter().stream()
+																	.anyMatch(dokumentvariant -> (dokumentvariant.getVariantformat() == SLADDET && dokumentvariant.isSaksbehandlerHarTilgang()))
+																	? Variantformat.SLADDET.name() : Variantformat.ARKIV.name())
 													.withArkivDokumentInfoId(dokumentInfo.getDokumentInfoId())
 													.withRekkefolge(i + 1);
 										})
