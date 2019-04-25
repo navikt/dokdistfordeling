@@ -11,6 +11,5 @@ import no.nav.dokdistfordeling.kodeverk.Variantformat;
 @Builder
 public class Dokumentvariant {
 	private final Variantformat variantformat;
-	private final String filnavn;
 	private final boolean saksbehandlerHarTilgang;
 }

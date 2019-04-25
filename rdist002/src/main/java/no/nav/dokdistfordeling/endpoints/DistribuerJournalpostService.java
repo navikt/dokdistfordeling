@@ -4,11 +4,15 @@ import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.AvsenderMottaker;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.Bruker;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.DokumentInfo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Dokumentvariant;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
@@ -16,6 +20,7 @@ import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.Dokumentstatus;
 import no.nav.dokdistfordeling.kodeverk.Journalstatus;
+import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.dokdistfordeling.qdist012.Adresse;
 import no.nav.dokdistfordeling.qdist012.Aktoer;
 import no.nav.dokdistfordeling.qdist012.ArkivInformasjon;
@@ -31,12 +36,12 @@ import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.informasj
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Component
+@Slf4j
 public class DistribuerJournalpostService {
 
 	private static final String NORSK_POSTADRESSE = "norskPostadresse";
@@ -57,134 +62,130 @@ public class DistribuerJournalpostService {
 
 	public String distribuerForsendelse(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, String authorizationHeader) {
 
-		// steg 1, validering av request
 		validateRequest(distribuerJournalpostRequestTo);
 
-		// steg 2, hent journalpost fra saf
 		Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
+		validateJournalpostAndDokumenter(journalpost);
 
-		validateJournalpost(journalpost); // comment for testing
-		// steg 3, validering av journalpost
+		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
+		validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
 
 		List<DokumentInfo> dokumenter = journalpost.getDokumenter();
-
 		DokumentInfo hovedDokumentInfo = dokumenter.iterator().next();
-		// steg 4, kontroller dokumenter på journalpost
 
-		// steg 5, kontroller dokumenttype, kall dokkat
-		dokumentkatalogAdmin.getDokumenttypeInfo(hovedDokumentInfo.getBrevkode()); //comment for testing
-//		dokumentkatalogAdmin.getDokumenttypeInfo("000001"); //uncomment for testing
+		// brevkode for utgående dokumenter tilsvarer dokumenttypeid
+		dokumentkatalogAdmin.getDokumenttypeInfo(hovedDokumentInfo.getBrevkode());
 
-		// generere guid som skal sendes med til qdist008
 		String bestillingsId = UUID.randomUUID().toString();
 
-		//  steg 6, legg på kø til qdist012,
-		distribuerForsendelseProducer.produce(
-				new HentDokumenterFraJoark()
-						.withDistribusjonbestilling(
-								new Distribusjonbestilling()
-										.withArkivInformasjon(
-												new ArkivInformasjon()
-														.withArkivId(distribuerJournalpostRequestTo.getJournalpostId())
-														.withArkivSystem(journalpost.getTema())
-										)
-										.withDokumenter(IntStream
-												.range(0, dokumenter.size())
-												.mapToObj(i -> {
-													DokumentInfo dokumentInfo = dokumenter.get(i);
-													return new DokumentInformasjon()
-															.withArkivDokumentInfoId(dokumentInfo.getDokumentInfoId())
-															.withDokumenttypeId(hovedDokumentInfo.getBrevkode())
-															.withTilknyttetSom(i == 0 ? HOVEDDOKUMENT.name() : VEDLEGG.name())
-															.withVariantFormat(dokumentInfo
-																	.getDokumentvarianter().stream()
-																	.map(Dokumentvariant::getVariantformat)
-																	.anyMatch(SLADDET::equals) ? SLADDET.name() : ARKIV.name())
-															.withRekkefolge(i + 1);
-												})
-												.collect(Collectors.toList()))
+		distribuerForsendelseProducer.produce(createHentDokumenterFraJoarkBestilling(distribuerJournalpostRequestTo, journalpost, mottaker, dokumenter, bestillingsId), bestillingsId);
 
-										.withAdresse(mapAdresse(distribuerJournalpostRequestTo.getAdresse()))
-										.withBatchId(distribuerJournalpostRequestTo.getBatchId())
-										.withBestillingsId(bestillingsId)
-										.withBestillendeFagsystem(distribuerJournalpostRequestTo.getBestillendeFagsystem())
-										.withDokumentProdApp(distribuerJournalpostRequestTo.getDokumentProdApp())
-										.withForsendelseTittel(journalpost.getTittel())
-										.withMottaker(mapMottaker(journalpost.getAvsenderMottaker()))
-										.withTema(journalpost.getTema())
-						)
-		);
-
-		// steg 7, returner bestillingsid til bestiller
 		return bestillingsId;
 	}
 
 
 	private void validateRequest(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
 		try {
-			assertNotNullOrEmpty(distribuerJournalpostRequestTo.getJournalpostId(), "journalpostId");
-			assertNotNullOrEmpty(distribuerJournalpostRequestTo.getBestillendeFagsystem(), "bestillendeFagsystem");
-			assertNotNullOrEmpty(distribuerJournalpostRequestTo.getDokumentProdApp(), "dokumentProdapp");
-
-			// todo assert adresse depends on mottaker being samhandler, adapt when saf offers avsenderMottakerType, might have to be moved
-			DistribuerJournalpostRequestTo.AdresseTo adresse = distribuerJournalpostRequestTo.getAdresse();
-
-			assertNotNullOrEmpty(distribuerJournalpostRequestTo.getAdresse().getLand(), "adresse.land");
-
-			switch (distribuerJournalpostRequestTo.getAdresse().getAdresseType()) {
-				case NORSK_POSTADRESSE:
-					assertNotNullOrEmpty(adresse.getPoststed(), "adresse.poststed for norsk postadresse");
-					assertNotNullOrEmpty(adresse.getPostnummer(), "adresse.postnummer for norsk postadresse");
-					break;
-				case UTENLANDSK_POSTADRESSE:
-					assertNotNullOrEmpty(adresse.getAdresselinje1(), "adresse.adresselinje1 for utenlands postadresse");
-					break;
-				default:
-					throw new IllegalArgumentException(String.format("AdresseType må være enten \"norskPostadresse\" eller \"utenlandskPostadresse\", mottok %s", adresse.getAdresseType()));
-			}
-
-		} catch (IllegalArgumentException e) {
+			assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
+			assertNotNullOrEmpty("bestillendeFagsystem", distribuerJournalpostRequestTo.getBestillendeFagsystem());
+			assertNotNullOrEmpty("dokumentProdapp", distribuerJournalpostRequestTo.getDokumentProdApp());
+		} catch (ValidationException e) {
+			log.warn("Validering av distribuerJournalpostRequest: " + e.getMessage());
 			throw new ValidationException("Validering av distribuerJournalpostRequest feilet.", e);
 		}
 	}
 
-	private void validateJournalpost(Journalpost journalpost) {
+	private void validateAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo, Aktoer mottaker) {
+
 		try {
-			forParameterAssertEquals("journalposttype", journalpost.getJournalposttype().name(), JournalpostType.U.name());
-			forParameterAssertEquals("journalpoststatus", journalpost.getJournalstatus().name(), Journalstatus.FERDIGSTILT.name());
-			assertNotNullOrEmpty(journalpost.getBruker(), "bruker");
-			assertNotNullOrEmpty(journalpost.getAvsenderMottaker(), "avsenderMottaker");
+			if (mottaker instanceof Samhandler) {
+				assertNotNull(DistribuerJournalpostRequestTo.AdresseTo.class, adresseTo);
+			}
+
+			assertNotNullOrEmpty("land", adresseTo.getLand());
+
+			switch (adresseTo.getAdresseType()) {
+				case NORSK_POSTADRESSE:
+					assertNotNullOrEmpty("poststed", adresseTo.getPoststed());
+					assertNotNullOrEmpty("postnummer", adresseTo.getPostnummer());
+					break;
+				case UTENLANDSK_POSTADRESSE:
+					assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
+					break;
+				default:
+					throw new ValidationException(String.format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, mottok %s", adresseTo.getAdresseType()));
+			}
+		} catch (ValidationException e) {
+			log.warn("Validering av adresse feilet: " + e.getMessage());
+			throw new ValidationException("Validering av adresse for mottaker feilet.", e);
+		}
+	}
+
+	private void validateJournalpostAndDokumenter(Journalpost journalpost) {
+		try {
+			assertParameterIsAsExpected("journalposttype", journalpost.getJournalposttype().name(), JournalpostType.U.name());
+			assertParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus().name(), Journalstatus.FERDIGSTILT.name());
+			assertNotNull(Bruker.class, journalpost.getBruker());
+			assertNotNull(AvsenderMottaker.class, journalpost.getAvsenderMottaker());
 
 			validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
 
-			journalpost.getDokumenter().forEach(this::validateVedleggDokumentInfo);
+			journalpost.getDokumenter().forEach(this::validateDokumentInfo);
 
-		} catch (IllegalArgumentException e) {
-			throw new ValidationException("Validering av distribuerJournalpostRequest feilet.", e);
+		} catch (ValidationException e) {
+			log.warn("Validering av journalpost mottatt fra saf feilet: " + e.getMessage());
+			throw new ValidationException(String.format("Validering av journalpost mottatt fra saf feilet. %s", e.getMessage()), e);
 		}
 	}
+
 
 	private void validateHovedDokumentInfo(DokumentInfo dokumentInfo) {
-		assertNotNullOrEmpty(dokumentInfo.getTittel(), "dokumentinfo.tittel");
-		assertNotNullOrEmpty(dokumentInfo.getBrevkode(), "dokumentinfo.brevkode");
+		assertNotNullOrEmpty("tittel", dokumentInfo.getTittel());
+		assertNotNullOrEmpty("brevkode", dokumentInfo.getBrevkode());
 	}
 
-	private void validateVedleggDokumentInfo(DokumentInfo dokumentInfo) {
-		forParameterAssertEquals("dokumentinfo.dokumentstatus", dokumentInfo.getDokumentstatus().name(), Dokumentstatus.FERDIGSTILT.name());
-//		forParameterAssertEquals("dokumentinfo.dokumentvariant", dokumentInfo.getDokumentvarianter().get(0).getVariantformat().name(), Variantformat.ARKIV.name());
-		// todo await more documentation.
-	}
+	private void validateDokumentInfo(DokumentInfo dokumentInfo) {
+		assertParameterIsAsExpected("dokumentstatus", dokumentInfo.getDokumentstatus().name(), Dokumentstatus.FERDIGSTILT.name());
 
-	private void assertNotNullOrEmpty(Object value, String parameter) {
-		if (Objects.isNull(value) || (value instanceof String && isBlank((String) value))) {
-			throw new IllegalArgumentException(String.format("Input mangler påkrevd parameter \"%s\"", parameter));
+		if (dokumentInfo.getDokumentvarianter().stream().noneMatch(dokInfo -> dokInfo.isSaksbehandlerHarTilgang() && (dokInfo.getVariantformat() == Variantformat.ARKIV || dokInfo.getVariantformat() == Variantformat.SLADDET))) {
+			log.warn("Validering av journalpost mottatt fra saf feilet, ingen variantformater av dokumentet med tilgang for saksbehandler ble funnet.");
+			throw new ValidationException("Validering av dokumentInfo feilet, ingen variantformater av dokumentet med tilgang for saksbehandler ble funnet.");
 		}
 	}
 
-	private void forParameterAssertEquals(String parameterName, String value, String expected) {
-		if (!value.equals(expected)) {
-			throw new IllegalArgumentException(String.format("%s er ikke som forventet, fikk: \"%s\", men forventet \"%s\"", parameterName, value, expected));
-		}
+	private HentDokumenterFraJoark createHentDokumenterFraJoarkBestilling(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost, Aktoer mottaker, List<DokumentInfo> dokumenter, String bestillingsId) {
+		return new HentDokumenterFraJoark()
+				.withDistribusjonbestilling(
+						new Distribusjonbestilling()
+								.withBestillingsId(bestillingsId)
+								.withBatchId(distribuerJournalpostRequestTo.getBatchId())
+								.withBestillendeFagsystem(distribuerJournalpostRequestTo.getBestillendeFagsystem())
+								.withTema(journalpost.getTema())
+								.withForsendelseTittel(journalpost.getTittel())
+								.withArkivInformasjon(
+										new ArkivInformasjon()
+												.withArkivId(distribuerJournalpostRequestTo.getJournalpostId())
+												.withArkivSystem(journalpost.getTema())
+								)
+								.withMottaker(mottaker)
+								.withAdresse(mapAdresse(distribuerJournalpostRequestTo.getAdresse()))
+								.withDokumentProdApp(distribuerJournalpostRequestTo.getDokumentProdApp())
+								.withDokumenter(IntStream
+										.range(0, dokumenter.size())
+										.mapToObj(i -> {
+											DokumentInfo dokumentInfo = dokumenter.get(i);
+											return new DokumentInformasjon()
+													.withArkivDokumentInfoId(dokumentInfo.getDokumentInfoId())
+													.withDokumenttypeId(dokumenter.get(0).getBrevkode())
+													.withTilknyttetSom(i == 0 ? HOVEDDOKUMENT.name() : VEDLEGG.name())
+													.withVariantFormat(dokumentInfo
+															.getDokumentvarianter().stream()
+															.map(Dokumentvariant::getVariantformat)
+															.anyMatch(SLADDET::equals) ? SLADDET.name() : ARKIV.name())
+													.withRekkefolge(i + 1);
+										})
+										.collect(Collectors.toList()))
+				);
 	}
 
 	private Adresse mapAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo) {
@@ -206,7 +207,8 @@ public class DistribuerJournalpostService {
 	}
 
 	private Aktoer mapMottaker(AvsenderMottaker avsenderMottaker) {
-		if (avsenderMottaker.getId().length() == 11) { // todo replace when saf offers AvsenderMottakerType field
+		// todo replace when saf offers AvsenderMottakerType field
+		if (avsenderMottaker.getId().length() == 11) {
 			return new Person()
 					.withNavn(avsenderMottaker.getNavn())
 					.withPersonidentifikator(avsenderMottaker.getId());
@@ -221,5 +223,4 @@ public class DistribuerJournalpostService {
 		}
 		return null;
 	}
-
 }

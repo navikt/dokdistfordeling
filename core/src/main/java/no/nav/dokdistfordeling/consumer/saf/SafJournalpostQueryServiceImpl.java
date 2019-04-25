@@ -48,10 +48,9 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 	public Journalpost hentJournalpost(String journalpostid, String authorizationHeader) {
 
 		return safGraphqlConsumer.performQuery(GraphQLRequest.builder()
-						.query(journalpostquery)
-						.operationName("journalpost")
-						.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
-						.build(),
-				authorizationHeader);
+				.query(journalpostquery)
+				.operationName("journalpost")
+				.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
+				.build(), authorizationHeader);
 	}
 }

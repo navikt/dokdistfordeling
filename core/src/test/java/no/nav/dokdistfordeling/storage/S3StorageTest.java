@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
 import no.nav.dokdistfordeling.exception.technical.S3FailedToGetDocumentTechnicalException;
-import no.nav.dokdistfordeling.storage.crypto.Crypto;
+import no.nav.dokdistfordeling.crypto.Crypto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

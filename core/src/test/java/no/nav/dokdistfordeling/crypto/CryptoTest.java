@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.storage.crypto;
+package no.nav.dokdistfordeling.crypto;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;

@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.endpoints;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("rest/v1")
+@Slf4j
 public class DistribuerJournalpostController {
 
 	private DistribuerJournalpostService distribuerJournalpostService;
@@ -24,6 +26,7 @@ public class DistribuerJournalpostController {
 	@ResponseBody
 	public DistribuerJournalpostResponseTo distribuerJournalpost(@RequestBody DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
 																 @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+		log.info("distribuerJournalpost har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());
 		return new DistribuerJournalpostResponseTo(distribuerJournalpostService.distribuerForsendelse(distribuerJournalpostRequestTo, authorizationHeader));
 	}
 }

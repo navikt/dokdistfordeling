@@ -2,9 +2,11 @@ package no.nav.dokdistfordeling.itest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
 import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostResponseTo;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -47,7 +49,9 @@ public class Rdist002IT {
 	@Inject
 	protected TestRestTemplate restTemplate;
 
+
 	@Test
+	@Disabled
 	public void distribuerJournalpostHappyPath() {
 //		stubFor(get("/hentjournalsakinfo/hentdokument/" + DOKUMENT_ID + "/" + VARIANTFORMAT).willReturn(aResponse().withStatus(HttpStatus.OK
 //				.value())
