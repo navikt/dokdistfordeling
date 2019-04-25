@@ -10,8 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonJournalpost;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
-import no.nav.dokdistfordeling.exception.technical.DokdistFordelingConvertToJsonTechnicalException;
-import no.nav.dokdistfordeling.exception.technical.DokdistfordelingJournalpostQueryTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.MarshalGraphqlRequestToJsonTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.SafJournalpostQueryTechnicalException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -48,7 +48,7 @@ public class SafGraphqlConsumer {
 		this.graphQLurl = graphQLurl;
 	}
 
-	@Retryable(include = DokdistfordelingJournalpostQueryTechnicalException.class, maxAttempts = MAX_ATTEMPTS_SHORT, backoff = @Backoff(delay = DELAY_SHORT))
+	@Retryable(include = SafJournalpostQueryTechnicalException.class, maxAttempts = MAX_ATTEMPTS_SHORT, backoff = @Backoff(delay = DELAY_SHORT))
 	public Journalpost performQuery(GraphQLRequest graphQLRequest, String authorizationHeader) {
 
 		try {
@@ -57,20 +57,22 @@ public class SafGraphqlConsumer {
 			ResponseEntity<SafJsonJournalpost> responseEntity = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(requestToJson(graphQLRequest), httpHeaders), SafJsonJournalpost.class);
 
 			if (responseEntity.getStatusCodeValue() > HttpStatus.OK.value()) {
-				throw new DokdistfordelingJournalpostQueryTechnicalException(String.format("Saf respons var ikke OK. Statuskode: %s", responseEntity.getStatusCode()));
+				log.warn(String.format("Saf respons var ikke OK. Statuskode: %s", responseEntity.getStatusCode()));
+				throw new SafJournalpostQueryTechnicalException(String.format("Saf respons var ikke OK. Statuskode: %s", responseEntity.getStatusCode()));
 			}
-			if (responseEntity.getBody().getData().getJournalpost() == null) {
-				throw new SafJournalpostIkkeFunnetFunctionalException("Datafeltet mottatt fra saf var null.");
+			if (responseEntity.getBody() == null || responseEntity.getBody().getData().getJournalpost() == null) {
+				log.warn("Ingen journalpost ble returnert ifra saf.");
+				throw new SafJournalpostIkkeFunnetFunctionalException("Ingen journalpost ble returnert ifra saf.");
 			}
 
 			return responseEntity.getBody().getJournalpost();
 
 		} catch (HttpClientErrorException e) {
 			log.warn("Kallet til SAF (graphQL) feilet: " + e.getMessage());
-			throw new DokdistfordelingJournalpostQueryTechnicalException(String.format("Kallet til SAF (graphQL) feilet med status=%s feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
+			throw new SafJournalpostQueryTechnicalException(String.format("Kallet til SAF (graphQL) feilet med status=%s feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
 			log.warn("Tjenesten SAF (graphQL) feilet: " + e.getMessage());
-			throw new DokdistfordelingJournalpostQueryTechnicalException(String.format("Tjenesten SAF (graphQL) feilet med status=%s feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
+			throw new SafJournalpostQueryTechnicalException(String.format("Tjenesten SAF (graphQL) feilet med status=%s feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
 		}
 	}
 
@@ -87,7 +89,7 @@ public class SafGraphqlConsumer {
 		try {
 			return new ObjectMapper().writeValueAsString(graphQLRequest);
 		} catch (JsonProcessingException e) {
-			throw new DokdistFordelingConvertToJsonTechnicalException(String.format("Kunne ikke konvertere graphqlrequest objekt til json, feilmelding=%s", e.getMessage()), e);
+			throw new MarshalGraphqlRequestToJsonTechnicalException(String.format("Kunne ikke konvertere graphQlRequest til json, feilmelding=%s", e.getMessage()), e);
 		}
 	}
 }

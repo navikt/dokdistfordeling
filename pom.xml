@@ -77,6 +77,11 @@
 			</dependency>
 
 			<dependency>
+				<groupId>no.nav.meldinger.virksomhet</groupId>
+				<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
+				<version>1.0.2</version>
+			</dependency>
+			<dependency>
 				<groupId>javax.inject</groupId>
 				<artifactId>javax.inject</artifactId>
 				<version>${javax.inject.version}</version>

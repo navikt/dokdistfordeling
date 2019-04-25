@@ -3,9 +3,6 @@ package no.nav.dokdistfordeling.consumer.saf.journalpost;
 import lombok.Builder;
 import lombok.Value;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Value
 @Builder
 public class AvsenderMottaker {

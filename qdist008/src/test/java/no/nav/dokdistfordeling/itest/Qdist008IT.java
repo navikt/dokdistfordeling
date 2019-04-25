@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import no.nav.dokdistfordeling.itest.config.Qdist008TestConfig;
+import no.nav.dokdistfordeling.itest.config.Qdist008ItestConfig;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.io.IOUtils;
@@ -64,7 +64,7 @@ import java.util.concurrent.TimeUnit;
 
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
-@SpringBootTest(classes = {Qdist008TestConfig.class},
+@SpringBootTest(classes = {Qdist008ItestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")

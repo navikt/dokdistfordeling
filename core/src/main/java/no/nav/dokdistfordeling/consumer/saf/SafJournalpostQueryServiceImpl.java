@@ -11,8 +11,7 @@ import java.util.Collections;
 @Component
 public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryService {
 
-	private final SafGraphqlConsumer safGraphqlConsumer;
-	private final String journalpostquery =
+	private static final String JOURNALPOST_QUERY =
 			"query journalpost($queryJournalpostId: String!) {\n" +
 					"  journalpost(journalpostId: $queryJournalpostId) {\n" +
 					"    journalposttype\n" +
@@ -40,6 +39,7 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 					"    }\n" +
 					"  }\n" +
 					"}\n";
+	private final SafGraphqlConsumer safGraphqlConsumer;
 
 	public SafJournalpostQueryServiceImpl(SafGraphqlConsumer safGraphqlConsumer) {
 		this.safGraphqlConsumer = safGraphqlConsumer;
@@ -48,7 +48,7 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 	public Journalpost hentJournalpost(String journalpostid, String authorizationHeader) {
 
 		return safGraphqlConsumer.performQuery(GraphQLRequest.builder()
-				.query(journalpostquery)
+				.query(JOURNALPOST_QUERY)
 				.operationName("journalpost")
 				.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
 				.build(), authorizationHeader);

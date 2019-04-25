@@ -7,13 +7,8 @@ import no.nav.dokdistfordeling.kodeverk.Dokumentstatus;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
-
 @Value
 @Builder
-
 public class DokumentInfo {
 	private final String dokumentInfoId;
 	private final String tittel;

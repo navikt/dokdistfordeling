@@ -4,9 +4,6 @@ import lombok.Builder;
 import lombok.Value;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Value
 @Builder
 public class Dokumentvariant {

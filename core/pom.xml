@@ -18,7 +18,6 @@
 		<dependency>
 			<groupId>no.nav.meldinger.virksomhet</groupId>
 			<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
-			<version>1.0.2</version>
 		</dependency>
 
 		<dependency>

@@ -2,11 +2,10 @@ package no.nav.dokdistfordeling.config.jms;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.crypto.Crypto;
-import no.nav.dokdistfordeling.exception.technical.MarshallingHentDokumenterFraJoarkTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.MarshalHentDokumenterFraJoarkTechnicalException;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoark;
 import org.springframework.jms.core.JmsTemplate;
 
-import javax.inject.Inject;
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -16,13 +15,12 @@ import java.io.StringWriter;
 @Slf4j
 public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseProducer {
 
-	@Inject
 	private JmsTemplate jmsTemplate;
-
 	private String encryptionPassphrase;
 	private Queue queue;
 
-	public DistribuerForsendelseProducerImpl(Queue queue, String encryptionPassphrase) {
+	public DistribuerForsendelseProducerImpl(JmsTemplate jmsTemplate, Queue queue, String encryptionPassphrase) {
+		this.jmsTemplate = jmsTemplate;
 		this.queue = queue;
 		this.encryptionPassphrase = encryptionPassphrase;
 	}
@@ -32,7 +30,7 @@ public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseP
 		jmsTemplate.send(
 				queue,
 				session -> session.createTextMessage(marshalHentDokumenterFraJoarkToXmlString(hentDokumenterFraJoark, bestillingsId)));
-		log.info("hentDokumenterFraJoark bestilling ble lagt på kø imot qdist012 for bestillingsId={}", bestillingsId);
+		log.info("hentDokumenterFraJoark bestilling med bestillingsId{} ble lagt på kø imot qdist012", bestillingsId);
 	}
 
 	private String marshalHentDokumenterFraJoarkToXmlString(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId) {
@@ -44,8 +42,8 @@ public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseP
 			marshaller.marshal(hentDokumenterFraJoark, sw);
 
 			return encrypt(sw.toString(), bestillingsId);
-		} catch (JAXBException | IllegalArgumentException e) {
-			throw new MarshallingHentDokumenterFraJoarkTechnicalException("Kunne ikke marshalle hentDokumenterFraJoark til xmlString", e);
+		} catch (JAXBException e) {
+			throw new MarshalHentDokumenterFraJoarkTechnicalException("Kunne ikke marshalle hentDokumenterFraJoark bestilling til xmlString", e);
 		}
 	}
 

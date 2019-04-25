@@ -9,8 +9,4 @@ public class SafJournalpostIkkeFunnetFunctionalException extends AbstractDokdist
 	public SafJournalpostIkkeFunnetFunctionalException(String message) {
 		super(message);
 	}
-
-	public SafJournalpostIkkeFunnetFunctionalException(String message, Throwable cause) {
-		super(message, cause);
-	}
 }

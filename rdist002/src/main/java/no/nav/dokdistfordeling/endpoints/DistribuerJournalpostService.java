@@ -46,6 +46,8 @@ public class DistribuerJournalpostService {
 
 	private static final String NORSK_POSTADRESSE = "norskPostadresse";
 	private static final String UTENLANDSK_POSTADRESSE = "utenlandskPostadresse";
+	private static final String UTGAAENDE = JournalpostType.U.name();
+	private static final String FERDIGSTILT = Journalstatus.FERDIGSTILT.name();
 
 	private SafJournalpostQueryService safJournalpostQueryService;
 	private DistribuerForsendelseProducer distribuerForsendelseProducer;
@@ -102,18 +104,20 @@ public class DistribuerJournalpostService {
 				assertNotNull(DistribuerJournalpostRequestTo.AdresseTo.class, adresseTo);
 			}
 
-			assertNotNullOrEmpty("land", adresseTo.getLand());
+			if (adresseTo != null) {
+				assertNotNullOrEmpty("land", adresseTo.getLand());
 
-			switch (adresseTo.getAdresseType()) {
-				case NORSK_POSTADRESSE:
-					assertNotNullOrEmpty("poststed", adresseTo.getPoststed());
-					assertNotNullOrEmpty("postnummer", adresseTo.getPostnummer());
-					break;
-				case UTENLANDSK_POSTADRESSE:
-					assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
-					break;
-				default:
-					throw new ValidationException(String.format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, mottok %s", adresseTo.getAdresseType()));
+				switch (adresseTo.getAdresseType()) {
+					case NORSK_POSTADRESSE:
+						assertNotNullOrEmpty("poststed", adresseTo.getPoststed());
+						assertNotNullOrEmpty("postnummer", adresseTo.getPostnummer());
+						break;
+					case UTENLANDSK_POSTADRESSE:
+						assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
+						break;
+					default:
+						throw new ValidationException(String.format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, mottok %s", adresseTo.getAdresseType()));
+				}
 			}
 		} catch (ValidationException e) {
 			log.warn("Validering av adresse feilet: " + e.getMessage());
@@ -123,8 +127,8 @@ public class DistribuerJournalpostService {
 
 	private void validateJournalpostAndDokumenter(Journalpost journalpost) {
 		try {
-			assertParameterIsAsExpected("journalposttype", journalpost.getJournalposttype().name(), JournalpostType.U.name());
-			assertParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus().name(), Journalstatus.FERDIGSTILT.name());
+			assertParameterIsAsExpected("journalposttype", journalpost.getJournalposttype().name(), UTGAAENDE);
+			assertParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus().name(), FERDIGSTILT);
 			assertNotNull(Bruker.class, journalpost.getBruker());
 			assertNotNull(AvsenderMottaker.class, journalpost.getAvsenderMottaker());
 
@@ -145,7 +149,7 @@ public class DistribuerJournalpostService {
 	}
 
 	private void validateDokumentInfo(DokumentInfo dokumentInfo) {
-		assertParameterIsAsExpected("dokumentstatus", dokumentInfo.getDokumentstatus().name(), Dokumentstatus.FERDIGSTILT.name());
+		assertParameterIsAsExpected("dokumentstatus", dokumentInfo.getDokumentstatus().name(), FERDIGSTILT);
 
 		if (dokumentInfo.getDokumentvarianter().stream().noneMatch(dokInfo -> dokInfo.isSaksbehandlerHarTilgang() && (dokInfo.getVariantformat() == Variantformat.ARKIV || dokInfo.getVariantformat() == Variantformat.SLADDET))) {
 			log.warn("Validering av journalpost mottatt fra saf feilet, ingen variantformater av dokumentet med tilgang for saksbehandler ble funnet.");
@@ -194,9 +198,9 @@ public class DistribuerJournalpostService {
 					.withAdresselinje1(adresseTo.getAdresselinje1())
 					.withAdresselinje2(adresseTo.getAdresselinje2())
 					.withAdresselinje3(adresseTo.getAdresselinje3())
-					.withLand(adresseTo.getLand())
 					.withPostnummer(adresseTo.getPostnummer())
-					.withPoststed(adresseTo.getPostnummer());
+					.withPoststed(adresseTo.getPostnummer())
+					.withLand(adresseTo.getLand());
 		} else {
 			return new UtenlandskPostadresse()
 					.withAdresselinje1(adresseTo.getAdresselinje1())

@@ -8,9 +8,6 @@ import no.nav.dokdistfordeling.kodeverk.Journalstatus;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Value
 @Builder
 public class Journalpost {

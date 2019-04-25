@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Profile;
 		LokalTestCacheConfig.class,
 		STSTestConfig.class,
 		CoreConfig.class})
-public class Qdist008TestConfig {
+public class Qdist008ItestConfig {
 
 	@Bean
 	public Storage storage() {

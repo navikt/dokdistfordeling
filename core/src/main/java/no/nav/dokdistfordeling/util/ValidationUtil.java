@@ -4,7 +4,7 @@ import static java.lang.String.format;
 
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 
-public class ValidationUtil {
+public final class ValidationUtil {
 
 	private ValidationUtil() {
 	}
