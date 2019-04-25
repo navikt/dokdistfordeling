@@ -2,7 +2,6 @@ package no.nav.dokdistfordeling.endpoints;
 
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
-import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
@@ -181,10 +180,10 @@ public class DistribuerJournalpostService {
 											return new DokumentInformasjon()
 													.withDokumenttypeId(dokumenter.get(0).getBrevkode())
 													.withTilknyttetSom(i == 0 ? HOVEDDOKUMENT.name() : VEDLEGG.name())
-													.withVariantFormat(dokumentInfo
-															.getDokumentvarianter().stream()
-															.map(Dokumentvariant::getVariantformat)
-															.anyMatch(SLADDET::equals) ? SLADDET.name() : ARKIV.name())
+													.withVariantFormat(
+															dokumentInfo.getDokumentvarianter().stream()
+																	.anyMatch(dokumentvariant -> (dokumentvariant.getVariantformat() == SLADDET && dokumentvariant.isSaksbehandlerHarTilgang()))
+																		 ? Variantformat.SLADDET.name() : Variantformat.ARKIV.name())
 													.withArkivDokumentInfoId(dokumentInfo.getDokumentInfoId())
 													.withRekkefolge(i + 1);
 										})

@@ -3,9 +3,10 @@ package no.nav.dokdistfordeling.config.jms;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.exception.technical.MarshalHentDokumenterFraJoarkTechnicalException;
-
 import no.nav.dokdistfordeling.melding.qdist012.HentDokumenterFraJoark;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.stereotype.Component;
 
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
@@ -14,27 +15,31 @@ import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 
 @Slf4j
+@Component
 public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseProducer {
 
 	private JmsTemplate jmsTemplate;
-	private String encryptionPassphrase;
-	private Queue queue;
 
-	public DistribuerForsendelseProducerImpl(JmsTemplate jmsTemplate, Queue queue, String encryptionPassphrase) {
+
+	private Queue qdist012;
+
+	@Value("${hentdokumenter_fra_joark_crypto_password}")
+	private String encryptionPassphrase;
+
+	public DistribuerForsendelseProducerImpl(JmsTemplate jmsTemplate, Queue qdist012) {
 		this.jmsTemplate = jmsTemplate;
-		this.queue = queue;
-		this.encryptionPassphrase = encryptionPassphrase;
+		this.qdist012 = qdist012;
 	}
 
 	@Override
 	public void produce(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId) {
 		jmsTemplate.send(
-				queue,
-				session -> session.createTextMessage(marshalHentDokumenterFraJoarkToXmlString(hentDokumenterFraJoark, bestillingsId)));
+				qdist012,
+				session -> session.createTextMessage(marshalHentDokumenterFraJoarkToXmlStringAndEncrypt(hentDokumenterFraJoark, bestillingsId)));
 		log.info("hentDokumenterFraJoark bestilling med bestillingsId{} ble lagt på kø imot qdist012", bestillingsId);
 	}
 
-	private String marshalHentDokumenterFraJoarkToXmlString(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId) {
+	private String marshalHentDokumenterFraJoarkToXmlStringAndEncrypt(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId) {
 		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(HentDokumenterFraJoark.class);
 			Marshaller marshaller = jaxbContext.createMarshaller();

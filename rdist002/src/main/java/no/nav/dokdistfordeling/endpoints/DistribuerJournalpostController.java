@@ -26,7 +26,7 @@ public class DistribuerJournalpostController {
 	@ResponseBody
 	public DistribuerJournalpostResponseTo distribuerJournalpost(@RequestBody DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
 																 @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader) {
-		log.info("distribuerJournalpost har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());
+		log.info("rdist002 har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());
 		return new DistribuerJournalpostResponseTo(distribuerJournalpostService.distribuerForsendelse(distribuerJournalpostRequestTo, authorizationHeader));
 	}
 }
