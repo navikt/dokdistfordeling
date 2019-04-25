@@ -1,0 +1,37 @@
+{
+  "data": {
+    "journalpost": {
+      "journalposttype": "U",
+      "journalstatus": "FERDIGSTILT",
+      "tema": "OPP",
+      "bruker": {
+        "id": "***gammelt_fnr***45",
+        "type": "AKTOERID"
+      },
+      "avsenderMottaker": {
+        "id": "***gammelt_fnr***",
+        "navn": "MASKERT_FELT",
+        "land": "NO",
+        "erLikBruker": true
+      },
+      "dokumenter": [
+        {
+          "dokumentInfoId": "555555555",
+          "tittel": "MASKERT_FELT",
+          "brevkode": "000001",
+          "dokumentstatus": "FERDIGSTILT",
+          "dokumentvarianter": [
+            {
+              "saksbehandlerHarTilgang": true,
+              "variantformat": "SLADDET"
+            },
+            {
+              "saksbehandlerHarTilgang": true,
+              "variantformat": "ARKIV"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

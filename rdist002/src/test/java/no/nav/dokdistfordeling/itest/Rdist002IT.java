@@ -1,12 +1,17 @@
 package no.nav.dokdistfordeling.itest;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
 import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostResponseTo;
-import org.junit.jupiter.api.Disabled;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -34,8 +39,8 @@ public class Rdist002IT {
 
 	private static final String TEMP_OIDC_TOKEN = "eyAidHlwIjogIkpXVCIsICJraWQiOiAiMWwySmtDb1RMMTBibWVBeHlsZzR4Umk4ajJZPSIsICJhbGciOiAiUlMyNTYiIH0.eyAiYXRfaGFzaCI6ICJ4RklSS0dpTWZ4ZFVPS3c0ZmQ4MW9BIiwgInN1YiI6ICJaOTkyMzEwIiwgImF1ZGl0VHJhY2tpbmdJZCI6ICJiZDdlYWE0ZC1mYzIzLTQ2ZGMtOGRjZi1iMjJmNzU1NDExZjQtMjAyMDc5MzQiLCAiaXNzIjogImh0dHBzOi8vaXNzby1xLmFkZW8ubm86NDQzL2lzc28vb2F1dGgyIiwgInRva2VuTmFtZSI6ICJpZF90b2tlbiIsICJhdWQiOiAiaWRhLXEiLCAiY19oYXNoIjogInctbGx3ZlJMenVpRFBselpkY1BhenciLCAib3JnLmZvcmdlcm9jay5vcGVuaWRjb25uZWN0Lm9wcyI6ICIyZmNlNWU1ZS02ODdjLTQ5ZmYtOTRjYS1jNzE2OGVmY2M2MmQiLCAiYXpwIjogImlkYS1xIiwgImF1dGhfdGltZSI6IDE1NTUwNzQ3NjcsICJyZWFsbSI6ICIvIiwgImV4cCI6IDE1NTUwNzgzNjcsICJ0b2tlblR5cGUiOiAiSldUVG9rZW4iLCAiaWF0IjogMTU1NTA3NDc2NyB9.orrUotLp8SMkCpigVhkAUlw9Rx5tigBrYNVv3j8fTmkIe-I1MEI0xctxM-tnLbrgcW3I-3Ye_bkS4KplhR4spnG9hT45L1dD-yoLsu8R6cD1PklMsx8m93XmaTHDReGZAI3uKO4KSPcQHyVE7-tIc6CWYqbVXWmEUxUsHNYm3bWO_0rZ-Su6CWVCEBz3yWa85rUcPn0Il-_BWkgF-0YhOWJn3ndKAl_96ARmR-nllhUnQDYqHk2DwYLWnz_WOb4HuuqxKRP5i1h8zHwGIR6VORCzWgFViiFNTPT54Mtr2fZtVinP8W70JoRZ1pKbk-bYK4ErJgACU8npdGBZYTZa6g";
 	private static final String DISTRIBUER_JOURNALPOST_URI = "/rest/v1/distribuerjournalpost";
-	private static final String JOURNALPOSTID = "666666";
-	private static final String BATCHID = "55555";
+	private static final String JOURNALPOSTID = "555555555";
+	private static final String BATCHID = "66666";
 	private static final String BESTILLENDEFAGSYSTEM = "bestillendeFagsystem";
 	private static final String ADRESSETYPE_NORSK = "norskPostadresse";
 	private static final String ADRESSETYPE_UTENLANDS = "utenlandskPostadresse";
@@ -45,29 +50,27 @@ public class Rdist002IT {
 	private static final String LAND_NO = "NO";
 	private static final String LAND_US = "US";
 	private static final String DOKUMENTPRODAPP = "dokumentprodapp";
+	private static final String DOKUMENTTYPEID = "000001";
+	private static final String TITTEL = "dokkatTittel";
 
 	@Inject
 	protected TestRestTemplate restTemplate;
 
+// happypath test should be the most complicated functioning path possible
+	// journalpost distribusjonrequest, with all requestfields and token
+	// receives a journalpost with both sladdet and arkiv from saf, as well as U, FERDIGSTILT, and
 
 	@Test
-	@Disabled
 	public void distribuerJournalpostHappyPath() {
-//		stubFor(get("/hentjournalsakinfo/hentdokument/" + DOKUMENT_ID + "/" + VARIANTFORMAT).willReturn(aResponse().withStatus(HttpStatus.OK
-//				.value())
-//				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
-//				.withBody(Base64.getEncoder().encode(TEST_FILE_BYTES))));
-//
-//		stubFor(get("/hentjournalsakinfo/henttilgangjournalpost/" + JOURNALPOST_ID + "/" + DOKUMENT_ID + "/" + VARIANTFORMAT).willReturn(aResponse()
-//				.withStatus(HttpStatus.OK.value())
-//				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-//				.withBodyFile("hentjournalsakinfo/henttilgangjournalpost_gsak-happy.json")));
-//
-//		stubFor(get("/gsak/10672720").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-//				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-//				.withBodyFile("hentsak/hentsakbysaksid-happy.json")));
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withBodyFile("saf/safGraphQlResponse-happy.json"))); // todo remove request ?
 
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost();
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokkat/tkat020-happy.json")));
+
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(); // todo bruk rdist002request-happy.json ?
 		DistribuerJournalpostResponseTo response = responseEntity.getBody();
 
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -111,7 +114,7 @@ public class Rdist002IT {
 	private HttpHeaders createHeaders() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-		headers.add(HttpHeaders.AUTHORIZATION, TEMP_OIDC_TOKEN);
+		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + TEMP_OIDC_TOKEN);
 		return headers;
 	}
 
