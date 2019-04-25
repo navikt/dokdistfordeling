@@ -45,6 +45,7 @@
 		<micrometer.version>1.1.4</micrometer.version>
 		<spring-wiremock.version>1.2.5.RELEASE</spring-wiremock.version>
 		<wiremock-standalone.version>2.19.0</wiremock-standalone.version>
+		<melding-virksomhet-dokdistfordeling.version>1.0.2</melding-virksomhet-dokdistfordeling.version>
 	</properties>
 
 	<dependencyManagement>
@@ -56,8 +57,23 @@
 			</dependency>
 			<dependency>
 				<groupId>no.nav.dokdistfordeling</groupId>
+				<artifactId>schemas</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokdistfordeling</groupId>
+				<artifactId>qdist012</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokdistfordeling</groupId>
 				<artifactId>qdist008</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.meldinger.virksomhet</groupId>
+				<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
+				<version>${melding-virksomhet-dokdistfordeling.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.inject</groupId>

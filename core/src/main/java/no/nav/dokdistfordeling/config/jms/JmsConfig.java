@@ -43,6 +43,16 @@ public class JmsConfig {
 	}
 
 	@Bean
+	public Queue qdist012(@Value("${dokdistfordeling_qdist012_hent_dok_fra_joark.queuename}") String qdist012QueueName) throws JMSException {
+		return new MQQueue(qdist012QueueName);
+	}
+
+	@Bean
+	public Queue qdist012FunksjonellFeil(@Value("${dokdistfordeling_qdist012_funk_feil.queuename}") String qdist012FunksjonellFeilQueueName) throws JMSException {
+		return new MQQueue(qdist012FunksjonellFeilQueueName);
+	}
+
+	@Bean
 	public ConnectionFactory wmqConnectionFactory(final MqGatewayAlias mqGatewayAlias,
 												  final @Value("${dokdistfordeling_channel.name}") String channelName,
 												  final SrvAppserverProperties srvAppserverProperties) throws JMSException {
