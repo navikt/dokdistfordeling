@@ -58,10 +58,11 @@
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<generatePackage>no.nav.dokdistfordeling.qdist012</generatePackage>
+							<generatePackage>no.nav.dokdistfordeling.melding.qdist012</generatePackage>
 							<schemaDirectory>src/main/resources/no/nav/dokdistfordeling/qdist012/xsd</schemaDirectory>
 							<bindingDirectory>src/main/resources/no/nav/dokdistfordeling/qdist012/bindings</bindingDirectory>
-							<generateDirectory>${project.build.directory}/no/nav/dokdistfordeling/hentdokumenterfrajoark/</generateDirectory>
+							<generateDirectory>${project.build.directory}/no/nav/dokdistfordeling/hentdokumenterfrajoark/
+							</generateDirectory>
 							<strict>false</strict>
 							<plugins>
 								<plugin>
