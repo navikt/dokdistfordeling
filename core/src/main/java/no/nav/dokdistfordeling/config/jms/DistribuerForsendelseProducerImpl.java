@@ -3,7 +3,8 @@ package no.nav.dokdistfordeling.config.jms;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.exception.technical.MarshalHentDokumenterFraJoarkTechnicalException;
-import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoark;
+
+import no.nav.dokdistfordeling.melding.qdist012.HentDokumenterFraJoark;
 import org.springframework.jms.core.JmsTemplate;
 
 import javax.jms.Queue;

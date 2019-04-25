@@ -18,20 +18,19 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.Dokumentvariant;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
-import no.nav.dokdistfordeling.kodeverk.Dokumentstatus;
 import no.nav.dokdistfordeling.kodeverk.Journalstatus;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
-import no.nav.dokdistfordeling.qdist012.Adresse;
-import no.nav.dokdistfordeling.qdist012.Aktoer;
-import no.nav.dokdistfordeling.qdist012.ArkivInformasjon;
-import no.nav.dokdistfordeling.qdist012.Distribusjonbestilling;
-import no.nav.dokdistfordeling.qdist012.DokumentInformasjon;
-import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoark;
-import no.nav.dokdistfordeling.qdist012.NorskPostadresse;
-import no.nav.dokdistfordeling.qdist012.Organisasjon;
-import no.nav.dokdistfordeling.qdist012.Person;
-import no.nav.dokdistfordeling.qdist012.Samhandler;
-import no.nav.dokdistfordeling.qdist012.UtenlandskPostadresse;
+import no.nav.dokdistfordeling.melding.qdist012.Adresse;
+import no.nav.dokdistfordeling.melding.qdist012.Aktoer;
+import no.nav.dokdistfordeling.melding.qdist012.ArkivInformasjon;
+import no.nav.dokdistfordeling.melding.qdist012.Distribusjonbestilling;
+import no.nav.dokdistfordeling.melding.qdist012.DokumentInformasjon;
+import no.nav.dokdistfordeling.melding.qdist012.HentDokumenterFraJoark;
+import no.nav.dokdistfordeling.melding.qdist012.NorskPostadresse;
+import no.nav.dokdistfordeling.melding.qdist012.Organisasjon;
+import no.nav.dokdistfordeling.melding.qdist012.Person;
+import no.nav.dokdistfordeling.melding.qdist012.Samhandler;
+import no.nav.dokdistfordeling.melding.qdist012.UtenlandskPostadresse;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.informasjon.arkiverdokumentproduksjon.JournalpostType;
 import org.springframework.stereotype.Component;
 
@@ -172,6 +171,7 @@ public class DistribuerJournalpostService {
 												.withArkivSystem(journalpost.getTema())
 								)
 								.withMottaker(mottaker)
+								.withBruker(mapBruker(journalpost.getBruker()))
 								.withAdresse(mapAdresse(distribuerJournalpostRequestTo.getAdresse()))
 								.withDokumentProdApp(distribuerJournalpostRequestTo.getDokumentProdApp())
 								.withDokumenter(IntStream
@@ -179,13 +179,13 @@ public class DistribuerJournalpostService {
 										.mapToObj(i -> {
 											DokumentInfo dokumentInfo = dokumenter.get(i);
 											return new DokumentInformasjon()
-													.withArkivDokumentInfoId(dokumentInfo.getDokumentInfoId())
 													.withDokumenttypeId(dokumenter.get(0).getBrevkode())
 													.withTilknyttetSom(i == 0 ? HOVEDDOKUMENT.name() : VEDLEGG.name())
 													.withVariantFormat(dokumentInfo
 															.getDokumentvarianter().stream()
 															.map(Dokumentvariant::getVariantformat)
 															.anyMatch(SLADDET::equals) ? SLADDET.name() : ARKIV.name())
+													.withArkivDokumentInfoId(dokumentInfo.getDokumentInfoId())
 													.withRekkefolge(i + 1);
 										})
 										.collect(Collectors.toList()))
@@ -224,6 +224,20 @@ public class DistribuerJournalpostService {
 			new Samhandler()
 					.withNavn(avsenderMottaker.getNavn())
 					.withSamhandleridentifikator(avsenderMottaker.getId());
+		}
+		return null;
+	}
+
+	private Aktoer mapBruker(Bruker bruker) {
+		if (bruker.getId().length() == 11) {
+			return new Person()
+					.withPersonidentifikator(bruker.getId());
+		} else if (bruker.getId().length() == 9) {
+			return new Organisasjon()
+					.withOrgnummer(bruker.getId());
+		} else {
+			new Samhandler()
+					.withSamhandleridentifikator(bruker.getId());
 		}
 		return null;
 	}
