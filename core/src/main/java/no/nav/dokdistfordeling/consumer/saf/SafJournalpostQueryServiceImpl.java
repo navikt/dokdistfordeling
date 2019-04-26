@@ -24,8 +24,6 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 					"    avsenderMottaker {\n" +
 					"      id\n" +
 					"      navn\n" +
-					"      land\n" +
-					"      erLikBruker\n" +
 					"    }\n" +
 					"    dokumenter {\n" +
 					"      dokumentInfoId\n" +

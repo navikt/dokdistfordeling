@@ -4,5 +4,5 @@ import lombok.Value;
 
 @Value
 public class DistribuerJournalpostResponseTo {
-	private String bestillingsId;
+	private final String bestillingsId;
 }

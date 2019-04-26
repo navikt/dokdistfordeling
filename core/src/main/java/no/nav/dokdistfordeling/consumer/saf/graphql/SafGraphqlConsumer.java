@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonJournalpost;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
 import no.nav.dokdistfordeling.exception.technical.MarshalGraphqlRequestToJsonTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostQueryTechnicalException;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,22 +58,18 @@ public class SafGraphqlConsumer {
 			ResponseEntity<SafJsonJournalpost> responseEntity = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(requestToJson(graphQLRequest), httpHeaders), SafJsonJournalpost.class);
 
 			if (responseEntity.getStatusCodeValue() > HttpStatus.OK.value()) {
-				log.warn(String.format("Saf respons var ikke OK. Statuskode: %s", responseEntity.getStatusCode()));
 				throw new SafJournalpostQueryTechnicalException(String.format("Saf respons var ikke OK. Statuskode: %s", responseEntity.getStatusCode()));
 			}
-			if (responseEntity.getBody() == null || responseEntity.getBody().getData().getJournalpost() == null) {
-				log.warn("Ingen journalpost ble returnert ifra saf.");
-				throw new SafJournalpostIkkeFunnetFunctionalException("Ingen journalpost ble returnert ifra saf.");
+			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null || responseEntity.getBody().getData().getJournalpost() == null) {
+				throw new SafJournalpostIkkeFunnetFunctionalException("Ingen journalpost ble funnet");
 			}
 
 			return responseEntity.getBody().getJournalpost();
 
 		} catch (HttpClientErrorException e) {
-			log.warn("Kallet til SAF (graphQL) feilet: " + e.getMessage());
-			throw new SafJournalpostQueryTechnicalException(String.format("Kallet til SAF (graphQL) feilet med status=%s feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
+			throw new SafJournalpostQueryUnauthorizedException(String.format("Henting av journalpost feilet med status: %s, feilmelding: %s", e.getStatusCode(), e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
-			log.warn("Tjenesten SAF (graphQL) feilet: " + e.getMessage());
-			throw new SafJournalpostQueryTechnicalException(String.format("Tjenesten SAF (graphQL) feilet med status=%s feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
+			throw new SafJournalpostQueryTechnicalException(String.format("Tjenesten SAF (graphQL) feilet med status: %s, feilmelding: %s", e.getStatusCode(), e.getMessage()), e);
 		}
 	}
 
