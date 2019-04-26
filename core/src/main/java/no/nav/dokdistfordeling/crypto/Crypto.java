@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.storage.crypto;
+package no.nav.dokdistfordeling.crypto;
 
 import no.nav.dokdistfordeling.exception.functional.CryptoException;
 import org.apache.commons.lang3.StringUtils;

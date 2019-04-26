@@ -25,11 +25,11 @@ import org.springframework.context.annotation.Profile;
 		MqGatewayAlias.class,
 		SrvAppserverProperties.class})
 @Import({
-		JmsItestConfig.class,
+		Qdist008JmsItestConfig.class,
 		LokalTestCacheConfig.class,
 		STSTestConfig.class,
 		CoreConfig.class})
-public class Qdist008TestConfig {
+public class Qdist008ItestConfig {
 
 	@Bean
 	public Storage storage() {

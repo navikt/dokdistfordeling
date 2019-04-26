@@ -24,32 +24,33 @@ import java.nio.charset.StandardCharsets;
  */
 //FIXME
 @Component
-public class Qdist012Route {//} extends SpringRouteBuilder {
+public class Qdist012Route {
+//	extends SpringRouteBuilder {
 
 	public static final String QDIST012_SERVICE_ID = "qdist012";
 	static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
 	static final String PROPERTY_FORSENDELSE_ID = "forsendelseId";
-//
-//	private final Qdist012Service qdist012Service;
-//	private final Queue qdist008;
-//	private final Queue qdist009;
-//	private final Queue qdist008FunksjonellFeil;
-//	private final Qdist012MetricsRoutePolicy qdist012MetricsRoutePolicy;
-//
-//
-//	@Inject
-//	public Qdist012Route(Queue qdist008,
-//						 Queue qdist009,
-//						 Queue qdist008FunksjonellFeil,
-//						 Qdist012Service qdist012Service,
-//						 Qdist012MetricsRoutePolicy qdist012MetricsRoutePolicy) {
-//		this.qdist008 = qdist008;
-//		this.qdist009 = qdist009;
-//		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
-//		this.qdist012Service = qdist012Service;
-//		this.qdist012MetricsRoutePolicy = qdist012MetricsRoutePolicy;
-//	}
-//
+
+	private final Qdist012Service qdist012Service;
+	private final Queue qdist012;
+	private final Queue qdist012FunksjonellFeil;
+	private final Queue qdist008;
+	private final Qdist012MetricsRoutePolicy qdist012MetricsRoutePolicy;
+
+
+	@Inject
+	public Qdist012Route(Queue qdist012,
+						 Queue qdist012FunksjonellFeil,
+						 Queue qdist008,
+						 Qdist012Service qdist012Service,
+						 Qdist012MetricsRoutePolicy qdist012MetricsRoutePolicy) {
+		this.qdist012 = qdist012;
+		this.qdist012FunksjonellFeil = qdist012FunksjonellFeil;
+		this.qdist008 = qdist008;
+		this.qdist012Service = qdist012Service;
+		this.qdist012MetricsRoutePolicy = qdist012MetricsRoutePolicy;
+	}
+
 //	@Override
 //	public void configure() throws Exception {
 //		errorHandler(defaultErrorHandler()
@@ -62,9 +63,9 @@ public class Qdist012Route {//} extends SpringRouteBuilder {
 //				.handled(true)
 //				.useOriginalMessage()
 //				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
-//				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
+//				.to("jms:" + qdist012FunksjonellFeil.getQueueName());
 //
-//		from("jms:" + qdist008.getQueueName() +
+//		from("jms:" + qdist012.getQueueName() +
 //				"?transacted=true")
 //				.routeId(QDIST012_SERVICE_ID)
 //				.routePolicy(qdist012MetricsRoutePolicy)
@@ -75,23 +76,19 @@ public class Qdist012Route {//} extends SpringRouteBuilder {
 //				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
 //				.doCatch(Exception.class)
 //				.end()
-////				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/distribuerforsendelse.xsd")
-////				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
-////				.bean(distribuerForsendelseMapper)
-////				.bean(forsendelseValidator)
-//				.log(LoggingLevel.INFO, log, "qdist008 har validert forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} ok.")
+//				.to("validator:no/nav/dokdistfordeling/qdist012/xsd/hentdokumenterfrajoark.xsd")
+//				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(HentDokumenterFraJoark.class)))
 //				.bean(qdist012Service)
-////				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelseTilSentralPrint.class)))
+//				.marshal(new JaxbDataFormat(JAXBContext.newInstance(HentDokumenterFraJoark.class)))
 //				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
 //				.setHeader(CALL_ID, simple("${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}"))
-//				.inOnly("jms:" + qdist009.getQueueName())
-//				.log(LoggingLevel.INFO, log, "qdist008 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist009 for distribusjon via PRINT")
-////				.bean(dokdistStatusUpdater)
-//				.log(LoggingLevel.INFO, log, "qdist008 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med " + getIdsForLogging());
+//				.inOnly("jms:" + qdist008.getQueueName())
+//				.log(LoggingLevel.INFO, log, "qdist012 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist008 for distribusjon av forsendelse")
+//				.to("validator:no/nav/dokdistfordeling/qdist012/xsd/hentdokumenterfrajoark.xsd");
 //	}
-//
-//	public static String getIdsForLogging() {
-//		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} og " +
-//				"forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "}";
-//	}
+
+	public static String getIdsForLogging() {
+		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} og " +
+				"forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "}";
+	}
 }

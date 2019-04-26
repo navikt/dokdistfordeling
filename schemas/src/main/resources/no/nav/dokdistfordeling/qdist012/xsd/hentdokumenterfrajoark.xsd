@@ -62,6 +62,12 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name="bruker" type="dokdistfordeling:Aktoer">
+				<xs:annotation>
+					<xs:documentation>Struktur for å beskrive sakspart forsendelsen gjelder. Inneholder enten Organisasjon, Person eller Samhandler
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="adresse" type="dokdistfordeling:Adresse" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>Struktur for å beskrive postadresse. Inneholder enten norskPostadresse eller

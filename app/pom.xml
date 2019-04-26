@@ -22,6 +22,14 @@
 			<groupId>no.nav.dokdistfordeling</groupId>
 			<artifactId>qdist008</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>no.nav.dokdistfordeling</groupId>
+			<artifactId>rdist002</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>no.nav.dokdistfordeling</groupId>
+			<artifactId>qdist012</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
