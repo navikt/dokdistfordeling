@@ -4,7 +4,7 @@ import no.nav.dokdistfordeling.consumer.saf.hentdokument.HentDokument;
 import no.nav.dokdistfordeling.consumer.saf.hentdokument.HentDokumentResponseTo;
 import no.nav.dokdistfordeling.storage.DokdistDokument;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
-import no.nav.dokdistfordeling.storage.S3Storage;
+import no.nav.dokdistfordeling.storage.Storage;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Service;
@@ -19,17 +19,17 @@ import java.util.UUID;
 public class Qdist012Service {
 
 	private final HentDokument hentDokument;
-	private final S3Storage s3Storage;
-	private final DistribuerForsendelseMapper distribuerForsendelseMapper;
+	private final Storage storage;
+	private final Qdist008DistribuerForsendelseMapper qdist008DistribuerForsendelseMapper;
 
 
 	@Inject
 	public Qdist012Service(HentDokument hentDokument,
-						   S3Storage s3Storage,
-						   DistribuerForsendelseMapper distribuerForsendelseMapper) {
+						   Storage storage,
+						   Qdist008DistribuerForsendelseMapper qdist008DistribuerForsendelseMapper) {
 		this.hentDokument = hentDokument;
-		this.s3Storage = s3Storage;
-		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
+		this.storage = storage;
+		this.qdist008DistribuerForsendelseMapper = qdist008DistribuerForsendelseMapper;
 	}
 
 	@Handler
@@ -43,10 +43,10 @@ public class Qdist012Service {
 							dokumentInformasjonTo.getVariantFormat());
 					final String dokumentObjektReferanse = UUID.randomUUID().toString();
 					dokumentInformasjonTo.setDokumentObjektReferanse(dokumentObjektReferanse);
-					s3Storage.put(dokumentObjektReferanse, buildAndSerializeDokdistDokument(hentDokumentResponseTo.getDokument()));
+					storage.put(dokumentObjektReferanse, buildAndSerializeDokdistDokument(hentDokumentResponseTo.getDokument()));
 				});
 
-		return distribuerForsendelseMapper.map(hentDokumenterFraJoarkTo);
+		return qdist008DistribuerForsendelseMapper.map(hentDokumenterFraJoarkTo);
 	}
 
 	private String buildAndSerializeDokdistDokument(byte[] document) {

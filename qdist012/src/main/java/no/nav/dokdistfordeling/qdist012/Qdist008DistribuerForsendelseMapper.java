@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * @author Sigurd Midttun, Visma Consulting.
  */
 @Component
-public class DistribuerForsendelseMapper {
+public class Qdist008DistribuerForsendelseMapper {
 
 	public DistribuerForsendelse map(HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo) {
 		try {
