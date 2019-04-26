@@ -18,7 +18,6 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
@@ -57,9 +56,6 @@ public class SafGraphqlConsumer {
 
 			ResponseEntity<SafJsonJournalpost> responseEntity = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(requestToJson(graphQLRequest), httpHeaders), SafJsonJournalpost.class);
 
-			if (responseEntity.getStatusCodeValue() > HttpStatus.OK.value()) {
-				throw new SafJournalpostQueryTechnicalException(String.format("Saf respons var ikke OK. Statuskode: %s", responseEntity.getStatusCode()));
-			}
 			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null || responseEntity.getBody().getData().getJournalpost() == null) {
 				throw new SafJournalpostIkkeFunnetFunctionalException("Ingen journalpost ble funnet");
 			}

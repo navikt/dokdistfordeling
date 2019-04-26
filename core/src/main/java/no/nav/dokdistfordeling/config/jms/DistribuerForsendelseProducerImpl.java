@@ -3,7 +3,6 @@ package no.nav.dokdistfordeling.config.jms;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.exception.technical.MarshalHentDokumenterFraJoarkTechnicalException;
-
 import no.nav.dokdistfordeling.melding.qdist012.HentDokumenterFraJoark;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
@@ -19,16 +18,16 @@ import java.io.StringWriter;
 @Component
 public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseProducer {
 
+	private final String encryptionPassphrase;
 	private JmsTemplate jmsTemplate;
-
-	@Value("${hentdokumenter_fra_joark_crypto_password}")
-	private String encryptionPassphrase;
-
 	private Queue qdist012;
 
-	public DistribuerForsendelseProducerImpl(JmsTemplate jmsTemplate, Queue qdist012) {
+	public DistribuerForsendelseProducerImpl(JmsTemplate jmsTemplate,
+											 Queue qdist012,
+											 @Value("${hentdokumenter_fra_joark_crypto_password}") String encryptionPassphrase) {
 		this.jmsTemplate = jmsTemplate;
 		this.qdist012 = qdist012;
+		this.encryptionPassphrase = encryptionPassphrase;
 	}
 
 	@Override
