@@ -1,8 +1,9 @@
 package no.nav.dokdistfordeling.exception.functional;
 
-/**
- * @author Jarl Øystein Samseth, Visma Consulting
- */
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 public class ValidationException extends AbstractDokdistfordelingFunctionalException {
 
 	public ValidationException(String message) {

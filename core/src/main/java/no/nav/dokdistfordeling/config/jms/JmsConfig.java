@@ -26,7 +26,6 @@ public class JmsConfig {
 
 	private static final int UTF_8_WITH_PUA = 1208;
 
-
 	@Bean
 	public Queue qdist008(@Value("${dokdistfordeling_qdist008_dist_forsendels.queuename}") String qdist008QueueName) throws JMSException {
 		return new MQQueue(qdist008QueueName);

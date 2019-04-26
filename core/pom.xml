@@ -12,9 +12,12 @@
 	<artifactId>core</artifactId>
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.camel</groupId>
-			<artifactId>camel-jms</artifactId>
-			<version>${camel.version}</version>
+			<groupId>no.nav.dokdistfordeling</groupId>
+			<artifactId>schemas</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>no.nav.meldinger.virksomhet</groupId>
+			<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
 		</dependency>
 
 		<dependency>
@@ -107,6 +110,13 @@
 			<version>${wmq.version}</version>
 		</dependency>
 
+		<!--camel-->
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-jms</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+
 		<!--Tjenestegrensesnitt-->
 
 		<dependency>
@@ -143,6 +153,11 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-broker</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

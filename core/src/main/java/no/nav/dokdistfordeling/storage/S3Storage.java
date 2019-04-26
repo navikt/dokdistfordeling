@@ -11,7 +11,8 @@ import com.amazonaws.services.s3.model.S3Object;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.S3FailedToGetDocumentTechnicalException;
-import no.nav.dokdistfordeling.storage.crypto.Crypto;
+import no.nav.dokdistfordeling.crypto.Crypto;
+
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 

@@ -13,6 +13,7 @@
 		<module>app</module>
 		<module>core</module>
 		<module>qdist008</module>
+		<module>rdist002</module>
 		<module>qdist012</module>
 		<module>schemas</module>
 	</modules>
@@ -63,6 +64,11 @@
 			<dependency>
 				<groupId>no.nav.dokdistfordeling</groupId>
 				<artifactId>qdist012</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokdistfordeling</groupId>
+				<artifactId>rdist002</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
