@@ -4,6 +4,7 @@ import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.ForsendelseManglerCallIdFunctionalException;
 import no.nav.dokdistfordeling.melding.qdist012.HentDokumenterFraJoark;
 import no.nav.dokdistfordeling.metrics.Qdist012MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
@@ -36,6 +37,7 @@ public class Qdist012Route extends SpringRouteBuilder {
 	private final Queue qdist008;
 	private final Qdist012MetricsRoutePolicy qdist012MetricsRoutePolicy;
 	private final HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper;
+	private final HentDokumenterFraJoarkDecrypter hentDokumenterFraJoarkDecrypter;
 
 
 	@Inject
@@ -44,13 +46,15 @@ public class Qdist012Route extends SpringRouteBuilder {
 						 Queue qdist008,
 						 Qdist012Service qdist012Service,
 						 Qdist012MetricsRoutePolicy qdist012MetricsRoutePolicy,
-						 HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper) {
+						 HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper,
+						 HentDokumenterFraJoarkDecrypter hentDokumenterFraJoarkDecrypter) {
 		this.qdist012 = qdist012;
 		this.qdist012FunksjonellFeil = qdist012FunksjonellFeil;
 		this.qdist008 = qdist008;
 		this.qdist012Service = qdist012Service;
 		this.qdist012MetricsRoutePolicy = qdist012MetricsRoutePolicy;
 		this.hentDokumenterFraJoarkMapper = hentDokumenterFraJoarkMapper;
+		this.hentDokumenterFraJoarkDecrypter = hentDokumenterFraJoarkDecrypter;
 	}
 
 	@Override
@@ -73,11 +77,13 @@ public class Qdist012Route extends SpringRouteBuilder {
 				.routePolicy(qdist012MetricsRoutePolicy)
 				.setExchangePattern(ExchangePattern.InOnly)
 				.doTry()
-				.setProperty(PROPERTY_BESTILLINGS_ID, xpath("//bestillingsId/text()", String.class))
+				.setProperty(PROPERTY_BESTILLINGS_ID, simple("${in.header.callId}", String.class))
 				.log(LoggingLevel.INFO, log, "qdist012 har mottatt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
 				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
 				.doCatch(Exception.class)
+				.throwException(new ForsendelseManglerCallIdFunctionalException("qdist012 har mottatt forsendelse uten påkrevd header callId"))
 				.end()
+				.bean(hentDokumenterFraJoarkDecrypter)
 				.to("validator:no/nav/dokdistfordeling/qdist012/xsd/hentdokumenterfrajoark.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(HentDokumenterFraJoark.class)))
 				.bean(hentDokumenterFraJoarkMapper)
