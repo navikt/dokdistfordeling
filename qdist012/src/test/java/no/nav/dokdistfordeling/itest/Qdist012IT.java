@@ -1,15 +1,8 @@
 package no.nav.dokdistfordeling.itest;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.matchingXPath;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,6 +11,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.itest.config.Qdist012TestConfig;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.activemq.command.ActiveMQTextMessage;
@@ -27,6 +21,7 @@ import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
@@ -61,6 +56,7 @@ public class Qdist012IT {
 
 	private static byte[] TEST_FILE_BYTES1 = "TestThis1".getBytes();
 	private static byte[] TEST_FILE_BYTES2 = "TestThis2".getBytes();
+	private static String BESTILLINGS_ID = "4a7d638a-6a63-11e9-a923-1681be663d3e";
 
 	@Inject
 	private JmsTemplate jmsTemplate;
@@ -80,6 +76,8 @@ public class Qdist012IT {
 	@Inject
 	private Storage storage;
 
+	@Value("${hentdokumenter_fra_joark_crypto_password}")
+	private String encryptionPassphrase;
 
 	@BeforeEach
 	public void setupBefore() {
@@ -102,7 +100,7 @@ public class Qdist012IT {
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(Base64.getEncoder().encode(TEST_FILE_BYTES2))));
 
-		sendStringMessage(qdist012, classpathToString("qdist012/qdist012-happy.xml"));
+		encryptAndSendStringMessage(qdist012, classpathToString("qdist012/qdist012-happy.xml"));
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			String response = receive(qdist008);
@@ -113,10 +111,12 @@ public class Qdist012IT {
 	}
 
 
-	private void sendStringMessage(Queue queue, final String message) {
+	private void encryptAndSendStringMessage(Queue queue, final String message) {
 		jmsTemplate.send(queue, session -> {
 			TextMessage msg = new ActiveMQTextMessage();
-			msg.setText(message);
+			final String encryptedMessage = new Crypto(encryptionPassphrase, BESTILLINGS_ID).encrypt(message);
+			msg.setText(encryptedMessage);
+			msg.setStringProperty("callId", BESTILLINGS_ID);
 			return msg;
 		});
 	}

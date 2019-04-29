@@ -21,8 +21,8 @@ public class HentDokumenterFraJoarkDecrypter {
 	}
 
 	@Handler
-	public String decrypt(String hentDokumenterFraJoarkEncrypted, Exchange exchangeProperty) {
-		return new Crypto(encryptionPassphrase, exchangeProperty.getProperty(PROPERTY_BESTILLINGS_ID, String.class))
+	public String decrypt(String hentDokumenterFraJoarkEncrypted, Exchange exchange) {
+		return new Crypto(encryptionPassphrase, exchange.getProperty(PROPERTY_BESTILLINGS_ID, String.class))
 				.decrypt(hentDokumenterFraJoarkEncrypted);
 	}
 }

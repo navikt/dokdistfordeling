@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.qdist012;
 
 import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
@@ -79,7 +80,10 @@ public class Qdist012Route extends SpringRouteBuilder {
 				.doTry()
 				.setProperty(PROPERTY_BESTILLINGS_ID, simple("${in.header.callId}", String.class))
 				.log(LoggingLevel.INFO, log, "qdist012 har mottatt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
-				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
+				.process(exchange -> {
+					assertNotNullOrEmpty("callId", exchange.getProperty(PROPERTY_BESTILLINGS_ID, String.class));
+					MDC.put(CALL_ID, exchange.getProperty(PROPERTY_BESTILLINGS_ID, String.class));
+				})
 				.doCatch(Exception.class)
 				.throwException(new ForsendelseManglerCallIdFunctionalException("qdist012 har mottatt forsendelse uten påkrevd header callId"))
 				.end()
