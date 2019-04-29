@@ -14,8 +14,8 @@ import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalstatus;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
-import no.nav.dokdistfordeling.melding.qdist012.Aktoer;
-import no.nav.dokdistfordeling.melding.qdist012.Samhandler;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.informasjon.arkiverdokumentproduksjon.JournalpostType;
 
 public class Rdist002ValidationUtil {
