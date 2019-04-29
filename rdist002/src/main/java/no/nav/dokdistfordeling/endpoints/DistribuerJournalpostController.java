@@ -26,22 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class DistribuerJournalpostController {
 
 	private DistribuerJournalpostService distribuerJournalpostService;
-	private static final String lol = "{\n" +
-			"\"journalpostId\": \"374126287\",\n" +
-			"\"batchId\": \"55555\",\n" +
-			"\"bestillendeFagsystem\": \"example1\",\n" +
-			"\"dokumentProdApp\": \"example2\",\n" +
-			"\"adresse\": {\n" +
-			"\t\"adresseType\": \"norskPostadresse\",\n" +
-			"\t\"postnummer\": \"1337\",\n" +
-			"\t\"poststed\": \"right here\",\n" +
-			"\t\"adresselinje1\": \"nah\",\n" +
-			"\t\"adresselinje2\": \"bah\",\n" +
-			"\t\"adresselinje3\": \"nah\",\n" +
-			"\t\"land\": \"NO\"\n" +
-			"}\n" +
-			"}";
-
 	public DistribuerJournalpostController(DistribuerJournalpostService distribuerJournalpostService) {
 		this.distribuerJournalpostService = distribuerJournalpostService;
 	}
@@ -49,24 +33,6 @@ public class DistribuerJournalpostController {
 	@ApiOperation(value = "Bestiller distribusjon av en journalpost.", authorizations = {@Authorization(value = "apiKey")})
 	@SwaggerRestDistribuerJournalpost
 	@PostMapping(value = "/distribuerjournalpost")
-//	@ApiImplicitParams(
-//			@ApiImplicitParam(name = "distribuerJournalpostRequestTo", value = "requestObject", required = true, examples = @Example(value = {@ExampleProperty(value =
-//					"{{\n" +
-//					"'journalpostId': '374126287'," +
-//					"'batchId': '55555'," +
-//					"'bestillendeFagsystem': 'example1'," +
-//					"\"dokumentProdApp\": \"example2\",\n" +
-//					"\"adresse\": {\n" +
-//					"\t\"adresseType\": \"norskPostadresse\",\n" +
-//					"\t\"postnummer\": \"1337\",\n" +
-//					"\t\"poststed\": \"right here\",\n" +
-//					"\t\"adresselinje1\": \"nah\",\n" +
-//					"\t\"adresselinje2\": \"bah\",\n" +
-//					"\t\"adresselinje3\": \"nah\",\n" +
-//					"\t\"land\": \"NO\"\n" +
-//					"}\n" +
-//					"}}", mediaType = "application/json")}))
-//	)
 	public ResponseEntity<DistribuerJournalpostResponseTo> distribuerJournalpost(@RequestBody DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
 																				 @ApiParam(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader) {
 		log.info("rdist002 har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());
