@@ -84,7 +84,7 @@ public class Qdist012Route {
 //				.setHeader(CALL_ID, simple("${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}"))
 //				.inOnly("jms:" + qdist008.getQueueName())
 //				.log(LoggingLevel.INFO, log, "qdist012 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist008 for distribusjon av forsendelse")
-//				.to("validator:no/nav/dokdistfordeling/qdist012/xsd/hentdokumenterfrajoark.xsd");
+//				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist012/in/hentdokumenterfrajoark.xsd");
 //	}
 
 	public static String getIdsForLogging() {
