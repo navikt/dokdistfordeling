@@ -42,7 +42,7 @@ public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseP
 					msg.setStringProperty(CALL_ID, bestillingsId);
 					return msg;
 				});
-		log.info("hentDokumenterFraJoark bestilling med bestillingsId{} ble lagt på kø imot qdist012", bestillingsId);
+		log.info("hentDokumenterFraJoark bestilling med bestillingsId={} ble lagt på kø imot qdist012", bestillingsId);
 	}
 
 	private String marshalHentDokumenterFraJoarkToXmlStringAndEncrypt(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId) {

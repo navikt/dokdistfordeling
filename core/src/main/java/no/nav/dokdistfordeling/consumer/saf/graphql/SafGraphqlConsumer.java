@@ -11,6 +11,7 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonJournalpost;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
+import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.exception.technical.MarshalGraphqlRequestToJsonTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostQueryTechnicalException;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,7 +72,9 @@ public class SafGraphqlConsumer {
 
 	private HttpHeaders createAuthHeaderFromToken(String authorizationHeader) {
 		HttpHeaders headers = new HttpHeaders();
-		assertParameterIsAsExpected("authorization header prefix", authorizationHeader.split(" ")[0], OIDC_TOKEN_PREFIX);
+		if (!authorizationHeader.split(" ")[0].equals(OIDC_TOKEN_PREFIX)) {
+			throw new ValidationException("Authorization header må være på formen Bearer {token}");
+		}
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.add(HttpHeaders.AUTHORIZATION, authorizationHeader);
