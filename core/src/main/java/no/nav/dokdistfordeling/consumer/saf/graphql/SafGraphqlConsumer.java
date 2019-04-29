@@ -72,7 +72,7 @@ public class SafGraphqlConsumer {
 
 	private HttpHeaders createAuthHeaderFromToken(String authorizationHeader) {
 		HttpHeaders headers = new HttpHeaders();
-		if (!authorizationHeader.split(" ")[0].equals(OIDC_TOKEN_PREFIX)) {
+		if (!OIDC_TOKEN_PREFIX.equals(authorizationHeader.split(" ")[0])) {
 			throw new ValidationException("Authorization header må være på formen Bearer {token}");
 		}
 

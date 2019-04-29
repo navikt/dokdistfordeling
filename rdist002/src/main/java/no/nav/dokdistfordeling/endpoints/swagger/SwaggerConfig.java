@@ -35,7 +35,7 @@ public class SwaggerConfig {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.select()
 				.apis(RequestHandlerSelectors.any())
-				.paths(regex("/rest.*"))
+				.paths(regex("/rest/v1.*"))
 				.build()
 				.useDefaultResponseMessages(false)
 				.apiInfo(apiInfo())
@@ -64,7 +64,7 @@ public class SwaggerConfig {
 	private ApiInfo apiInfo() {
 		return new ApiInfo(
 				"DistribuerJournalpost API",
-				"Her dokumenteres tjenestegrensesnittet distribuer journalpost tjenesten. Til autentisering brukes OIDC-token (JWT via OAuth2.0). " +
+				"Her dokumenteres tjenestegrensesnittet til distribuerJournalpost. Til autentisering brukes OIDC-token (JWT via OAuth2.0). " +
 						"Følgende format må brukes i Authorize sitt input-felt \"Value\": <strong> Bearer {token} </strong>. " +
 						"Eksempel på verdi i input-feltet: <strong> Bearer eYdmifml0ejugm </strong>. Et gyldig token kommer til å ha mange flere karakterer enn i eksempelet.",
 				version,

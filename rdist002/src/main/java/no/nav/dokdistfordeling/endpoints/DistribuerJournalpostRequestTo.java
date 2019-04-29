@@ -13,7 +13,7 @@ import lombok.Value;
 public class DistribuerJournalpostRequestTo {
 	@ApiModelProperty(name = "journalpostId", value = "Journalpost som skal distribueres", example = "374126287")
 	private final String journalpostId;
-	@ApiModelProperty(name = "batchId", value = "Identifiserer batch forsendelsen inngår i. Lar bestiller identifisere forsendelser som hører sammen. Fritekst, og konsument må selv vurdere hva som er hensiktsmessige verdier", example = "54321", position = 1)
+	@ApiModelProperty(name = "batchId", value = "Identifiserer batch som forsendelsen inngår i. Lar bestiller identifisere forsendelser som hører sammen. Fritekst, og konsument må selv vurdere hva som er hensiktsmessige verdier", example = "54321", position = 1)
 	private final String batchId;
 	@ApiModelProperty(name = "bestillendeFagsystem", value = "Fagsystemet som bestiller distribusjon", example = "SYM", position = 2)
 	private final String bestillendeFagsystem;

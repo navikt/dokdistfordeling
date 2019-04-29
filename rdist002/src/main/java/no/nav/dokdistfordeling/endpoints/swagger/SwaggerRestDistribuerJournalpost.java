@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 		@ApiResponse(code = 400, message = "Ugyldig input. Validering av request body, eller validering av journalposten som journalpostId refererer til feilet."),
 		@ApiResponse(code = 401, message = "* Bruker mangler tilgang for å vise journalposten.\n* Ugyldig OIDC token."),
 		@ApiResponse(code = 404, message = "Journalposten ble ikke funnet."),
-		@ApiResponse(code = 500, message = "Internal server error ")
+		@ApiResponse(code = 500, message = " Teknisk feil under prosessering av forsendelse.")
 }
 )
 public @interface SwaggerRestDistribuerJournalpost {
