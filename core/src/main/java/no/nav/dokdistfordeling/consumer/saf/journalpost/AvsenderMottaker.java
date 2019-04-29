@@ -8,6 +8,4 @@ import lombok.Value;
 public class AvsenderMottaker {
 	private final String id;
 	private final String navn;
-	private final String land;
-	private final boolean erLikBruker;
 }

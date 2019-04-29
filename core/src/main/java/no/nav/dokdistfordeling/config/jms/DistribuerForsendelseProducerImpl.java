@@ -18,17 +18,16 @@ import java.io.StringWriter;
 @Component
 public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseProducer {
 
+	private final String encryptionPassphrase;
 	private JmsTemplate jmsTemplate;
-
-
 	private Queue qdist012;
 
-	@Value("${hentdokumenter_fra_joark_crypto_password}")
-	private String encryptionPassphrase;
-
-	public DistribuerForsendelseProducerImpl(JmsTemplate jmsTemplate, Queue qdist012) {
+	public DistribuerForsendelseProducerImpl(JmsTemplate jmsTemplate,
+											 Queue qdist012,
+											 @Value("${hentdokumenter_fra_joark_crypto_password}") String encryptionPassphrase) {
 		this.jmsTemplate = jmsTemplate;
 		this.qdist012 = qdist012;
+		this.encryptionPassphrase = encryptionPassphrase;
 	}
 
 	@Override
