@@ -12,10 +12,6 @@
 	<artifactId>core</artifactId>
 	<dependencies>
 		<dependency>
-			<groupId>no.nav.dokdistfordeling</groupId>
-			<artifactId>schemas</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>no.nav.meldinger.virksomhet</groupId>
 			<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
 		</dependency>

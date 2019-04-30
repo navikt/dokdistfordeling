@@ -1,12 +1,12 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTilSentralPrint;
 import no.nav.dokdistfordeling.qdist008.metrics.Qdist008MetricsRoutePolicy;
-import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.ValidationException;
@@ -85,7 +85,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
 				.doCatch(Exception.class)
 				.end()
-				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/distribuerforsendelse.xsd")
+				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist008/in/distribuerforsendelse.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
 				.bean(distribuerForsendelseMapper)
 				.bean(forsendelseValidator)

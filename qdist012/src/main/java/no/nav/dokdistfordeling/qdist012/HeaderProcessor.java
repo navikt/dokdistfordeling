@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.qdist012.Qdist012Route.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.qdist012.Qdist012Route.PROPERTY_JOURNALPOST_ID;
 

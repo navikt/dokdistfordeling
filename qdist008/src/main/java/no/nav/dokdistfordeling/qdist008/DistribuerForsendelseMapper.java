@@ -2,25 +2,25 @@ package no.nav.dokdistfordeling.qdist008;
 
 import static java.lang.String.format;
 
-import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
-import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
+import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.dokdistfordeling.kodeverk.TemaCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
-import no.nav.meldinger.virksomhet.dokdistfordeling.Adresse;
-import no.nav.meldinger.virksomhet.dokdistfordeling.Aktoer;
-import no.nav.meldinger.virksomhet.dokdistfordeling.AktoerId;
-import no.nav.meldinger.virksomhet.dokdistfordeling.ArkivInformasjon;
-import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
-import no.nav.meldinger.virksomhet.dokdistfordeling.Distribusjonbestilling;
-import no.nav.meldinger.virksomhet.dokdistfordeling.NorskPostadresse;
-import no.nav.meldinger.virksomhet.dokdistfordeling.Organisasjon;
-import no.nav.meldinger.virksomhet.dokdistfordeling.Person;
-import no.nav.meldinger.virksomhet.dokdistfordeling.Samhandler;
-import no.nav.meldinger.virksomhet.dokdistfordeling.UtenlandskPostadresse;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Aktoer;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.AktoerId;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.ArkivInformasjon;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Distribusjonbestilling;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.NorskPostadresse;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Organisasjon;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Person;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Samhandler;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.UtenlandskPostadresse;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 

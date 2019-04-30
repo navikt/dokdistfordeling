@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.consumer.rdist001;
 
-import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 

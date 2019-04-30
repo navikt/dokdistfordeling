@@ -1,14 +1,18 @@
 package no.nav.dokdistfordeling.config.jms;
 
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.JOURNALPOST_ID;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.exception.technical.MarshalHentDokumenterFraJoarkTechnicalException;
-import no.nav.dokdistfordeling.melding.qdist012.HentDokumenterFraJoark;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.jms.Queue;
+import javax.jms.TextMessage;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -31,11 +35,16 @@ public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseP
 	}
 
 	@Override
-	public void produce(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId) {
+	public void produce(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId, String journalpostId) {
 		jmsTemplate.send(
 				qdist012,
-				session -> session.createTextMessage(marshalHentDokumenterFraJoarkToXmlStringAndEncrypt(hentDokumenterFraJoark, bestillingsId)));
-		log.info("hentDokumenterFraJoark bestilling med bestillingsId{} ble lagt på kø imot qdist012", bestillingsId);
+				session -> {
+					TextMessage msg = session.createTextMessage(marshalHentDokumenterFraJoarkToXmlStringAndEncrypt(hentDokumenterFraJoark, bestillingsId));
+					msg.setStringProperty(CALL_ID, bestillingsId);
+					msg.setStringProperty(JOURNALPOST_ID, journalpostId);
+					return msg;
+				});
+		log.info("hentDokumenterFraJoark bestilling med bestillingsId={} ble lagt på kø imot qdist012", bestillingsId);
 	}
 
 	private String marshalHentDokumenterFraJoarkToXmlStringAndEncrypt(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId) {

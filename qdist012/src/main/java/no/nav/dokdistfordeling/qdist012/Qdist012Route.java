@@ -3,9 +3,9 @@ package no.nav.dokdistfordeling.qdist012;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
-import no.nav.dokdistfordeling.melding.qdist012.HentDokumenterFraJoark;
 import no.nav.dokdistfordeling.metrics.Qdist012MetricsRoutePolicy;
-import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.ValidationException;
@@ -77,7 +77,7 @@ public class Qdist012Route extends SpringRouteBuilder {
 				.process(new HeaderProcessor())
 				.log(LoggingLevel.INFO, log, "qdist012 har mottatt forsendelse med " + getIdsForLogging())
 				.bean(hentDokumenterFraJoarkDecrypter)
-				.to("validator:no/nav/dokdistfordeling/qdist012/xsd/hentdokumenterfrajoark.xsd")
+				.to("validator:/no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist012/hentdokumenterfrajoark.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(HentDokumenterFraJoark.class)))
 				.bean(hentDokumenterFraJoarkMapper)
 				.bean(qdist012Service)

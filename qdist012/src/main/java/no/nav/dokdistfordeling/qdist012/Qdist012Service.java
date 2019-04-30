@@ -5,7 +5,7 @@ import no.nav.dokdistfordeling.consumer.saf.hentdokument.HentDokumentResponseTo;
 import no.nav.dokdistfordeling.storage.DokdistDokument;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.dokdistfordeling.storage.Storage;
-import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Service;
 
