@@ -9,10 +9,10 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.S3Object;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.S3FailedToGetDocumentTechnicalException;
-import no.nav.dokdistfordeling.crypto.Crypto;
-
+import no.nav.dokdistfordeling.exception.technical.S3FailedToPutDocumentTechnicalException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 
@@ -33,15 +33,14 @@ public class S3Storage implements Storage {
 		this.encryptionPassphrase = encryptionPassphrase;
 	}
 
-
-	//	Bare brukt for testing dersom vi ønsker å persistere dummy-data til bucket. Også brukt for å verifisere s3-oppsett
 	@Override
+	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void put(String key, String value) {
 		try {
 			String encryptedValue = encrypt(value, key);
 			writeString(key, encryptedValue);
 		} catch (Exception e) {
-			throw new S3FailedToGetDocumentTechnicalException(String.format("Feilet ved sending av dokument til S3. Nøkkel=%s", key), e);
+			throw new S3FailedToPutDocumentTechnicalException(String.format("Feilet ved persistering av dokument til S3. Nøkkel=%s", key), e);
 		}
 	}
 

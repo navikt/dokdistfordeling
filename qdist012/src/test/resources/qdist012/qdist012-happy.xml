@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:hentDokumenterFraJoark xmlns:ns2="http://nav.no/melding/virksomhet/dokdistfordeling">
 	<distribusjonbestilling>
-		<bestillingsId>9f2177cf-4df4-4694-83e7-7719d9f46917</bestillingsId>
+		<bestillingsId>4a7d638a-6a63-11e9-a923-1681be663d3e</bestillingsId>
 		<batchId>55555</batchId>
 		<bestillendeFagsystem>example1</bestillendeFagsystem>
 		<tema>PEN</tema>
 		<arkivInformasjon>
-			<arkivSystem>PEN</arkivSystem>
+			<arkivSystem>JOARK</arkivSystem>
 			<arkivId>arkivId</arkivId>
 		</arkivInformasjon>
 		<mottaker xsi:type="ns2:Person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">

@@ -68,7 +68,7 @@ public class HentDokumentConsumer implements HentDokument {
 					.dokument(Base64.getDecoder().decode(dokumentBase64String))
 					.build();
 		} catch (Exception e) {
-			throw new SafHentDokumentTechnicalException(String.format("Kunne ikke dekode dokument. journalpostId=%s, dokumentInfoId=%s, variantFormat=%s. Feilmelding=%s", journalpostId, dokumentInfoId, variantFormat, e
+			throw new SafHentDokumentFunctionalException(String.format("Kunne ikke dekode dokument, da dokumentet ikke er base64-encodet journalpostId=%s, dokumentInfoId=%s, variantFormat=%s. Feilmelding=%s", journalpostId, dokumentInfoId, variantFormat, e
 					.getMessage()), e);
 		}
 	}

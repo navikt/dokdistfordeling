@@ -29,7 +29,7 @@ public class HeaderProcessor implements Processor {
 		} else if (callId.trim().isEmpty()) {
 			throw new ForsendelseManglerPaakrevdHeaderFunctionalException("qdist012 har mottatt forsendelse med tom header callId");
 		}
-		exchange.setProperty(PROPERTY_BESTILLINGS_ID, String.class);
+		exchange.setProperty(PROPERTY_BESTILLINGS_ID, callId);
 		MDC.put(CALL_ID, exchange.getProperty(PROPERTY_BESTILLINGS_ID, String.class));
 	}
 

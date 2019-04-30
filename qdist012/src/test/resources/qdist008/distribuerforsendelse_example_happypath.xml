@@ -1,42 +1,46 @@
-<dok:distribuerForsendelse xmlns:dok="http://nav.no/melding/virksomhet/dokdistfordeling">
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:distribuerForsendelse xmlns:ns2="http://nav.no/melding/virksomhet/dokdistfordeling">
 	<distribusjonbestilling>
-		<bestillingsId>7882d37e-34f7-11e9-b210-d663bd873d93</bestillingsId>
-		<!--Optional:-->
-		<batchId>batchId</batchId>
-		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
-		<tema>FS22</tema>
-		<!--Optional:-->
+		<bestillingsId>4a7d638a-6a63-11e9-a923-1681be663d3e</bestillingsId>
+		<batchId>55555</batchId>
+		<bestillendeFagsystem>example1</bestillendeFagsystem>
+		<tema>PEN</tema>
 		<arkivInformasjon>
 			<arkivSystem>JOARK</arkivSystem>
-			<arkivId>1234</arkivId>
+			<arkivId>arkivId</arkivId>
 		</arkivInformasjon>
-		<mottaker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
-			<aktoerId>***gammelt_fnr***01</aktoerId>
-			<navn>Bjarne Betjent</navn>
+		<mottaker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns2:Person">
+			<personidentifikator>***gammelt_fnr***</personidentifikator>
+			<navn>Ola-Johnny</navn>
 		</mottaker>
-		<bruker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
-			<aktoerId>***gammelt_fnr***01</aktoerId>
-			<navn>Bjarne Betjent</navn>
+		<bruker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns2:Person">
+			<personidentifikator>***gammelt_fnr***</personidentifikator>
+			<navn>Roy Roger Testersen</navn>
 		</bruker>
-		<!--Optional:-->
-		<adresse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:NorskPostadresse">
-			<adresselinje1>Adresslinje 1</adresselinje1>
-			<adresselinje2>Adresslinje 2</adresselinje2>
-			<adresselinje3>Adresslinje 3</adresselinje3>
-			<postnummer>0654</postnummer>
-			<poststed>Oslo</poststed>
+		<adresse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns2:NorskPostadresse">
+			<adresselinje1>adresselinje1</adresselinje1>
+			<adresselinje2>adresselinje2</adresselinje2>
+			<adresselinje3>adresselinje3</adresselinje3>
+			<postnummer>1337</postnummer>
+			<poststed>OSLO</poststed>
 			<land>NO</land>
 		</adresse>
-		<dokumentProdApp>token</dokumentProdApp>
+		<dokumentProdApp>dokprodApp</dokumentProdApp>
 		<dokumenter>
 			<dokumentInformasjon>
-				<dokumenttypeId>1111111</dokumenttypeId>
-				<dokumentObjektReferanse>testKey</dokumentObjektReferanse>
+				<dokumenttypeId>doktypeId1</dokumenttypeId>
+				<dokumentObjektReferanse>dokumentObjektReferanse</dokumentObjektReferanse>
 				<tilknyttetSom>HOVEDDOKUMENT</tilknyttetSom>
-				<!--Optional:-->
-				<arkivDokumentInfoId>1234</arkivDokumentInfoId>
+				<arkivDokumentInfoId>arkivDokumentInfoIdHoveddok</arkivDokumentInfoId>
 				<rekkefolge>1</rekkefolge>
+			</dokumentInformasjon>
+			<dokumentInformasjon>
+				<dokumenttypeId>doktypeId2</dokumenttypeId>
+				<dokumentObjektReferanse>dokumentObjektReferanse</dokumentObjektReferanse>
+				<tilknyttetSom>VEDLEGG</tilknyttetSom>
+				<arkivDokumentInfoId>arkivDokumentInfoIdVedlegg</arkivDokumentInfoId>
+				<rekkefolge>2</rekkefolge>
 			</dokumentInformasjon>
 		</dokumenter>
 	</distribusjonbestilling>
-</dok:distribuerForsendelse>
+</ns2:distribuerForsendelse>
