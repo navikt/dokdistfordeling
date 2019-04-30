@@ -2,10 +2,10 @@ package no.nav.dokdistfordeling.endpoints;
 
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
+import no.nav.dokdistfordeling.exception.technical.DokkatGetDokumenttypeInfoTechnicalException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,9 +47,9 @@ public class DistribuerJournalpostController {
 			log.warn("rdist002 - utilstrekkelig tilgang til journalpost med journalpostid={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw new SafJournalpostQueryUnauthorizedException(String.format("bruker har ikke tilgang til journalpost med journalpostId=%s", distribuerJournalpostRequestTo.getJournalpostId()));
 
-		} catch (BestemDokdistKanalFunctionalException e) {
+		} catch (DokkatGetDokumenttypeInfoTechnicalException e) {
 			log.warn("rdist002 - Ugyldig dokumenttypeid på dokumentet for journalpost med journalpostid={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
-			throw new BestemDokdistKanalFunctionalException(String.format("Ugyldig dokumenttypeid på dokumentet for journalpost med journalpostid=%s", distribuerJournalpostRequestTo.getJournalpostId()));
+			throw new DokkatGetDokumenttypeInfoTechnicalException(String.format("Ugyldig dokumenttypeid på dokumentet for journalpost med journalpostid=%s", distribuerJournalpostRequestTo.getJournalpostId()));
 
 		} catch (Exception e) {
 

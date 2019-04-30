@@ -1,7 +1,7 @@
 {
   "data": {
     "journalpost": {
-      "journalposttype": "U",
+      "journalposttype": "I",
       "journalstatus": "FERDIGSTILT",
       "tema": "OPP",
       "tittel": "journalpostTittel",

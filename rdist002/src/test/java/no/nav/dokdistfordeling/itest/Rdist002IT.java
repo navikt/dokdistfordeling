@@ -68,7 +68,8 @@ public class Rdist002IT {
 
 	private static final String TEMP_OIDC_TOKEN = "eyAidHlwIjogIkpXVCIsICJraWQiOiAiMWwySmtDb1RMMTBibWVBeHlsZzR4Umk4ajJZPSIsICJhbGciOiAiUlMyNTYiIH0.eyAiYXRfaGFzaCI6ICJ4RklSS0dpTWZ4ZFVPS3c0ZmQ4MW9BIiwgInN1YiI6ICJaOTkyMzEwIiwgImF1ZGl0VHJhY2tpbmdJZCI6ICJiZDdlYWE0ZC1mYzIzLTQ2ZGMtOGRjZi1iMjJmNzU1NDExZjQtMjAyMDc5MzQiLCAiaXNzIjogImh0dHBzOi8vaXNzby1xLmFkZW8ubm86NDQzL2lzc28vb2F1dGgyIiwgInRva2VuTmFtZSI6ICJpZF90b2tlbiIsICJhdWQiOiAiaWRhLXEiLCAiY19oYXNoIjogInctbGx3ZlJMenVpRFBselpkY1BhenciLCAib3JnLmZvcmdlcm9jay5vcGVuaWRjb25uZWN0Lm9wcyI6ICIyZmNlNWU1ZS02ODdjLTQ5ZmYtOTRjYS1jNzE2OGVmY2M2MmQiLCAiYXpwIjogImlkYS1xIiwgImF1dGhfdGltZSI6IDE1NTUwNzQ3NjcsICJyZWFsbSI6ICIvIiwgImV4cCI6IDE1NTUwNzgzNjcsICJ0b2tlblR5cGUiOiAiSldUVG9rZW4iLCAiaWF0IjogMTU1NTA3NDc2NyB9.orrUotLp8SMkCpigVhkAUlw9Rx5tigBrYNVv3j8fTmkIe-I1MEI0xctxM-tnLbrgcW3I-3Ye_bkS4KplhR4spnG9hT45L1dD-yoLsu8R6cD1PklMsx8m93XmaTHDReGZAI3uKO4KSPcQHyVE7-tIc6CWYqbVXWmEUxUsHNYm3bWO_0rZ-Su6CWVCEBz3yWa85rUcPn0Il-_BWkgF-0YhOWJn3ndKAl_96ARmR-nllhUnQDYqHk2DwYLWnz_WOb4HuuqxKRP5i1h8zHwGIR6VORCzWgFViiFNTPT54Mtr2fZtVinP8W70JoRZ1pKbk-bYK4ErJgACU8npdGBZYTZa6g";
 	private static final String DISTRIBUER_JOURNALPOST_URI = "/rest/v1/distribuerjournalpost";
-	private static final String JOURNALPOSTID = "555555555";
+	private static final String JOURNALPOST_ID = "555555555";
+
 	private static final String BATCHID = "66666";
 	private static final String BESTILLENDEFAGSYSTEM = "bestillendeFagsystem";
 	private static final String ADRESSETYPE_NORSK = "norskPostadresse";
@@ -81,15 +82,14 @@ public class Rdist002IT {
 	private static final String LAND_NO = "NO";
 	private static final String LAND_US = "US";
 	private static final String DOKUMENTPRODAPP = "dokumentprodapp";
+
 	private static final String DOKUMENTTYPEID = "000001";
 	private static final String TITTEL = "journalpostTittel";
-
-	private static final String ARKIVID = "555555555";
 	private static final String TEMA = "OPP";
 	private static final String MOTTAKER_ID = "***gammelt_fnr***";
 	private static final String MOTTAKER_NAVN = "Jan Neimansen";
 	private static final String BRUKER_ID = "***gammelt_fnr***";
-	private static final String DOKUMENT_INFO_ID = "555555555";
+	private static final String DOKUMENT_INFO_ID = "666666666";
 
 	private @Value("${hentdokumenter_fra_joark_crypto_password}")
 	String encryptionPassphrase;
@@ -113,7 +113,35 @@ public class Rdist002IT {
 				.withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokkat/tkat020-happy.json")));
 
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost();
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+		DistribuerJournalpostResponseTo restResponse = responseEntity.getBody();
+
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertEquals(36, restResponse.getBestillingsId().length());
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			HentDokumenterFraJoark qdist012Result = unmarshalHentDokumenterFraJoarkFromXmlStringAndDecrypt(qdist012ResultMessage);
+
+			assertNotNull(qdist012Result);
+			assertQdist012Result(qdist012Result.getDistribusjonbestilling(), restResponse.getBestillingsId());
+			assertNorskPostadresse((NorskPostadresse) qdist012Result.getDistribusjonbestilling().getAdresse());
+		});
+	}
+
+	@Test
+	public void distribuerJournalpostWithoutAdresseHappyPath() {
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withBodyFile("saf/safGraphQlResponse-happy.json")));
+
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokkat/tkat020-happy.json")));
+
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
 		DistribuerJournalpostResponseTo restResponse = responseEntity.getBody();
 
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -128,17 +156,117 @@ public class Rdist002IT {
 		});
 	}
 
-	//itest paths:
-	// happy
-	// mangler authorizationHeader
-	// feil i requestvalidering
-	// unauthorized mot saf
-	// tom respons fra saf
-	// teknisk feil i saf
-	// feil i validering av journalpost fra saf
-	// Ugyldig dokumentTypeId ifra dokkat
-	// teknisk feil i dokkat
-	// Feil ved legging på kø mot qdist012
+	@Test
+	public void distribuerJournalpostWithUtenlandskAdresseHappyPath() {
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withBodyFile("saf/safGraphQlResponse-happy.json")));
+
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokkat/tkat020-happy.json")));
+
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(createUtenlandskAdresse()).build(), createHappyPathHeaders());
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+		DistribuerJournalpostResponseTo restResponse = responseEntity.getBody();
+
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertEquals(36, restResponse.getBestillingsId().length());
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			HentDokumenterFraJoark qdist012Result = unmarshalHentDokumenterFraJoarkFromXmlStringAndDecrypt(qdist012ResultMessage);
+
+			assertNotNull(qdist012Result);
+			assertQdist012Result(qdist012Result.getDistribusjonbestilling(), restResponse.getBestillingsId());
+			assertUtenlandskPostadresse((UtenlandskPostadresse) qdist012Result.getDistribusjonbestilling().getAdresse());
+		});
+	}
+
+	@Test
+	public void distribuerJournalpostWithoutAuthHeader() {
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHeaderWithoutAuth());
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+
+		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+		assertNull(responseEntity.getBody().getBestillingsId());
+	}
+
+	@Test
+	public void distribuerJournalpostWithoutJournalpostId() {
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().journalpostId(null).build(), createHappyPathHeaders());
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+
+		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+		assertNull(responseEntity.getBody().getBestillingsId());
+	}
+
+	@Test
+	public void distribuerJournalpostThrowsSafJournalpostIkkeFunnetFunctionalException() {
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)));
+
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+
+		assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+		assertNull(responseEntity.getBody().getBestillingsId());
+	}
+
+	@Test
+	public void distribuerJournalpostThrowsSafJournalpostQueryUnauthorizedException() {
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.UNAUTHORIZED.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withBody("{}")));
+
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+
+		assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+		assertNull(responseEntity.getBody().getBestillingsId());
+	}
+
+	@Test
+	public void distribuerJournalpostThrowsSafJournalpostQueryTechnicalException() {
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)));
+
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+		assertNull(responseEntity.getBody().getBestillingsId());
+	}
+
+	@Test
+	public void distribuerJournalpostWithInngaaendeJournalposttype() {
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withBodyFile("saf/safGraphQlResponse-inngaaendeJournalpostType.json")));
+
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+
+		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+		assertNull(responseEntity.getBody().getBestillingsId());
+	}
+
+
+	@Test
+	public void distribuerJournalpostThrowsDokkatGetDokumenttypeInfoTechnicalException() {
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withBodyFile("saf/safGraphQlResponse-happy.json")));
+
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())
+				.withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())));
+
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+
+		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+		assertNull(responseEntity.getBody().getBestillingsId());
+	}
 
 	private void assertQdist012Result(Distribusjonbestilling qdist012Result, String restResponseBestillingsId) {
 		assertNotNull(qdist012Result);
@@ -151,13 +279,12 @@ public class Rdist002IT {
 		assertArkivInformasjon(qdist012Result.getArkivInformasjon());
 		assertMottaker((Person) qdist012Result.getMottaker());
 		assertBruker((Person) qdist012Result.getBruker());
-		assertNorskPostadresse((NorskPostadresse) qdist012Result.getAdresse());
 		assertEquals(DOKUMENTPRODAPP, qdist012Result.getDokumentProdApp());
 		assertDokumenter(qdist012Result.getDokumenter());
 	}
 
 	private void assertArkivInformasjon(ArkivInformasjon arkivInformasjon) {
-		assertEquals(ARKIVID, arkivInformasjon.getArkivId());
+		assertEquals(JOURNALPOST_ID, arkivInformasjon.getArkivId());
 		assertEquals(TEMA, arkivInformasjon.getArkivSystem());
 	}
 
@@ -183,7 +310,7 @@ public class Rdist002IT {
 
 	private void assertUtenlandskPostadresse(UtenlandskPostadresse adresse) {
 		assertNotNull(adresse);
-		assertEquals(LAND_NO, adresse.getLand());
+		assertEquals(LAND_US, adresse.getLand());
 		assertEquals(ADDRESSELINJE1, adresse.getAdresselinje1());
 		assertEquals(ADDRESSELINJE2, adresse.getAdresselinje2());
 		assertEquals(ADDRESSELINJE3, adresse.getAdresselinje3());
@@ -209,24 +336,26 @@ public class Rdist002IT {
 		assertEquals(SLADDET.name(), dokument.getVariantFormat());
 	}
 
-	private ResponseEntity<DistribuerJournalpostResponseTo> callDistribuerJournalpost() {
-		return this.restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, HttpMethod.POST, createHttpEntity(), DistribuerJournalpostResponseTo.class);
+	private ResponseEntity<DistribuerJournalpostResponseTo> callDistribuerJournalpost(HttpEntity requestEntity) {
+		return this.restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, HttpMethod.POST, requestEntity, DistribuerJournalpostResponseTo.class);
 	}
 
-	private HttpEntity createHttpEntity() {
-		return new HttpEntity<>(defaultDistribuerJournalpostRequestTo(), createHeaders());
-	}
-
-	private HttpHeaders createHeaders() {
+	private HttpHeaders createHappyPathHeaders() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + TEMP_OIDC_TOKEN);
 		return headers;
 	}
 
-	private DistribuerJournalpostRequestTo defaultDistribuerJournalpostRequestTo() {
+	private HttpHeaders createHeaderWithoutAuth() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+		return headers;
+	}
+
+	private DistribuerJournalpostRequestTo.DistribuerJournalpostRequestToBuilder createHappyPathDistribuerJournalpostRequestTo() {
 		return DistribuerJournalpostRequestTo.builder()
-				.journalpostId(JOURNALPOSTID)
+				.journalpostId(JOURNALPOST_ID)
 				.batchId(BATCHID)
 				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
 				.adresse(new DistribuerJournalpostRequestTo.AdresseTo(
@@ -238,9 +367,20 @@ public class Rdist002IT {
 						null,
 						LAND_NO
 				))
-				.dokumentProdApp(DOKUMENTPRODAPP)
-				.build();
+				.dokumentProdApp(DOKUMENTPRODAPP);
 
+	}
+
+	private DistribuerJournalpostRequestTo.AdresseTo createUtenlandskAdresse() {
+		return new DistribuerJournalpostRequestTo.AdresseTo(
+				ADRESSETYPE_UTENLANDSK,
+				null,
+				null,
+				ADDRESSELINJE1,
+				ADDRESSELINJE2,
+				ADDRESSELINJE3,
+				LAND_US
+		);
 	}
 
 	private HentDokumenterFraJoark unmarshalHentDokumenterFraJoarkFromXmlStringAndDecrypt(Message message) throws JMSException, JAXBException {
