@@ -4,5 +4,5 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJo
 
 public interface DistribuerForsendelseProducer {
 
-	void produce(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId);
+	void produce(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId, String journalpostId);
 }

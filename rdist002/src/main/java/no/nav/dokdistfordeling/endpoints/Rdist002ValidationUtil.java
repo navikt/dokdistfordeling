@@ -10,6 +10,7 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.AvsenderMottaker;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Bruker;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.DokumentInfo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalstatus;
@@ -73,8 +74,6 @@ public class Rdist002ValidationUtil {
 			assertNotNullOrEmpty("mottakerId", journalpost.getAvsenderMottaker().getId());
 
 			validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
-
-
 			journalpost.getDokumenter().forEach(this::validateDokumentInfo);
 
 		} catch (ValidationException e) {
@@ -91,7 +90,7 @@ public class Rdist002ValidationUtil {
 		assertParameterIsAsExpected("dokumentstatus", dokumentInfo.getDokumentstatus().name(), FERDIGSTILT);
 
 		if (dokumentInfo.getDokumentvarianter().stream().noneMatch(dokInfo -> dokInfo.isSaksbehandlerHarTilgang() && (dokInfo.getVariantformat() == Variantformat.ARKIV || dokInfo.getVariantformat() == Variantformat.SLADDET))) {
-			throw new ValidationException("ingen variantformater av dokumentet med tilgang for saksbehandler ble funnet.");
+			throw new BrukerManglerTilgangTilDokumentFunctionalException("ingen variantformater av dokumentet med tilgang for saksbehandler ble funnet.");
 		}
 	}
 }

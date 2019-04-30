@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.config.jms;
 
-import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.JOURNALPOST_ID;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.crypto.Crypto;
@@ -34,15 +35,16 @@ public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseP
 	}
 
 	@Override
-	public void produce(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId) {
+	public void produce(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId, String journalpostId) {
 		jmsTemplate.send(
 				qdist012,
 				session -> {
 					TextMessage msg = session.createTextMessage(marshalHentDokumenterFraJoarkToXmlStringAndEncrypt(hentDokumenterFraJoark, bestillingsId));
 					msg.setStringProperty(CALL_ID, bestillingsId);
+					msg.setStringProperty(JOURNALPOST_ID, journalpostId);
 					return msg;
 				});
-		log.info("hentDokumenterFraJoark bestilling med bestillingsId{} ble lagt på kø imot qdist012", bestillingsId);
+		log.info("hentDokumenterFraJoark bestilling med bestillingsId={} ble lagt på kø imot qdist012", bestillingsId);
 	}
 
 	private String marshalHentDokumenterFraJoarkToXmlStringAndEncrypt(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId) {

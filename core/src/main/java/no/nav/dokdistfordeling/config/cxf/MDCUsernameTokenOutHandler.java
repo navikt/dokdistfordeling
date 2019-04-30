@@ -1,7 +1,7 @@
 package no.nav.dokdistfordeling.config.cxf;
 
-import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
-import static no.nav.dokdistfordeling.constants.MdcConstants.USER_ID;
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.USER_ID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;

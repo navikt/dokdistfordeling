@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.endpoints;
 
-import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
@@ -56,7 +56,9 @@ public class DistribuerJournalpostService {
 		// brevkode for utgående dokumenter tilsvarer dokumenttypeid
 		dokumentkatalogAdmin.getDokumenttypeInfo(hovedDokumentInfo.getBrevkode());
 
-		distribuerForsendelseProducer.produce(hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, dokumenter, bestillingsId), bestillingsId);
+		distribuerForsendelseProducer.produce(hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, dokumenter, bestillingsId),
+				bestillingsId,
+				distribuerJournalpostRequestTo.getJournalpostId());
 
 		return bestillingsId;
 	}
