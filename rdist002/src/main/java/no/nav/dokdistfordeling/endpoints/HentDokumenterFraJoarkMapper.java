@@ -74,7 +74,7 @@ public class HentDokumenterFraJoarkMapper {
 					.withAdresselinje2(adresseTo.getAdresselinje2())
 					.withAdresselinje3(adresseTo.getAdresselinje3())
 					.withPostnummer(adresseTo.getPostnummer())
-					.withPoststed(adresseTo.getPostnummer())
+					.withPoststed(adresseTo.getPoststed())
 					.withLand(adresseTo.getLand());
 		} else {
 			return new UtenlandskPostadresse()
