@@ -6,7 +6,7 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
-import no.nav.dokdistfordeling.constants.MdcConstants;
+import no.nav.dokdistfordeling.constants.Constants;
 import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalMappingException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
@@ -82,7 +82,7 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 
 	private HttpHeaders httpHeaders() {
 		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.set(MdcConstants.CALL_ID, MDC.get(MdcConstants.CALL_ID));
+		httpHeaders.set(Constants.CALL_ID, MDC.get(Constants.CALL_ID));
 		httpHeaders.setContentType(APPLICATION_JSON_UTF8);
 		return httpHeaders;
 	}
