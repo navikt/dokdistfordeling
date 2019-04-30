@@ -54,7 +54,7 @@ public class Qdist008DistribuerForsendelseMapper {
 								.withTilknyttetSom(dokumentInformasjon.getTilknyttetSom())
 								.withArkivDokumentInfoId(dokumentInformasjon.getArkivDokumentInfoId())
 								.withRekkefolge(dokumentInformasjon.getRekkefolge())
-								.withDokumentObjektReferanse(dokumentInformasjon.getVariantFormat()))
+								.withDokumentObjektReferanse(dokumentInformasjon.getDokumentObjektReferanse()))
 						.collect(Collectors.toList()));
 	}
 

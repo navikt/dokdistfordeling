@@ -1,11 +1,8 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import static no.nav.dokdistfordeling.constants.MdcConstants.CALL_ID;
-import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
-import no.nav.dokdistfordeling.exception.functional.ForsendelseManglerCallIdFunctionalException;
 import no.nav.dokdistfordeling.melding.qdist012.HentDokumenterFraJoark;
 import no.nav.dokdistfordeling.metrics.Qdist012MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.DistribuerForsendelse;
@@ -14,7 +11,6 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.ValidationException;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.spring.SpringRouteBuilder;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -31,6 +27,7 @@ public class Qdist012Route extends SpringRouteBuilder {
 
 	public static final String QDIST012_SERVICE_ID = "qdist012";
 	static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
+	static final String PROPERTY_JOURNALPOST_ID = "journalpostId";
 
 	private final Qdist012Service qdist012Service;
 	private final Queue qdist012;
@@ -69,7 +66,7 @@ public class Qdist012Route extends SpringRouteBuilder {
 		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
 				.useOriginalMessage()
-				.log(LoggingLevel.WARN, log, "${exception}; bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}")
+				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist012FunksjonellFeil.getQueueName());
 
 		from("jms:" + qdist012.getQueueName() +
@@ -77,16 +74,8 @@ public class Qdist012Route extends SpringRouteBuilder {
 				.routeId(QDIST012_SERVICE_ID)
 				.routePolicy(qdist012MetricsRoutePolicy)
 				.setExchangePattern(ExchangePattern.InOnly)
-				.doTry()
-				.setProperty(PROPERTY_BESTILLINGS_ID, simple("${in.header.callId}", String.class))
-				.log(LoggingLevel.INFO, log, "qdist012 har mottatt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
-				.process(exchange -> {
-					assertNotNullOrEmpty("callId", exchange.getProperty(PROPERTY_BESTILLINGS_ID, String.class));
-					MDC.put(CALL_ID, exchange.getProperty(PROPERTY_BESTILLINGS_ID, String.class));
-				})
-				.doCatch(Exception.class)
-				.throwException(new ForsendelseManglerCallIdFunctionalException("qdist012 har mottatt forsendelse uten påkrevd header callId"))
-				.end()
+				.process(new HeaderProcessor())
+				.log(LoggingLevel.INFO, log, "qdist012 har mottatt forsendelse med " + getIdsForLogging())
 				.bean(hentDokumenterFraJoarkDecrypter)
 				.to("validator:no/nav/dokdistfordeling/qdist012/xsd/hentdokumenterfrajoark.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(HentDokumenterFraJoark.class)))
@@ -96,6 +85,11 @@ public class Qdist012Route extends SpringRouteBuilder {
 				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
 				.inOnly("jms:" + qdist008.getQueueName())
 				.log(LoggingLevel.INFO, log, "qdist012 har lagt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} på kø til qdist008 for distribusjon av forsendelse");
+	}
+
+	public static String getIdsForLogging() {
+		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} og " +
+				"journalpostId=${exchangeProperty." + PROPERTY_JOURNALPOST_ID + "}";
 	}
 
 }

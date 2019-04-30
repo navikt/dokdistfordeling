@@ -50,7 +50,7 @@ public class Crypto {
 			cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv.getBytes()));
 			return new String(cipher.doFinal(Base64.getDecoder().decode(encrypted)));
 		} catch (Exception ex) {
-			throw new CryptoException("Feilet ved dekryptering av tekst", ex);
+			throw new CryptoException("Feilet ved dekryptering av tekst. Åraken er sannynligvis at input-meldingen ikke er korrekt kryptert.", ex);
 		}
 	}
 
