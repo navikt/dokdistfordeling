@@ -7,9 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
-import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
-import no.nav.dokdistfordeling.kodeverk.TemaCode;
-import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 
 import java.util.List;
 
