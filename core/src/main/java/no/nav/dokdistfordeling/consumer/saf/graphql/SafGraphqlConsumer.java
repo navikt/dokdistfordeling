@@ -2,7 +2,6 @@ package no.nav.dokdistfordeling.consumer.saf.graphql;
 
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
-import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

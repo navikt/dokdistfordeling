@@ -50,7 +50,7 @@ public class Crypto {
 			cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv.getBytes()));
 			return new String(cipher.doFinal(Base64.getDecoder().decode(encrypted)));
 		} catch (Exception ex) {
-			throw new CryptoException("Feilet ved dekryptering av tekst", ex);
+			throw new CryptoException("Feilet ved dekryptering av tekst. Åraken er sannynligvis at input-meldingen ikke er korrekt kryptert", ex);
 		}
 	}
 
@@ -59,8 +59,8 @@ public class Crypto {
 			SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
 			char[] ***passord=gammelt_passord***();
 			KeySpec spec = new PBEKeySpec(passwordChars, salt.getBytes(), 10000, 128);
-			SecretKey key = factory.generateSecret(spec);
-			return new SecretKeySpec(key.getEncoded(), "AES");
+			SecretKey secretKey = factory.generateSecret(spec);
+			return new SecretKeySpec(secretKey.getEncoded(), "AES");
 		} catch (Exception ex) {
 			throw new CryptoException("Feilet ved generering av krypteringsnøkkel", ex);
 		}
