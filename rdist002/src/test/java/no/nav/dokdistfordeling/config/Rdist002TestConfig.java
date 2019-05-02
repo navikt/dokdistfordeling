@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
+import org.springframework.retry.annotation.EnableRetry;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Profile;
 		ArkiverDokumentproduksjonV1Alias.class,
 		MqGatewayAlias.class
 })
+@EnableRetry
 @Import({
 		Rdist002JmsItestConfig.class,
 		DistribuerJournalpostConfig.class,

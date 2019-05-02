@@ -28,6 +28,7 @@ public class HentDokumenterFraJoarkMapper {
 
 	public static final String NORSK_POSTADRESSE = "norskPostadresse";
 	public static final String UTENLANDSK_POSTADRESSE = "utenlandskPostadresse";
+	public static final String SAMHANDLER_KATEGORI = "HPR";
 
 	public HentDokumenterFraJoark map(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost, Aktoer mottaker, List<DokumentInfo> dokumenter, String bestillingsId) {
 		return new HentDokumenterFraJoark()
@@ -94,7 +95,8 @@ public class HentDokumenterFraJoarkMapper {
 					.withOrgnummer(bruker.getId());
 		} else {
 			return new Samhandler()
-					.withSamhandleridentifikator(bruker.getId());
+					.withSamhandleridentifikator(bruker.getId())
+					.withSamhandlerkategori(SAMHANDLER_KATEGORI);
 		}
 	}
 }
