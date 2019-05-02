@@ -24,70 +24,55 @@ public class Rdist002ValidationUtil {
 	private static final String FERDIGSTILT = Journalstatus.FERDIGSTILT.name();
 
 	public void validateRequest(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
-		try {
-			assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
-			assertNotNullOrEmpty("bestillendeFagsystem", distribuerJournalpostRequestTo.getBestillendeFagsystem());
-			assertNotNullOrEmpty("dokumentProdapp", distribuerJournalpostRequestTo.getDokumentProdApp());
-		} catch (ValidationException e) {
-			throw new ValidationException(String.format("validering av distribuerJournalpostRequest feilet grunnet: %s", e.getMessage()), e);
-		}
+		assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
+		assertNotNullOrEmpty("bestillendeFagsystem", distribuerJournalpostRequestTo.getBestillendeFagsystem());
+		assertNotNullOrEmpty("dokumentProdapp", distribuerJournalpostRequestTo.getDokumentProdApp());
 	}
 
 	public void validateAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo, Aktoer mottaker) {
+		if (mottaker instanceof Samhandler) {
+			assertNotNull(DistribuerJournalpostRequestTo.AdresseTo.class, adresseTo);
+		}
 
-		try {
-			if (mottaker instanceof Samhandler) {
-				assertNotNull(DistribuerJournalpostRequestTo.AdresseTo.class, adresseTo);
+		if (adresseTo != null) {
+			assertNotNullOrEmpty("land", adresseTo.getLand());
+
+			switch (adresseTo.getAdresseType()) {
+				case NORSK_POSTADRESSE:
+					assertNotNullOrEmpty("poststed", adresseTo.getPoststed());
+					assertNotNullOrEmpty("postnummer", adresseTo.getPostnummer());
+					break;
+				case UTENLANDSK_POSTADRESSE:
+					assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
+					break;
+				default:
+					throw new ValidationException(String.format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, mottok %s", adresseTo.getAdresseType()));
 			}
-
-			if (adresseTo != null) {
-				assertNotNullOrEmpty("land", adresseTo.getLand());
-
-				switch (adresseTo.getAdresseType()) {
-					case NORSK_POSTADRESSE:
-						assertNotNullOrEmpty("poststed", adresseTo.getPoststed());
-						assertNotNullOrEmpty("postnummer", adresseTo.getPostnummer());
-						break;
-					case UTENLANDSK_POSTADRESSE:
-						assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
-						break;
-					default:
-						throw new ValidationException(String.format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, mottok %s", adresseTo.getAdresseType()));
-				}
-			}
-		} catch (ValidationException e) {
-			throw new ValidationException("Validering av adresse for mottaker feilet.", e);
 		}
 	}
 
 	public void validateJournalpostAndDokumenter(Journalpost journalpost) {
-		try {
-			assertParameterIsAsExpected("journalposttype", journalpost.getJournalposttype().name(), UTGAAENDE);
-			assertParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus().name(), FERDIGSTILT);
+		assertParameterIsAsExpected("journalposttype", journalpost.getJournalposttype().name(), UTGAAENDE);
+		assertParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus().name(), FERDIGSTILT);
 
-			assertNotNull(Bruker.class, journalpost.getBruker());
-			assertNotNullOrEmpty("brukerId", journalpost.getBruker().getId());
-			assertNotNull(BrukerIdType.class, journalpost.getBruker().getType());
+		assertNotNull(Bruker.class, journalpost.getBruker());
+		assertNotNullOrEmpty("brukerId", journalpost.getBruker().getId());
+		assertNotNull(BrukerIdType.class, journalpost.getBruker().getType());
 
-			assertNotNull(AvsenderMottaker.class, journalpost.getAvsenderMottaker());
-			assertNotNullOrEmpty("mottakerId", journalpost.getAvsenderMottaker().getId());
+		assertNotNull(AvsenderMottaker.class, journalpost.getAvsenderMottaker());
+		assertNotNullOrEmpty("mottakerId", journalpost.getAvsenderMottaker().getId());
 
-			validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
+		validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
 
-
-			journalpost.getDokumenter().forEach(this::validateDokumentInfo);
-
-		} catch (ValidationException e) {
-			throw new ValidationException(String.format("Validering av journalposten feilet grunnet: %s", e.getMessage()), e);
-		}
+		journalpost.getDokumenter().forEach(this::validateDokumentInfo);
 	}
 
-	public void validateHovedDokumentInfo(DokumentInfo dokumentInfo) {
+	private void validateHovedDokumentInfo(DokumentInfo dokumentInfo) {
 		assertNotNullOrEmpty("tittel", dokumentInfo.getTittel());
 		assertNotNullOrEmpty("brevkode", dokumentInfo.getBrevkode());
 	}
 
-	public void validateDokumentInfo(DokumentInfo dokumentInfo) {
+	private void validateDokumentInfo(DokumentInfo dokumentInfo) {
 		assertParameterIsAsExpected("dokumentstatus", dokumentInfo.getDokumentstatus().name(), FERDIGSTILT);
 
 		if (dokumentInfo.getDokumentvarianter().stream().noneMatch(dokInfo -> dokInfo.isSaksbehandlerHarTilgang() && (dokInfo.getVariantformat() == Variantformat.ARKIV || dokInfo.getVariantformat() == Variantformat.SLADDET))) {
