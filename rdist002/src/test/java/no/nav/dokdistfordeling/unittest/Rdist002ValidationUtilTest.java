@@ -144,15 +144,6 @@ public class Rdist002ValidationUtilTest {
 	}
 
 	@Test
-	public void shouldThrowValidationExceptionFromBrukerOfTypeHPR() {
-		Journalpost journalpost = unitTestUtil.createJournalpostBuilder()
-				.bruker(new Bruker(BRUKER_ID, BrukerIdType.HPRNR))
-				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
-		assertEquals("brukerIdType kan ikke være av typen HPR", thrownException.getMessage());
-	}
-
-	@Test
 	public void shouldThrowValidationExceptionFromWrongJournalpoststatus() {
 		Journalpost journalpost = unitTestUtil.createJournalpostBuilder()
 				.journalstatus(Journalstatus.EKSPEDERT)

@@ -7,6 +7,7 @@ import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Bruker;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.DokumentInfo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Adresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
@@ -17,7 +18,6 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJo
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.NorskPostadresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.UtenlandskPostadresse;
 
 import java.util.List;
@@ -28,7 +28,6 @@ public class HentDokumenterFraJoarkMapper {
 
 	public static final String NORSK_POSTADRESSE = "norskPostadresse";
 	public static final String UTENLANDSK_POSTADRESSE = "utenlandskPostadresse";
-	public static final String SAMHANDLER_KATEGORI = "HPR";
 
 	public HentDokumenterFraJoark map(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost, Aktoer mottaker, List<DokumentInfo> dokumenter, String bestillingsId) {
 		return new HentDokumenterFraJoark()
@@ -87,16 +86,15 @@ public class HentDokumenterFraJoarkMapper {
 	}
 
 	private Aktoer mapBruker(Bruker bruker) {
-		if (bruker.getId().trim().length() == 11) {
+		if (BrukerIdType.FNR.equals(bruker.getType())) {
 			return new Person()
 					.withPersonidentifikator(bruker.getId());
-		} else if (bruker.getId().length() == 9) {
+		} else if (BrukerIdType.AKTOERID.equals(bruker.getType())) {
+			return new Person()
+					.withPersonidentifikator(bruker.getId());
+		} else {
 			return new Organisasjon()
 					.withOrgnummer(bruker.getId());
-		} else {
-			return new Samhandler()
-					.withSamhandleridentifikator(bruker.getId())
-					.withSamhandlerkategori(SAMHANDLER_KATEGORI);
 		}
 	}
 }
