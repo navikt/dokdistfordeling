@@ -55,7 +55,7 @@ fasitResources:
   - alias: dokdistfordeling_qdist008_funk_feil
     resourceType: queue
   - alias: dokdistsentralprint_qdist009_dist_s_print
-    resourceType: queue,
+    resourceType: queue
   - alias: dokdistfordeling_qdist012_hent_dok_fra_joark
     resourceType: queue
   - alias: dokdistfordeling_qdist012_funk_feil
