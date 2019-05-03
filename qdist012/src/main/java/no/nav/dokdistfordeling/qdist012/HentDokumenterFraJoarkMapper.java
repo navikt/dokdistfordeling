@@ -1,26 +1,22 @@
-package no.nav.dokdistfordeling.qdist008;
+package no.nav.dokdistfordeling.qdist012;
 
 import static java.lang.String.format;
 
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
-import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
-import no.nav.dokdistfordeling.kodeverk.TemaCode;
-import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
-import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Aktoer;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.AktoerId;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.ArkivInformasjon;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Distribusjonbestilling;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.NorskPostadresse;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Organisasjon;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Person;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Samhandler;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.UtenlandskPostadresse;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Adresse;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.AktoerId;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Distribusjonbestilling;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.NorskPostadresse;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.UtenlandskPostadresse;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
@@ -30,26 +26,26 @@ import java.util.stream.Collectors;
  * @author Sigurd Midttun, Visma Consulting.
  */
 @Component
-public class DistribuerForsendelseMapper {
+public class HentDokumenterFraJoarkMapper {
 
 	@Handler
-	public DistribuerForsendelseTo map(DistribuerForsendelse distribuerForsendelse) {
+	public HentDokumenterFraJoarkTo map(HentDokumenterFraJoark hentDokumenterFraJoark) {
 		try {
-			return DistribuerForsendelseTo.builder()
-					.distribusjonbestilling(mapDokumentbestillingsinformasjon(distribuerForsendelse.getDistribusjonbestilling()))
+			return HentDokumenterFraJoarkTo.builder()
+					.distribusjonbestilling(mapDokumentbestillingsinformasjon(hentDokumenterFraJoark.getDistribusjonbestilling()))
 					.build();
 		} catch (IllegalArgumentException e) {
-			throw new DistrubuerForsendelseMapFunctionalException(format("Kunne ikke mappe qdist008 input-XML til domene-objekter. Feilmelding=%s",
+			throw new DistrubuerForsendelseMapFunctionalException(format("Kunne ikke mappe qdist012 input-XML til domene-objekter. Feilmelding=%s",
 					e.getMessage()), e);
 		}
 	}
 
-	private DistribuerForsendelseTo.DistribusjonbestillingTo mapDokumentbestillingsinformasjon(Distribusjonbestilling distribusjonbestilling) {
-		return DistribuerForsendelseTo.DistribusjonbestillingTo.builder()
+	private HentDokumenterFraJoarkTo.DistribusjonbestillingTo mapDokumentbestillingsinformasjon(Distribusjonbestilling distribusjonbestilling) {
+		return HentDokumenterFraJoarkTo.DistribusjonbestillingTo.builder()
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
 				.batchId(distribusjonbestilling.getBatchId())
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
-				.tema(stringToEnum(TemaCode.class, distribusjonbestilling.getTema()))
+				.tema(distribusjonbestilling.getTema())
 				.forsendelseTittel(distribusjonbestilling.getForsendelseTittel())
 				.arkivInformasjon(distribusjonbestilling.getArkivInformasjon() == null ? null :
 						mapArkivInformasjon(distribusjonbestilling.getArkivInformasjon()))
@@ -58,28 +54,28 @@ public class DistribuerForsendelseMapper {
 				.adresse(mapAdresse(distribusjonbestilling.getAdresse()))
 				.dokumentProdApp(distribusjonbestilling.getDokumentProdApp())
 				.dokumenter(distribusjonbestilling.getDokumenter().stream()
-						.map(dokumentInformasjon -> DistribuerForsendelseTo.DokumentInformasjonTo.builder()
+						.map(dokumentInformasjon -> HentDokumenterFraJoarkTo.DokumentInformasjonTo.builder()
 								.dokumenttypeId(dokumentInformasjon.getDokumenttypeId())
-								.dokumentObjektReferanse(dokumentInformasjon.getDokumentObjektReferanse())
-								.tilknyttetSom(stringToEnum(TilknyttetSomCode.class, dokumentInformasjon.getTilknyttetSom()))
+								.tilknyttetSom(dokumentInformasjon.getTilknyttetSom())
 								.arkivDokumentInfoId(dokumentInformasjon.getArkivDokumentInfoId())
 								.rekkefolge(dokumentInformasjon.getRekkefolge())
+								.variantFormat(dokumentInformasjon.getVariantFormat())
 								.build())
 						.collect(Collectors.toList()))
 				.build();
 	}
 
-	private DistribuerForsendelseTo.ArkivInformasjonTo mapArkivInformasjon(ArkivInformasjon arkivInformasjon) {
-		return DistribuerForsendelseTo.ArkivInformasjonTo.builder()
-				.arkivSystem(stringToEnum(ArkivSystemCode.class, arkivInformasjon.getArkivSystem()))
+	private HentDokumenterFraJoarkTo.ArkivInformasjonTo mapArkivInformasjon(ArkivInformasjon arkivInformasjon) {
+		return HentDokumenterFraJoarkTo.ArkivInformasjonTo.builder()
+				.arkivSystem(arkivInformasjon.getArkivSystem())
 				.arkivId(arkivInformasjon.getArkivId())
 				.build();
 	}
 
-	private DistribuerForsendelseTo.AktoerTo mapAktoer(Aktoer aktoer) {
+	private HentDokumenterFraJoarkTo.AktoerTo mapAktoer(Aktoer aktoer) {
 		if (aktoer instanceof Person) {
 			Person person = (Person) aktoer;
-			return DistribuerForsendelseTo.AktoerTo.builder()
+			return HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(person.getNavn())
 					.identifikator(person.getPersonidentifikator())
 					.aktoerType(AktoerTypeCode.PERSON)
@@ -87,7 +83,7 @@ public class DistribuerForsendelseMapper {
 					.build();
 		} else if (aktoer instanceof Organisasjon) {
 			Organisasjon organisasjon = (Organisasjon) aktoer;
-			return DistribuerForsendelseTo.AktoerTo.builder()
+			return HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(organisasjon.getNavn())
 					.identifikator(organisasjon.getOrgnummer())
 					.aktoerType(AktoerTypeCode.ORGANISASJON)
@@ -95,7 +91,7 @@ public class DistribuerForsendelseMapper {
 					.build();
 		} else if (aktoer instanceof AktoerId) {
 			AktoerId aktoerId = (AktoerId) aktoer;
-			return DistribuerForsendelseTo.AktoerTo.builder()
+			return HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(aktoerId.getNavn())
 					.identifikator(aktoerId.getAktoerId())
 					.aktoerType(AktoerTypeCode.PERSON)
@@ -103,7 +99,7 @@ public class DistribuerForsendelseMapper {
 					.build();
 		} else if (aktoer instanceof Samhandler) {
 			Samhandler samhandler = (Samhandler) aktoer;
-			return DistribuerForsendelseTo.AktoerTo.builder()
+			return HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(samhandler.getNavn())
 					.identifikator(samhandler.getSamhandleridentifikator())
 					.aktoerType(mapSamhandlerKategoriToSamhandlerType(samhandler.getSamhandlerkategori()))
@@ -114,12 +110,12 @@ public class DistribuerForsendelseMapper {
 		}
 	}
 
-	private DistribuerForsendelseTo.AdresseTo mapAdresse(Adresse adresse) {
+	private HentDokumenterFraJoarkTo.AdresseTo mapAdresse(Adresse adresse) {
 		if (adresse == null) {
 			return null;
 		} else if (adresse instanceof NorskPostadresse) {
 			NorskPostadresse norskPostadresse = (NorskPostadresse) adresse;
-			return DistribuerForsendelseTo.NorskPostadresseTo.builder()
+			return HentDokumenterFraJoarkTo.NorskPostadresseTo.builder()
 					.adresselinje1(norskPostadresse.getAdresselinje1())
 					.adresselinje2(norskPostadresse.getAdresselinje2())
 					.adresselinje3(norskPostadresse.getAdresselinje3())
@@ -129,7 +125,7 @@ public class DistribuerForsendelseMapper {
 					.build();
 		} else if (adresse instanceof UtenlandskPostadresse) {
 			UtenlandskPostadresse utenlandskPostadresse = (UtenlandskPostadresse) adresse;
-			return DistribuerForsendelseTo.UtenlandskPostadresseTo.builder()
+			return HentDokumenterFraJoarkTo.UtenlandskPostadresseTo.builder()
 					.adresselinje1(utenlandskPostadresse.getAdresselinje1())
 					.adresselinje2(utenlandskPostadresse.getAdresselinje2())
 					.adresselinje3(utenlandskPostadresse.getAdresselinje3())
@@ -149,13 +145,6 @@ public class DistribuerForsendelseMapper {
 			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
 		}
 	}
-
-	private static <E extends Enum<E>> E stringToEnum(Class<E> enumClass, String enumName) {
-		try {
-			return enumName == null ? null : Enum.valueOf(enumClass, enumName);
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException(format("%s er ikke en gyldig kodeverdi for %s", enumName, enumClass));
-		}
-	}
-
 }
+
+

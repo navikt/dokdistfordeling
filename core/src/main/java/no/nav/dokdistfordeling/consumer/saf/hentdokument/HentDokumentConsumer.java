@@ -50,7 +50,7 @@ public class HentDokumentConsumer implements HentDokument {
 	public HentDokumentResponseTo hentDokument(String journalpostId, String dokumentInfoId, String variantFormat) {
 		try {
 			HttpEntity entity = new HttpEntity<>(createAuthorizationHeader());
-			String dokumentBase64String = restTemplate.exchange(this.hentDokumentUrl + "/{journalpostId}/{dokumentInfoId}/{variantFormat}", HttpMethod.GET, entity, String.class)
+			String dokumentBase64String = restTemplate.exchange(this.hentDokumentUrl + "/{journalpostId}/{dokumentInfoId}/{variantFormat}", HttpMethod.GET, entity, String.class, journalpostId, dokumentInfoId, variantFormat)
 					.getBody();
 			return decodeAndMapResponse(dokumentBase64String, journalpostId, dokumentInfoId, variantFormat);
 		} catch (HttpClientErrorException e) {
@@ -68,7 +68,7 @@ public class HentDokumentConsumer implements HentDokument {
 					.dokument(Base64.getDecoder().decode(dokumentBase64String))
 					.build();
 		} catch (Exception e) {
-			throw new SafHentDokumentTechnicalException(String.format("Kunne ikke dekode dokument. journalpostId=%s, dokumentInfoId=%s, variantFormat=%s. Feilmelding=%s", journalpostId, dokumentInfoId, variantFormat, e
+			throw new SafHentDokumentFunctionalException(String.format("Kunne ikke dekode dokument, da dokumentet ikke er base64-encodet journalpostId=%s, dokumentInfoId=%s, variantFormat=%s. Feilmelding=%s", journalpostId, dokumentInfoId, variantFormat, e
 					.getMessage()), e);
 		}
 	}
@@ -76,7 +76,7 @@ public class HentDokumentConsumer implements HentDokument {
 	private HttpHeaders createAuthorizationHeader() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set(HttpHeaders.AUTHORIZATION, "bearer " + stsRestConsumer.getOidcToken());
+		headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + stsRestConsumer.getOidcToken());
 		return headers;
 	}
 

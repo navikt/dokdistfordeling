@@ -3,10 +3,11 @@ package no.nav.dokdistfordeling.constants;
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
-public final class MdcConstants {
+public final class Constants {
 
-	private MdcConstants() {
+	private Constants() {
 	}
 
 	public static final String CALL_ID = "callId";
+	public static final String JOURNALPOST_ID = "journalpostId";
 	public static final String USER_ID = "userId";}

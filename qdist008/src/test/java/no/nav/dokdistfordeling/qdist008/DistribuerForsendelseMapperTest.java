@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.AktoerId;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.ArkivInformasjon;
