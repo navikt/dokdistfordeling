@@ -21,7 +21,7 @@ import javax.jms.Queue;
 public class Qdist012JmsItestConfig {
 
 	@Bean
-	public Queue qdist012(@Value("${dokdistfordeling_qdist012_hent_dok_fra_joark.queuename}") String qdist008QueueName) {
+	public Queue qdist012(@Value("${dokdistfordeling_qdist012_hent_dok_joark.queuename}") String qdist008QueueName) {
 		return new ActiveMQQueue(qdist008QueueName);
 	}
 
