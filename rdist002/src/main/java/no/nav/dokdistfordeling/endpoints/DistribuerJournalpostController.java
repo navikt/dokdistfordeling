@@ -12,6 +12,7 @@ import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokum
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
+import no.nav.dokdistfordeling.metrics.Monitor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +36,7 @@ public class DistribuerJournalpostController {
 	@ApiOperation(value = "Bestiller distribusjon av en journalpost.", authorizations = {@Authorization(value = "apiKey")})
 	@SwaggerRestDistribuerJournalpost
 	@PostMapping(value = "/distribuerjournalpost")
+	@Monitor(value = "dok_request", extraTags = {"process", "distribuerJournalpost"}, histogram = true)
 	public ResponseEntity<DistribuerJournalpostResponseTo> distribuerJournalpost(@RequestBody DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
 																				 @ApiParam(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader) {
 		log.info("rdist002 har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());

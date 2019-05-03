@@ -10,6 +10,7 @@ import no.nav.dokdistfordeling.exception.functional.PersisterForsendelseFunction
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.OppdaterForsendelseTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.PersisterForsendelseTechnicalException;
+import no.nav.dokdistfordeling.metrics.Monitor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -48,6 +49,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.build();
 	}
 
+	@Monitor(value = "dok_consumer", extraTags = {"process", "persisterForsendelse"}, histogram = true)
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public PersisterForsendelseResponseTo persisterForsendelse(final PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
 		try {
