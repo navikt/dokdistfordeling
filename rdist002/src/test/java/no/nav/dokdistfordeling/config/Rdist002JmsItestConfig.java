@@ -31,7 +31,7 @@ public class Rdist002JmsItestConfig {
 	}
 
 	@Bean
-	public Queue qdist012(@Value("${dokdistfordeling_qdist012_hent_dok_fra_joark.queuename}") String qdist012QueueName) {
+	public Queue qdist012(@Value("${dokdistfordeling_qdist012_hent_dok_joark.queuename}") String qdist012QueueName) {
 		return new ActiveMQQueue(qdist012QueueName);
 	}
 

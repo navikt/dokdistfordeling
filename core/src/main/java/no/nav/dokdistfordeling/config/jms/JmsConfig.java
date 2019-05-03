@@ -42,7 +42,7 @@ public class JmsConfig {
 	}
 
 	@Bean
-	public Queue qdist012(@Value("${dokdistfordeling_qdist012_hent_dok_fra_joark.queuename}") String qdist012QueueName) throws JMSException {
+	public Queue qdist012(@Value("${dokdistfordeling_qdist012_hent_dok_joark.queuename}") String qdist012QueueName) throws JMSException {
 		return new MQQueue(qdist012QueueName);
 	}
 
