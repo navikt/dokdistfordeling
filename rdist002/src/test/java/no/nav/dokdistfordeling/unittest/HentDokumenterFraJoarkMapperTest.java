@@ -3,25 +3,39 @@ package no.nav.dokdistfordeling.unittest;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
-import static no.nav.dokdistfordeling.kodeverk.Variantformat.PRODUKSJON;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ADRESSELINJE1;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ADRESSELINJE2;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ADRESSELINJE3;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.BATCH_ID;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.BESTILLENDEFAGSYSTEM;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.BRUKER_NAVN;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOKUMENTPRODAPP;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOKUMENTTYPEID;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOK_INFO_ID_1;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOK_INFO_ID_2;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.JOURNALPOST_ID;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.LAND_NO;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.LAND_US;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.MOTTAKER_ID;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.MOTTAKER_NAVN;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ORGNR;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ORG_NAVN;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.POSTNUMMER;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.POSTSTED;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.SAMHANDLER_ID;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.SAMHANDLER_KATOGORI;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.SAMHANDLER_NAVN;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.TEMA;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.TITTEL;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import no.nav.dokdistfordeling.consumer.saf.journalpost.AvsenderMottaker;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Bruker;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.DokumentInfo;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Dokumentvariant;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.endpoints.HentDokumenterFraJoarkMapper;
-import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
-import no.nav.dokdistfordeling.kodeverk.Dokumentstatus;
-import no.nav.dokdistfordeling.kodeverk.Journalposttype;
-import no.nav.dokdistfordeling.kodeverk.Journalstatus;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Distribusjonbestilling;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.DokumentInformasjon;
@@ -33,55 +47,21 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.UtenlandskPostadresse;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class HentDokumenterFraJoarkMapperTest {
 
 	private static final String BESTILLINGS_ID = "7cc280ce-4168-4204-8d03-8dbdc3c4fc32";
 
-	private static final String JOURNALPOST_ID = "555555555";
-	private static final Journalposttype JOURNALPOST_TYPE = Journalposttype.U;
-	private static final Journalstatus JP_FERDIGSTILT = Journalstatus.FERDIGSTILT;
-	private static final String BATCH_ID = "66666";
-	private static final String BESTILLENDEFAGSYSTEM = "bestillendeFagsystem";
-	private static final String ADRESSETYPE_NORSK = "norskPostadresse";
-	private static final String ADRESSETYPE_UTENLANDSK = "utenlandskPostadresse";
-	private static final String ADRESSELINJE1 = "eksempelveien 23 A";
-	private static final String ADRESSELINJE2 = "eksempelveien 24 A";
-	private static final String ADRESSELINJE3 = "eksempelveien 25 A";
-	private static final String POSTSTED = "poststed";
-	private static final String POSTNUMMER = "1337";
-	private static final String LAND_NO = "NO";
-	private static final String LAND_US = "US";
-	private static final String DOKUMENTPRODAPP = "dokumentprodapp";
-	private static final String DOK_TITTEL_1 = "DOK_TITTEL_1";
-	private static final String DOK_TITTEL_2 = "DOK_TITTEL_2";
-	private static final String BREVKODE = "000001";
-
-	private static final String DOKUMENTTYPEID = "000001";
-	private static final String TITTEL = "journalpostTittel";
-	private static final String TEMA = "OPP";
-	private static final String MOTTAKER_ID = "***gammelt_fnr***";
-	private static final String MOTTAKER_NAVN = "Jan Neimansen";
-	private static final String BRUKER_ID = "***gammelt_fnr***";
-	private static final String BRUKER_NAVN = "***gammelt_fnr***";
-	private static final String ORGNR = "776677665";
-	private static final String ORG_NAVN = "eksempelcorp ASA";
-	private static final String SAMHANDLER_KATOGORI = "HPR";
-	private static final String SAMHANDLER_NAVN = "Betina Samhandlerson";
-	private static final String SAMHANDLER_ID = "33322211";
-	private static final String DOK_INFO_ID_1 = "666666666";
-	private static final String DOK_INFO_ID_2 = "777777777";
-
+	private UnitTestUtil unitTestUtil = new UnitTestUtil();
 	private HentDokumenterFraJoarkMapper mapper = new HentDokumenterFraJoarkMapper();
 
 	@Test
 	public void shouldMap() {
 		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder().build(),
-				createJournalpostBuilder().build(),
+				unitTestUtil.createJournalpostBuilder().build(),
 				createPersonMottaker(),
-				createDefaultDokumentInfoList(),
+				unitTestUtil.createDefaultDokumentInfoList(),
 				BESTILLINGS_ID);
 
 		assertNotNull(result.getDistribusjonbestilling());
@@ -104,10 +84,10 @@ public class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapWithUtenlandskAdresse() {
 		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder()
-						.adresse(createUtenlandskPostadresse()).build(),
-				createJournalpostBuilder().build(),
+						.adresse(unitTestUtil.createUtenlandskPostadresse()).build(),
+				unitTestUtil.createJournalpostBuilder().build(),
 				createPersonMottaker(),
-				createDefaultDokumentInfoList(),
+				unitTestUtil.createDefaultDokumentInfoList(),
 				BESTILLINGS_ID);
 
 		assertNotNull(result.getDistribusjonbestilling());
@@ -117,9 +97,9 @@ public class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapWithMottakerAsOrganisasjon() {
 		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder().build(),
-				createJournalpostBuilder().build(),
+				unitTestUtil.createJournalpostBuilder().build(),
 				createOrganisasjonMottaker(),
-				createDefaultDokumentInfoList(),
+				unitTestUtil.createDefaultDokumentInfoList(),
 				BESTILLINGS_ID);
 
 		assertNotNull(result.getDistribusjonbestilling());
@@ -129,9 +109,9 @@ public class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapWithMottakerAsSamhandler() {
 		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder().build(),
-				createJournalpostBuilder().build(),
+				unitTestUtil.createJournalpostBuilder().build(),
 				createSamhandlerMottaker(),
-				createDefaultDokumentInfoList(),
+				unitTestUtil.createDefaultDokumentInfoList(),
 				BESTILLINGS_ID);
 
 		assertNotNull(result.getDistribusjonbestilling());
@@ -141,11 +121,11 @@ public class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapWithBrukerAsOrganisasjon() {
 		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder().build(),
-				createJournalpostBuilder()
-						.bruker(createBrukerWithOrgnrId())
+				unitTestUtil.createJournalpostBuilder()
+						.bruker(unitTestUtil.createBrukerWithOrgnrId())
 						.build(),
 				createPersonMottaker(),
-				createDefaultDokumentInfoList(),
+				unitTestUtil.createDefaultDokumentInfoList(),
 				BESTILLINGS_ID);
 
 		assertNotNull(result.getDistribusjonbestilling());
@@ -155,11 +135,11 @@ public class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapWithBrukerAsSamhandler() {
 		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder().build(),
-				createJournalpostBuilder()
-						.bruker(createBrukerWithSamhandlerId())
+				unitTestUtil.createJournalpostBuilder()
+						.bruker(unitTestUtil.createBrukerWithSamhandlerId())
 						.build(),
 				createPersonMottaker(),
-				createDefaultDokumentInfoList(),
+				unitTestUtil.createDefaultDokumentInfoList(),
 				BESTILLINGS_ID);
 
 		assertNotNull(result.getDistribusjonbestilling());
@@ -246,98 +226,8 @@ public class HentDokumenterFraJoarkMapperTest {
 				.journalpostId(JOURNALPOST_ID)
 				.batchId(BATCH_ID)
 				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
-				.adresse(createNorskPostadresse())
+				.adresse(unitTestUtil.createNorskPostadresse())
 				.dokumentProdApp(DOKUMENTPRODAPP);
-	}
-
-	private DistribuerJournalpostRequestTo.AdresseTo createNorskPostadresse() {
-		return new DistribuerJournalpostRequestTo.AdresseTo(
-				ADRESSETYPE_NORSK,
-				POSTNUMMER,
-				POSTSTED,
-				ADRESSELINJE1,
-				null,
-				null,
-				LAND_NO
-		);
-	}
-
-	private DistribuerJournalpostRequestTo.AdresseTo createUtenlandskPostadresse() {
-		return new DistribuerJournalpostRequestTo.AdresseTo(
-				ADRESSETYPE_UTENLANDSK,
-				null,
-				null,
-				ADRESSELINJE1,
-				ADRESSELINJE2,
-				ADRESSELINJE3,
-				LAND_US
-		);
-	}
-
-	private Journalpost.JournalpostBuilder createJournalpostBuilder() {
-		return Journalpost.builder()
-				.journalposttype(JOURNALPOST_TYPE)
-				.journalstatus(JP_FERDIGSTILT)
-				.tema(TEMA)
-				.tittel(TITTEL)
-				.bruker(createBrukerWithFNR())
-				.avsenderMottaker(createAvsenderMottaker())
-				.dokumenter(createDefaultDokumentInfoList());
-	}
-
-	private AvsenderMottaker createAvsenderMottaker() {
-		return AvsenderMottaker.builder()
-				.id(MOTTAKER_ID)
-				.navn(MOTTAKER_NAVN)
-				.build();
-	}
-
-	private Bruker createBrukerWithFNR() {
-		return new Bruker(BRUKER_NAVN, BrukerIdType.FNR);
-	}
-
-	private Bruker createBrukerWithOrgnrId() {
-		return new Bruker(ORGNR, BrukerIdType.ORGNR);
-	}
-
-	private Bruker createBrukerWithSamhandlerId() {
-		return new Bruker(SAMHANDLER_ID, BrukerIdType.AKTOERID);
-	}
-
-	private List<DokumentInfo> createDefaultDokumentInfoList() {
-		return Arrays.asList(
-				createDokumentInfo1Builder().build(),
-				createDokumentInfo2Builder().build());
-	}
-
-	private DokumentInfo.DokumentInfoBuilder createDokumentInfo1Builder() {
-		return DokumentInfo.builder()
-				.dokumentInfoId(DOK_INFO_ID_1)
-				.tittel(DOK_TITTEL_1)
-				.brevkode(BREVKODE)
-				.dokumentstatus(Dokumentstatus.FERDIGSTILT)
-				.dokumentvarianter(Arrays.asList(Dokumentvariant.builder()
-								.saksbehandlerHarTilgang(false)
-								.variantformat(ARKIV).build(),
-						Dokumentvariant.builder()
-								.saksbehandlerHarTilgang(true)
-								.variantformat(SLADDET).build(),
-						Dokumentvariant.builder()
-								.saksbehandlerHarTilgang(true)
-								.variantformat(PRODUKSJON).build()));
-	}
-
-	private DokumentInfo.DokumentInfoBuilder createDokumentInfo2Builder() {
-		return DokumentInfo.builder()
-				.dokumentInfoId(DOK_INFO_ID_2)
-				.tittel(DOK_TITTEL_2)
-				.brevkode(BREVKODE)
-				.dokumentvarianter(Arrays.asList(Dokumentvariant.builder()
-								.saksbehandlerHarTilgang(true)
-								.variantformat(ARKIV).build(),
-						Dokumentvariant.builder()
-								.saksbehandlerHarTilgang(true)
-								.variantformat(PRODUKSJON).build()));
 	}
 
 	private Person createPersonMottaker() {

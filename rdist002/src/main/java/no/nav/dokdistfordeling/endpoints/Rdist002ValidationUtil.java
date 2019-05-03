@@ -12,6 +12,7 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.DokumentInfo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
+import no.nav.dokdistfordeling.kodeverk.Dokumentstatus;
 import no.nav.dokdistfordeling.kodeverk.Journalstatus;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
@@ -52,7 +53,9 @@ public class Rdist002ValidationUtil {
 	}
 
 	public void validateJournalpostAndDokumenter(Journalpost journalpost) {
+		assertNotNull(JournalpostType.class, journalpost.getJournalposttype());
 		assertParameterIsAsExpected("journalposttype", journalpost.getJournalposttype().name(), UTGAAENDE);
+		assertNotNull(Journalstatus.class, journalpost.getJournalstatus());
 		assertParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus().name(), FERDIGSTILT);
 
 		assertNotNull(Bruker.class, journalpost.getBruker());
@@ -73,6 +76,7 @@ public class Rdist002ValidationUtil {
 	}
 
 	private void validateDokumentInfo(DokumentInfo dokumentInfo) {
+		assertNotNull(Dokumentstatus.class, dokumentInfo.getDokumentstatus());
 		assertParameterIsAsExpected("dokumentstatus", dokumentInfo.getDokumentstatus().name(), FERDIGSTILT);
 
 		if (dokumentInfo.getDokumentvarianter().stream().noneMatch(dokInfo -> dokInfo.isSaksbehandlerHarTilgang() && (dokInfo.getVariantformat() == Variantformat.ARKIV || dokInfo.getVariantformat() == Variantformat.SLADDET))) {
