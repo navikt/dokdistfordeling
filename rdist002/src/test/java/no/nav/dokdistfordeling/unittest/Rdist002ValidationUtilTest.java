@@ -20,6 +20,7 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.Dokumentvariant;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.endpoints.Rdist002ValidationUtil;
+import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Dokumentstatus;
@@ -143,6 +144,15 @@ public class Rdist002ValidationUtilTest {
 	}
 
 	@Test
+	public void shouldThrowValidationExceptionFromBrukerOfTypeHPR() {
+		Journalpost journalpost = unitTestUtil.createJournalpostBuilder()
+				.bruker(new Bruker(BRUKER_ID, BrukerIdType.HPRNR))
+				.build();
+		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
+		assertEquals("brukerIdType kan ikke være av typen HPR", thrownException.getMessage());
+	}
+
+	@Test
 	public void shouldThrowValidationExceptionFromWrongJournalpoststatus() {
 		Journalpost journalpost = unitTestUtil.createJournalpostBuilder()
 				.journalstatus(Journalstatus.EKSPEDERT)
@@ -255,7 +265,7 @@ public class Rdist002ValidationUtilTest {
 								.build(),
 						unitTestUtil.createDokumentInfo2Builder().build()))
 				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
+		Exception thrownException = Assertions.assertThrows(BrukerManglerTilgangTilDokumentFunctionalException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("ingen variantformater av dokumentet med tilgang for saksbehandler ble funnet.", thrownException.getMessage());
 	}
 }

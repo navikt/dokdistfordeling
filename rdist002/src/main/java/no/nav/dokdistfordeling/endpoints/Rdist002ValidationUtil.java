@@ -2,6 +2,7 @@ package no.nav.dokdistfordeling.endpoints;
 
 import static no.nav.dokdistfordeling.endpoints.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.endpoints.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
+import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.HPRNR;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
@@ -62,6 +63,10 @@ public class Rdist002ValidationUtil {
 		assertNotNull(Bruker.class, journalpost.getBruker());
 		assertNotNullOrEmpty("brukerId", journalpost.getBruker().getId());
 		assertNotNull(BrukerIdType.class, journalpost.getBruker().getType());
+
+		if (journalpost.getBruker().getType() == HPRNR) {
+			throw new ValidationException("brukerIdType kan ikke være av typen HPR");
+		}
 
 		assertNotNull(AvsenderMottaker.class, journalpost.getAvsenderMottaker());
 		assertNotNullOrEmpty("mottakerId", journalpost.getAvsenderMottaker().getId());

@@ -56,12 +56,11 @@ public class DistribuerJournalpostController {
 			log.warn("rdist002 - utilstrekkelig tilgang til journalpost med journalpostid={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw new SafJournalpostQueryUnauthorizedException(String.format("bruker har ikke tilgang til journalpost med journalpostId=%s", distribuerJournalpostRequestTo.getJournalpostId()));
 
-		} catch (DokkatGetDokumenttypeInfoTechnicalException e) {
 		} catch (BrukerManglerTilgangTilDokumentFunctionalException e) {
 			log.warn("rdist002 - bruker har ikke tilgang til noen av dokumentvariantene på journalposten med journalpostId={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw new BrukerManglerTilgangTilDokumentFunctionalException(String.format("bruker har ikke tilgang til noen av dokumentvariantene på journalposten med journalpostId=%s", distribuerJournalpostRequestTo.getJournalpostId()));
 
-		} catch (BestemDokdistKanalFunctionalException e) {
+		} catch (DokkatGetDokumenttypeInfoTechnicalException e) {
 			log.warn("rdist002 - Ugyldig dokumenttypeid på dokumentet for journalpost med journalpostid={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw new DokkatGetDokumenttypeInfoTechnicalException(String.format("Ugyldig dokumenttypeid på dokumentet for journalpost med journalpostid=%s", distribuerJournalpostRequestTo.getJournalpostId()));
 
