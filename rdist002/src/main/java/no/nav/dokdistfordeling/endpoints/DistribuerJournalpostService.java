@@ -9,10 +9,10 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.AvsenderMottaker;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.DokumentInfo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
+import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
@@ -70,7 +70,6 @@ public class DistribuerJournalpostService {
 	}
 
 	private Aktoer mapMottaker(AvsenderMottaker avsenderMottaker) {
-		// todo replace when saf offers AvsenderMottakerType field
 		if (avsenderMottaker.getId().trim().length() == 11) {
 			return new Person()
 					.withNavn(avsenderMottaker.getNavn())
@@ -80,9 +79,7 @@ public class DistribuerJournalpostService {
 					.withNavn(avsenderMottaker.getNavn())
 					.withOrgnummer(avsenderMottaker.getId());
 		} else {
-			return new Samhandler()
-					.withNavn(avsenderMottaker.getNavn())
-					.withSamhandleridentifikator(avsenderMottaker.getId());
+			throw new ValidationException(String.format("Id for den aktuelle mottakeren har lengde=%s, forventet lengde=9 (ORGNR) eller lengde=11 (FNR)", avsenderMottaker.getId().trim().length()));
 		}
 	}
 }

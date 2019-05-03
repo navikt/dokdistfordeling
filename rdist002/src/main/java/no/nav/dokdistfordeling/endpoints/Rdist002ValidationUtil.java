@@ -33,7 +33,9 @@ public class Rdist002ValidationUtil {
 
 	public void validateAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo, Aktoer mottaker) {
 		if (mottaker instanceof Samhandler) {
-			assertNotNull(DistribuerJournalpostRequestTo.AdresseTo.class, adresseTo);
+			if (adresseTo == null) {
+				throw new ValidationException("For mottaker av type samhandler kan ikke adresse være null");
+			}
 		}
 
 		if (adresseTo != null) {

@@ -106,7 +106,7 @@ public class Rdist002ValidationUtilTest {
 				.withNavn(MOTTAKER_NAVN)
 				.withSamhandleridentifikator(MOTTAKER_ID);
 		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(null, mottaker));
-		assertEquals("no.nav.dokdistfordeling.endpoints.DistribuerJournalpostRequestTo.AdresseTo kan ikke være null. Fikk no.nav.dokdistfordeling.endpoints.DistribuerJournalpostRequestTo.AdresseTo=null", thrownException.getMessage());
+		assertEquals("For mottaker av type samhandler kan ikke adresse være null", thrownException.getMessage());
 	}
 
 	@Test

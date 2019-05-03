@@ -11,6 +11,7 @@ import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Adresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.AktoerId;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Distribusjonbestilling;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.DokumentInformasjon;
@@ -90,8 +91,8 @@ public class HentDokumenterFraJoarkMapper {
 			return new Person()
 					.withPersonidentifikator(bruker.getId());
 		} else if (BrukerIdType.AKTOERID.equals(bruker.getType())) {
-			return new Person()
-					.withPersonidentifikator(bruker.getId());
+			return new AktoerId()
+					.withAktoerId(bruker.getId());
 		} else {
 			return new Organisasjon()
 					.withOrgnummer(bruker.getId());

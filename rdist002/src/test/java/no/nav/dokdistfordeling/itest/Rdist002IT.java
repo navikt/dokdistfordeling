@@ -21,6 +21,7 @@ import no.nav.dokdistfordeling.config.Rdist002TestConfig;
 import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostResponseTo;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.AktoerId;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Distribusjonbestilling;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.DokumentInformasjon;
@@ -278,7 +279,7 @@ public class Rdist002IT {
 		assertEquals(TITTEL, qdist012Result.getForsendelseTittel());
 		assertArkivInformasjon(qdist012Result.getArkivInformasjon());
 		assertMottaker((Person) qdist012Result.getMottaker());
-		assertBruker((Person) qdist012Result.getBruker());
+		assertBruker((AktoerId) qdist012Result.getBruker());
 		assertEquals(DOKUMENTPRODAPP, qdist012Result.getDokumentProdApp());
 		assertDokumenter(qdist012Result.getDokumenter());
 	}
@@ -293,9 +294,9 @@ public class Rdist002IT {
 		assertEquals(MOTTAKER_NAVN, person.getNavn());
 	}
 
-	private void assertBruker(Person person) {
-		assertEquals(BRUKER_ID, person.getPersonidentifikator());
-		assertNull(person.getNavn());
+	private void assertBruker(AktoerId aktoer) {
+		assertEquals(BRUKER_ID, aktoer.getAktoerId());
+		assertNull(aktoer.getNavn());
 	}
 
 	private void assertNorskPostadresse(NorskPostadresse adresse) {

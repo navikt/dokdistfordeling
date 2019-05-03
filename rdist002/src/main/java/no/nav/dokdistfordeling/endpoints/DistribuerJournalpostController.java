@@ -60,8 +60,8 @@ public class DistribuerJournalpostController {
 			throw new BrukerManglerTilgangTilDokumentFunctionalException(String.format("bruker har ikke tilgang til noen av dokumentvariantene på journalposten med journalpostId=%s", distribuerJournalpostRequestTo.getJournalpostId()));
 
 		} catch (DokkatGetDokumenttypeInfoTechnicalException e) {
-			log.warn("rdist002 - Ugyldig dokumenttypeid på dokumentet for journalpost med journalpostid={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
-			throw new DokkatGetDokumenttypeInfoTechnicalException(String.format("Ugyldig dokumenttypeid på dokumentet for journalpost med journalpostid=%s", distribuerJournalpostRequestTo.getJournalpostId()));
+			log.warn("rdist002 - Ugyldig dokumenttypeid på hoveddokumentet for journalpost med journalpostid={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
+			throw new DokkatGetDokumenttypeInfoTechnicalException(String.format("Ugyldig dokumenttypeid på hoveddokumentet for journalpost med journalpostid=%s", distribuerJournalpostRequestTo.getJournalpostId()));
 
 		} catch (Exception e) {
 			log.warn("rdist002 - feilet ved distribusjon av journalpost med journalpostId={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
