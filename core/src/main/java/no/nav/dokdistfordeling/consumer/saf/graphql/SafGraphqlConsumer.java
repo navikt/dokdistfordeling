@@ -49,7 +49,7 @@ public class SafGraphqlConsumer {
 		this.graphQLurl = graphQLurl;
 	}
 
-	@Monitor(value = "dok_consumer", extraTags = {"process", "callSafJournalpostquery"}, histogram = true)
+	@Monitor(value = "dok_consumer", extraTags = {"process", "safJournalpostquery"}, histogram = true)
 	@Retryable(include = SafJournalpostQueryTechnicalException.class, maxAttempts = MAX_ATTEMPTS_SHORT, backoff = @Backoff(delay = DELAY_SHORT))
 	public Journalpost performQuery(GraphQLRequest graphQLRequest, String authorizationHeader) {
 
