@@ -4,9 +4,9 @@ import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
-import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTilSentralPrint;
 import no.nav.dokdistfordeling.qdist008.metrics.Qdist008MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.ValidationException;
@@ -91,7 +91,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.bean(forsendelseValidator)
 				.log(LoggingLevel.INFO, log, "qdist008 har validert forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} ok.")
 				.bean(qdist008Service)
-				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelseTilSentralPrint.class)))
+				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
 				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
 				.setHeader(CALL_ID, simple("${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}"))
 				.inOnly("jms:" + qdist009.getQueueName())
