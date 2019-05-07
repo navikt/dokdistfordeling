@@ -45,7 +45,7 @@
 		<micrometer.version>1.1.4</micrometer.version>
 		<spring-wiremock.version>1.2.5.RELEASE</spring-wiremock.version>
 		<wiremock-standalone.version>2.19.0</wiremock-standalone.version>
-		<melding-virksomhet-dokdistfordeling.version>2.0.2</melding-virksomhet-dokdistfordeling.version>
+		<melding-virksomhet-dokdistfordeling.version>2.0.4</melding-virksomhet-dokdistfordeling.version>
 		<io.springfox.version>2.9.2</io.springfox.version>
 	</properties>
 
