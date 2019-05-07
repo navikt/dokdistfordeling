@@ -13,7 +13,6 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.ValidationException;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.spring.SpringRouteBuilder;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -85,12 +84,8 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.routeId(SERVICE_ID)
 				.routePolicy(qdist008MetricsRoutePolicy)
 				.setExchangePattern(ExchangePattern.InOnly)
-				.doTry()
-				.setProperty(PROPERTY_BESTILLINGS_ID, xpath("//bestillingsId/text()", String.class))
+				.process(new IdsProcessor())
 				.log(LoggingLevel.INFO, log, "qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
-				.process(exchange -> MDC.put(CALL_ID, (String) exchange.getProperty(PROPERTY_BESTILLINGS_ID)))
-				.doCatch(Exception.class)
-				.end()
 				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist008/in/distribuerforsendelse.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
 				.bean(distribuerForsendelseMapper)
