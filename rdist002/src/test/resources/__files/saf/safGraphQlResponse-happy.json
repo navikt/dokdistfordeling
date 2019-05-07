@@ -33,15 +33,11 @@
           ]
         },
         {
-          "dokumentInfoId": "666666666",
+          "dokumentInfoId": "777777777",
           "tittel": "MASKERT_FELT",
           "brevkode": "000001",
           "dokumentstatus": "FERDIGSTILT",
           "dokumentvarianter": [
-            {
-              "saksbehandlerHarTilgang": true,
-              "variantformat": "SLADDET"
-            },
             {
               "saksbehandlerHarTilgang": true,
               "variantformat": "ARKIV"

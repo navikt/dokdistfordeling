@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling.unittest;
 
-import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
-import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ADRESSELINJE1;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ADRESSETYPE_NORSK;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.BATCH_ID;
@@ -15,17 +14,14 @@ import static no.nav.dokdistfordeling.unittest.UnitTestUtil.POSTNUMMER;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.POSTSTED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Bruker;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Dokumentvariant;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
-import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostRequestTo;
-import no.nav.dokdistfordeling.endpoints.Rdist002ValidationUtil;
+import no.nav.dokdistfordeling.DistribuerJournalpostRequestTo;
+import no.nav.dokdistfordeling.Rdist002ValidationUtil;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
-import no.nav.dokdistfordeling.kodeverk.Dokumentstatus;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
-import no.nav.dokdistfordeling.kodeverk.Journalstatus;
+import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import org.junit.jupiter.api.Assertions;
@@ -146,7 +142,7 @@ public class Rdist002ValidationUtilTest {
 	@Test
 	public void shouldThrowValidationExceptionFromWrongJournalpoststatus() {
 		Journalpost journalpost = unitTestUtil.createJournalpostBuilder()
-				.journalstatus(Journalstatus.EKSPEDERT)
+				.journalstatus(EKSPEDERT)
 				.build();
 		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("journalpoststatus er ikke som forventet, fikk: EKSPEDERT, men forventet FERDIGSTILT", thrownException.getMessage());
@@ -158,13 +154,13 @@ public class Rdist002ValidationUtilTest {
 				.bruker(null)
 				.build();
 		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
-		assertEquals("no.nav.dokdistfordeling.consumer.saf.journalpost.Bruker kan ikke være null. Fikk no.nav.dokdistfordeling.consumer.saf.journalpost.Bruker=null", thrownException.getMessage());
+		assertEquals("no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost.Bruker kan ikke være null. Fikk no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost.Bruker=null", thrownException.getMessage());
 	}
 
 	@Test
 	public void shouldThrowValidationExceptionFromBrukerIdIsNull() {
 		Journalpost journalpost = unitTestUtil.createJournalpostBuilder()
-				.bruker(new Bruker(null, BrukerIdType.FNR))
+				.bruker(Journalpost.Bruker.builder().id(null).type(BrukerIdType.FNR).build())
 				.build();
 		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("Feltet brukerId kan ikke være null eller tomt. Fikk brukerId=null", thrownException.getMessage());
@@ -173,7 +169,7 @@ public class Rdist002ValidationUtilTest {
 	@Test
 	public void shouldThrowValidationExceptionFromBrukerIdTypeIsNull() {
 		Journalpost journalpost = unitTestUtil.createJournalpostBuilder()
-				.bruker(new Bruker(BRUKER_ID, null))
+				.bruker(Journalpost.Bruker.builder().id(BRUKER_ID).type(null).build())
 				.build();
 		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("no.nav.dokdistfordeling.kodeverk.BrukerIdType kan ikke være null. Fikk no.nav.dokdistfordeling.kodeverk.BrukerIdType=null", thrownException.getMessage());
@@ -186,7 +182,7 @@ public class Rdist002ValidationUtilTest {
 				.avsenderMottaker(null)
 				.build();
 		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
-		assertEquals("no.nav.dokdistfordeling.consumer.saf.journalpost.AvsenderMottaker kan ikke være null. Fikk no.nav.dokdistfordeling.consumer.saf.journalpost.AvsenderMottaker=null", thrownException.getMessage());
+		assertEquals("no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost.AvsenderMottaker kan ikke være null. Fikk no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost.AvsenderMottaker=null", thrownException.getMessage());
 	}
 
 	@Test
@@ -225,7 +221,7 @@ public class Rdist002ValidationUtilTest {
 						unitTestUtil.createDokumentInfo2Builder().build()))
 				.build();
 		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
-		assertEquals("no.nav.dokdistfordeling.kodeverk.Dokumentstatus kan ikke være null. Fikk no.nav.dokdistfordeling.kodeverk.Dokumentstatus=null", thrownException.getMessage());
+		assertEquals("dokumentstatus er ikke som forventet, fikk: null, men forventet FERDIGSTILT", thrownException.getMessage());
 	}
 
 	@Test
@@ -233,7 +229,7 @@ public class Rdist002ValidationUtilTest {
 		Journalpost journalpost = unitTestUtil.createJournalpostBuilder()
 				.dokumenter(Arrays.asList(
 						unitTestUtil.createDokumentInfo1Builder()
-								.dokumentstatus(Dokumentstatus.UNDER_REDIGERING)
+								.dokumentstatus("UNDER_REDIGERING")
 								.build(),
 						unitTestUtil.createDokumentInfo2Builder().build()))
 				.build();
@@ -247,12 +243,13 @@ public class Rdist002ValidationUtilTest {
 				.dokumenter(Arrays.asList(
 						unitTestUtil.createDokumentInfo1Builder()
 								.dokumentvarianter(Arrays.asList(
-										Dokumentvariant.builder()
+
+										Journalpost.Dokumentvariant.builder()
 												.saksbehandlerHarTilgang(false)
-												.variantformat(ARKIV).build(),
-										Dokumentvariant.builder()
+												.variantformat(Variantformat.ARKIV).build(),
+										Journalpost.Dokumentvariant.builder()
 												.saksbehandlerHarTilgang(false)
-												.variantformat(SLADDET).build()))
+												.variantformat(Variantformat.SLADDET).build()))
 								.build(),
 						unitTestUtil.createDokumentInfo2Builder().build()))
 				.build();

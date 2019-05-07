@@ -1,12 +1,10 @@
-package no.nav.dokdistfordeling.endpoints;
+package no.nav.dokdistfordeling;
 
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.AvsenderMottaker;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.DokumentInfo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
@@ -50,8 +48,8 @@ public class DistribuerJournalpostService {
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
 		rdist002ValidationUtil.validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
 
-		List<DokumentInfo> dokumenter = journalpost.getDokumenter();
-		DokumentInfo hovedDokumentInfo = dokumenter.iterator().next();
+		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
+		Journalpost.DokumentInfo hovedDokumentInfo = dokumenter.iterator().next();
 
 		// brevkode for utgående dokumenter tilsvarer dokumenttypeid
 		dokumentkatalogAdmin.getDokumenttypeInfo(hovedDokumentInfo.getBrevkode());
@@ -69,7 +67,7 @@ public class DistribuerJournalpostService {
 		return id;
 	}
 
-	private Aktoer mapMottaker(AvsenderMottaker avsenderMottaker) {
+	private Aktoer mapMottaker(Journalpost.AvsenderMottaker avsenderMottaker) {
 		if (avsenderMottaker.getId().trim().length() == 11) {
 			return new Person()
 					.withNavn(avsenderMottaker.getNavn())

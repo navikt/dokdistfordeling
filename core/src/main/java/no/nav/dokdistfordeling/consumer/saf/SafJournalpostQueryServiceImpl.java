@@ -2,6 +2,7 @@ package no.nav.dokdistfordeling.consumer.saf;
 
 
 import no.nav.dokdistfordeling.consumer.saf.graphql.GraphQLRequest;
+import no.nav.dokdistfordeling.consumer.saf.graphql.JournalpostToMapper;
 import no.nav.dokdistfordeling.consumer.saf.graphql.SafGraphqlConsumer;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,7 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 					"  }\n" +
 					"}\n";
 	private final SafGraphqlConsumer safGraphqlConsumer;
+	private final JournalpostToMapper journalpostMapper = new JournalpostToMapper();
 
 	public SafJournalpostQueryServiceImpl(SafGraphqlConsumer safGraphqlConsumer) {
 		this.safGraphqlConsumer = safGraphqlConsumer;
@@ -45,10 +47,10 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 
 	public Journalpost hentJournalpost(String journalpostid, String authorizationHeader) {
 
-		return safGraphqlConsumer.performQuery(GraphQLRequest.builder()
+		return journalpostMapper.map(safGraphqlConsumer.performQuery(GraphQLRequest.builder()
 				.query(JOURNALPOST_QUERY)
 				.operationName("journalpost")
 				.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
-				.build(), authorizationHeader);
+				.build(), authorizationHeader));
 	}
 }

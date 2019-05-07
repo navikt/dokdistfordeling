@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.endpoints;
+package no.nav.dokdistfordeling;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

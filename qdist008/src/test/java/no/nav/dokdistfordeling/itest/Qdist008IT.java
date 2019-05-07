@@ -237,12 +237,12 @@ public class Qdist008IT {
 	@Test
 	public void shouldThrowForsendelseMapperException() throws Exception {
 
-		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_mapperfail_bad_tema.xml"));
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_mapperfail_bad_arkivsystemkode.xml"));
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			String resultOnQdist008FunksjonellFeilQueue = receive(qdist008FunksjonellFeil);
 			assertNotNull(resultOnQdist008FunksjonellFeilQueue);
-			assertEquals(resultOnQdist008FunksjonellFeilQueue, classpathToString("qdist008/distribuerforsendelse_example_mapperfail_bad_tema.xml"));
+			assertEquals(resultOnQdist008FunksjonellFeilQueue, classpathToString("qdist008/distribuerforsendelse_example_mapperfail_bad_arkivsystemkode.xml"));
 		});
 	}
 

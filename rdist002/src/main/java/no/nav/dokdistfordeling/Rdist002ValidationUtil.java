@@ -1,20 +1,16 @@
-package no.nav.dokdistfordeling.endpoints;
+package no.nav.dokdistfordeling;
 
-import static no.nav.dokdistfordeling.endpoints.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
-import static no.nav.dokdistfordeling.endpoints.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
+import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
+import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
 
-import no.nav.dokdistfordeling.consumer.saf.journalpost.AvsenderMottaker;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Bruker;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.DokumentInfo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
-import no.nav.dokdistfordeling.kodeverk.Dokumentstatus;
-import no.nav.dokdistfordeling.kodeverk.Journalstatus;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
@@ -23,7 +19,6 @@ import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.informasj
 public class Rdist002ValidationUtil {
 
 	private static final String UTGAAENDE = JournalpostType.U.name();
-	private static final String FERDIGSTILT = Journalstatus.FERDIGSTILT.name();
 
 	public void validateRequest(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
 		assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
@@ -32,10 +27,8 @@ public class Rdist002ValidationUtil {
 	}
 
 	public void validateAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo, Aktoer mottaker) {
-		if (mottaker instanceof Samhandler) {
-			if (adresseTo == null) {
-				throw new ValidationException("For mottaker av type samhandler kan ikke adresse være null");
-			}
+		if (mottaker instanceof Samhandler && adresseTo == null) {
+			throw new ValidationException("For mottaker av type samhandler kan ikke adresse være null");
 		}
 
 		if (adresseTo != null) {
@@ -58,14 +51,13 @@ public class Rdist002ValidationUtil {
 	public void validateJournalpostAndDokumenter(Journalpost journalpost) {
 		assertNotNull(JournalpostType.class, journalpost.getJournalposttype());
 		assertParameterIsAsExpected("journalposttype", journalpost.getJournalposttype().name(), UTGAAENDE);
-		assertNotNull(Journalstatus.class, journalpost.getJournalstatus());
-		assertParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus().name(), FERDIGSTILT);
+		assertParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus(), FERDIGSTILT);
 
-		assertNotNull(Bruker.class, journalpost.getBruker());
+		assertNotNull(Journalpost.Bruker.class, journalpost.getBruker());
 		assertNotNullOrEmpty("brukerId", journalpost.getBruker().getId());
 		assertNotNull(BrukerIdType.class, journalpost.getBruker().getType());
 
-		assertNotNull(AvsenderMottaker.class, journalpost.getAvsenderMottaker());
+		assertNotNull(Journalpost.AvsenderMottaker.class, journalpost.getAvsenderMottaker());
 		assertNotNullOrEmpty("mottakerId", journalpost.getAvsenderMottaker().getId());
 
 		validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
@@ -73,16 +65,15 @@ public class Rdist002ValidationUtil {
 		journalpost.getDokumenter().forEach(this::validateDokumentInfo);
 	}
 
-	private void validateHovedDokumentInfo(DokumentInfo dokumentInfo) {
+	private void validateHovedDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
 		assertNotNullOrEmpty("tittel", dokumentInfo.getTittel());
 		assertNotNullOrEmpty("brevkode", dokumentInfo.getBrevkode());
 	}
 
-	private void validateDokumentInfo(DokumentInfo dokumentInfo) {
-		assertNotNull(Dokumentstatus.class, dokumentInfo.getDokumentstatus());
-		assertParameterIsAsExpected("dokumentstatus", dokumentInfo.getDokumentstatus().name(), FERDIGSTILT);
+	private void validateDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
+		assertParameterIsAsExpected("dokumentstatus", dokumentInfo.getDokumentstatus(), FERDIGSTILT);
 
-		if (dokumentInfo.getDokumentvarianter().stream().noneMatch(dokInfo -> dokInfo.isSaksbehandlerHarTilgang() && (dokInfo.getVariantformat() == Variantformat.ARKIV || dokInfo.getVariantformat() == Variantformat.SLADDET))) {
+		if (dokumentInfo.getDokumentvarianter().stream().noneMatch(dokInfo -> dokInfo.isSaksbehandlerHarTilgang() && (Variantformat.ARKIV.equals(dokInfo.getVariantformat()) || Variantformat.SLADDET.equals(dokInfo.getVariantformat())))) {
 			throw new BrukerManglerTilgangTilDokumentFunctionalException("ingen variantformater av dokumentet med tilgang for saksbehandler ble funnet.");
 		}
 	}

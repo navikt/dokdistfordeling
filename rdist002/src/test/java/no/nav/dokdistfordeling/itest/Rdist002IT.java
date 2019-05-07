@@ -1,14 +1,23 @@
 package no.nav.dokdistfordeling.itest;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
-import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ARKIV_SYSTEM;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOK_INFO_ID_1;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOK_INFO_ID_2;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
@@ -17,10 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import no.nav.dokdistfordeling.DistribuerJournalpostRequestTo;
+import no.nav.dokdistfordeling.DistribuerJournalpostResponseTo;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
 import no.nav.dokdistfordeling.crypto.Crypto;
-import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostRequestTo;
-import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostResponseTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.AktoerId;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Distribusjonbestilling;
@@ -30,8 +40,10 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.NorskPostadresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.UtenlandskPostadresse;
 import org.apache.http.entity.ContentType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -85,12 +97,10 @@ public class Rdist002IT {
 	private static final String DOKUMENTPRODAPP = "dokumentprodapp";
 
 	private static final String DOKUMENTTYPEID = "000001";
-	private static final String TITTEL = "journalpostTittel";
 	private static final String TEMA = "OPP";
 	private static final String MOTTAKER_ID = "***gammelt_fnr***";
 	private static final String MOTTAKER_NAVN = "Jan Neimansen";
 	private static final String BRUKER_ID = "***gammelt_fnr***";
-	private static final String DOKUMENT_INFO_ID = "666666666";
 
 	private @Value("${hentdokumenter_fra_joark_crypto_password}")
 	String encryptionPassphrase;
@@ -103,6 +113,14 @@ public class Rdist002IT {
 
 	@Inject
 	protected TestRestTemplate restTemplate;
+
+	@BeforeEach
+	public void setupBefore() {
+		WireMock.reset();
+		WireMock.resetAllRequests();
+		WireMock.removeAllMappings();
+	}
+
 
 	@Test
 	public void distribuerJournalpostHappyPath() {
@@ -129,6 +147,9 @@ public class Rdist002IT {
 			assertQdist012Result(qdist012Result.getDistribusjonbestilling(), restResponse.getBestillingsId());
 			assertNorskPostadresse((NorskPostadresse) qdist012Result.getDistribusjonbestilling().getAdresse());
 		});
+
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	@Test
@@ -155,6 +176,9 @@ public class Rdist002IT {
 			assertNotNull(qdist012Result);
 			assertQdist012Result(qdist012Result.getDistribusjonbestilling(), restResponse.getBestillingsId());
 		});
+
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	@Test
@@ -182,6 +206,9 @@ public class Rdist002IT {
 			assertQdist012Result(qdist012Result.getDistribusjonbestilling(), restResponse.getBestillingsId());
 			assertUtenlandskPostadresse((UtenlandskPostadresse) qdist012Result.getDistribusjonbestilling().getAdresse());
 		});
+
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	@Test
@@ -212,6 +239,8 @@ public class Rdist002IT {
 
 		assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
 		assertNull(responseEntity.getBody().getBestillingsId());
+
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
 	}
 
 	@Test
@@ -225,6 +254,7 @@ public class Rdist002IT {
 
 		assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
 		assertNull(responseEntity.getBody().getBestillingsId());
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
 	}
 
 	@Test
@@ -237,6 +267,7 @@ public class Rdist002IT {
 
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
 		assertNull(responseEntity.getBody().getBestillingsId());
+		verify(exactly(3), postRequestedFor(urlEqualTo("/safgraphql")));
 	}
 
 	@Test
@@ -250,6 +281,7 @@ public class Rdist002IT {
 
 		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 		assertNull(responseEntity.getBody().getBestillingsId());
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
 	}
 
 
@@ -267,6 +299,8 @@ public class Rdist002IT {
 
 		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 		assertNull(responseEntity.getBody().getBestillingsId());
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
+		verify(exactly(3), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	private void assertQdist012Result(Distribusjonbestilling qdist012Result, String restResponseBestillingsId) {
@@ -276,7 +310,6 @@ public class Rdist002IT {
 		assertEquals(BATCHID, qdist012Result.getBatchId());
 		assertEquals(BESTILLENDEFAGSYSTEM, qdist012Result.getBestillendeFagsystem());
 		assertEquals(TEMA, qdist012Result.getTema());
-		assertEquals(TITTEL, qdist012Result.getForsendelseTittel());
 		assertArkivInformasjon(qdist012Result.getArkivInformasjon());
 		assertMottaker((Person) qdist012Result.getMottaker());
 		assertBruker((AktoerId) qdist012Result.getBruker());
@@ -286,7 +319,7 @@ public class Rdist002IT {
 
 	private void assertArkivInformasjon(ArkivInformasjon arkivInformasjon) {
 		assertEquals(JOURNALPOST_ID, arkivInformasjon.getArkivId());
-		assertEquals(TEMA, arkivInformasjon.getArkivSystem());
+		assertEquals(ARKIV_SYSTEM, arkivInformasjon.getArkivSystem());
 	}
 
 	private void assertMottaker(Person person) {
@@ -323,18 +356,16 @@ public class Rdist002IT {
 		dokumenter.forEach(dokumentInformasjon -> {
 			if (HOVEDDOKUMENT.name().equals(dokumentInformasjon.getTilknyttetSom())) {
 				assertEquals(dokumentInformasjon.getRekkefolge(), 1);
+				assertEquals(SLADDET, dokumentInformasjon.getVariantFormat());
+				assertEquals(DOK_INFO_ID_1, dokumentInformasjon.getArkivDokumentInfoId());
 			} else {
 				assertThat(dokumentInformasjon.getRekkefolge(), greaterThan(1));
 				assertEquals(VEDLEGG.name(), dokumentInformasjon.getTilknyttetSom());
+				assertEquals(ARKIV, dokumentInformasjon.getVariantFormat());
+				assertEquals(DOK_INFO_ID_2, dokumentInformasjon.getArkivDokumentInfoId());
 			}
-			assertSladdetDokument(dokumentInformasjon);
+			assertEquals(DOKUMENTTYPEID, dokumentInformasjon.getDokumenttypeId());
 		});
-	}
-
-	private void assertSladdetDokument(DokumentInformasjon dokument) {
-		assertEquals(DOKUMENTTYPEID, dokument.getDokumenttypeId());
-		assertEquals(DOKUMENT_INFO_ID, dokument.getArkivDokumentInfoId());
-		assertEquals(SLADDET.name(), dokument.getVariantFormat());
 	}
 
 	private ResponseEntity<DistribuerJournalpostResponseTo> callDistribuerJournalpost(HttpEntity requestEntity) {

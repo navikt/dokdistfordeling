@@ -1,19 +1,12 @@
 package no.nav.dokdistfordeling.unittest;
 
-import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
-import static no.nav.dokdistfordeling.kodeverk.Variantformat.PRODUKSJON;
-import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
 
-import no.nav.dokdistfordeling.consumer.saf.journalpost.AvsenderMottaker;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Bruker;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.DokumentInfo;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Dokumentvariant;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
-import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostRequestTo;
+import no.nav.dokdistfordeling.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
-import no.nav.dokdistfordeling.kodeverk.Dokumentstatus;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
-import no.nav.dokdistfordeling.kodeverk.Journalstatus;
+import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 
 import java.util.Arrays;
@@ -22,7 +15,6 @@ import java.util.List;
 public class UnitTestUtil {
 
 	public static final Journalposttype JOURNALPOST_TYPE = Journalposttype.U;
-	public static final Journalstatus JP_FERDIGSTILT = Journalstatus.FERDIGSTILT;
 	public static final String DOK_TITTEL_1 = "DOK_TITTEL_1";
 	public static final String DOK_TITTEL_2 = "DOK_TITTEL_2";
 	public static final String BREVKODE = "000001";
@@ -42,10 +34,10 @@ public class UnitTestUtil {
 	public static final String DOKUMENTTYPEID = "000001";
 	public static final String TITTEL = "journalpostTittel";
 	public static final String TEMA = "OPP";
+	public static final String ARKIV_SYSTEM = "JOARK";
 	public static final String MOTTAKER_ID = "***gammelt_fnr***";
 	public static final String MOTTAKER_NAVN = "Jan Neimansen";
 	public static final String BRUKER_ID = "***gammelt_fnr***";
-	public static final String BRUKER_NAVN = "***gammelt_fnr***";
 	public static final String ORGNR = "776677665";
 	public static final String ORG_NAVN = "eksempelcorp ASA";
 	public static final String SAMHANDLER_KATOGORI = "HPR";
@@ -59,7 +51,7 @@ public class UnitTestUtil {
 	public Journalpost.JournalpostBuilder createJournalpostBuilder() {
 		return Journalpost.builder()
 				.journalposttype(JOURNALPOST_TYPE)
-				.journalstatus(JP_FERDIGSTILT)
+				.journalstatus(FERDIGSTILT)
 				.tema(TEMA)
 				.tittel(TITTEL)
 				.bruker(createBrukerWithFNR())
@@ -67,23 +59,23 @@ public class UnitTestUtil {
 				.dokumenter(createDefaultDokumentInfoList());
 	}
 
-	private AvsenderMottaker createAvsenderMottaker() {
-		return AvsenderMottaker.builder()
+	private Journalpost.AvsenderMottaker createAvsenderMottaker() {
+		return Journalpost.AvsenderMottaker.builder()
 				.id(MOTTAKER_ID)
 				.navn(MOTTAKER_NAVN)
 				.build();
 	}
 
-	public Bruker createBrukerWithFNR() {
-		return new Bruker(BRUKER_NAVN, BrukerIdType.FNR);
+	public Journalpost.Bruker createBrukerWithFNR() {
+		return Journalpost.Bruker.builder().id(BRUKER_ID).type(BrukerIdType.FNR).build();
 	}
 
-	public Bruker createBrukerWithOrgnrId() {
-		return new Bruker(ORGNR, BrukerIdType.ORGNR);
+	public Journalpost.Bruker createBrukerWithOrgnrId() {
+		return Journalpost.Bruker.builder().id(ORGNR).type(BrukerIdType.ORGNR).build();
 	}
 
-	public Bruker createBrukerWithSamhandlerId() {
-		return new Bruker(SAMHANDLER_ID, BrukerIdType.AKTOERID);
+	public Journalpost.Bruker createBrukerWithSamhandlerId() {
+		return Journalpost.Bruker.builder().id(SAMHANDLER_ID).type(BrukerIdType.AKTOERID).build();
 	}
 
 	private Person createPersonMottaker() {
@@ -92,41 +84,35 @@ public class UnitTestUtil {
 				.withNavn(MOTTAKER_NAVN);
 	}
 
-	public List<DokumentInfo> createDefaultDokumentInfoList() {
+	public List<Journalpost.DokumentInfo> createDefaultDokumentInfoList() {
 		return Arrays.asList(
 				createDokumentInfo1Builder().build(),
 				createDokumentInfo2Builder().build());
 	}
 
-	public DokumentInfo.DokumentInfoBuilder createDokumentInfo1Builder() {
-		return DokumentInfo.builder()
+	public Journalpost.DokumentInfo.DokumentInfoBuilder createDokumentInfo1Builder() {
+		return Journalpost.DokumentInfo.builder()
 				.dokumentInfoId(DOK_INFO_ID_1)
 				.tittel(DOK_TITTEL_1)
 				.brevkode(BREVKODE)
-				.dokumentstatus(Dokumentstatus.FERDIGSTILT)
-				.dokumentvarianter(Arrays.asList(Dokumentvariant.builder()
+				.dokumentstatus(FERDIGSTILT)
+				.dokumentvarianter(Arrays.asList(Journalpost.Dokumentvariant.builder()
 								.saksbehandlerHarTilgang(false)
-								.variantformat(ARKIV).build(),
-						Dokumentvariant.builder()
+								.variantformat(Variantformat.ARKIV).build(),
+						Journalpost.Dokumentvariant.builder()
 								.saksbehandlerHarTilgang(true)
-								.variantformat(SLADDET).build(),
-						Dokumentvariant.builder()
-								.saksbehandlerHarTilgang(true)
-								.variantformat(PRODUKSJON).build()));
+								.variantformat(Variantformat.SLADDET).build()));
 	}
 
-	public DokumentInfo.DokumentInfoBuilder createDokumentInfo2Builder() {
-		return DokumentInfo.builder()
+	public Journalpost.DokumentInfo.DokumentInfoBuilder createDokumentInfo2Builder() {
+		return Journalpost.DokumentInfo.builder()
 				.dokumentInfoId(DOK_INFO_ID_2)
 				.tittel(DOK_TITTEL_2)
 				.brevkode(BREVKODE)
-				.dokumentstatus(Dokumentstatus.FERDIGSTILT)
-				.dokumentvarianter(Arrays.asList(Dokumentvariant.builder()
-								.saksbehandlerHarTilgang(true)
-								.variantformat(ARKIV).build(),
-						Dokumentvariant.builder()
-								.saksbehandlerHarTilgang(true)
-								.variantformat(PRODUKSJON).build()));
+				.dokumentstatus(FERDIGSTILT)
+				.dokumentvarianter(Arrays.asList(Journalpost.Dokumentvariant.builder()
+						.saksbehandlerHarTilgang(true)
+						.variantformat(Variantformat.ARKIV).build()));
 	}
 
 	public DistribuerJournalpostRequestTo.AdresseTo createNorskPostadresse() {

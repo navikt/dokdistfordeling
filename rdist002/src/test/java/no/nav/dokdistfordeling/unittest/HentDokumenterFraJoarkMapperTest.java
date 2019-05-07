@@ -2,14 +2,15 @@ package no.nav.dokdistfordeling.unittest;
 
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
-import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
-import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ADRESSELINJE1;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ADRESSELINJE2;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ADRESSELINJE3;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ARKIV_SYSTEM;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.BATCH_ID;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.BESTILLENDEFAGSYSTEM;
-import static no.nav.dokdistfordeling.unittest.UnitTestUtil.BRUKER_NAVN;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.BRUKER_ID;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOKUMENTPRODAPP;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOKUMENTTYPEID;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOK_INFO_ID_1;
@@ -34,8 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostRequestTo;
-import no.nav.dokdistfordeling.endpoints.HentDokumenterFraJoarkMapper;
+import no.nav.dokdistfordeling.DistribuerJournalpostRequestTo;
+import no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Distribusjonbestilling;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.DokumentInformasjon;
@@ -139,13 +140,13 @@ public class HentDokumenterFraJoarkMapperTest {
 		dokumenter.forEach(dokument -> {
 			if (HOVEDDOKUMENT.name().equals(dokument.getTilknyttetSom())) {
 				assertEquals(dokument.getRekkefolge(), 1);
-				assertEquals(SLADDET.name(), dokument.getVariantFormat());
+				assertEquals(SLADDET, dokument.getVariantFormat());
 				assertEquals(DOK_INFO_ID_1, dokument.getArkivDokumentInfoId());
 
 			} else {
 				assertThat(dokument.getRekkefolge(), greaterThan(1));
 				assertEquals(VEDLEGG.name(), dokument.getTilknyttetSom());
-				assertEquals(ARKIV.name(), dokument.getVariantFormat());
+				assertEquals(ARKIV, dokument.getVariantFormat());
 				assertEquals(DOK_INFO_ID_2, dokument.getArkivDokumentInfoId());
 			}
 			assertEquals(DOKUMENTTYPEID, dokument.getDokumenttypeId());
@@ -155,26 +156,23 @@ public class HentDokumenterFraJoarkMapperTest {
 
 	private void assertArkivinformasjon(ArkivInformasjon arkivInformasjon) {
 		assertEquals(JOURNALPOST_ID, arkivInformasjon.getArkivId());
-		assertEquals(TEMA, arkivInformasjon.getArkivSystem());
+		assertEquals(ARKIV_SYSTEM, arkivInformasjon.getArkivSystem());
 	}
 
 	private void assertPersonBruker(Person bruker) {
-		assertEquals(BRUKER_NAVN, bruker.getPersonidentifikator());
+		assertEquals(BRUKER_ID, bruker.getPersonidentifikator());
 		assertNull(bruker.getNavn());
-//		assertEquals(BRUKER_NAVN, bruker.getNavn());
 	}
 
 	private void assertOrganisasjonBruker(Organisasjon bruker) {
 		assertEquals(ORGNR, bruker.getOrgnummer());
 		assertNull(bruker.getNavn());
-//		assertEquals(ORG_NAVN, bruker.getNavn());
 	}
 
 	private void assertSamhandlerBruker(Samhandler bruker) {
 		assertEquals(SAMHANDLER_ID, bruker.getSamhandleridentifikator());
 		assertEquals(SAMHANDLER_KATOGORI, bruker.getSamhandlerkategori());
 		assertNull(bruker.getNavn());
-//		assertEquals(SAMHANDLER_NAVN, bruker.getNavn());
 	}
 
 	private void assertPersonMottaker(Person mottaker) {

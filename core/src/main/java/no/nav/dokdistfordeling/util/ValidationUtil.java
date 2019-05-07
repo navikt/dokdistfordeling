@@ -23,7 +23,7 @@ public final class ValidationUtil {
 	}
 
 	public static void assertParameterIsAsExpected(String parameterName, String value, String expected) {
-		if (!value.equals(expected)) {
+		if (!expected.equals(value)) {
 			throw new ValidationException(String.format("%s er ikke som forventet, fikk: %s, men forventet %s", parameterName, value, expected));
 		}
 	}

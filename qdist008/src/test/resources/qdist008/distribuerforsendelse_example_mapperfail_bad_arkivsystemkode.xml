@@ -4,10 +4,10 @@
 		<!--Optional:-->
 		<batchId>batchId</batchId>
 		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
-		<tema>DetteErJoIkkeEtTemaDa</tema>
+		<tema>SYM</tema>
 		<!--Optional:-->
 		<arkivInformasjon>
-			<arkivSystem>JOARK</arkivSystem>
+			<arkivSystem>Skynet</arkivSystem>
 			<arkivId>1234</arkivId>
 		</arkivInformasjon>
 		<mottaker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
