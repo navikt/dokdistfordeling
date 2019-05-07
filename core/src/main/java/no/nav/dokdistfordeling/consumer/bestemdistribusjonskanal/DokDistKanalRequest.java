@@ -15,4 +15,5 @@ public class DokDistKanalRequest {
 	private String dokumentTypeId;
 	private String mottakerType;
 	private String brukerId;
+	private boolean erArkivert;
 }

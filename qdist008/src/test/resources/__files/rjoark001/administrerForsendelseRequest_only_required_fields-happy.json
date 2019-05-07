@@ -1,0 +1,23 @@
+{
+  "bestillingsId" : "7882d37e-34f7-11e9-b210-d663bd873d93",
+  "distribusjonsKanal" : "PRINT",
+  "bestillendeFagsystem" : "bestillendeFagsystem",
+  "tema" : "FS22",
+  "forsendelseTittel" : "Innkalling til informasjonsmoete",
+  "batchId" : null,
+  "dokumentProdApp" : "token",
+  "mottaker" : {
+    "mottakerId" : "***gammelt_fnr***",
+    "mottakerNavn" : "Bjarne Betjent",
+    "mottakerType" : "PERSON"
+  },
+  "arkivInformasjon" : null,
+  "postadresse" : null,
+  "dokumenter" : [ {
+    "tilknyttetSom" : "HOVEDDOKUMENT",
+    "dokumentObjektReferanse" : "testKey",
+    "rekkefolge" : 1,
+    "arkivDokumentInfoId" : null,
+    "dokumenttypeId" : "1111111"
+  } ]
+}
