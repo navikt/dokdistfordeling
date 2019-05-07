@@ -1,5 +1,6 @@
 package no.nav.dokdistfordeling.qdist008;
 
+import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
 import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist008Metrics;
@@ -9,17 +10,17 @@ import static org.springframework.util.StringUtils.isEmpty;
 import no.nav.dokdistfordeling.consumer.aktoerv2.AktoerV2;
 import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanal;
-import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTilSentralPrint;
-import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
+import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
+import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
+import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseResponseTo;
 import no.nav.dokdistfordeling.consumer.tjoark110.ArkiverDokumentproduksjon;
 import no.nav.dokdistfordeling.consumer.tjoark110.SettJournalpostAttributterRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
-import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
-import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
-import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseResponseTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTilSentralPrint;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.dokdistfordeling.qdist008.domain.PersisterForsendelseToRequestMapper;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
@@ -69,6 +70,7 @@ public class Qdist008Service {
 				getDokumenttypeIdHoveddokument(distribusjonbestilling),
 				distribusjonbestilling.getMottaker().getAktoerType(),
 				getIdentifikator(distribusjonbestilling.getBruker(), brukerHentIdentForAktoerIdResponseTo));
+		exchange.setProperty(PROPERTY_DISTRIBUSJONSKANAL, distribusjonsKanal);
 
 		final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
 				.map(distribusjonbestilling, dokumenttypeInfoTo, mottakerHentIdentForAktoerIdResponseTo, distribusjonsKanal);
