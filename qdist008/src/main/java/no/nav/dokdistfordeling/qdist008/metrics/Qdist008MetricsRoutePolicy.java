@@ -27,8 +27,8 @@ public class Qdist008MetricsRoutePolicy extends RoutePolicySupport {
 	private final MeterRegistry registry;
 	private Timer.Sample timer;
 
-	private static final String EXCEPTION_COUNTER = "dok_route_exception_total";
-	private static final String QDIST008_PROCESS_TIMER = "dok_request_latency_histogram";
+	private static final String EXCEPTION_COUNTER = "dok_metric_exception_total";
+	private static final String QDIST008_PROCESS_TIMER = "dok_route_latency_histogram";
 	private static final String QDIST008_PROCESS_TIMER_DESCRIPTION = "prosesseringstid for kall inn til qdist008";
 	private static final String QDIST008_START = "Qdist008_start";
 

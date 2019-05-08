@@ -6,7 +6,7 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SettJournalpostAttributterTechnicalException;
-import no.nav.dokdistfordeling.metrics.Monitor;
+import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.ArkiverDokumentproduksjonV1;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.meldinger.SettJournalpostAttributterRequest;
 import org.springframework.retry.annotation.Backoff;
@@ -27,7 +27,7 @@ public class SettJournalpostAttributterConsumer implements ArkiverDokumentproduk
 		this.arkiverDokumentproduksjonV1 = arkiverDokumentproduksjonV1;
 	}
 
-	@Monitor(value = "dok_consumer", extraTags = {"process", "settJournalpostAttributter"}, histogram = true)
+	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "settJournalpostAttributter"}, histogram = true)
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void settJournalpostAttributter(final SettJournalpostAttributterRequestTo settJournalpostAttributterRequestTo, String endretAvNavn) {
 		try {

@@ -7,7 +7,7 @@ import no.nav.dokdistfordeling.consumer.sts.StsRestConsumer;
 import no.nav.dokdistfordeling.exception.functional.SafHentDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafHentDokumentTechnicalException;
-import no.nav.dokdistfordeling.metrics.Monitor;
+import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -47,7 +47,7 @@ public class HentDokumentConsumer implements HentDokument {
 				.build();
 	}
 
-	@Monitor(value = "dok_consumer", extraTags = {"process", "hentDokument"}, histogram = true)
+	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "hentDokument"}, histogram = true)
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public HentDokumentResponseTo hentDokument(String journalpostId, String dokumentInfoId, String variantFormat) {
 		try {
