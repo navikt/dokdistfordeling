@@ -2,12 +2,11 @@ package no.nav.dokdistfordeling.unittest;
 
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
 
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.DistribuerJournalpostRequestTo;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +47,7 @@ public class UnitTestUtil {
 	public static final String BESTILLENDEFAGSYSTEM = "bestillendeFagsystem";
 	public static final String DOKUMENTPRODAPP = "dokumentprodapp";
 
-	public Journalpost.JournalpostBuilder createJournalpostBuilder() {
+	public static Journalpost.JournalpostBuilder createJournalpostBuilder() {
 		return Journalpost.builder()
 				.journalposttype(JOURNALPOST_TYPE)
 				.journalstatus(FERDIGSTILT)
@@ -59,18 +58,18 @@ public class UnitTestUtil {
 				.dokumenter(createDefaultDokumentInfoList());
 	}
 
-	private Journalpost.AvsenderMottaker createAvsenderMottaker() {
+	private static Journalpost.AvsenderMottaker createAvsenderMottaker() {
 		return Journalpost.AvsenderMottaker.builder()
 				.id(MOTTAKER_ID)
 				.navn(MOTTAKER_NAVN)
 				.build();
 	}
 
-	public Journalpost.Bruker createBrukerWithFNR() {
+	public static Journalpost.Bruker createBrukerWithFNR() {
 		return Journalpost.Bruker.builder().id(BRUKER_ID).type(BrukerIdType.FNR).build();
 	}
 
-	public Journalpost.Bruker createBrukerWithOrgnrId() {
+	public static Journalpost.Bruker createBrukerWithOrgnrId() {
 		return Journalpost.Bruker.builder().id(ORGNR).type(BrukerIdType.ORGNR).build();
 	}
 
@@ -78,19 +77,13 @@ public class UnitTestUtil {
 		return Journalpost.Bruker.builder().id(SAMHANDLER_ID).type(BrukerIdType.AKTOERID).build();
 	}
 
-	private Person createPersonMottaker() {
-		return new Person()
-				.withPersonidentifikator(MOTTAKER_ID)
-				.withNavn(MOTTAKER_NAVN);
-	}
-
-	public List<Journalpost.DokumentInfo> createDefaultDokumentInfoList() {
+	public static List<Journalpost.DokumentInfo> createDefaultDokumentInfoList() {
 		return Arrays.asList(
 				createDokumentInfo1Builder().build(),
 				createDokumentInfo2Builder().build());
 	}
 
-	public Journalpost.DokumentInfo.DokumentInfoBuilder createDokumentInfo1Builder() {
+	public static Journalpost.DokumentInfo.DokumentInfoBuilder createDokumentInfo1Builder() {
 		return Journalpost.DokumentInfo.builder()
 				.dokumentInfoId(DOK_INFO_ID_1)
 				.tittel(DOK_TITTEL_1)
@@ -104,7 +97,7 @@ public class UnitTestUtil {
 								.variantformat(Variantformat.SLADDET).build()));
 	}
 
-	public Journalpost.DokumentInfo.DokumentInfoBuilder createDokumentInfo2Builder() {
+	public static Journalpost.DokumentInfo.DokumentInfoBuilder createDokumentInfo2Builder() {
 		return Journalpost.DokumentInfo.builder()
 				.dokumentInfoId(DOK_INFO_ID_2)
 				.tittel(DOK_TITTEL_2)
@@ -115,19 +108,19 @@ public class UnitTestUtil {
 						.variantformat(Variantformat.ARKIV).build()));
 	}
 
-	public DistribuerJournalpostRequestTo.AdresseTo createNorskPostadresse() {
+	public static DistribuerJournalpostRequestTo.AdresseTo createNorskPostadresse() {
 		return new DistribuerJournalpostRequestTo.AdresseTo(
 				ADRESSETYPE_NORSK,
 				POSTNUMMER,
 				POSTSTED,
 				ADRESSELINJE1,
-				null,
-				null,
+				ADRESSELINJE2,
+				ADRESSELINJE3,
 				LAND_NO
 		);
 	}
 
-	public DistribuerJournalpostRequestTo.AdresseTo createUtenlandskPostadresse() {
+	public static DistribuerJournalpostRequestTo.AdresseTo createUtenlandskPostadresse() {
 		return new DistribuerJournalpostRequestTo.AdresseTo(
 				ADRESSETYPE_UTENLANDSK,
 				null,

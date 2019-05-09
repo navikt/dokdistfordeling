@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.itest;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
@@ -10,6 +11,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
@@ -35,20 +37,20 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.AktoerId;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Distribusjonbestilling;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.DokumentInformasjon;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.NorskPostadresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.UtenlandskPostadresse;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -64,10 +66,9 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Queue;
 import javax.jms.TextMessage;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.StringReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -79,7 +80,7 @@ import java.util.concurrent.TimeUnit;
 @ActiveProfiles("itest")
 public class Rdist002IT {
 
-	private static final String TEMP_OIDC_TOKEN = "eyAidHlwIjogIkpXVCIsICJraWQiOiAiMWwySmtDb1RMMTBibWVBeHlsZzR4Umk4ajJZPSIsICJhbGciOiAiUlMyNTYiIH0.eyAiYXRfaGFzaCI6ICJ4RklSS0dpTWZ4ZFVPS3c0ZmQ4MW9BIiwgInN1YiI6ICJaOTkyMzEwIiwgImF1ZGl0VHJhY2tpbmdJZCI6ICJiZDdlYWE0ZC1mYzIzLTQ2ZGMtOGRjZi1iMjJmNzU1NDExZjQtMjAyMDc5MzQiLCAiaXNzIjogImh0dHBzOi8vaXNzby1xLmFkZW8ubm86NDQzL2lzc28vb2F1dGgyIiwgInRva2VuTmFtZSI6ICJpZF90b2tlbiIsICJhdWQiOiAiaWRhLXEiLCAiY19oYXNoIjogInctbGx3ZlJMenVpRFBselpkY1BhenciLCAib3JnLmZvcmdlcm9jay5vcGVuaWRjb25uZWN0Lm9wcyI6ICIyZmNlNWU1ZS02ODdjLTQ5ZmYtOTRjYS1jNzE2OGVmY2M2MmQiLCAiYXpwIjogImlkYS1xIiwgImF1dGhfdGltZSI6IDE1NTUwNzQ3NjcsICJyZWFsbSI6ICIvIiwgImV4cCI6IDE1NTUwNzgzNjcsICJ0b2tlblR5cGUiOiAiSldUVG9rZW4iLCAiaWF0IjogMTU1NTA3NDc2NyB9.orrUotLp8SMkCpigVhkAUlw9Rx5tigBrYNVv3j8fTmkIe-I1MEI0xctxM-tnLbrgcW3I-3Ye_bkS4KplhR4spnG9hT45L1dD-yoLsu8R6cD1PklMsx8m93XmaTHDReGZAI3uKO4KSPcQHyVE7-tIc6CWYqbVXWmEUxUsHNYm3bWO_0rZ-Su6CWVCEBz3yWa85rUcPn0Il-_BWkgF-0YhOWJn3ndKAl_96ARmR-nllhUnQDYqHk2DwYLWnz_WOb4HuuqxKRP5i1h8zHwGIR6VORCzWgFViiFNTPT54Mtr2fZtVinP8W70JoRZ1pKbk-bYK4ErJgACU8npdGBZYTZa6g";
+	private static final String OIDC_TOKEN = "eyAidHlwIjogIkpXVCIsICJraWQiOiAiMWwySmtDb1RMMTBibWVBeHlsZzR4Umk4ajJZPSIsICJhbGciOiAiUlMyNTYiIH0.eyAiYXRfaGFzaCI6ICJ4RklSS0dpTWZ4ZFVPS3c0ZmQ4MW9BIiwgInN1YiI6ICJaOTkyMzEwIiwgImF1ZGl0VHJhY2tpbmdJZCI6ICJiZDdlYWE0ZC1mYzIzLTQ2ZGMtOGRjZi1iMjJmNzU1NDExZjQtMjAyMDc5MzQiLCAiaXNzIjogImh0dHBzOi8vaXNzby1xLmFkZW8ubm86NDQzL2lzc28vb2F1dGgyIiwgInRva2VuTmFtZSI6ICJpZF90b2tlbiIsICJhdWQiOiAiaWRhLXEiLCAiY19oYXNoIjogInctbGx3ZlJMenVpRFBselpkY1BhenciLCAib3JnLmZvcmdlcm9jay5vcGVuaWRjb25uZWN0Lm9wcyI6ICIyZmNlNWU1ZS02ODdjLTQ5ZmYtOTRjYS1jNzE2OGVmY2M2MmQiLCAiYXpwIjogImlkYS1xIiwgImF1dGhfdGltZSI6IDE1NTUwNzQ3NjcsICJyZWFsbSI6ICIvIiwgImV4cCI6IDE1NTUwNzgzNjcsICJ0b2tlblR5cGUiOiAiSldUVG9rZW4iLCAiaWF0IjogMTU1NTA3NDc2NyB9.orrUotLp8SMkCpigVhkAUlw9Rx5tigBrYNVv3j8fTmkIe-I1MEI0xctxM-tnLbrgcW3I-3Ye_bkS4KplhR4spnG9hT45L1dD-yoLsu8R6cD1PklMsx8m93XmaTHDReGZAI3uKO4KSPcQHyVE7-tIc6CWYqbVXWmEUxUsHNYm3bWO_0rZ-Su6CWVCEBz3yWa85rUcPn0Il-_BWkgF-0YhOWJn3ndKAl_96ARmR-nllhUnQDYqHk2DwYLWnz_WOb4HuuqxKRP5i1h8zHwGIR6VORCzWgFViiFNTPT54Mtr2fZtVinP8W70JoRZ1pKbk-bYK4ErJgACU8npdGBZYTZa6g";
 	private static final String DISTRIBUER_JOURNALPOST_URI = "/rest/v1/distribuerjournalpost";
 	private static final String JOURNALPOST_ID = "555555555";
 
@@ -87,9 +88,9 @@ public class Rdist002IT {
 	private static final String BESTILLENDEFAGSYSTEM = "bestillendeFagsystem";
 	private static final String ADRESSETYPE_NORSK = "norskPostadresse";
 	private static final String ADRESSETYPE_UTENLANDSK = "utenlandskPostadresse";
-	private static final String ADDRESSELINJE1 = "eksempelveien 23 A";
-	private static final String ADDRESSELINJE2 = "eksempelveien 24 A";
-	private static final String ADDRESSELINJE3 = "eksempelveien 25 A";
+	private static final String ADRESSELINJE1 = "eksempelveien 23 A";
+	private static final String ADRESSELINJE2 = "eksempelveien 24 A";
+	private static final String ADRESSELINJE3 = "eksempelveien 25 A";
 	private static final String POSTSTED = "poststed";
 	private static final String POSTNUMMER = "1337";
 	private static final String LAND_NO = "NO";
@@ -133,22 +134,20 @@ public class Rdist002IT {
 				.withBodyFile("dokkat/tkat020-happy.json")));
 
 		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
-		DistribuerJournalpostResponseTo restResponse = responseEntity.getBody();
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
-		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(36, restResponse.getBestillingsId().length());
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
-			HentDokumenterFraJoark qdist012Result = unmarshalHentDokumenterFraJoarkFromXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
-			assertQdist012Result(qdist012Result.getDistribusjonbestilling(), restResponse.getBestillingsId());
-			assertNorskPostadresse((NorskPostadresse) qdist012Result.getDistribusjonbestilling().getAdresse());
+			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
+			assertEquals(classpathToString("__files/rdist002IT-hentDokumenterFraJoark-happy.xml"), qdist012ResultWithoutBestillingsId);
 		});
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
@@ -163,21 +162,20 @@ public class Rdist002IT {
 				.withBodyFile("dokkat/tkat020-happy.json")));
 
 		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
-		DistribuerJournalpostResponseTo restResponse = responseEntity.getBody();
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
-		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(36, restResponse.getBestillingsId().length());
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
-			HentDokumenterFraJoark qdist012Result = unmarshalHentDokumenterFraJoarkFromXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
-			assertQdist012Result(qdist012Result.getDistribusjonbestilling(), restResponse.getBestillingsId());
+			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
+			assertEquals(classpathToString("__files/rdist002IT-hentDokumenterFraJoarkWithoutAdresse-happy.xml"), qdist012ResultWithoutBestillingsId);
 		});
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
@@ -192,41 +190,37 @@ public class Rdist002IT {
 				.withBodyFile("dokkat/tkat020-happy.json")));
 
 		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(createUtenlandskAdresse()).build(), createHappyPathHeaders());
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
-		DistribuerJournalpostResponseTo restResponse = responseEntity.getBody();
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
-		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(36, restResponse.getBestillingsId().length());
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
-			HentDokumenterFraJoark qdist012Result = unmarshalHentDokumenterFraJoarkFromXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
-			assertQdist012Result(qdist012Result.getDistribusjonbestilling(), restResponse.getBestillingsId());
-			assertUtenlandskPostadresse((UtenlandskPostadresse) qdist012Result.getDistribusjonbestilling().getAdresse());
+			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
+			assertEquals(classpathToString("__files/rdist002IT-hentDokumenterFraJoarkWithUtenlandskAdresse-happy.xml"), qdist012ResultWithoutBestillingsId);
 		});
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	@Test
 	public void distribuerJournalpostWithoutAuthHeader() {
 		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHeaderWithoutAuth());
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.BAD_REQUEST);
 
-		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-		assertNull(responseEntity.getBody().getBestillingsId());
+		assertNull(restResponse.getBestillingsId());
 	}
 
 	@Test
 	public void distribuerJournalpostWithoutJournalpostId() {
 		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().journalpostId(null).build(), createHappyPathHeaders());
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.BAD_REQUEST);
 
-		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-		assertNull(responseEntity.getBody().getBestillingsId());
+		assertNull(restResponse.getBestillingsId());
 	}
 
 	@Test
@@ -235,12 +229,11 @@ public class Rdist002IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)));
 
 		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.NOT_FOUND);
 
-		assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-		assertNull(responseEntity.getBody().getBestillingsId());
-
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
+		assertNull(restResponse.getBestillingsId());
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	@Test
@@ -250,11 +243,11 @@ public class Rdist002IT {
 				.withBody("{}")));
 
 		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.UNAUTHORIZED);
 
-		assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
-		assertNull(responseEntity.getBody().getBestillingsId());
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
+		assertNull(restResponse.getBestillingsId());
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	@Test
@@ -263,11 +256,11 @@ public class Rdist002IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)));
 
 		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.INTERNAL_SERVER_ERROR);
 
-		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-		assertNull(responseEntity.getBody().getBestillingsId());
-		verify(exactly(3), postRequestedFor(urlEqualTo("/safgraphql")));
+		assertNull(restResponse.getBestillingsId());
+		verify(exactly(3), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	@Test
@@ -277,16 +270,15 @@ public class Rdist002IT {
 				.withBodyFile("saf/safGraphQlResponse-inngaaendeJournalpostType.json")));
 
 		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.BAD_REQUEST);
 
-		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-		assertNull(responseEntity.getBody().getBestillingsId());
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
+		assertNull(restResponse.getBestillingsId());
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
-
 	@Test
-	public void distribuerJournalpostThrowsDokkatGetDokumenttypeInfoTechnicalException() {
+	public void distribuerJournalpostThrowsDokkatGetDokumenttypeInfoFunctionalException() {
 		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
@@ -295,11 +287,27 @@ public class Rdist002IT {
 				.withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())));
 
 		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpost(requestEntity);
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.BAD_REQUEST);
 
-		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-		assertNull(responseEntity.getBody().getBestillingsId());
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")));
+		assertNull(restResponse.getBestillingsId());
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
+	}
+
+	@Test
+	public void distribuerJournalpostThrowsDokkatGetDokumenttypeInfoTechnicalException() {
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withBodyFile("saf/safGraphQlResponse-happy.json")));
+
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+				.withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())));
+
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		assertNull(restResponse.getBestillingsId());
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(3), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
@@ -337,17 +345,17 @@ public class Rdist002IT {
 		assertEquals(LAND_NO, adresse.getLand());
 		assertEquals(POSTNUMMER, adresse.getPostnummer());
 		assertEquals(POSTSTED, adresse.getPoststed());
-		assertEquals(ADDRESSELINJE1, adresse.getAdresselinje1());
-		assertNull(adresse.getAdresselinje2());
-		assertNull(adresse.getAdresselinje3());
+		assertEquals(ADRESSELINJE1, adresse.getAdresselinje1());
+		assertEquals(ADRESSELINJE2, adresse.getAdresselinje2());
+		assertEquals(ADRESSELINJE3, adresse.getAdresselinje3());
 	}
 
 	private void assertUtenlandskPostadresse(UtenlandskPostadresse adresse) {
 		assertNotNull(adresse);
 		assertEquals(LAND_US, adresse.getLand());
-		assertEquals(ADDRESSELINJE1, adresse.getAdresselinje1());
-		assertEquals(ADDRESSELINJE2, adresse.getAdresselinje2());
-		assertEquals(ADDRESSELINJE3, adresse.getAdresselinje3());
+		assertEquals(ADRESSELINJE1, adresse.getAdresselinje1());
+		assertEquals(ADRESSELINJE2, adresse.getAdresselinje2());
+		assertEquals(ADRESSELINJE3, adresse.getAdresselinje3());
 	}
 
 	private void assertDokumenter(List<DokumentInformasjon> dokumenter) {
@@ -368,14 +376,17 @@ public class Rdist002IT {
 		});
 	}
 
-	private ResponseEntity<DistribuerJournalpostResponseTo> callDistribuerJournalpost(HttpEntity requestEntity) {
-		return this.restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, HttpMethod.POST, requestEntity, DistribuerJournalpostResponseTo.class);
+
+	private DistribuerJournalpostResponseTo callDistribuerJournalpostAndAssertResponseCode(HttpEntity requestEntity, HttpStatus expectedStatus) {
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = this.restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, HttpMethod.POST, requestEntity, DistribuerJournalpostResponseTo.class);
+		assertEquals(expectedStatus, responseEntity.getStatusCode());
+		return responseEntity.getBody();
 	}
 
 	private HttpHeaders createHappyPathHeaders() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + TEMP_OIDC_TOKEN);
+		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + OIDC_TOKEN);
 		return headers;
 	}
 
@@ -394,9 +405,9 @@ public class Rdist002IT {
 						ADRESSETYPE_NORSK,
 						POSTNUMMER,
 						POSTSTED,
-						ADDRESSELINJE1,
-						null,
-						null,
+						ADRESSELINJE1,
+						ADRESSELINJE2,
+						ADRESSELINJE3,
 						LAND_NO
 				))
 				.dokumentProdApp(DOKUMENTPRODAPP);
@@ -408,23 +419,28 @@ public class Rdist002IT {
 				ADRESSETYPE_UTENLANDSK,
 				null,
 				null,
-				ADDRESSELINJE1,
-				ADDRESSELINJE2,
-				ADDRESSELINJE3,
+				ADRESSELINJE1,
+				ADRESSELINJE2,
+				ADRESSELINJE3,
 				LAND_US
 		);
 	}
 
-	private HentDokumenterFraJoark unmarshalHentDokumenterFraJoarkFromXmlStringAndDecrypt(Message message) throws JMSException, JAXBException {
+	private String extractHentDokumenterFraJoarkXmlStringAndDecrypt(Message message) throws JMSException, JAXBException {
 		String bestillingsId = message.getStringProperty(CALL_ID);
 		String encryptedAndMarshaledBody = ((TextMessage) message).getText();
+		return new Crypto(encryptionPassphrase, bestillingsId).decrypt(encryptedAndMarshaledBody);
+	}
 
-		String decryptedAndMarshaledBody = new Crypto(encryptionPassphrase, bestillingsId).decrypt(encryptedAndMarshaledBody);
-
-		StringReader sr = new StringReader(decryptedAndMarshaledBody);
-		JAXBContext jaxbContext = JAXBContext.newInstance(HentDokumenterFraJoark.class);
-		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-		return (HentDokumenterFraJoark) unmarshaller.unmarshal(sr);
+	private String classpathToString(String classpathResource) {
+		String message = null;
+		try {
+			InputStream inputStream = new ClassPathResource(classpathResource).getInputStream();
+			message = IOUtils.toString(inputStream, UTF_8);
+			IOUtils.closeQuietly(inputStream);
+		} catch (IOException e) {
+			return "Failed to load file";
+		}
+		return message;
 	}
 }

@@ -1,8 +1,11 @@
 package no.nav.dokdistfordeling;
 
-import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertHovedokumentFieldNotNullOrEmpty;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNull;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
@@ -15,6 +18,8 @@ import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.informasjon.arkiverdokumentproduksjon.JournalpostType;
+
+import java.util.List;
 
 public class Rdist002ValidationUtil {
 
@@ -34,47 +39,53 @@ public class Rdist002ValidationUtil {
 		if (adresseTo != null) {
 			assertNotNullOrEmpty("land", adresseTo.getLand());
 
-			switch (adresseTo.getAdresseType()) {
-				case NORSK_POSTADRESSE:
-					assertNotNullOrEmpty("poststed", adresseTo.getPoststed());
-					assertNotNullOrEmpty("postnummer", adresseTo.getPostnummer());
-					break;
-				case UTENLANDSK_POSTADRESSE:
-					assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
-					break;
-				default:
-					throw new ValidationException(String.format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, mottok %s", adresseTo.getAdresseType()));
+			if (adresseTo.getAdresseType().equals(NORSK_POSTADRESSE)) {
+				assertNotNullOrEmpty("poststed", adresseTo.getPoststed());
+				assertNotNullOrEmpty("postnummer", adresseTo.getPostnummer());
+			} else if (adresseTo.getAdresseType().equals(UTENLANDSK_POSTADRESSE)) {
+				assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
+			} else {
+				throw new ValidationException(String.format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, mottok %s", adresseTo.getAdresseType()));
 			}
 		}
 	}
 
 	public void validateJournalpostAndDokumenter(Journalpost journalpost) {
+
 		assertNotNull(JournalpostType.class, journalpost.getJournalposttype());
 		assertParameterIsAsExpected("journalposttype", journalpost.getJournalposttype().name(), UTGAAENDE);
 		assertParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus(), FERDIGSTILT);
 
-		assertNotNull(Journalpost.Bruker.class, journalpost.getBruker());
-		assertNotNullOrEmpty("brukerId", journalpost.getBruker().getId());
-		assertNotNull(BrukerIdType.class, journalpost.getBruker().getType());
+		assertJournalpostFieldNotNull(Journalpost.Bruker.class, journalpost.getBruker());
+		assertJournalpostFieldNotNullOrEmpty("brukerId", journalpost.getBruker().getId());
+		assertJournalpostFieldNotNull(BrukerIdType.class, journalpost.getBruker().getType());
 
-		assertNotNull(Journalpost.AvsenderMottaker.class, journalpost.getAvsenderMottaker());
-		assertNotNullOrEmpty("mottakerId", journalpost.getAvsenderMottaker().getId());
+		assertJournalpostFieldNotNull(Journalpost.AvsenderMottaker.class, journalpost.getAvsenderMottaker());
+		assertJournalpostFieldNotNullOrEmpty("mottakerId", journalpost.getAvsenderMottaker().getId());
 
-		validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
+		try {
+			validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
 
-		journalpost.getDokumenter().forEach(this::validateDokumentInfo);
+			journalpost.getDokumenter().forEach(this::validateDokumentInfo);
+		} catch (ValidationException e) {
+			throw new ValidationException(String.format(e.getMessage() + ", dokumentInfoId=%s", journalpost.getDokumenter().iterator().next().getDokumentInfoId()));
+		}
 	}
 
 	private void validateHovedDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
-		assertNotNullOrEmpty("tittel", dokumentInfo.getTittel());
-		assertNotNullOrEmpty("brevkode", dokumentInfo.getBrevkode());
+		assertHovedokumentFieldNotNullOrEmpty("tittel", dokumentInfo.getTittel());
+		assertHovedokumentFieldNotNullOrEmpty("brevkode", dokumentInfo.getBrevkode());
 	}
 
 	private void validateDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
 		assertParameterIsAsExpected("dokumentstatus", dokumentInfo.getDokumentstatus(), FERDIGSTILT);
 
-		if (dokumentInfo.getDokumentvarianter().stream().noneMatch(dokInfo -> dokInfo.isSaksbehandlerHarTilgang() && (Variantformat.ARKIV.equals(dokInfo.getVariantformat()) || Variantformat.SLADDET.equals(dokInfo.getVariantformat())))) {
-			throw new BrukerManglerTilgangTilDokumentFunctionalException("ingen variantformater av dokumentet med tilgang for saksbehandler ble funnet.");
+		if (checkIfNoDokumentvariantWithTilgang(dokumentInfo.getDokumentvarianter())) {
+			throw new BrukerManglerTilgangTilDokumentFunctionalException(String.format("Saksbehandler har ikke tilgang til noen av dokumentets variantformater. dokumentInfoId=%s", dokumentInfo.getDokumentInfoId()));
 		}
+	}
+
+	private boolean checkIfNoDokumentvariantWithTilgang(List<Journalpost.Dokumentvariant> dokumentvarianter) {
+		return dokumentvarianter.stream().noneMatch(dokumentvariant -> dokumentvariant.isSaksbehandlerHarTilgang() && (Variantformat.ARKIV.equals(dokumentvariant.getVariantformat()) || Variantformat.SLADDET.equals(dokumentvariant.getVariantformat())));
 	}
 }

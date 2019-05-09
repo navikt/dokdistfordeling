@@ -15,9 +15,6 @@ public class SafJsonJournalpost implements Serializable {
 	}
 
 	public SafJournalpostTo getJournalpost() {
-		if (data != null) {
-			return data.getJournalpost();
-		}
-		return null;
+		return data.getJournalpost();
 	}
 }

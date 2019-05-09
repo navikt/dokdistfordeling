@@ -1,9 +1,9 @@
 package no.nav.dokdistfordeling.unittest;
 
-import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
-import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
+import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
+import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ADRESSELINJE1;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ADRESSELINJE2;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ADRESSELINJE3;
@@ -29,6 +29,10 @@ import static no.nav.dokdistfordeling.unittest.UnitTestUtil.SAMHANDLER_KATOGORI;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.SAMHANDLER_NAVN;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.TEMA;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.TITTEL;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createBrukerWithOrgnrId;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createJournalpostBuilder;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createNorskPostadresse;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createUtenlandskPostadresse;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,15 +59,13 @@ public class HentDokumenterFraJoarkMapperTest {
 
 	private static final String BESTILLINGS_ID = "7cc280ce-4168-4204-8d03-8dbdc3c4fc32";
 
-	private UnitTestUtil unitTestUtil = new UnitTestUtil();
 	private HentDokumenterFraJoarkMapper mapper = new HentDokumenterFraJoarkMapper();
 
 	@Test
 	public void shouldMap() {
 		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder().build(),
-				unitTestUtil.createJournalpostBuilder().build(),
+				createJournalpostBuilder().build(),
 				createPersonMottaker(),
-				unitTestUtil.createDefaultDokumentInfoList(),
 				BESTILLINGS_ID);
 
 		assertNotNull(result.getDistribusjonbestilling());
@@ -86,10 +88,9 @@ public class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapWithUtenlandskAdresse() {
 		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder()
-						.adresse(unitTestUtil.createUtenlandskPostadresse()).build(),
-				unitTestUtil.createJournalpostBuilder().build(),
+						.adresse(createUtenlandskPostadresse()).build(),
+				createJournalpostBuilder().build(),
 				createPersonMottaker(),
-				unitTestUtil.createDefaultDokumentInfoList(),
 				BESTILLINGS_ID);
 
 		assertNotNull(result.getDistribusjonbestilling());
@@ -99,9 +100,8 @@ public class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapWithMottakerAsOrganisasjon() {
 		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder().build(),
-				unitTestUtil.createJournalpostBuilder().build(),
+				createJournalpostBuilder().build(),
 				createOrganisasjonMottaker(),
-				unitTestUtil.createDefaultDokumentInfoList(),
 				BESTILLINGS_ID);
 
 		assertNotNull(result.getDistribusjonbestilling());
@@ -112,9 +112,8 @@ public class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapWithMottakerAsSamhandler() {
 		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder().build(),
-				unitTestUtil.createJournalpostBuilder().build(),
+				createJournalpostBuilder().build(),
 				createSamhandlerMottaker(),
-				unitTestUtil.createDefaultDokumentInfoList(),
 				BESTILLINGS_ID);
 
 		assertNotNull(result.getDistribusjonbestilling());
@@ -124,11 +123,10 @@ public class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapWithBrukerAsOrganisasjon() {
 		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder().build(),
-				unitTestUtil.createJournalpostBuilder()
-						.bruker(unitTestUtil.createBrukerWithOrgnrId())
+				createJournalpostBuilder()
+						.bruker(createBrukerWithOrgnrId())
 						.build(),
 				createPersonMottaker(),
-				unitTestUtil.createDefaultDokumentInfoList(),
 				BESTILLINGS_ID);
 
 		assertNotNull(result.getDistribusjonbestilling());
@@ -196,8 +194,8 @@ public class HentDokumenterFraJoarkMapperTest {
 		assertEquals(POSTNUMMER, adresse.getPostnummer());
 		assertEquals(POSTSTED, adresse.getPoststed());
 		assertEquals(ADRESSELINJE1, adresse.getAdresselinje1());
-		assertNull(adresse.getAdresselinje2());
-		assertNull(adresse.getAdresselinje3());
+		assertEquals(ADRESSELINJE2, adresse.getAdresselinje2());
+		assertEquals(ADRESSELINJE3, adresse.getAdresselinje3());
 	}
 
 	private void assertUtenlandskPostadresse(UtenlandskPostadresse adresse) {
@@ -212,7 +210,7 @@ public class HentDokumenterFraJoarkMapperTest {
 				.journalpostId(JOURNALPOST_ID)
 				.batchId(BATCH_ID)
 				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
-				.adresse(unitTestUtil.createNorskPostadresse())
+				.adresse(createNorskPostadresse())
 				.dokumentProdApp(DOKUMENTPRODAPP);
 	}
 

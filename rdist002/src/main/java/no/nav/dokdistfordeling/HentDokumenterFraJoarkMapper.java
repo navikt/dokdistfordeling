@@ -9,6 +9,7 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
+import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Adresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.AktoerId;
@@ -30,7 +31,9 @@ public class HentDokumenterFraJoarkMapper {
 	public static final String NORSK_POSTADRESSE = "norskPostadresse";
 	public static final String UTENLANDSK_POSTADRESSE = "utenlandskPostadresse";
 
-	public HentDokumenterFraJoark map(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost, Aktoer mottaker, List<Journalpost.DokumentInfo> dokumenter, String bestillingsId) {
+	public HentDokumenterFraJoark map(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost, Aktoer mottaker, String bestillingsId) {
+		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
+
 		return new HentDokumenterFraJoark()
 				.withDistribusjonbestilling(
 						new Distribusjonbestilling()
@@ -57,8 +60,7 @@ public class HentDokumenterFraJoarkMapper {
 													.withTilknyttetSom(i == 0 ? HOVEDDOKUMENT.name() : VEDLEGG.name())
 													.withVariantFormat(
 															dokumentInfo.getDokumentvarianter().stream()
-																	.anyMatch(dokumentvariant -> (dokumentvariant.getVariantformat().name().equals(SLADDET) && dokumentvariant.isSaksbehandlerHarTilgang()))
-																	? SLADDET : ARKIV)
+																	.anyMatch(dokumentvariant -> (dokumentvariant.getVariantformat().equals(Variantformat.SLADDET) && dokumentvariant.isSaksbehandlerHarTilgang())) ? SLADDET : ARKIV)
 													.withArkivDokumentInfoId(dokumentInfo.getDokumentInfoId())
 													.withRekkefolge(i + 1);
 										})
@@ -96,7 +98,8 @@ public class HentDokumenterFraJoarkMapper {
 		} else if (BrukerIdType.ORGNR.equals(bruker.getType())) {
 			return new Organisasjon()
 					.withOrgnummer(bruker.getId());
+		} else {
+			throw new ValidationException(String.format("BrukerIdType var ikke som forventet, fikk brukerIdType=%s, men forventet FNR, AKTOERID eller ORGNR", bruker.getType().name()));
 		}
-		throw new ValidationException(String.format("BrukerIdType var ikke som forventet, fikk brukerIdType=%s, men forventet FNR, AKTOERID eller ORGNR", bruker.getType().name()));
 	}
 }

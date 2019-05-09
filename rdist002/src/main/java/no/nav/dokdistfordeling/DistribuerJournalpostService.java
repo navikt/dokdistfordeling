@@ -54,7 +54,7 @@ public class DistribuerJournalpostService {
 		// brevkode for utgående dokumenter tilsvarer dokumenttypeid
 		dokumentkatalogAdmin.getDokumenttypeInfo(hovedDokumentInfo.getBrevkode());
 
-		distribuerForsendelseProducer.produce(hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, dokumenter, bestillingsId),
+		distribuerForsendelseProducer.produce(hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, bestillingsId),
 				bestillingsId,
 				distribuerJournalpostRequestTo.getJournalpostId());
 

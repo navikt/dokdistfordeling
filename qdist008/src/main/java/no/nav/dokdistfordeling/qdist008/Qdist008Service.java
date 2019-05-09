@@ -90,7 +90,7 @@ public class Qdist008Service {
 		if (aktoer.isIdentifikatorAktoerId()) {
 			return aktoerV2.hentIdentForAktoerId(aktoer.getIdentifikator());
 		} else {
-			return HentIdentForAktoerIdResponseTo.builder().foedselsnr(aktoer.getIdentifikator()).build();
+			return null;
 		}
 	}
 

@@ -2,6 +2,8 @@ package no.nav.dokdistfordeling.util;
 
 import static java.lang.String.format;
 
+import no.nav.dokdistfordeling.exception.functional.InvalidMappingToEnumFunctionalException;
+
 public final class MappingUtil {
 
 	private MappingUtil() {
@@ -11,7 +13,7 @@ public final class MappingUtil {
 		try {
 			return enumName == null ? null : Enum.valueOf(enumClass, enumName);
 		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException(format("%s er ikke en gyldig kodeverdi for %s", enumName, enumClass));
+			throw new InvalidMappingToEnumFunctionalException(format("%s er ikke en gyldig kodeverdi for %s", enumName, enumClass));
 		}
 	}
 }

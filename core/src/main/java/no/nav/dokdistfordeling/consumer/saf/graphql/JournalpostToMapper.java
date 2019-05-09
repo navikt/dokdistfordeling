@@ -44,7 +44,7 @@ public class JournalpostToMapper {
 	private List<Journalpost.Dokumentvariant> mapDokumentVarianter(List<SafJournalpostTo.Dokumentvariant> dokumentvarianter) {
 		return dokumentvarianter
 				.stream()
-				.filter(dokumentvariant -> Variantformat.ARKIV.name().equals(dokumentvariant.getVariantformat()) || Variantformat.SLADDET.name().equals(dokumentvariant.getVariantformat()))
+				.filter(this::isVariantformatArkivOrSladdet)
 				.map(this::mapDokumentVariant)
 				.collect(Collectors.toList());
 
@@ -69,5 +69,9 @@ public class JournalpostToMapper {
 				.id(avsenderMottaker.getId())
 				.navn(avsenderMottaker.getNavn())
 				.build();
+	}
+
+	private boolean isVariantformatArkivOrSladdet(SafJournalpostTo.Dokumentvariant dokumentvariant) {
+		return Variantformat.ARKIV.name().equals(dokumentvariant.getVariantformat()) || Variantformat.SLADDET.name().equals(dokumentvariant.getVariantformat());
 	}
 }
