@@ -61,10 +61,9 @@ public class Qdist008Service {
 		DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling = distribuerForsendelseTo.getDistribusjonbestilling();
 
 		final DokumenttypeInfoTo dokumenttypeInfoTo = getTittelFromDokkkatIfNotProvided(distribusjonbestilling);
-		final HentIdentForAktoerIdResponseTo mottakerHentIdentForAktoerIdResponseTo = getFoedselsnummerIfIdentifikatorIsAktoerId(distribusjonbestilling
-				.getMottaker());
-		final HentIdentForAktoerIdResponseTo brukerHentIdentForAktoerIdResponseTo = getFoedselsnummerIfIdentifikatorIsAktoerId(distribusjonbestilling
-				.getBruker());
+		final HentIdentForAktoerIdResponseTo mottakerHentIdentForAktoerIdResponseTo = getFoedselsnummerIfIdentifikatorIsAktoerId(distribusjonbestilling.getMottaker());
+		final HentIdentForAktoerIdResponseTo brukerHentIdentForAktoerIdResponseTo = getFoedselsnummerIfIdentifikatorIsAktoerId(distribusjonbestilling.getBruker());
+
 		final DistribusjonsKanalCode distribusjonsKanal = bestemDistribusjonskanal.bestemKanal(
 				mapDokDistKanalRequest(distribusjonbestilling, mottakerHentIdentForAktoerIdResponseTo, brukerHentIdentForAktoerIdResponseTo));
 		final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper

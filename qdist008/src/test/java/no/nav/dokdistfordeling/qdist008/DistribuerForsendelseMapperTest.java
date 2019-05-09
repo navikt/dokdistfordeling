@@ -185,16 +185,6 @@ class DistribuerForsendelseMapperTest {
 	}
 
 	@Test
-	public void shouldFailUgyldigTema() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().setTema("NO_SUCH_TEMA");
-
-		assertThrows(AbstractDokdistfordelingFunctionalException.class,
-				() -> distribuerForsendelseMapper.map(distribuerForsendelse),
-				"Expected distribuerForsendelseMapper.map() to throw AbstractDokdistfordelingFunctionalException, but it didn't");
-	}
-
-	@Test
 	public void shouldFailUgyldigTilknytning() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
 		distribuerForsendelse.getDistribusjonbestilling().getDokumenter().get(0).setTilknyttetSom("NO_SUCH_TILKNYTNING");
@@ -212,7 +202,7 @@ class DistribuerForsendelseMapperTest {
 		assertEquals(distBestilling.getBestillingsId(), BESTILLINGS_ID);
 		assertEquals(distBestilling.getBatchId(), BATCH_ID);
 		assertEquals(distBestilling.getBestillendeFagsystem(), BESTILLENDE_FAGSYSTEM);
-		assertEquals(distBestilling.getTema().name(), TEMA);
+		assertEquals(distBestilling.getTema(), TEMA);
 		assertEquals(distBestilling.getForsendelseTittel(), FORSENDELSE_TITTEL);
 		assertEquals(distBestilling.getDokumentProdApp(), DOKUMENT_PROD_APP);
 

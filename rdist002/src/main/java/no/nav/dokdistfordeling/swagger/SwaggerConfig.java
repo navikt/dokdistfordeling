@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.endpoints.swagger;
+package no.nav.dokdistfordeling.swagger;
 
 import static springfox.documentation.builders.PathSelectors.regex;
 

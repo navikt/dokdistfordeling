@@ -2,19 +2,16 @@ package no.nav.dokdistfordeling.consumer.saf.journalpost;
 
 import lombok.Builder;
 import lombok.Value;
-import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
-import no.nav.dokdistfordeling.kodeverk.Journalposttype;
-import no.nav.dokdistfordeling.kodeverk.Variantformat;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Value
 @Builder
-public class Journalpost {
+public class SafJournalpostTo {
 	private final String tittel;
 	private final String tema;
-	private final Journalposttype journalposttype;
+	private final String journalposttype;
 	private final String journalstatus;
 	private final Bruker bruker;
 	private final AvsenderMottaker avsenderMottaker;
@@ -22,12 +19,11 @@ public class Journalpost {
 	@Builder.Default
 	private final List<DokumentInfo> dokumenter = new ArrayList<>();
 
-
 	@Value
 	@Builder
 	public static class Bruker {
 		private final String id;
-		private final BrukerIdType type;
+		private final String type;
 	}
 
 	@Value
@@ -52,8 +48,7 @@ public class Journalpost {
 	@Value
 	@Builder
 	public static class Dokumentvariant {
-		private final Variantformat variantformat;
+		private final String variantformat;
 		private final boolean saksbehandlerHarTilgang;
 	}
-
 }

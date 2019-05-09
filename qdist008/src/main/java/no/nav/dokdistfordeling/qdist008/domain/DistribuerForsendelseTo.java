@@ -5,9 +5,8 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
-import no.nav.dokdistfordeling.kodeverk.TemaCode;
+import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 
 import java.util.List;
@@ -28,7 +27,7 @@ public class DistribuerForsendelseTo {
 		private final String bestillingsId;
 		private final String batchId;
 		private final String bestillendeFagsystem;
-		private final TemaCode tema;
+		private final String tema;
 		private final String forsendelseTittel;
 		private final ArkivInformasjonTo arkivInformasjon;
 		private final AktoerTo mottaker;
