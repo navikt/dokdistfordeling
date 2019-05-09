@@ -30,8 +30,7 @@ public final class ValidationUtil {
 
 	public static void assertJournalpostFieldNotNull(Class inputClass, Object value) {
 		if (value == null) {
-			throw new ValidationException(format("For journalposter kan feltet %s ikke være null eller tomt. Fikk %s=null", inputClass.getCanonicalName(), inputClass
-					.getCanonicalName()));
+			throw new ValidationException(format("For journalposter kan feltet %s ikke være null eller tomt. Fikk %s=null", inputClass.getCanonicalName(), inputClass.getCanonicalName()));
 		}
 	}
 

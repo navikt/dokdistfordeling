@@ -63,22 +63,26 @@ public class Rdist002ValidationUtil {
 		assertJournalpostFieldNotNull(Journalpost.AvsenderMottaker.class, journalpost.getAvsenderMottaker());
 		assertJournalpostFieldNotNullOrEmpty("mottakerId", journalpost.getAvsenderMottaker().getId());
 
-		try {
-			validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
+		validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
 
-			journalpost.getDokumenter().forEach(this::validateDokumentInfo);
-		} catch (ValidationException e) {
-			throw new ValidationException(String.format(e.getMessage() + ", dokumentInfoId=%s", journalpost.getDokumenter().iterator().next().getDokumentInfoId()));
-		}
+		journalpost.getDokumenter().forEach(this::validateDokumentInfo);
 	}
 
 	private void validateHovedDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
-		assertHovedokumentFieldNotNullOrEmpty("tittel", dokumentInfo.getTittel());
-		assertHovedokumentFieldNotNullOrEmpty("brevkode", dokumentInfo.getBrevkode());
+		try {
+			assertHovedokumentFieldNotNullOrEmpty("tittel", dokumentInfo.getTittel());
+			assertHovedokumentFieldNotNullOrEmpty("brevkode", dokumentInfo.getBrevkode());
+		} catch (ValidationException e) {
+			throw new ValidationException(String.format(e.getMessage() + ", dokumentInfoId=%s", dokumentInfo.getDokumentInfoId()));
+		}
 	}
 
 	private void validateDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
-		assertParameterIsAsExpected("dokumentstatus", dokumentInfo.getDokumentstatus(), FERDIGSTILT);
+		try {
+			assertParameterIsAsExpected("dokumentstatus", dokumentInfo.getDokumentstatus(), FERDIGSTILT);
+		} catch (ValidationException e) {
+			throw new ValidationException(String.format(e.getMessage() + ", dokumentInfoId=%s", dokumentInfo.getDokumentInfoId()));
+		}
 
 		if (checkIfNoDokumentvariantWithTilgang(dokumentInfo.getDokumentvarianter())) {
 			throw new BrukerManglerTilgangTilDokumentFunctionalException(String.format("Saksbehandler har ikke tilgang til noen av dokumentets variantformater. dokumentInfoId=%s", dokumentInfo.getDokumentInfoId()));
