@@ -13,6 +13,7 @@ import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthori
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.exception.technical.MarshalGraphqlRequestToJsonTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostQueryTechnicalException;
+import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -48,6 +49,7 @@ public class SafGraphqlConsumer {
 		this.graphQLurl = graphQLurl;
 	}
 
+	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "safJournalpostquery"}, histogram = true)
 	@Retryable(include = SafJournalpostQueryTechnicalException.class, maxAttempts = MAX_ATTEMPTS_SHORT, backoff = @Backoff(delay = DELAY_SHORT))
 	public SafJournalpostTo performQuery(GraphQLRequest graphQLRequest, String authorizationHeader) {
 

@@ -12,6 +12,7 @@ import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalMappingExc
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.BestemDokdistKanalTechnicalException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -46,6 +47,7 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 				.build();
 	}
 
+	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "bestemKanal"}, histogram = true)
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public DistribusjonsKanalCode bestemKanal(DokDistKanalRequest dokDistKanalRequest) {
 		try {

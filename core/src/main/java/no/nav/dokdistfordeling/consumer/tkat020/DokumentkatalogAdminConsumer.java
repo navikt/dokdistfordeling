@@ -9,6 +9,7 @@ import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
 import no.nav.dokdistfordeling.exception.functional.DokkatGetDokumenttypeInfoFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.DokkatGetDokumenttypeInfoTechnicalException;
+import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -46,6 +47,7 @@ class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 	}
 
 	@Cacheable(TKAT020_CACHE)
+	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "getDokumenttypeInfo"}, histogram = true)
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public DokumenttypeInfoTo getDokumenttypeInfo(final String dokumenttypeId) {
 		try {

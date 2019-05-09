@@ -12,6 +12,7 @@ import no.nav.dokdistfordeling.exception.functional.InvalidMappingToEnumFunction
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
+import no.nav.dokdistfordeling.metrics.Monitor;
 import no.nav.dokdistfordeling.swagger.SwaggerRestDistribuerJournalpost;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,7 @@ public class DistribuerJournalpostController {
 	@ApiOperation(value = "Bestiller distribusjon av en journalpost.", authorizations = {@Authorization(value = "apiKey")})
 	@SwaggerRestDistribuerJournalpost
 	@PostMapping(value = "/distribuerjournalpost")
+	@Monitor(value = "dok_metric", extraTags = {"process", "rdist002"}, histogram = true)
 	public ResponseEntity<DistribuerJournalpostResponseTo> distribuerJournalpost(@RequestBody DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
 																				 @ApiParam(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader) {
 		log.info("rdist002 har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());
