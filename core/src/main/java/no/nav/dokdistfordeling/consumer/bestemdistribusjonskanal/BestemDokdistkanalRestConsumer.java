@@ -11,7 +11,6 @@ import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalFunctional
 import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalMappingException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.BestemDokdistKanalTechnicalException;
-import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import org.slf4j.MDC;
@@ -50,18 +49,9 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 
 	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "bestemKanal"}, histogram = true)
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	public DistribusjonsKanalCode bestemKanal(String mottakerId, String dokumentTypeId, AktoerTypeCode mottakerTypeCode, String brukerId) {
-
+	public DistribusjonsKanalCode bestemKanal(DokDistKanalRequest dokDistKanalRequest) {
 		try {
-			DokDistKanalRequest request = DokDistKanalRequest.builder()
-					.dokumentTypeId(dokumentTypeId)
-					.mottakerId(mottakerId)
-					.mottakerType(mottakerTypeCode.name())
-					.brukerId(brukerId)
-					.build();
-
-			HttpEntity<DokDistKanalRequest> httpEntity = new HttpEntity<>(request, httpHeaders());
-
+			HttpEntity<DokDistKanalRequest> httpEntity = new HttpEntity<>(dokDistKanalRequest, httpHeaders());
 			DokDistKanalResponseTo dokDistKanalResponseTo = restTemplate.postForObject(bestemDokdistKanalUrl, httpEntity, DokDistKanalResponseTo.class);
 			return mapToDistribusjonKanalCode(dokDistKanalResponseTo.getDistribusjonsKanal());
 

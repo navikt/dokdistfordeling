@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.endpoints;
+package no.nav.dokdistfordeling;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,7 +11,7 @@ import lombok.Value;
 @Builder
 @ApiModel(value = "DistribuerJournalpostRequestTo model")
 public class DistribuerJournalpostRequestTo {
-	@ApiModelProperty(name = "journalpostId", value = "Journalpost som skal distribueres", example = "374126287")
+	@ApiModelProperty(name = "journalpostId", value = "Journalpost som skal distribueres", example = "343752389")
 	private final String journalpostId;
 	@ApiModelProperty(name = "batchId", value = "Identifiserer batch som forsendelsen inngår i. Lar bestiller identifisere forsendelser som hører sammen. Fritekst, og konsument må selv vurdere hva som er hensiktsmessige verdier", example = "54321", position = 1)
 	private final String batchId;
@@ -19,7 +19,7 @@ public class DistribuerJournalpostRequestTo {
 	private final String bestillendeFagsystem;
 	@ApiModelProperty(name = "adresse", value = "Struktur for å beskrive postadresse. Inneholder enten norsk postadresse eller utenlandsk postadresse. Påkrevd hvis mottaker er samhandler, ellers skal dokdistsentralprint hente adresse fra fellesregistre hvis ikke satt", position = 3)
 	private final AdresseTo adresse;
-	@ApiModelProperty(name = "dokumentProdApp", value = "Applikasjon som har produsert hoveddokumentet (for sporing og feilsøking)", example = "eksempelApplikasjon", position = 4)
+	@ApiModelProperty(name = "dokumentProdApp", value = "Applikasjon som har produsert hoveddokumentet (for sporing og feilsøking)", example = "ELIN_STANDARD", position = 4)
 	private final String dokumentProdApp;
 
 	@Getter

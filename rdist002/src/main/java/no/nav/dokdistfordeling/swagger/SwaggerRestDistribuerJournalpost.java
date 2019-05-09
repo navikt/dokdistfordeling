@@ -1,8 +1,8 @@
-package no.nav.dokdistfordeling.endpoints.swagger;
+package no.nav.dokdistfordeling.swagger;
 
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import no.nav.dokdistfordeling.endpoints.DistribuerJournalpostRequestTo;
+import no.nav.dokdistfordeling.DistribuerJournalpostRequestTo;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.web.bind.annotation.RequestMapping;
 

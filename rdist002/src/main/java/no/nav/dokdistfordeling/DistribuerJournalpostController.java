@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.endpoints;
+package no.nav.dokdistfordeling;
 
 
 import io.swagger.annotations.Api;
@@ -6,13 +6,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.endpoints.swagger.SwaggerRestDistribuerJournalpost;
-import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.DokkatGetDokumenttypeInfoFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.InvalidMappingToEnumFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.metrics.Monitor;
+import no.nav.dokdistfordeling.swagger.SwaggerRestDistribuerJournalpost;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,9 +62,13 @@ public class DistribuerJournalpostController {
 			log.warn("rdist002 - bruker har ikke tilgang til noen av dokumentvariantene på journalposten med journalpostId={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw new BrukerManglerTilgangTilDokumentFunctionalException(String.format("bruker har ikke tilgang til noen av dokumentvariantene på journalposten med journalpostId=%s", distribuerJournalpostRequestTo.getJournalpostId()));
 
-		} catch (BestemDokdistKanalFunctionalException e) {
-			log.warn("rdist002 - Ugyldig dokumenttypeid på dokumentet for journalpost med journalpostid={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
-			throw new BestemDokdistKanalFunctionalException(String.format("Ugyldig dokumenttypeid på dokumentet for journalpost med journalpostid=%s", distribuerJournalpostRequestTo.getJournalpostId()));
+		} catch (DokkatGetDokumenttypeInfoFunctionalException e) {
+			log.warn("rdist002 - Ugyldig dokumenttypeid på hoveddokumentet for journalpost med journalpostid={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
+			throw new DokkatGetDokumenttypeInfoFunctionalException(String.format("Ugyldig dokumenttypeid på hoveddokumentet for journalpost med journalpostid=%s", distribuerJournalpostRequestTo.getJournalpostId()));
+
+		} catch (InvalidMappingToEnumFunctionalException e) {
+			log.warn("rdist002 - Uventet verdi ble forsøkt mappet til enum, for journalpost med journalpostId={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
+			throw new InvalidMappingToEnumFunctionalException(String.format("Uventet verdi ble forsøkt mappet til enum, for journalpost med journalpostId=%s, feilmelding: %s", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage()));
 
 		} catch (Exception e) {
 			log.warn("rdist002 - feilet ved distribusjon av journalpost med journalpostId={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());

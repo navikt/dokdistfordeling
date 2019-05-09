@@ -6,7 +6,7 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHOR
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonJournalpost;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
@@ -51,7 +51,7 @@ public class SafGraphqlConsumer {
 
 	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "safJournalpostquery"}, histogram = true)
 	@Retryable(include = SafJournalpostQueryTechnicalException.class, maxAttempts = MAX_ATTEMPTS_SHORT, backoff = @Backoff(delay = DELAY_SHORT))
-	public Journalpost performQuery(GraphQLRequest graphQLRequest, String authorizationHeader) {
+	public SafJournalpostTo performQuery(GraphQLRequest graphQLRequest, String authorizationHeader) {
 
 		try {
 			HttpHeaders httpHeaders = createAuthHeaderFromToken(authorizationHeader);

@@ -23,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.time.Duration;
-import java.util.Base64;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -52,9 +51,10 @@ public class HentDokumentConsumer implements HentDokument {
 	public HentDokumentResponseTo hentDokument(String journalpostId, String dokumentInfoId, String variantFormat) {
 		try {
 			HttpEntity entity = new HttpEntity<>(createAuthorizationHeader());
-			String dokumentBase64String = restTemplate.exchange(this.hentDokumentUrl + "/{journalpostId}/{dokumentInfoId}/{variantFormat}", HttpMethod.GET, entity, String.class, journalpostId, dokumentInfoId, variantFormat)
-					.getBody();
-			return decodeAndMapResponse(dokumentBase64String, journalpostId, dokumentInfoId, variantFormat);
+			byte[] dokument = restTemplate.exchange(this.hentDokumentUrl + "/{journalpostId}/{dokumentInfoId}/{variantFormat}", HttpMethod.GET, entity, byte[].class, journalpostId, dokumentInfoId, variantFormat).getBody();
+
+			return mapResponse(dokument, journalpostId, dokumentInfoId, variantFormat);
+
 		} catch (HttpClientErrorException e) {
 			throw new SafHentDokumentFunctionalException(String.format("Kall mot saf:hentdokument feilet funksjonelt med statusKode=%s, feilmelding=%s", e
 					.getStatusCode(), e.getResponseBodyAsString()), e);
@@ -64,10 +64,10 @@ public class HentDokumentConsumer implements HentDokument {
 		}
 	}
 
-	private HentDokumentResponseTo decodeAndMapResponse(String dokumentBase64String, String journalpostId, String dokumentInfoId, String variantFormat) {
+	private HentDokumentResponseTo mapResponse(byte[] dokument, String journalpostId, String dokumentInfoId, String variantFormat) {
 		try {
 			return HentDokumentResponseTo.builder()
-					.dokument(Base64.getDecoder().decode(dokumentBase64String))
+					.dokument(dokument)
 					.build();
 		} catch (Exception e) {
 			throw new SafHentDokumentFunctionalException(String.format("Kunne ikke dekode dokument, da dokumentet ikke er base64-encodet journalpostId=%s, dokumentInfoId=%s, variantFormat=%s. Feilmelding=%s", journalpostId, dokumentInfoId, variantFormat, e
