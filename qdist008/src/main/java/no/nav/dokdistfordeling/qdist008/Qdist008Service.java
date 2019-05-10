@@ -1,5 +1,6 @@
 package no.nav.dokdistfordeling.qdist008;
 
+import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
 import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist008Metrics;
@@ -66,16 +67,25 @@ public class Qdist008Service {
 
 		final DistribusjonsKanalCode distribusjonsKanal = bestemDistribusjonskanal.bestemKanal(
 				mapDokDistKanalRequest(distribusjonbestilling, mottakerHentIdentForAktoerIdResponseTo, brukerHentIdentForAktoerIdResponseTo));
-		final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
-				.map(distribusjonbestilling, dokumenttypeInfoTo, mottakerHentIdentForAktoerIdResponseTo, distribusjonsKanal);
+		exchange.setProperty(PROPERTY_DISTRIBUSJONSKANAL, distribusjonsKanal);
 
-		PersisterForsendelseResponseTo persisterForsendelseResponseTo = administrerForsendelse.persisterForsendelse(persisterForsendelseRequestTo);
-		exchange.setProperty(PROPERTY_FORSENDELSE_ID, persisterForsendelseResponseTo.getForsendelseId());
+		DistribuerTilKanal distribuerTilKanal = new DistribuerTilKanal();
+
+		if(!(distribusjonsKanal.equals(DistribusjonsKanalCode.INGEN_DISTRIBUSJON) || distribusjonsKanal.equals(DistribusjonsKanalCode.LOKAL_PRINT))){
+
+			final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
+					.map(distribusjonbestilling, dokumenttypeInfoTo, mottakerHentIdentForAktoerIdResponseTo, distribusjonsKanal);
+
+			PersisterForsendelseResponseTo persisterForsendelseResponseTo = administrerForsendelse.persisterForsendelse(persisterForsendelseRequestTo);
+			exchange.setProperty(PROPERTY_FORSENDELSE_ID, persisterForsendelseResponseTo.getForsendelseId());
+
+			distribuerTilKanal.setForsendelseId(persisterForsendelseResponseTo.getForsendelseId());
+		}
 
 		updateArkivIfArkivsystemIsJoark(distribusjonbestilling, distribusjonsKanal);
-		updateQdist008Metrics(persisterForsendelseRequestTo, distribusjonbestilling);
+		updateQdist008Metrics(distribusjonbestilling);
 
-		return new DistribuerTilKanal().withForsendelseId(persisterForsendelseResponseTo.getForsendelseId());
+		return distribuerTilKanal;
 	}
 
 	private DokumenttypeInfoTo getTittelFromDokkkatIfNotProvided(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {

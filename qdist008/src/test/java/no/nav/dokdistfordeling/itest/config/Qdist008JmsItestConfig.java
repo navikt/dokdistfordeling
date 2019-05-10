@@ -36,6 +36,11 @@ public class Qdist008JmsItestConfig {
 	}
 
 	@Bean
+	public Queue qdist010(@Value("${dokdistdittnav_qdist010_dist_ditt_nav.queuename}") String qdist010QueueName) {
+		return new ActiveMQQueue(qdist010QueueName);
+	}
+
+	@Bean
 	public Queue qdist012(@Value("${dokdistfordeling_qdist012_hent_dok_joark.queuename}") String qdist012QueueName) {
 		return new ActiveMQQueue(qdist012QueueName);
 	}

@@ -1,8 +1,10 @@
 package no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal;
 
 
+import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
@@ -64,11 +66,15 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 		}
 	}
 
-	private DistribusjonsKanalCode mapToDistribusjonKanalCode(String distribusjonKanalCodeTo) {
+	private DistribusjonsKanalCode mapToDistribusjonKanalCode(String distribusjonKanal) {
 		try {
-			return DistribusjonsKanalCode.valueOf(distribusjonKanalCodeTo);
+			if(DITT_NAV.equals(distribusjonKanal)){
+				return DITTNAV;
+			}else{
+				return DistribusjonsKanalCode.valueOf(distribusjonKanal);
+			}
 		} catch (IllegalArgumentException e) {
-			throw new BestemDokdistKanalMappingException("DistribusjonKanalCode i dokprod støtter ikke enum-verdien " + distribusjonKanalCodeTo);
+			throw new BestemDokdistKanalMappingException("DistribusjonKanalCode i dokdist støtter ikke enum-verdien " + distribusjonKanal);
 		}
 	}
 

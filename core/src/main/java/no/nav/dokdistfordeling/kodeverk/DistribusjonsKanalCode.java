@@ -9,7 +9,7 @@ public enum DistribusjonsKanalCode {
 
 	PRINT("S"),
 	SDP("SDP"),
-	DITT_NAV("NAV_NO"),
+	DITTNAV("NAV_NO"),
 	LOKAL_PRINT("L"),
 	INGEN_DISTRIBUSJON("INGEN_DISTRIBUSJON");
 
