@@ -3,13 +3,13 @@ package no.nav.dokdistfordeling.consumer.saf.journalpost;
 import java.io.Serializable;
 
 public class DataJournalpost implements Serializable {
-	private Journalpost journalpost;
+	private SafJournalpostTo journalpost;
 
-	public Journalpost getJournalpost() {
+	public SafJournalpostTo getJournalpost() {
 		return journalpost;
 	}
 
-	public void setJournalpost(Journalpost journalpost) {
+	public void setJournalpost(SafJournalpostTo journalpost) {
 		this.journalpost = journalpost;
 	}
 }

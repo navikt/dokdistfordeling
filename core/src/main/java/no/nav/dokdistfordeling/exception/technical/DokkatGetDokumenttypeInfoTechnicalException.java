@@ -4,4 +4,8 @@ public class DokkatGetDokumenttypeInfoTechnicalException extends AbstractDokdist
 	public DokkatGetDokumenttypeInfoTechnicalException(String message, Throwable cause) {
 		super(message, cause);
 	}
+
+	public DokkatGetDokumenttypeInfoTechnicalException(String message) {
+		super(message);
+	}
 }

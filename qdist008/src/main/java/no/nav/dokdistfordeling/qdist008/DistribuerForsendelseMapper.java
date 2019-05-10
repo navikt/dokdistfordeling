@@ -1,13 +1,13 @@
 package no.nav.dokdistfordeling.qdist008;
 
 import static java.lang.String.format;
+import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
 
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
-import no.nav.dokdistfordeling.kodeverk.TemaCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
@@ -49,7 +49,7 @@ public class DistribuerForsendelseMapper {
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
 				.batchId(distribusjonbestilling.getBatchId())
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
-				.tema(stringToEnum(TemaCode.class, distribusjonbestilling.getTema()))
+				.tema(distribusjonbestilling.getTema())
 				.forsendelseTittel(distribusjonbestilling.getForsendelseTittel())
 				.arkivInformasjon(distribusjonbestilling.getArkivInformasjon() == null ? null :
 						mapArkivInformasjon(distribusjonbestilling.getArkivInformasjon()))
@@ -149,13 +149,4 @@ public class DistribuerForsendelseMapper {
 			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
 		}
 	}
-
-	private static <E extends Enum<E>> E stringToEnum(Class<E> enumClass, String enumName) {
-		try {
-			return enumName == null ? null : Enum.valueOf(enumClass, enumName);
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException(format("%s er ikke en gyldig kodeverdi for %s", enumName, enumClass));
-		}
-	}
-
 }

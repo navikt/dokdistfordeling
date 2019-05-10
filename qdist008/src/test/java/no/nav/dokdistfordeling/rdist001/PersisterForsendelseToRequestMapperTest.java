@@ -5,14 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
-import no.nav.dokdistfordeling.qdist008.domain.PersisterForsendelseToRequestMapper;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
+import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
-import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
-import no.nav.dokdistfordeling.kodeverk.TemaCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
+import no.nav.dokdistfordeling.qdist008.domain.PersisterForsendelseToRequestMapper;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -49,7 +48,7 @@ class PersisterForsendelseToRequestMapperTest {
 	private static final AktoerTypeCode PERSON_TYPE_CODE = AktoerTypeCode.PERSON;
 	private static final AktoerTypeCode SAMHANDLER_TYPE_CODE = AktoerTypeCode.SAMHANDLER_HPR;
 	private static final AktoerTypeCode ORGANISASJON_TYPE_CODE = AktoerTypeCode.ORGANISASJON;
-	private static final TemaCode TEMA = TemaCode.FS22;
+	private static final String TEMA = "FS22";
 	private static final TilknyttetSomCode TILKNYTTET_SOM_CODE_1 = TilknyttetSomCode.HOVEDDOKUMENT;
 	private static final TilknyttetSomCode TILKNYTTET_SOM_CODE_2 = TilknyttetSomCode.VEDLEGG;
 	private static final ArkivSystemCode ARKIV_SYSTEM_CODE = ArkivSystemCode.JOARK;
@@ -247,7 +246,7 @@ class PersisterForsendelseToRequestMapperTest {
 				.dokumentProdApp(DOKUMENT_PROD_APP)
 				.forsendelseTittel(FORSENDELSE_TITTEL)
 				.mottaker(createMottakerToWithPerson())
-				.tema(TemaCode.FS22);
+				.tema(TEMA);
 	}
 
 	private DistribuerForsendelseTo.DokumentInformasjonTo.DokumentInformasjonToBuilder createFirstDistribuerForsendelseToBuilder() {
