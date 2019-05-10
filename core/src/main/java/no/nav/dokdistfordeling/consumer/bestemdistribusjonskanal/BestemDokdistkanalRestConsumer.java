@@ -64,15 +64,15 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 		}
 	}
 
-	private DistribusjonsKanalCode mapToDistribusjonKanalCode(String distribusjonKanalCodeTo) {
+	private DistribusjonsKanalCode mapToDistribusjonKanalCode(String distribusjonKanal) {
 		try {
-			if(DITT_NAV.equals(distribusjonKanalCodeTo)){
+			if(DITT_NAV.equals(distribusjonKanal)){
 				return DITTNAV;
 			}else{
-				return DistribusjonsKanalCode.valueOf(distribusjonKanalCodeTo);
+				return DistribusjonsKanalCode.valueOf(distribusjonKanal);
 			}
 		} catch (IllegalArgumentException e) {
-			throw new BestemDokdistKanalMappingException("DistribusjonKanalCode i dokprod støtter ikke enum-verdien " + distribusjonKanalCodeTo);
+			throw new BestemDokdistKanalMappingException("DistribusjonKanalCode i dokdist støtter ikke enum-verdien " + distribusjonKanal);
 		}
 	}
 
