@@ -33,14 +33,14 @@ public class MetricUpdater {
 		meterRegistry.counter(QDIST008_SERVICE,
 				LABEL_PROCESS, SERVICE_ID,
 				LABEL_DOKUMENTTYPEID, getDokumenttypeIdHoveddokument(distribusjonbestilling),
-				LABEL_TEMA, distribusjonbestilling.getTema().name(),
+				LABEL_TEMA, distribusjonbestilling.getTema(),
 				LABEL_TILKNYTNING, HOVEDDOKUMENT,
 				LABEL_BESTILLENDE_FAGSYSTEM, distribusjonbestilling.getBestillendeFagsystem()).increment();
 
 		meterRegistry.counter(QDIST008_SERVICE,
 				LABEL_PROCESS, SERVICE_ID,
 				LABEL_DOKUMENTTYPEID, getDokumenttypeIdHoveddokument(distribusjonbestilling),
-				LABEL_TEMA, distribusjonbestilling.getTema().name(),
+				LABEL_TEMA, distribusjonbestilling.getTema(),
 				LABEL_TILKNYTNING, VEDLEGG,
 				LABEL_BESTILLENDE_FAGSYSTEM, distribusjonbestilling.getBestillendeFagsystem())
 				.increment(countVedlegg(distribusjonbestilling));
