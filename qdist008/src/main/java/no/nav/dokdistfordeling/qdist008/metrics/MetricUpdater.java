@@ -6,7 +6,6 @@ import static no.nav.dokdistfordeling.util.Qdist008Util.countVedlegg;
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import org.springframework.stereotype.Component;
 
@@ -30,21 +29,20 @@ public class MetricUpdater {
 		MetricUpdater.meterRegistry = meterRegistry;
 	}
 
-	public static void updateQdist008Metrics(PersisterForsendelseRequestTo persisterForsendelseRequestTo,
-											 DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
+	public static void updateQdist008Metrics( DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
 		meterRegistry.counter(QDIST008_SERVICE,
 				LABEL_PROCESS, SERVICE_ID,
 				LABEL_DOKUMENTTYPEID, getDokumenttypeIdHoveddokument(distribusjonbestilling),
-				LABEL_TEMA, persisterForsendelseRequestTo.getTema().toString(),
+				LABEL_TEMA, distribusjonbestilling.getTema().name(),
 				LABEL_TILKNYTNING, HOVEDDOKUMENT,
-				LABEL_BESTILLENDE_FAGSYSTEM, persisterForsendelseRequestTo.getBestillendeFagsystem()).increment();
+				LABEL_BESTILLENDE_FAGSYSTEM, distribusjonbestilling.getBestillendeFagsystem()).increment();
 
 		meterRegistry.counter(QDIST008_SERVICE,
 				LABEL_PROCESS, SERVICE_ID,
 				LABEL_DOKUMENTTYPEID, getDokumenttypeIdHoveddokument(distribusjonbestilling),
-				LABEL_TEMA, persisterForsendelseRequestTo.getTema().toString(),
+				LABEL_TEMA, distribusjonbestilling.getTema().name(),
 				LABEL_TILKNYTNING, VEDLEGG,
-				LABEL_BESTILLENDE_FAGSYSTEM, persisterForsendelseRequestTo.getBestillendeFagsystem())
+				LABEL_BESTILLENDE_FAGSYSTEM, distribusjonbestilling.getBestillendeFagsystem())
 				.increment(countVedlegg(distribusjonbestilling));
 	}
 }

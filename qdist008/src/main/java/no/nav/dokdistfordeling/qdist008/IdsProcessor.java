@@ -21,9 +21,7 @@ public class IdsProcessor implements Processor {
 
 	private void setBestillingsIdAsPropertyAndAddCallIdToMdc(Exchange exchange) {
 		String bestillingsId = XPathBuilder.xpath("//bestillingsId/text()").evaluate(exchange, String.class);
-		if (bestillingsId == null) {
-			throw new ForsendelseManglerBestillingsIdFunctionalException("qdist008 har mottatt forsendelse uten påkrevd bestillingsId");
-		} else if (bestillingsId.trim().isEmpty()) {
+		if (bestillingsId.trim().isEmpty()) {
 			throw new ForsendelseManglerBestillingsIdFunctionalException("qdist008 har mottatt forsendelse med tom bestillingsId");
 		}
 		exchange.setProperty(PROPERTY_BESTILLINGS_ID, bestillingsId);

@@ -43,7 +43,6 @@ public class Qdist008Route extends SpringRouteBuilder {
 	private final Queue qdist008FunksjonellFeil;
 	private final Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy;
 
-
 	@Inject
 	public Qdist008Route(Queue qdist008,
 						 Queue qdist009,
@@ -85,40 +84,43 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.routePolicy(qdist008MetricsRoutePolicy)
 				.setExchangePattern(ExchangePattern.InOnly)
 				.process(new IdsProcessor())
-				.log(LoggingLevel.INFO, log, "qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}.")
+				.log(LoggingLevel.INFO, log, String.format("qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))
 				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist008/in/distribuerforsendelse.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
 				.bean(distribuerForsendelseMapper)
 				.bean(forsendelseValidator)
-				.log(LoggingLevel.INFO, log, "qdist008 har validert forsendelse med bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} ok.")
+				.log(LoggingLevel.INFO, log, String.format("qdist008 har validert forsendelse med bestillingsId=${exchangeProperty. %s} ok.", PROPERTY_BESTILLINGS_ID))
 				.bean(qdist008Service)
+				.setBody(exchangeProperty(PROPERTY_DISTRIBUSJONS_OBJEKT))
+				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
+				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
+				.setHeader(CALL_ID, simple("${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}"))
 				.choice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DistribusjonsKanalCode.LOKAL_PRINT))
-					.log(LoggingLevel.INFO, log, "qdist008 forsendelse med " + getIdsForLogging() + " er printet ut lokalt. Behandling avsluttes.")
+					.log(LoggingLevel.INFO, log, String.format("qdist008 har lagt til forsendelse med %s på kø for distribusjon via LOKAL_PRINT. Behandling avsluttes.", getIdsForLogging()))
+					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DistribusjonsKanalCode.INGEN_DISTRIBUSJON))
-					.log(LoggingLevel.INFO, log,"qdist008 forsendelse med " + getIdsForLogging() + " skal ikke distribueres. Behandling avsluttes.")
-				.otherwise()
-					.setBody(exchangeProperty(PROPERTY_DISTRIBUSJONS_OBJEKT))
-					.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
-					.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
-					.setHeader(CALL_ID, simple("${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "}"))
-					.choice()
-					.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DistribusjonsKanalCode.PRINT))
-						.inOnly("jms:" + qdist009.getQueueName())
-						.log(LoggingLevel.INFO, log, "qdist008 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist009 for distribusjon via PRINT")
-					.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DistribusjonsKanalCode.DITT_NAV))
-						.inOnly("jms:" + qdist010.getQueueName())
-						.log(LoggingLevel.INFO, log, "qdist008 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist010 for distribusjon via DITT NAV")
-					.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DistribusjonsKanalCode.SDP))
-						.log(LoggingLevel.WARN, log, "qdist008 skulle ha lagt forsendelse med " + getIdsForLogging() + " på kø til qdist011 for distribusjon via DPI")
-					.end()
-					.bean(dokdistStatusUpdater)
+					.log(LoggingLevel.INFO, log, String.format("qdist008 har lagt til forsendelse med %s på kø for INGEN_DISTRIBUSJON. Behandling avsluttes.", getIdsForLogging()))
+					.endChoice()
+				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DistribusjonsKanalCode.PRINT))
+					.inOnly("jms:" + qdist009.getQueueName())
+					.log(LoggingLevel.INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist009 for distribusjon via PRINT", getIdsForLogging()))
+					.endChoice()
+				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DistribusjonsKanalCode.DITTNAV))
+					.inOnly("jms:" + qdist010.getQueueName())
+					.log(LoggingLevel.INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist010 for distribusjon via DITT NAV", getIdsForLogging()))
+					.endChoice()
+				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DistribusjonsKanalCode.SDP))
+					//TODO Legg til .inOnly("jms:" + qdist011.getQueueName()) når qdist011 er opprettet, og endre log.
+					.log(LoggingLevel.WARN, log, String.format("qdist008 skulle ha lagt forsendelse med %s på kø til qdist011 for distribusjon via DPI", getIdsForLogging()))
+					.endChoice()
 				.end()
-				.log(LoggingLevel.INFO, log, "qdist008 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med " + getIdsForLogging());
+				.bean(dokdistStatusUpdater)
+				.log(LoggingLevel.INFO, log, String.format("qdist008 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med %s", getIdsForLogging()));
 	}
 
 	public static String getIdsForLogging() {
-		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} og " +
-				"forsendelseId=${exchangeProperty." + PROPERTY_FORSENDELSE_ID + "}";
+		return String.format("bestillingsId=${exchangeProperty.%s} og " +
+				"forsendelseId=${exchangeProperty.%s}", PROPERTY_BESTILLINGS_ID, PROPERTY_FORSENDELSE_ID);
 	}
 }

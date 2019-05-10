@@ -59,7 +59,7 @@ public class Qdist008Service {
 	}
 
 	@Handler
-	public void distribuerForsendelseService(DistribuerForsendelseTo distribuerForsendelseTo, Exchange exchange) {
+	public DistribuerTilKanal distribuerForsendelseService(DistribuerForsendelseTo distribuerForsendelseTo, Exchange exchange) {
 		DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling = distribuerForsendelseTo.getDistribusjonbestilling();
 
 		final DokumenttypeInfoTo dokumenttypeInfoTo = getTittelFromDokkkatIfNotProvided(distribusjonbestilling);
@@ -71,20 +71,25 @@ public class Qdist008Service {
 				mapDokDistKanalRequest(distribusjonbestilling, mottakerHentIdentForAktoerIdResponseTo, brukerHentIdentForAktoerIdResponseTo));
 		exchange.setProperty(PROPERTY_DISTRIBUSJONSKANAL, distribusjonsKanal);
 
-		final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
-				.map(distribusjonbestilling, dokumenttypeInfoTo, mottakerHentIdentForAktoerIdResponseTo, distribusjonsKanal);
+		DistribuerTilKanal distribuerTilKanal = new DistribuerTilKanal().withForsendelseId(null);
 
 		if(!(distribusjonsKanal.equals(DistribusjonsKanalCode.INGEN_DISTRIBUSJON) || distribusjonsKanal.equals(DistribusjonsKanalCode.LOKAL_PRINT))){
+
+			final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
+					.map(distribusjonbestilling, dokumenttypeInfoTo, mottakerHentIdentForAktoerIdResponseTo, distribusjonsKanal);
 
 			PersisterForsendelseResponseTo persisterForsendelseResponseTo = administrerForsendelse.persisterForsendelse(persisterForsendelseRequestTo);
 			exchange.setProperty(PROPERTY_FORSENDELSE_ID, persisterForsendelseResponseTo.getForsendelseId());
 
-			DistribuerTilKanal distribuerTilKanal = new DistribuerTilKanal().withForsendelseId(persisterForsendelseResponseTo.getForsendelseId());
+			distribuerTilKanal.withForsendelseId(persisterForsendelseResponseTo.getForsendelseId());
+
 			exchange.setProperty(PROPERTY_DISTRIBUSJONS_OBJEKT, distribuerTilKanal);
 		}
 
 		updateArkivIfArkivsystemIsJoark(distribusjonbestilling, distribusjonsKanal);
-		updateQdist008Metrics(persisterForsendelseRequestTo, distribusjonbestilling);
+		updateQdist008Metrics(distribusjonbestilling);
+
+		return distribuerTilKanal;
 	}
 
 	private DokumenttypeInfoTo getTittelFromDokkkatIfNotProvided(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
