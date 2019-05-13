@@ -6,8 +6,10 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
+import no.nav.dokdistfordeling.exception.functional.DokkatGetDokumenttypeInfoFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.DokkatGetDokumenttypeInfoTechnicalException;
+import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -45,13 +47,14 @@ class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 	}
 
 	@Cacheable(TKAT020_CACHE)
+	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "getDokumenttypeInfo"}, histogram = true)
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public DokumenttypeInfoTo getDokumenttypeInfo(final String dokumenttypeId) {
 		try {
 			DokumentTypeInfoToV4 response = restTemplate.getForObject(this.dokumenttypeInfoV4Url + "/" + dokumenttypeId, DokumentTypeInfoToV4.class);
 			return mapResponse(response);
 		} catch (HttpClientErrorException e) {
-			throw new DokkatGetDokumenttypeInfoTechnicalException(String.format("TKAT020 feilet med statusKode=%s. Fant ingen dokumenttypeInfo med dokumenttypeId=%s. Feilmelding=%s", e.getStatusCode(), dokumenttypeId, e.getResponseBodyAsString()), e);
+			throw new DokkatGetDokumenttypeInfoFunctionalException(String.format("TKAT020 feilet med statusKode=%s. Fant ingen dokumenttypeInfo med dokumenttypeId=%s. Feilmelding=%s", e.getStatusCode(), dokumenttypeId, e.getResponseBodyAsString()), e);
 		} catch (HttpServerErrorException e) {
 			throw new DokkatGetDokumenttypeInfoTechnicalException(String.format("TKAT020 feilet teknisk med statusKode=%s, feilmelding=%s", e
 					.getStatusCode(), e

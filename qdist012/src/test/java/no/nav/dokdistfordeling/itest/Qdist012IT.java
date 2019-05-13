@@ -114,11 +114,11 @@ public class Qdist012IT {
 		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
-						.withBody(Base64.getEncoder().encode(TEST_FILE_BYTES1))));
+						.withBody(TEST_FILE_BYTES1)));
 		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
-						.withBody(Base64.getEncoder().encode(TEST_FILE_BYTES2))));
+						.withBody(TEST_FILE_BYTES2)));
 
 		ArgumentCaptor<String> argCaptorDokdistDokument = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> argCaptorDokumentObjektReferanse = ArgumentCaptor.forClass(String.class);
@@ -137,6 +137,7 @@ public class Qdist012IT {
 			DistribuerForsendelse unmarshaledResponse = unmarshalDistribuerForsendelseFromXmlString(response);
 			Mockito.verify(awsStorage, times(2))
 					.put(argCaptorDokumentObjektReferanse.capture(), argCaptorDokdistDokument.capture());
+
 			DokdistDokument dokdistDokument1 = JsonSerializer.deserialize(argCaptorDokdistDokument.getAllValues()
 					.get(0), DokdistDokument.class);
 			DokdistDokument dokdistDokument2 = JsonSerializer.deserialize(argCaptorDokdistDokument.getAllValues()
@@ -385,31 +386,6 @@ public class Qdist012IT {
 		verify(exactly(1), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
-
-	@Test
-	public void shouldThrowFunctionalExceptionDocumentNotInBase64Format() throws Exception {
-		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse-happy.json")));
-		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
-				aResponse().withStatus(HttpStatus.OK.value())
-						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
-						.withBody((TEST_FILE_BYTES1))));
-
-		String message = classpathToString("qdist012/qdist012-happy.xml");
-		encryptAndSendStringMessageWithHeaders(qdist012, message);
-
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(qdist012FunksjonellFeil);
-			assertThat(response, is(notNullValue()));
-			assertThat(decryptXml(response), is(message));
-		});
-		Mockito.verify(awsStorage, times(0)).put(any(), any());
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
-	}
-
 
 	private void encryptAndSendStringMessageWithHeaders(Queue queue, final String message) {
 		jmsTemplate.send(queue, session -> {

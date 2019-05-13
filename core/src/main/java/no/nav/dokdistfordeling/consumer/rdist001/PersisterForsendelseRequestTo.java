@@ -2,10 +2,9 @@ package no.nav.dokdistfordeling.consumer.rdist001;
 
 import lombok.Builder;
 import lombok.Value;
+import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
-import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
-import no.nav.dokdistfordeling.kodeverk.TemaCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public class PersisterForsendelseRequestTo {
 	private final String bestillingsId;
 	private final DistribusjonsKanalCode distribusjonsKanal;
 	private final String bestillendeFagsystem;
-	private final TemaCode tema;
+	private final String tema;
 	private final String forsendelseTittel;
 	private final String batchId;
 	private final String dokumentProdApp;

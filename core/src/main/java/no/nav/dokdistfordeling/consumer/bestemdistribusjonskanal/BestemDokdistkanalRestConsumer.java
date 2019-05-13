@@ -1,8 +1,10 @@
 package no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal;
 
 
+import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
@@ -11,8 +13,8 @@ import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalFunctional
 import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalMappingException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.BestemDokdistKanalTechnicalException;
-import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -47,19 +49,11 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 				.build();
 	}
 
+	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "bestemKanal"}, histogram = true)
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	public DistribusjonsKanalCode bestemKanal(String mottakerId, String dokumentTypeId, AktoerTypeCode mottakerTypeCode, String brukerId) {
-
+	public DistribusjonsKanalCode bestemKanal(DokDistKanalRequest dokDistKanalRequest) {
 		try {
-			DokDistKanalRequest request = DokDistKanalRequest.builder()
-					.dokumentTypeId(dokumentTypeId)
-					.mottakerId(mottakerId)
-					.mottakerType(mottakerTypeCode.name())
-					.brukerId(brukerId)
-					.build();
-
-			HttpEntity<DokDistKanalRequest> httpEntity = new HttpEntity<>(request, httpHeaders());
-
+			HttpEntity<DokDistKanalRequest> httpEntity = new HttpEntity<>(dokDistKanalRequest, httpHeaders());
 			DokDistKanalResponseTo dokDistKanalResponseTo = restTemplate.postForObject(bestemDokdistKanalUrl, httpEntity, DokDistKanalResponseTo.class);
 			return mapToDistribusjonKanalCode(dokDistKanalResponseTo.getDistribusjonsKanal());
 
@@ -72,11 +66,15 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 		}
 	}
 
-	private DistribusjonsKanalCode mapToDistribusjonKanalCode(String distribusjonKanalCodeTo) {
+	private DistribusjonsKanalCode mapToDistribusjonKanalCode(String distribusjonKanal) {
 		try {
-			return DistribusjonsKanalCode.valueOf(distribusjonKanalCodeTo);
+			if(DITT_NAV.equals(distribusjonKanal)){
+				return DITTNAV;
+			}else{
+				return DistribusjonsKanalCode.valueOf(distribusjonKanal);
+			}
 		} catch (IllegalArgumentException e) {
-			throw new BestemDokdistKanalMappingException("DistribusjonKanalCode i dokprod støtter ikke enum-verdien " + distribusjonKanalCodeTo);
+			throw new BestemDokdistKanalMappingException("DistribusjonKanalCode i dokdist støtter ikke enum-verdien " + distribusjonKanal);
 		}
 	}
 
