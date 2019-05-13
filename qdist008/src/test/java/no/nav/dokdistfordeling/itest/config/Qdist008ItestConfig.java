@@ -7,7 +7,7 @@ import no.nav.dokdistfordeling.config.alias.ArkiverDokumentproduksjonV1Alias;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
 import no.nav.dokdistfordeling.config.props.SrvAppserverProperties;
-import no.nav.dokdistfordeling.storage.Storage;
+import no.nav.dokdistfordeling.storageaws.AwsStorage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,8 +32,8 @@ import org.springframework.context.annotation.Profile;
 public class Qdist008ItestConfig {
 
 	@Bean
-	public Storage storage() {
-		return mock(Storage.class);
+	public AwsStorage awsStorage() {
+		return mock(AwsStorage.class);
 	}
 }
 

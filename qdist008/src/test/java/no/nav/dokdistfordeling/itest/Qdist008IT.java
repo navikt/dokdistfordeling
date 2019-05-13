@@ -29,7 +29,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import no.nav.dokdistfordeling.itest.config.Qdist008ItestConfig;
-import no.nav.dokdistfordeling.storage.Storage;
+import no.nav.dokdistfordeling.storageaws.AwsStorage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
@@ -89,7 +89,7 @@ public class Qdist008IT {
 	private Queue backoutQueue;
 
 	@Inject
-	private Storage storage;
+	private AwsStorage awsStorage;
 
 	@Inject
 	public CacheManager cacheManager;
@@ -98,8 +98,8 @@ public class Qdist008IT {
 	@BeforeEach
 	public void setupBefore() {
 		cacheManager.getCache(TKAT020_CACHE).clear();
-		reset(storage);
-		when(storage.get(any(String.class))).thenReturn(Optional.of(" "));
+		reset(awsStorage);
+		when(awsStorage.get(any(String.class))).thenReturn(Optional.of(" "));
 
 		WireMock.reset();
 		WireMock.resetAllRequests();
@@ -285,7 +285,7 @@ public class Qdist008IT {
 	@Test
 	public void shouldThrowValidatonNotAvailableInS3Exception() throws Exception {
 
-		when(storage.get(any(String.class))).thenReturn(null);
+		when(awsStorage.get(any(String.class))).thenReturn(null);
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {

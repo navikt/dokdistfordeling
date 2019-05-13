@@ -4,7 +4,7 @@ import no.nav.dokdistfordeling.consumer.saf.hentdokument.HentDokument;
 import no.nav.dokdistfordeling.consumer.saf.hentdokument.HentDokumentResponseTo;
 import no.nav.dokdistfordeling.storage.DokdistDokument;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
-import no.nav.dokdistfordeling.storage.Storage;
+import no.nav.dokdistfordeling.storageaws.AwsStorage;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Service;
@@ -19,13 +19,13 @@ import java.util.UUID;
 public class Qdist012Service {
 
 	private final HentDokument hentDokument;
-	private final Storage storage;
+	private final AwsStorage storage;
 	private final Qdist008DistribuerForsendelseMapper qdist008DistribuerForsendelseMapper;
 
 
 	@Inject
 	public Qdist012Service(HentDokument hentDokument,
-						   Storage storage,
+						   AwsStorage storage,
 						   Qdist008DistribuerForsendelseMapper qdist008DistribuerForsendelseMapper) {
 		this.hentDokument = hentDokument;
 		this.storage = storage;

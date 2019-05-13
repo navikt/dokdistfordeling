@@ -15,6 +15,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
 import no.nav.dokdistfordeling.exception.technical.S3FailedToGetDocumentTechnicalException;
 import no.nav.dokdistfordeling.crypto.Crypto;
+import no.nav.dokdistfordeling.storageaws.AwsStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +47,7 @@ public class S3StorageTest {
 	private AmazonS3 s3;
 
 	@Inject
-	private Storage storage;
+	private AwsStorage awsStorage;
 
 	@BeforeEach
 	public void setUp() {
@@ -56,7 +57,7 @@ public class S3StorageTest {
 
 	@Test
 	public void shouldEncryptAndPutObjectWithShortKey() {
-		storage.put("12", JsonSerializer.serialize(createDokument()));
+		awsStorage.put("12", JsonSerializer.serialize(createDokument()));
 
 		verify(s3).putObject(BUCKET_NAME, "12", new Crypto(encryptPsw, "12").encrypt(JsonSerializer.serialize(createDokument())));
 	}
@@ -66,7 +67,7 @@ public class S3StorageTest {
 	 */
 	@Test
 	public void shouldEncryptAndPutObject() {
-		storage.put(key, JsonSerializer.serialize(createDokument()));
+		awsStorage.put(key, JsonSerializer.serialize(createDokument()));
 
 		verify(s3).putObject(BUCKET_NAME, key, new Crypto(encryptPsw, key).encrypt(JsonSerializer.serialize(createDokument())));
 	}
@@ -77,7 +78,7 @@ public class S3StorageTest {
 		when(s3.getObject(any(String.class), any(String.class))).thenThrow(new S3FailedToGetDocumentTechnicalException("asd"));
 
 		try {
-			storage.get(key);
+			awsStorage.get(key);
 		} catch (Exception e) {
 			verify(s3, times(MAX_ATTEMPTS_SHORT)).getObject(any(String.class), any(String.class));
 		}
@@ -86,7 +87,7 @@ public class S3StorageTest {
 	@Test
 	public void shouldGetObjectAndDecrypt() {
 		when(s3.getObject(any(String.class), any(String.class))).thenReturn(createEncryptedS3Object());
-		String result = storage.get(key).get();
+		String result = awsStorage.get(key).get();
 
 		verify(s3).getObject(BUCKET_NAME, key);
 		assertThat(result, equalTo(JsonSerializer.serialize(createDokument())));

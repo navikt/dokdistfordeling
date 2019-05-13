@@ -25,7 +25,7 @@ import no.nav.dokdistfordeling.exception.technical.S3FailedToPutDocumentTechnica
 import no.nav.dokdistfordeling.itest.config.Qdist012TestConfig;
 import no.nav.dokdistfordeling.storage.DokdistDokument;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
-import no.nav.dokdistfordeling.storage.Storage;
+import no.nav.dokdistfordeling.storageaws.AwsStorage;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.io.IOUtils;
@@ -93,14 +93,14 @@ public class Qdist012IT {
 	private Queue backoutQueue;
 
 	@Inject
-	private Storage storage;
+	private AwsStorage awsStorage;
 
 	@Value("${hentdokumenter_fra_joark_crypto_password}")
 	private String encryptionPassphrase;
 
 	@BeforeEach
 	public void setupBefore() {
-		Mockito.reset(storage);
+		Mockito.reset(awsStorage);
 		WireMock.reset();
 		WireMock.resetAllRequests();
 		WireMock.removeAllMappings();
@@ -135,7 +135,7 @@ public class Qdist012IT {
 
 			//verifiser at riktige objekt lagres til s3
 			DistribuerForsendelse unmarshaledResponse = unmarshalDistribuerForsendelseFromXmlString(response);
-			Mockito.verify(storage, times(2))
+			Mockito.verify(awsStorage, times(2))
 					.put(argCaptorDokumentObjektReferanse.capture(), argCaptorDokdistDokument.capture());
 			DokdistDokument dokdistDokument1 = JsonSerializer.deserialize(argCaptorDokdistDokument.getAllValues()
 					.get(0), DokdistDokument.class);
@@ -173,7 +173,7 @@ public class Qdist012IT {
 			assertThat(decryptXml(responseTextMessage.getText()), is(message));
 			assertThat(responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE), is(JOURNALPOST_ID));
 		});
-		Mockito.verify(storage, times(0)).put(any(), any());
+		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -198,7 +198,7 @@ public class Qdist012IT {
 			assertThat(responseTextMessage.getStringProperty(CALL_ID), is(""));
 			assertThat(responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE), is(JOURNALPOST_ID));
 		});
-		Mockito.verify(storage, times(0)).put(any(), any());
+		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -220,7 +220,7 @@ public class Qdist012IT {
 			assertThat(decryptXml(responseTextMessage.getText()), is(message));
 			assertThat(responseTextMessage.getStringProperty(CALL_ID), is(BESTILLINGS_ID));
 		});
-		Mockito.verify(storage, times(0)).put(any(), any());
+		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -245,7 +245,7 @@ public class Qdist012IT {
 			assertThat(responseTextMessage.getStringProperty(CALL_ID), is(BESTILLINGS_ID));
 			assertThat(responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE), is(""));
 		});
-		Mockito.verify(storage, times(0)).put(any(), any());
+		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -268,7 +268,7 @@ public class Qdist012IT {
 			assertThat(response, is(notNullValue()));
 			assertThat(new Crypto(encryptionPassphrase, "thisKeyShouldBeBestillingsId").decrypt(response), is(message));
 		});
-		Mockito.verify(storage, times(0)).put(any(), any());
+		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -290,7 +290,7 @@ public class Qdist012IT {
 			assertThat(response, is(notNullValue()));
 			assertThat(response, is(message));
 		});
-		Mockito.verify(storage, times(0)).put(any(), any());
+		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -298,7 +298,7 @@ public class Qdist012IT {
 
 	@Test
 	public void shouldThrowS3TechnicalException() throws Exception {
-		doThrow(new S3FailedToPutDocumentTechnicalException("Feilet ved persistering av dokument til S3")).when(storage)
+		doThrow(new S3FailedToPutDocumentTechnicalException("Feilet ved persistering av dokument til S3")).when(awsStorage)
 				.put(any(), any());
 		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
@@ -316,7 +316,7 @@ public class Qdist012IT {
 			assertThat(response, is(notNullValue()));
 			assertThat(decryptXml(response), is(message));
 		});
-		Mockito.verify(storage, times(1)).put(any(), any());
+		Mockito.verify(awsStorage, times(1)).put(any(), any());
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -336,7 +336,7 @@ public class Qdist012IT {
 			assertThat(response, is(notNullValue()));
 			assertThat(decryptXml(response), is(message));
 		});
-		Mockito.verify(storage, times(0)).put(any(), any());
+		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(MAX_ATTEMPTS_SHORT * 3), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -358,7 +358,7 @@ public class Qdist012IT {
 			assertThat(response, is(notNullValue()));
 			assertThat(decryptXml(response), is(message));
 		});
-		Mockito.verify(storage, times(0)).put(any(), any());
+		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(MAX_ATTEMPTS_SHORT), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
 		verify(exactly(MAX_ATTEMPTS_SHORT), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -380,7 +380,7 @@ public class Qdist012IT {
 			assertThat(response, is(notNullValue()));
 			assertThat(decryptXml(response), is(message));
 		});
-		Mockito.verify(storage, times(0)).put(any(), any());
+		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -404,7 +404,7 @@ public class Qdist012IT {
 			assertThat(response, is(notNullValue()));
 			assertThat(decryptXml(response), is(message));
 		});
-		Mockito.verify(storage, times(0)).put(any(), any());
+		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
