@@ -29,7 +29,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import no.nav.dokdistfordeling.itest.config.Qdist008ItestConfig;
-import no.nav.dokdistfordeling.storageaws.AwsStorage;
+import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
@@ -92,7 +92,7 @@ public class Qdist008IT {
 	private Queue backoutQueue;
 
 	@Inject
-	private AwsStorage awsStorage;
+	private Storage awsStorage;
 
 	@Inject
 	public CacheManager cacheManager;

@@ -1,8 +1,8 @@
-package no.nav.dokdistfordeling.storageaws;
+package no.nav.dokdistfordeling.storage;
 
 import java.util.Optional;
 
-public interface AwsStorage {
+public interface Storage {
 
 	void put(String key, String value);
 

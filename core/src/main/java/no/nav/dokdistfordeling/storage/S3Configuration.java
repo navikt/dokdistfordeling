@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.storageaws;
+package no.nav.dokdistfordeling.storage;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -33,7 +33,7 @@ import java.util.List;
 
 @Configuration
 @Profile("nais")
-public class AwsS3Configuration {
+public class S3Configuration {
 
 	private final static String REGION_TO_USE_FOR_S3_TO_WORK_ONPREM = "us-east-1";
 	public static final String BUCKET_NAME = "dokdistmellomlager";
@@ -53,7 +53,7 @@ public class AwsS3Configuration {
 	private String encryptionPassphrase;
 
 	@Bean
-	public AwsStorage awsStorage() {
+	public Storage awsStorage() {
 		secretKey = key(encryptionPassphrase);
 		AmazonS3 s3 = s3(secretKey);
 
@@ -61,7 +61,7 @@ public class AwsS3Configuration {
 		configureBucketLifecycle(s3);
 		configureBucketAccessPolicy(s3);
 
-		return new AwsS3Storage(s3);
+		return new S3Storage(s3);
 	}
 
 	private AmazonS3 s3(SecretKey secretKey) {

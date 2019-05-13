@@ -1,8 +1,8 @@
-package no.nav.dokdistfordeling.storageaws;
+package no.nav.dokdistfordeling.storage;
 
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
-import static no.nav.dokdistfordeling.storageaws.AwsS3Configuration.BUCKET_NAME;
+import static no.nav.dokdistfordeling.storage.S3Configuration.BUCKET_NAME;
 
 import com.amazonaws.services.s3.AmazonS3;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
@@ -13,12 +13,12 @@ import javax.inject.Inject;
 import java.util.Optional;
 
 
-public class AwsS3Storage implements AwsStorage {
+public class S3Storage implements Storage {
 
 	private AmazonS3 s3WithStrictEncryption;
 
 	@Inject
-	public AwsS3Storage(AmazonS3 s3Encryption) {
+	public S3Storage(AmazonS3 s3Encryption) {
 		this.s3WithStrictEncryption = s3Encryption;
 	}
 

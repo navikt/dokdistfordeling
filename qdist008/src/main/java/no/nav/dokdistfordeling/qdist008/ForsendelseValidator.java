@@ -7,7 +7,7 @@ import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunc
 import no.nav.dokdistfordeling.exception.functional.DocumentNotFoundInS3FunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
-import no.nav.dokdistfordeling.storageaws.AwsStorage;
+import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
@@ -19,9 +19,9 @@ import java.util.UUID;
 @Component
 public class ForsendelseValidator {
 
-	private final AwsStorage storage;
+	private final Storage storage;
 
-	public ForsendelseValidator(AwsStorage storage) {
+	public ForsendelseValidator(Storage storage) {
 		this.storage = storage;
 	}
 

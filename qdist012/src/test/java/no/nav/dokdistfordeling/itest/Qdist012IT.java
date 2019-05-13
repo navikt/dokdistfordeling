@@ -25,7 +25,7 @@ import no.nav.dokdistfordeling.exception.technical.S3FailedToPutDocumentTechnica
 import no.nav.dokdistfordeling.itest.config.Qdist012TestConfig;
 import no.nav.dokdistfordeling.storage.DokdistDokument;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
-import no.nav.dokdistfordeling.storageaws.AwsStorage;
+import no.nav.dokdistfordeling.storage.Storage;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.io.IOUtils;
@@ -93,7 +93,7 @@ public class Qdist012IT {
 	private Queue backoutQueue;
 
 	@Inject
-	private AwsStorage awsStorage;
+	private Storage awsStorage;
 
 	@Value("${hentdokumenter_fra_joark_crypto_password}")
 	private String encryptionPassphrase;
