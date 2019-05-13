@@ -14,7 +14,6 @@ import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthori
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.metrics.Monitor;
 import no.nav.dokdistfordeling.swagger.SwaggerRestDistribuerJournalpost;
-import no.nav.dokdistfordeling.storageaws.AwsStorage;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,9 +22,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
-import java.util.concurrent.TimeUnit;
-
 @RestController
 @RequestMapping("rest/v1/")
 @Api(tags = "distribuerJournalpost API", description = "Tilbyr distribusjon av journalposter")
@@ -33,9 +29,6 @@ import java.util.concurrent.TimeUnit;
 public class DistribuerJournalpostController {
 
 	private DistribuerJournalpostService distribuerJournalpostService;
-
-	@Inject
-	private AwsStorage awsStorage;
 
 	public DistribuerJournalpostController(DistribuerJournalpostService distribuerJournalpostService) {
 		this.distribuerJournalpostService = distribuerJournalpostService;
@@ -48,20 +41,6 @@ public class DistribuerJournalpostController {
 	public ResponseEntity<DistribuerJournalpostResponseTo> distribuerJournalpost(@RequestBody DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
 																				 @ApiParam(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader) {
 		log.info("rdist002 har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());
-
-		// todo put into s3storage
-		String storeOnThisKey = "this key yo";
-		awsStorage.put(storeOnThisKey, "wohoooo");
-
-		try {
-			TimeUnit.SECONDS.sleep(1);
-		} catch (InterruptedException e) {
-			System.out.println("What does this mean?");
-		}
-
-		// todo get from strictSecuredS3Storage
-		awsStorage.get(storeOnThisKey);
-
 
 		try {
 			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(distribuerJournalpostService.distribuerForsendelse(distribuerJournalpostRequestTo, authorizationHeader));

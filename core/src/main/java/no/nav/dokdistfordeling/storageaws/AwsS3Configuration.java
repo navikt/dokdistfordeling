@@ -19,17 +19,14 @@ import com.amazonaws.services.s3.model.CryptoMode;
 import com.amazonaws.services.s3.model.EncryptionMaterials;
 import com.amazonaws.services.s3.model.StaticEncryptionMaterialsProvider;
 import com.amazonaws.services.s3.model.lifecycle.LifecycleFilter;
-import no.nav.dokdistfordeling.exception.functional.CryptoException;
+import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.spec.KeySpec;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,8 +54,7 @@ public class AwsS3Configuration {
 
 	@Bean
 	public AwsStorage awsStorage() {
-		secretKey = key(credsPass, "someRandomSaltWhichIsSupposedMightComeFromDate?IDon'tReallyKnow");
-
+		secretKey = key(encryptionPassphrase);
 		AmazonS3 s3 = s3(secretKey);
 
 		ensureBucketExists(s3);
@@ -117,19 +113,11 @@ public class AwsS3Configuration {
 				.withCannedAcl(CannedAccessControlList.Private));
 	}
 
-	private SecretKey key(String passphrase, String salt) {
-		try {
-			SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-			char[] ***passord=gammelt_passord***();
-			KeySpec spec = new PBEKeySpec(passwordChars, salt.getBytes(), 10000, 128);
-			SecretKey secretKey = factory.generateSecret(spec);
-			return new SecretKeySpec(secretKey.getEncoded(), "AES");
-		} catch (Exception ex) {
-			throw new CryptoException("Feilet ved generering av krypteringsnøkkel", ex);
+	private SecretKey key(String passphrase) {
+		if (passphrase.getBytes().length == 32) {
+			return new SecretKeySpec(passphrase.getBytes(), "AES");
+		} else {
+			throw new ValidationException("Passordet for s3Storage sin AES må være 256 bit");
 		}
-	}
-
-	private boolean isEmpty(String str) {
-		return str == null || str.trim().length() == 0;
 	}
 }
