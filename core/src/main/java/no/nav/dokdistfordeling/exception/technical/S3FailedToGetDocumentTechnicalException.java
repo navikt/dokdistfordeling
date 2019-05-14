@@ -5,7 +5,4 @@ public class S3FailedToGetDocumentTechnicalException extends AbstractDokdistford
 		super(message, cause);
 	}
 
-	public S3FailedToGetDocumentTechnicalException(String message) {
-		super(message);
-	}
 }

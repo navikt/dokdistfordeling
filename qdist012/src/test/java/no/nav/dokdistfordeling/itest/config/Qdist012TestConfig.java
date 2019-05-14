@@ -33,7 +33,7 @@ import org.springframework.retry.annotation.EnableRetry;
 public class Qdist012TestConfig {
 
 	@Bean
-	public Storage storage() {
+	public Storage awsStorage() {
 		return mock(Storage.class);
 	}
 }

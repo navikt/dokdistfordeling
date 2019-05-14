@@ -4,7 +4,6 @@ import static java.lang.String.format;
 import static no.nav.dokdistfordeling.util.Qdist008Util.countHoveddokument;
 
 import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalException;
-import no.nav.dokdistfordeling.exception.functional.DocumentNotFoundInS3FunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.dokdistfordeling.storage.Storage;
@@ -59,9 +58,7 @@ public class ForsendelseValidator {
 	private void assertThatDocumentsAreAvailableInS3(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
 		distribusjonbestillingTo.getDokumenter()
 				.forEach(dokumentInformasjonTo -> {
-					storage.get(dokumentInformasjonTo.getDokumentObjektReferanse())
-							.orElseThrow(() -> new DocumentNotFoundInS3FunctionalException(format("Kunne ikke finne dokument i S3 på key=dokumentObjektReferanse=%s", dokumentInformasjonTo
-									.getDokumentObjektReferanse())));
+					storage.get(dokumentInformasjonTo.getDokumentObjektReferanse());
 				});
 	}
 

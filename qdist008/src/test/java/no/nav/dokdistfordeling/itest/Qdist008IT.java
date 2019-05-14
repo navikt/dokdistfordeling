@@ -17,16 +17,19 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACHE;
+import static no.nav.dokdistfordeling.storage.S3Configuration.BUCKET_NAME;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import no.nav.dokdistfordeling.itest.config.Qdist008ItestConfig;
 import no.nav.dokdistfordeling.storage.Storage;
@@ -55,7 +58,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -92,7 +94,10 @@ public class Qdist008IT {
 	private Queue backoutQueue;
 
 	@Inject
-	private Storage storage;
+	private AmazonS3 amazonS3;
+
+	@Inject
+	private Storage awsStorage;
 
 	@Inject
 	public CacheManager cacheManager;
@@ -101,8 +106,8 @@ public class Qdist008IT {
 	@BeforeEach
 	public void setupBefore() {
 		cacheManager.getCache(TKAT020_CACHE).clear();
-		reset(storage);
-		when(storage.get(any(String.class))).thenReturn(Optional.of(" "));
+		reset(amazonS3);
+		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), any(String.class))).thenReturn(" ");
 
 		WireMock.reset();
 		WireMock.resetAllRequests();
@@ -438,17 +443,17 @@ public class Qdist008IT {
 					.replaceAll("\t", "")));
 		});
 
-		verify(exactly(1),getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 		verify(exactly(0), postRequestedFor(urlEqualTo("/aktoerv2")));
-		verify(exactly(1),postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-		verify(exactly(1),postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
+		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//bestemkanal/bestemkanal-organisasjon-happy.json"))));
-		verify(exactly(1),postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-		verify(exactly(1),postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("S"))));
-		verify(exactly(1),postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
+		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseWithOrganisasjonOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
 	}
@@ -466,7 +471,7 @@ public class Qdist008IT {
 	}
 
 	@Test
-	public void shouldThrowValidatonManglerHoveddokumentException() throws Exception {
+	public void shouldThrowManglerHoveddokumentValidationException() throws Exception {
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_mangler_hoveddokument.xml"));
 
@@ -478,7 +483,7 @@ public class Qdist008IT {
 	}
 
 	@Test
-	public void shouldThrowValidatonSamhandlerUtenAddresseException() throws Exception {
+	public void shouldThrowSamhandlerUtenAddresseValidationException() throws Exception {
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_samhandler_uten_addresse.xml"));
 
@@ -501,16 +506,17 @@ public class Qdist008IT {
 		});
 	}
 
-	@Test
-	public void shouldThrowValidatonNotAvailableInS3Exception() throws Exception {
 
-		when(storage.get(any(String.class))).thenReturn(null);
+	@Test
+	public void shouldThrowNotAvailableInS3ValidationException() throws Exception {
+
+		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), any(String.class))).thenReturn(null);
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String resultOnQdist008BackoutQueue = receive(backoutQueue);
-			assertNotNull(resultOnQdist008BackoutQueue);
-			assertEquals(resultOnQdist008BackoutQueue, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
+			String resultOnQdist008FunksjonellFeilQueue = receive(qdist008FunksjonellFeil);
+			assertNotNull(resultOnQdist008FunksjonellFeilQueue);
+			assertEquals(resultOnQdist008FunksjonellFeilQueue, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 		});
 	}
 
