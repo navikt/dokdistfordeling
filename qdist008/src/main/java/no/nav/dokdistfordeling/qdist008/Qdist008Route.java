@@ -89,7 +89,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
 				.bean(distribuerForsendelseMapper)
 				.bean(forsendelseValidator)
-				.log(LoggingLevel.INFO, log, String.format("qdist008 har validert forsendelse med bestillingsId=%s ok.", PROPERTY_BESTILLINGS_ID))
+				.log(LoggingLevel.INFO, log, String.format("qdist008 har validert forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))
 				.bean(qdist008Service)
 				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
 				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())

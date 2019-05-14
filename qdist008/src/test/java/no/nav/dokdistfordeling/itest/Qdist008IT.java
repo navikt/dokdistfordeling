@@ -17,16 +17,19 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACHE;
+import static no.nav.dokdistfordeling.storage.S3Configuration.BUCKET_NAME;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import no.nav.dokdistfordeling.itest.config.Qdist008ItestConfig;
 import no.nav.dokdistfordeling.storage.Storage;
@@ -91,6 +94,9 @@ public class Qdist008IT {
 	private Queue backoutQueue;
 
 	@Inject
+	private AmazonS3 amazonS3;
+
+	@Inject
 	private Storage awsStorage;
 
 	@Inject
@@ -100,8 +106,8 @@ public class Qdist008IT {
 	@BeforeEach
 	public void setupBefore() {
 		cacheManager.getCache(TKAT020_CACHE).clear();
-		reset(awsStorage);
-		when(awsStorage.get(any(String.class))).thenReturn(" ");
+		reset(amazonS3);
+		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), any(String.class))).thenReturn(" ");
 
 		WireMock.reset();
 		WireMock.resetAllRequests();
@@ -497,6 +503,20 @@ public class Qdist008IT {
 			String resultOnQdist008FunksjonellFeilQueue = receive(qdist008FunksjonellFeil);
 			assertNotNull(resultOnQdist008FunksjonellFeilQueue);
 			assertEquals(resultOnQdist008FunksjonellFeilQueue, classpathToString("qdist008/distribuerforsendelse_example_invalid_uuid.xml"));
+		});
+	}
+
+
+	@Test
+	public void shouldThrowNotAvailableInS3ValidationException() throws Exception {
+
+		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), any(String.class))).thenReturn(null);
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			String resultOnQdist008FunksjonellFeilQueue = receive(qdist008FunksjonellFeil);
+			assertNotNull(resultOnQdist008FunksjonellFeilQueue);
+			assertEquals(resultOnQdist008FunksjonellFeilQueue, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 		});
 	}
 
