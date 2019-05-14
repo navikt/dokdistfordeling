@@ -9,6 +9,7 @@ import com.amazonaws.auth.policy.Statement;
 import com.amazonaws.auth.policy.actions.S3Actions;
 import com.amazonaws.auth.policy.resources.S3ObjectResource;
 import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3EncryptionClientBuilder;
 import com.amazonaws.services.s3.model.BucketLifecycleConfiguration;
@@ -35,10 +36,10 @@ import java.util.List;
 @Profile("nais")
 public class S3Configuration {
 
-	private final static String REGION_TO_USE_FOR_S3_TO_WORK_ONPREM = "us-east-1";
+	private static final String REGION_TO_USE_FOR_S3_TO_WORK_ONPREM = Regions.US_EAST_1.name();
 	public static final String BUCKET_NAME = "dokdistmellomlager";
 
-	private static SecretKey secretKey;
+	private SecretKey secretKey;
 
 	@Value("${dokdistfordeling_s3_creds_username}")
 	private String credsUsername;

@@ -55,7 +55,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -102,7 +101,7 @@ public class Qdist008IT {
 	public void setupBefore() {
 		cacheManager.getCache(TKAT020_CACHE).clear();
 		reset(awsStorage);
-		when(awsStorage.get(any(String.class))).thenReturn(Optional.of(" "));
+		when(awsStorage.get(any(String.class))).thenReturn(" ");
 
 		WireMock.reset();
 		WireMock.resetAllRequests();
@@ -438,17 +437,17 @@ public class Qdist008IT {
 					.replaceAll("\t", "")));
 		});
 
-		verify(exactly(1),getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 		verify(exactly(0), postRequestedFor(urlEqualTo("/aktoerv2")));
-		verify(exactly(1),postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-		verify(exactly(1),postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
+		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//bestemkanal/bestemkanal-organisasjon-happy.json"))));
-		verify(exactly(1),postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-		verify(exactly(1),postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("S"))));
-		verify(exactly(1),postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
+		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseWithOrganisasjonOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
 	}
@@ -466,7 +465,7 @@ public class Qdist008IT {
 	}
 
 	@Test
-	public void shouldThrowValidatonManglerHoveddokumentException() throws Exception {
+	public void shouldThrowManglerHoveddokumentValidationException() throws Exception {
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_mangler_hoveddokument.xml"));
 
@@ -478,7 +477,7 @@ public class Qdist008IT {
 	}
 
 	@Test
-	public void shouldThrowValidatonSamhandlerUtenAddresseException() throws Exception {
+	public void shouldThrowSamhandlerUtenAddresseValidationException() throws Exception {
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_samhandler_uten_addresse.xml"));
 
@@ -498,19 +497,6 @@ public class Qdist008IT {
 			String resultOnQdist008FunksjonellFeilQueue = receive(qdist008FunksjonellFeil);
 			assertNotNull(resultOnQdist008FunksjonellFeilQueue);
 			assertEquals(resultOnQdist008FunksjonellFeilQueue, classpathToString("qdist008/distribuerforsendelse_example_invalid_uuid.xml"));
-		});
-	}
-
-	@Test
-	public void shouldThrowValidatonNotAvailableInS3Exception() throws Exception {
-
-		when(awsStorage.get(any(String.class))).thenReturn(null);
-		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
-
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String resultOnQdist008BackoutQueue = receive(backoutQueue);
-			assertNotNull(resultOnQdist008BackoutQueue);
-			assertEquals(resultOnQdist008BackoutQueue, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 		});
 	}
 
