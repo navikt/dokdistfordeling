@@ -102,7 +102,7 @@ public class S3Configuration {
 
 	private void configureBucketAccessPolicy(AmazonS3 s3) {
 		Statement allowDokarkivRead = new Statement(Statement.Effect.Allow)
-				.withPrincipals(new Principal("arn:aws:iam:::user/dokdistsentralprint"))
+				.withPrincipals(new Principal("arn:aws:iam:::user/dokdistsentralprint"), new Principal("arn:aws:iam:::user/dokdisteformidling"))
 				.withActions(S3Actions.GetObject)
 				.withResources(new S3ObjectResource(BUCKET_NAME, "*"));
 		Policy accessPolicy = new Policy().withStatements(allowDokarkivRead);

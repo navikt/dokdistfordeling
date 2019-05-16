@@ -21,6 +21,7 @@ public class LokalCacheConfig {
 
 	public static final String TKAT020_CACHE = "tkat020Cache";
 
+
 	@Bean
 	@Primary
 	CacheManager cacheManager() {
