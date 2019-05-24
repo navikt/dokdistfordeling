@@ -145,6 +145,8 @@ public class DistribuerForsendelseMapper {
 			throw new ValidationException("Ugyldig input: samhandlerkategori kan ikke være null");
 		} else if (SamhandlerKategoriCode.HPR.name().equals(samhandlerKategori)) {
 			return AktoerTypeCode.SAMHANDLER_HPR;
+		} else if (SamhandlerKategoriCode.UTL_ORG.name().equals(samhandlerKategori)){
+			return AktoerTypeCode.SAMHANDLER_UTL_ORG;
 		} else {
 			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
 		}
