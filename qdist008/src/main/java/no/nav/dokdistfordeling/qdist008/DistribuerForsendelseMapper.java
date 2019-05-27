@@ -148,7 +148,7 @@ public class DistribuerForsendelseMapper {
 		} else if (SamhandlerKategoriCode.UTL_ORG.name().equals(samhandlerKategori)){
 			return AktoerTypeCode.SAMHANDLER_UTL_ORG;
 		} else {
-			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
+			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=SAMHANDLER_HPR og SAMHANDLER_UTL_ORG støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
 		}
 	}
 }
