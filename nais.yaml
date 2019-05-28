@@ -58,6 +58,8 @@ fasitResources:
     resourceType: queue
   - alias: dokdistdittnav_qdist010_dist_ditt_nav
     resourceType: queue
+  - alias: dokdisteformidling_qdist011_dist_til_dpi
+    resourceType: queue
   - alias: dokdistfordeling_qdist012_hent_dok_joark
     resourceType: queue
   - alias: dokdistfordeling_qdist012_funk_feil

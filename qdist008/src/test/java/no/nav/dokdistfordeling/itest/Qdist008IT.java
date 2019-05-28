@@ -91,6 +91,9 @@ public class Qdist008IT {
 	private Queue qdist010;
 
 	@Inject
+	private Queue qdist011;
+
+	@Inject
 	private Queue backoutQueue;
 
 	@Inject
@@ -229,13 +232,12 @@ public class Qdist008IT {
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
-		/*TODO Må implementeres når qdist011 er implementert
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receive(qdist010);
+			String response = receive(qdist011);
 			assertThat(response.replaceAll("\r", "")
 					.replaceAll("\t", ""), is(classpathToString("out/out-happy.txt").replaceAll("\r", "")
 					.replaceAll("\t", "")));
-		});*/
+		});
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
