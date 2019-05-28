@@ -2,6 +2,7 @@ package no.nav.dokdistfordeling.consumer.saf.journalpost;
 
 import lombok.Builder;
 import lombok.Value;
+import no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
@@ -35,6 +36,7 @@ public class Journalpost {
 	public static class AvsenderMottaker {
 		private final String id;
 		private final String navn;
+		private final AvsenderMottakerIdType type;
 	}
 
 	@Value

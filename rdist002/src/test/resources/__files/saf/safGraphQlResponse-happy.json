@@ -12,6 +12,7 @@
       "avsenderMottaker": {
         "id": "***gammelt_fnr***",
         "navn": "Jan Neimansen",
+        "type": "FNR",
         "land": "NO",
         "erLikBruker": false
       },

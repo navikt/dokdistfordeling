@@ -44,8 +44,8 @@ class Qdist008DistribuerForsendelseMapperTest {
 	private static final String MOTTAKER_ID = "mottakerId";
 	private static final String ORGNUMMER = "orgnr";
 	private static final String SAMHANDLER_IDENTIFIKATOR = "samhandlerId";
-	private static final String SAMHANDLER_KATEGORI_HPR = "HPR";
-	private static final String SAMHANDLER_KATEGORI_UTL_ORG = "UTL_ORG";
+	private static final String SAMHANDLER_KATEGORI_HPR = "SAMHANDLER_HPR";
+	private static final String SAMHANDLER_KATEGORI_UTL_ORG = "SAMHANDLER_UTL_ORG";
 	private static final String ADRESSELINJE_1 = "adresselinje1";
 	private static final String ADRESSELINJE_2 = "adresselinje2";
 	private static final String ADRESSELINJE_3 = "adresselinje3";

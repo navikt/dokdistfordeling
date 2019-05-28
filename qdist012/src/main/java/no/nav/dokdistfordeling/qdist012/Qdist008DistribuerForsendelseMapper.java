@@ -89,13 +89,13 @@ public class Qdist008DistribuerForsendelseMapper {
 				output = new Samhandler()
 						.withSamhandleridentifikator(aktoer.getIdentifikator())
 						.withNavn(aktoer.getNavn())
-						.withSamhandlerkategori(HPR.name());
+						.withSamhandlerkategori(aktoer.getAktoerType().name());
 				break;
 			case SAMHANDLER_UTL_ORG:
 				output = new Samhandler()
 						.withSamhandleridentifikator(aktoer.getIdentifikator())
 						.withNavn(aktoer.getNavn())
-						.withSamhandlerkategori(UTL_ORG.name());
+						.withSamhandlerkategori(aktoer.getAktoerType().name());
 				break;
 			default:
 				output = null;

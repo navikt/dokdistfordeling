@@ -11,6 +11,7 @@ import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
@@ -68,16 +69,34 @@ public class DistribuerJournalpostService {
 	}
 
 	private Aktoer mapMottaker(Journalpost.AvsenderMottaker avsenderMottaker) {
-		if (avsenderMottaker.getId().trim().length() == 11) {
-			return new Person()
-					.withNavn(avsenderMottaker.getNavn())
-					.withPersonidentifikator(avsenderMottaker.getId());
-		} else if (avsenderMottaker.getId().length() == 9) {
-			return new Organisasjon()
-					.withNavn(avsenderMottaker.getNavn())
-					.withOrgnummer(avsenderMottaker.getId());
-		} else {
-			throw new ValidationException(String.format("Id for den aktuelle mottakeren har lengde=%s, forventet lengde=9 (ORGNR) eller lengde=11 (FNR)", avsenderMottaker.getId().trim().length()));
+		Aktoer output;
+		switch (avsenderMottaker.getType()) {
+			case FNR:
+				output = new Person()
+						.withNavn(avsenderMottaker.getNavn())
+						.withPersonidentifikator(avsenderMottaker.getId());
+				break;
+			case ORGNR:
+				output = new Organisasjon()
+						.withNavn(avsenderMottaker.getNavn())
+						.withOrgnummer(avsenderMottaker.getId());
+				break;
+			case HPRNR:
+				output = new Samhandler()
+						.withNavn(avsenderMottaker.getNavn())
+						.withSamhandleridentifikator(avsenderMottaker.getId())
+						.withSamhandlerkategori(avsenderMottaker.getType().name());
+				break;
+			case UTL_ORG:
+				output = new Samhandler()
+						.withNavn(avsenderMottaker.getNavn())
+						.withSamhandleridentifikator(avsenderMottaker.getId())
+						.withSamhandlerkategori(avsenderMottaker.getType().name());
+				break;
+			default:
+				output = null;
+				break;
 		}
+		return output;
 	}
 }

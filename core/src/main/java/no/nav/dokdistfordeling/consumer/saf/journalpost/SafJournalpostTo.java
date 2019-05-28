@@ -31,6 +31,7 @@ public class SafJournalpostTo {
 	public static class AvsenderMottaker {
 		private final String id;
 		private final String navn;
+		private final String type;
 	}
 
 	@Value
