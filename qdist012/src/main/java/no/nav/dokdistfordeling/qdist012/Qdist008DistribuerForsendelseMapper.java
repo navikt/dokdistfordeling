@@ -5,6 +5,7 @@ import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
+import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.AktoerId;
@@ -89,13 +90,13 @@ public class Qdist008DistribuerForsendelseMapper {
 				output = new Samhandler()
 						.withSamhandleridentifikator(aktoer.getIdentifikator())
 						.withNavn(aktoer.getNavn())
-						.withSamhandlerkategori(aktoer.getAktoerType().name());
+						.withSamhandlerkategori(HPR.name());
 				break;
 			case SAMHANDLER_UTL_ORG:
 				output = new Samhandler()
 						.withSamhandleridentifikator(aktoer.getIdentifikator())
 						.withNavn(aktoer.getNavn())
-						.withSamhandlerkategori(aktoer.getAktoerType().name());
+						.withSamhandlerkategori(UTL_ORG.name());
 				break;
 			default:
 				output = null;

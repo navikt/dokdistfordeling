@@ -4,17 +4,14 @@
       "journalposttype": "U",
       "journalstatus": "FERDIGSTILT",
       "tema": "OPP",
-      "tittel": "journalpostTittel",
       "bruker": {
         "id": "***gammelt_fnr***",
         "type": "AKTOERID"
       },
       "avsenderMottaker": {
         "id": "***gammelt_fnr***",
-        "navn": "Jan Neimansen",
         "type": "FNR",
-        "land": "NO",
-        "erLikBruker": false
+        "navn": "Jan Neimansen"
       },
       "dokumenter": [
         {
