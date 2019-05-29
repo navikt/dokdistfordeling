@@ -7,7 +7,6 @@ import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
-import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
