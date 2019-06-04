@@ -5,5 +5,6 @@ package no.nav.dokdistfordeling.kodeverk;
  */
 public enum SamhandlerKategoriCode {
 
-	HPR
+	HPR,
+	UTL_ORG
 }

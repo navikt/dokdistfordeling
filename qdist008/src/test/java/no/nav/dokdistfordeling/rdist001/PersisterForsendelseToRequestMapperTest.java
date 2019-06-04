@@ -46,7 +46,8 @@ class PersisterForsendelseToRequestMapperTest {
 	private static final int REKKEFOLGE_2 = 2;
 	private static final String MOTTAKERNAVN = "mottakernavn";
 	private static final AktoerTypeCode PERSON_TYPE_CODE = AktoerTypeCode.PERSON;
-	private static final AktoerTypeCode SAMHANDLER_TYPE_CODE = AktoerTypeCode.SAMHANDLER_HPR;
+	private static final AktoerTypeCode SAMHANDLER_TYPE_CODE_HPR = AktoerTypeCode.SAMHANDLER_HPR;
+	private static final AktoerTypeCode SAMHANDLER_TYPE_CODE_UTL_ORG = AktoerTypeCode.SAMHANDLER_UTL_ORG;
 	private static final AktoerTypeCode ORGANISASJON_TYPE_CODE = AktoerTypeCode.ORGANISASJON;
 	private static final String TEMA = "FS22";
 	private static final TilknyttetSomCode TILKNYTTET_SOM_CODE_1 = TilknyttetSomCode.HOVEDDOKUMENT;
@@ -95,14 +96,25 @@ class PersisterForsendelseToRequestMapperTest {
 	}
 
 	@Test
-	public void shouldMapWithSamhandler() {
+	public void shouldMapWithSamhandlerHpr() {
 		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
-						.mottaker(createMottakerToWithSamhandler())
+						.mottaker(createMottakerToWithSamhandlerHpr())
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
 
-		assertMottakerWithSamhandler(persisterForsendelseRequestTo.getMottaker());
+		assertMottakerWithSamhandlerHpr(persisterForsendelseRequestTo.getMottaker());
+	}
+
+	@Test
+	public void shouldMapWithSamhandlerUtlOrg() {
+		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+						.mottaker(createMottakerToWithSamhandlerUtlOrg())
+						.build(),
+				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
+				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
+
+		assertMottakerWithSamhandlerUtlOrg(persisterForsendelseRequestTo.getMottaker());
 	}
 
 	@Test
@@ -178,8 +190,14 @@ class PersisterForsendelseToRequestMapperTest {
 		assertEquals(ORGNUMMER, mottaker.getMottakerId());
 	}
 
-	private void assertMottakerWithSamhandler(PersisterForsendelseRequestTo.MottakerTo mottaker) {
-		assertEquals(SAMHANDLER_TYPE_CODE, mottaker.getMottakerType());
+	private void assertMottakerWithSamhandlerHpr(PersisterForsendelseRequestTo.MottakerTo mottaker) {
+		assertEquals(SAMHANDLER_TYPE_CODE_HPR, mottaker.getMottakerType());
+		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
+		assertEquals(SAMHANDLER_IDENTIFIKATOR, mottaker.getMottakerId());
+	}
+
+	private void assertMottakerWithSamhandlerUtlOrg(PersisterForsendelseRequestTo.MottakerTo mottaker) {
+		assertEquals(SAMHANDLER_TYPE_CODE_UTL_ORG, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
 		assertEquals(SAMHANDLER_IDENTIFIKATOR, mottaker.getMottakerId());
 	}
@@ -296,11 +314,20 @@ class PersisterForsendelseToRequestMapperTest {
 				.build();
 	}
 
-	private DistribuerForsendelseTo.AktoerTo createMottakerToWithSamhandler() {
+	private DistribuerForsendelseTo.AktoerTo createMottakerToWithSamhandlerHpr() {
 		return DistribuerForsendelseTo.AktoerTo.builder()
 				.identifikator(SAMHANDLER_IDENTIFIKATOR)
 				.identifikatorAktoerId(false)
-				.aktoerType(SAMHANDLER_TYPE_CODE)
+				.aktoerType(SAMHANDLER_TYPE_CODE_HPR)
+				.navn(MOTTAKERNAVN)
+				.build();
+	}
+
+	private DistribuerForsendelseTo.AktoerTo createMottakerToWithSamhandlerUtlOrg() {
+		return DistribuerForsendelseTo.AktoerTo.builder()
+				.identifikator(SAMHANDLER_IDENTIFIKATOR)
+				.identifikatorAktoerId(false)
+				.aktoerType(SAMHANDLER_TYPE_CODE_UTL_ORG)
 				.navn(MOTTAKERNAVN)
 				.build();
 	}

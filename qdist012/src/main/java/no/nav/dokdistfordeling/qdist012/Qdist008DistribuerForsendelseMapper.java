@@ -2,6 +2,7 @@ package no.nav.dokdistfordeling.qdist012;
 
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
+import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
@@ -89,6 +90,12 @@ public class Qdist008DistribuerForsendelseMapper {
 						.withSamhandleridentifikator(aktoer.getIdentifikator())
 						.withNavn(aktoer.getNavn())
 						.withSamhandlerkategori(HPR.name());
+				break;
+			case SAMHANDLER_UTL_ORG:
+				output = new Samhandler()
+						.withSamhandleridentifikator(aktoer.getIdentifikator())
+						.withNavn(aktoer.getNavn())
+						.withSamhandlerkategori(UTL_ORG.name());
 				break;
 			default:
 				output = null;

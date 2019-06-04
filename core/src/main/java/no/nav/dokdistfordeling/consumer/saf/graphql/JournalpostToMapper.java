@@ -4,6 +4,7 @@ import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
 
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
+import no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
@@ -68,6 +69,7 @@ public class JournalpostToMapper {
 		return Journalpost.AvsenderMottaker.builder()
 				.id(avsenderMottaker.getId())
 				.navn(avsenderMottaker.getNavn())
+				.type(stringToEnum(AvsenderMottakerIdType.class, avsenderMottaker.getType()))
 				.build();
 	}
 

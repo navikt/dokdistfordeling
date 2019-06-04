@@ -50,6 +50,7 @@ class DistribuerForsendelseMapperTest {
 	private static final String MOTTAKER_ID = "mottakerId";
 	private static final String ORGNUMMER = "orgnr";
 	private static final String SAMHANDLER_IDENTIFIKATOR = "samhandlerId";
+	private static final String SAMHANDLER_KATEGORI_UTL_ORG = "UTL_ORG";
 	private static final String SAMHANDLER_KATEGORI_HPR = "HPR";
 	private static final String ADRESSELINJE_1 = "adresselinje1";
 	private static final String ADRESSELINJE_2 = "adresselinje2";
@@ -130,6 +131,21 @@ class DistribuerForsendelseMapperTest {
 		assertEquals(mottakerTo.getIdentifikator(), SAMHANDLER_IDENTIFIKATOR);
 		assertEquals(mottakerTo.getNavn(), SAMHANDLER_NAVN);
 		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.SAMHANDLER_HPR);
+		assertFalse(mottakerTo.isIdentifikatorAktoerId());
+	}
+
+	@Test
+	public void shouldMapSamhandlerUtlOrg() {
+		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
+		distribuerForsendelse.getDistribusjonbestilling().withMottaker(createAktoerSamhandlerOrgUtl());
+		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
+
+		assertDistribuerForsendelseTo(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
+		final DistribuerForsendelseTo.AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
+		assertEquals(mottakerTo.getIdentifikator(), SAMHANDLER_IDENTIFIKATOR);
+		assertEquals(mottakerTo.getNavn(), SAMHANDLER_NAVN);
+		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.SAMHANDLER_UTL_ORG);
 		assertFalse(mottakerTo.isIdentifikatorAktoerId());
 	}
 
@@ -338,5 +354,12 @@ class DistribuerForsendelseMapperTest {
 				.withNavn(SAMHANDLER_NAVN)
 				.withSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR)
 				.withSamhandlerkategori(SAMHANDLER_KATEGORI_HPR);
+	}
+
+	private Aktoer createAktoerSamhandlerOrgUtl() {
+		return new Samhandler()
+				.withNavn(SAMHANDLER_NAVN)
+				.withSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR)
+				.withSamhandlerkategori(SAMHANDLER_KATEGORI_UTL_ORG);
 	}
 }
