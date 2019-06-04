@@ -7,6 +7,7 @@ import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
+import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
@@ -84,13 +85,13 @@ public class DistribuerJournalpostService {
 				output = new Samhandler()
 						.withNavn(avsenderMottaker.getNavn())
 						.withSamhandleridentifikator(avsenderMottaker.getId())
-						.withSamhandlerkategori(avsenderMottaker.getType().name());
+						.withSamhandlerkategori(SamhandlerKategoriCode.HPR.name());
 				break;
 			case UTL_ORG:
 				output = new Samhandler()
 						.withNavn(avsenderMottaker.getNavn())
 						.withSamhandleridentifikator(avsenderMottaker.getId())
-						.withSamhandlerkategori(avsenderMottaker.getType().name());
+						.withSamhandlerkategori(SamhandlerKategoriCode.UTL_ORG.name());
 				break;
 			default:
 				output = null;
