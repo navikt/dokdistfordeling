@@ -62,6 +62,11 @@ public class JmsConfig {
 	}
 
 	@Bean
+	public Queue qdist013(@Value("${dokdisteformidling_qdist013_dist_trygderetten.queuename}") String qdist013QueueName) throws JMSException {
+		return new MQQueue(qdist013QueueName);
+	}
+
+	@Bean
 	public ConnectionFactory wmqConnectionFactory(final MqGatewayAlias mqGatewayAlias,
 												  final @Value("${dokdistfordeling_channel.name}") String channelName,
 												  final SrvAppserverProperties srvAppserverProperties) throws JMSException {

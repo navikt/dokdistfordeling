@@ -56,6 +56,11 @@ public class Qdist008JmsItestConfig {
 	}
 
 	@Bean
+	public Queue qdist013(@Value("${dokdisteformidling_qdist013_dist_trygderetten.queuename}") String qdist013QueueName) {
+		return new ActiveMQQueue(qdist013QueueName);
+	}
+
+	@Bean
 	public Queue backoutQueue() {
 		return new ActiveMQQueue("ActiveMQ.DLQ");
 	}

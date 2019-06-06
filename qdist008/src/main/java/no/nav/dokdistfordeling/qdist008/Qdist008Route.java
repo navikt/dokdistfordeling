@@ -41,6 +41,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 	private final Queue qdist009;
 	private final Queue qdist010;
 	private final Queue qdist011;
+	private final Queue qdist013;
 	private final Queue qdist008FunksjonellFeil;
 	private final Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy;
 
@@ -49,6 +50,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 						 Queue qdist009,
 						 Queue qdist010,
 						 Queue qdist011,
+						 Queue qdist013,
 						 Queue qdist008FunksjonellFeil,
 						 Qdist008Service qdist008Service,
 						 Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy,
@@ -59,6 +61,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 		this.qdist009 = qdist009;
 		this.qdist010 = qdist010;
 		this.qdist011 = qdist011;
+		this.qdist013 = qdist013;
 		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
 		this.qdist008Service = qdist008Service;
 		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
@@ -118,7 +121,7 @@ public class Qdist008Route extends SpringRouteBuilder {
 					.log(LoggingLevel.WARN, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist011 for distribusjon via DPI", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DistribusjonsKanalCode.TRYGDERETTEN))
-					// todo .inOnly("jms:" + qdist013.getQueueName())
+					.inOnly("jms:" + qdist013.getQueueName())
 					.log(LoggingLevel.WARN, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist013 for distribusjon via Trygderetten", getIdsForLogging()))
 					.endChoice()
 				.end()
