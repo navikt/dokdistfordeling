@@ -64,6 +64,8 @@ fasitResources:
     resourceType: queue
   - alias: dokdistfordeling_qdist012_funk_feil
     resourceType: queue
+  - alias: dokdisteformidling_qdist013_dist_trygderetten
+    resourceType: queue
 
 
 
