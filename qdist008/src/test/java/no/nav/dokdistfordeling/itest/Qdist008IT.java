@@ -32,6 +32,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import com.amazonaws.services.s3.AmazonS3;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import no.nav.dokdistfordeling.itest.config.Qdist008ItestConfig;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.io.IOUtils;
@@ -92,6 +93,9 @@ public class Qdist008IT {
 
 	@Inject
 	private Queue qdist011;
+
+	@Inject
+	private Queue qdist013;
 
 	@Inject
 	private Queue backoutQueue;
@@ -255,6 +259,53 @@ public class Qdist008IT {
 					.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilSDPOutputHappy.json"))));
 			verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
 		});
+	}
+
+	@Test
+	public void shouldProcessForsendelseAndWithUtsendingskanalTrygderetten() throws Exception {
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
+		stubFor(post("/aktoerv2")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("bestemkanal/distribusjonsKanalTrygderetten.json")));
+		stubFor(post("/arkiverdokumentproduksjon/v1")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
+		stubFor(post("/administrerforsendelse/v1")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			String response = receive(qdist013);
+			assertThat(response.replaceAll("\r", "").replaceAll("\t", ""),
+					is(classpathToString("out/out-happy.txt").replaceAll("\r", "")
+							.replaceAll("\t", "")));
+		});
+
+		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
+		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
+				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/bestemkanal/bestemkanal-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
+				.withRequestBody(matchingXPath("//utsendingskanal/text()",
+						equalTo(DistribusjonsKanalCode.TRYGDERETTEN.getJoarkUtsendingsKanal()))));
+		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilTrygderettenOutputHappy.json"))));
+		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
 	}
 
 	@Test
