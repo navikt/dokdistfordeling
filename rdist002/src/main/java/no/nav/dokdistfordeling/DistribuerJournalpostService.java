@@ -1,7 +1,5 @@
 package no.nav.dokdistfordeling;
 
-import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
@@ -12,7 +10,6 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -39,7 +36,7 @@ public class DistribuerJournalpostService {
 	}
 
 	public String distribuerForsendelse(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, String authorizationHeader) {
-		String bestillingsId = createBestillingsIdAndStoreAsCallId();
+		String bestillingsId = UUID.randomUUID().toString();
 
 		rdist002ValidationUtil.validateRequest(distribuerJournalpostRequestTo);
 
@@ -60,12 +57,6 @@ public class DistribuerJournalpostService {
 				distribuerJournalpostRequestTo.getJournalpostId());
 
 		return bestillingsId;
-	}
-
-	private String createBestillingsIdAndStoreAsCallId() {
-		String id = UUID.randomUUID().toString();
-		MDC.put(CALL_ID, id);
-		return id;
 	}
 
 	private Aktoer mapMottaker(Journalpost.AvsenderMottaker avsenderMottaker) {

@@ -12,6 +12,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static no.nav.dokdistfordeling.constants.Constants.BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
@@ -70,6 +71,7 @@ import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @ExtendWith(SpringExtension.class)
@@ -133,7 +135,8 @@ public class Rdist002IT {
 				.withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokkat/tkat020-happy.json")));
 
-		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
+		final String callId = UUID.randomUUID().toString();
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders(callId));
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -141,6 +144,7 @@ public class Rdist002IT {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			assertEquals(callId, qdist012ResultMessage.getStringProperty(CALL_ID));
 
 			assertNotNull(qdist012Result);
 			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
@@ -169,6 +173,7 @@ public class Rdist002IT {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
 
 			assertNotNull(qdist012Result);
 			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
@@ -384,9 +389,16 @@ public class Rdist002IT {
 	}
 
 	private HttpHeaders createHappyPathHeaders() {
+		return createHappyPathHeaders(null);
+	}
+
+	private HttpHeaders createHappyPathHeaders(String callId) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + OIDC_TOKEN);
+		if (callId != null) {
+			headers.add("Nav-CallId", callId);
+		}
 		return headers;
 	}
 
@@ -427,7 +439,7 @@ public class Rdist002IT {
 	}
 
 	private String extractHentDokumenterFraJoarkXmlStringAndDecrypt(Message message) throws JMSException, JAXBException {
-		String bestillingsId = message.getStringProperty(CALL_ID);
+		String bestillingsId = message.getStringProperty(BESTILLINGS_ID);
 		String encryptedAndMarshaledBody = ((TextMessage) message).getText();
 		return new Crypto(encryptionPassphrase, bestillingsId).decrypt(encryptedAndMarshaledBody);
 	}

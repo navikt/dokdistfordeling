@@ -1,5 +1,6 @@
 package no.nav.dokdistfordeling.config.jms;
 
+import static no.nav.dokdistfordeling.constants.Constants.BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.Constants.JOURNALPOST_ID;
 
@@ -7,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.exception.technical.MarshalHentDokumenterFraJoarkTechnicalException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
@@ -40,7 +42,8 @@ public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseP
 				qdist012,
 				session -> {
 					TextMessage msg = session.createTextMessage(marshalHentDokumenterFraJoarkToXmlStringAndEncrypt(hentDokumenterFraJoark, bestillingsId));
-					msg.setStringProperty(CALL_ID, bestillingsId);
+					msg.setStringProperty(CALL_ID, MDC.get(CALL_ID));
+					msg.setStringProperty(BESTILLINGS_ID, bestillingsId);
 					msg.setStringProperty(JOURNALPOST_ID, journalpostId);
 					return msg;
 				});

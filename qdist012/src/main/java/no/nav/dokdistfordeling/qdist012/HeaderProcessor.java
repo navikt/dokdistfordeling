@@ -1,36 +1,34 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.BESTILLINGS_ID;
+import static no.nav.dokdistfordeling.constants.Constants.JOURNALPOST_ID;
 import static no.nav.dokdistfordeling.qdist012.Qdist012Route.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.qdist012.Qdist012Route.PROPERTY_JOURNALPOST_ID;
 
 import no.nav.dokdistfordeling.exception.functional.ForsendelseManglerPaakrevdHeaderFunctionalException;
+import no.nav.dokdistfordeling.support.MDCHeaderProcessor;
 import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.slf4j.MDC;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
-public class HeaderProcessor implements Processor {
-
-	private static final String JOURNALPOST_ID = "journalpostId";
+public class HeaderProcessor extends MDCHeaderProcessor {
 
 	@Override
 	public void process(Exchange exchange) {
-		setBestillingsIdAsPropertyAndAddCallIdToMdc(exchange);
+		super.process(exchange);
+		setBestillingsIdAsProperty(exchange);
 		setJournalpostIdAsProperty(exchange);
 	}
 
-	private void setBestillingsIdAsPropertyAndAddCallIdToMdc(Exchange exchange) {
-		final String callId = exchange.getIn().getHeader(CALL_ID, String.class);
-		if (callId == null) {
-			throw new ForsendelseManglerPaakrevdHeaderFunctionalException("qdist012 har mottatt forsendelse uten påkrevd header callId");
-		} else if (callId.trim().isEmpty()) {
-			throw new ForsendelseManglerPaakrevdHeaderFunctionalException("qdist012 har mottatt forsendelse med tom header callId");
+	private void setBestillingsIdAsProperty(Exchange exchange) {
+		final String bestillingsId = exchange.getIn().getHeader(BESTILLINGS_ID, String.class);
+		if (bestillingsId == null) {
+			throw new ForsendelseManglerPaakrevdHeaderFunctionalException("qdist012 har mottatt forsendelse uten påkrevd header bestillingsId");
+		} else if (bestillingsId.trim().isEmpty()) {
+			throw new ForsendelseManglerPaakrevdHeaderFunctionalException("qdist012 har mottatt forsendelse med tom header bestillingsId");
 		}
-		exchange.setProperty(PROPERTY_BESTILLINGS_ID, callId);
-		MDC.put(CALL_ID, exchange.getProperty(PROPERTY_BESTILLINGS_ID, String.class));
+		exchange.setProperty(PROPERTY_BESTILLINGS_ID, bestillingsId);
 	}
 
 	private void setJournalpostIdAsProperty(Exchange exchange) {
@@ -42,6 +40,5 @@ public class HeaderProcessor implements Processor {
 		}
 		exchange.setProperty(PROPERTY_JOURNALPOST_ID, journalpostId);
 	}
-
 
 }
