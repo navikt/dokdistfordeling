@@ -14,6 +14,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.constants.Constants.BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
@@ -85,6 +86,7 @@ public class Rdist002IT {
 	private static final String OIDC_TOKEN = "eyAidHlwIjogIkpXVCIsICJraWQiOiAiMWwySmtDb1RMMTBibWVBeHlsZzR4Umk4ajJZPSIsICJhbGciOiAiUlMyNTYiIH0.eyAiYXRfaGFzaCI6ICJ4RklSS0dpTWZ4ZFVPS3c0ZmQ4MW9BIiwgInN1YiI6ICJaOTkyMzEwIiwgImF1ZGl0VHJhY2tpbmdJZCI6ICJiZDdlYWE0ZC1mYzIzLTQ2ZGMtOGRjZi1iMjJmNzU1NDExZjQtMjAyMDc5MzQiLCAiaXNzIjogImh0dHBzOi8vaXNzby1xLmFkZW8ubm86NDQzL2lzc28vb2F1dGgyIiwgInRva2VuTmFtZSI6ICJpZF90b2tlbiIsICJhdWQiOiAiaWRhLXEiLCAiY19oYXNoIjogInctbGx3ZlJMenVpRFBselpkY1BhenciLCAib3JnLmZvcmdlcm9jay5vcGVuaWRjb25uZWN0Lm9wcyI6ICIyZmNlNWU1ZS02ODdjLTQ5ZmYtOTRjYS1jNzE2OGVmY2M2MmQiLCAiYXpwIjogImlkYS1xIiwgImF1dGhfdGltZSI6IDE1NTUwNzQ3NjcsICJyZWFsbSI6ICIvIiwgImV4cCI6IDE1NTUwNzgzNjcsICJ0b2tlblR5cGUiOiAiSldUVG9rZW4iLCAiaWF0IjogMTU1NTA3NDc2NyB9.orrUotLp8SMkCpigVhkAUlw9Rx5tigBrYNVv3j8fTmkIe-I1MEI0xctxM-tnLbrgcW3I-3Ye_bkS4KplhR4spnG9hT45L1dD-yoLsu8R6cD1PklMsx8m93XmaTHDReGZAI3uKO4KSPcQHyVE7-tIc6CWYqbVXWmEUxUsHNYm3bWO_0rZ-Su6CWVCEBz3yWa85rUcPn0Il-_BWkgF-0YhOWJn3ndKAl_96ARmR-nllhUnQDYqHk2DwYLWnz_WOb4HuuqxKRP5i1h8zHwGIR6VORCzWgFViiFNTPT54Mtr2fZtVinP8W70JoRZ1pKbk-bYK4ErJgACU8npdGBZYTZa6g";
 	private static final String DISTRIBUER_JOURNALPOST_URI = "/rest/v1/distribuerjournalpost";
 	private static final String JOURNALPOST_ID = "555555555";
+	private static final String NAV_CONSUMER_ID = "itest";
 
 	private static final String BATCHID = "66666";
 	private static final String BESTILLENDEFAGSYSTEM = "bestillendeFagsystem";
@@ -136,7 +138,7 @@ public class Rdist002IT {
 				.withBodyFile("dokkat/tkat020-happy.json")));
 
 		final String callId = UUID.randomUUID().toString();
-		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders(callId));
+		HttpEntity requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -145,6 +147,7 @@ public class Rdist002IT {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 			assertEquals(callId, qdist012ResultMessage.getStringProperty(CALL_ID));
+			assertEquals(NAV_CONSUMER_ID, qdist012ResultMessage.getStringProperty(CONSUMER_ID));
 
 			assertNotNull(qdist012Result);
 			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
@@ -393,11 +396,18 @@ public class Rdist002IT {
 	}
 
 	private HttpHeaders createHappyPathHeaders(String callId) {
+		return createHappyPathHeaders(callId, null);
+	}
+
+	private HttpHeaders createHappyPathHeaders(String callId, String consumerId) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + OIDC_TOKEN);
 		if (callId != null) {
 			headers.add("Nav-CallId", callId);
+		}
+		if (consumerId != null) {
+			headers.add("Nav-Consumer-Id", consumerId);
 		}
 		return headers;
 	}
