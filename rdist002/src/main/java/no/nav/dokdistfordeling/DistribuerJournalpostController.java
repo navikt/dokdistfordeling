@@ -1,6 +1,9 @@
 package no.nav.dokdistfordeling;
 
 
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,6 +17,7 @@ import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthori
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.metrics.Monitor;
 import no.nav.dokdistfordeling.swagger.SwaggerRestDistribuerJournalpost;
+import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("rest/v1/")
@@ -39,7 +45,11 @@ public class DistribuerJournalpostController {
 	@PostMapping(value = "/distribuerjournalpost")
 	@Monitor(value = "dok_metric", extraTags = {"process", "rdist002"}, histogram = true)
 	public ResponseEntity<DistribuerJournalpostResponseTo> distribuerJournalpost(@RequestBody DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
-																				 @ApiParam(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+																				 @ApiParam(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader,
+																				 @ApiParam(value = "Nav-CallId - teknisk sporingsid") @RequestHeader(value = "Nav-CallId", required = false) String navCallId,
+																				 @ApiParam(value = "Nav-Consumer-Id - teknisk sporingsinfo om konsument") @RequestHeader(value = "Nav-Consumer-Id", required = false) String navConsumerId) {
+		addCallIdToMDC(navCallId);
+		addConsumerIdToMDC(navConsumerId);
 		log.info("rdist002 har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());
 
 		try {
@@ -73,6 +83,19 @@ public class DistribuerJournalpostController {
 		} catch (Exception e) {
 			log.warn("rdist002 - feilet ved distribusjon av journalpost med journalpostId={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw e;
+		}
+	}
+
+	private void addCallIdToMDC(String callId) {
+		if (callId == null || callId.isEmpty()) {
+			callId = UUID.randomUUID().toString();
+		}
+		MDC.put(CALL_ID, callId);
+	}
+
+	private void addConsumerIdToMDC(String consumerId) {
+		if (consumerId != null && !consumerId.isEmpty()) {
+			MDC.put(CONSUMER_ID, consumerId);
 		}
 	}
 }

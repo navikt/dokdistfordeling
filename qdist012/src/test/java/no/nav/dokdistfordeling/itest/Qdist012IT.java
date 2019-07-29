@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Base64;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -74,6 +75,7 @@ public class Qdist012IT {
 	private static byte[] TEST_FILE_BYTES1 = "TestThis1".getBytes();
 	private static byte[] TEST_FILE_BYTES2 = "TestThis2".getBytes();
 	private static String BESTILLINGS_ID = "4a7d638a-6a63-11e9-a923-1681be663d3e";
+	private static final String BESTILLINGS_ID_ATTRIBUTE = "bestillingsId";
 	private static String JOURNALPOST_ID = "arkivId";
 	private static String JOURNALPOST_ID_ATTRIBUTE = "journalpostId";
 
@@ -123,10 +125,13 @@ public class Qdist012IT {
 		ArgumentCaptor<String> argCaptorDokdistDokument = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> argCaptorDokumentObjektReferanse = ArgumentCaptor.forClass(String.class);
 
-		encryptAndSendStringMessageWithHeaders(qdist012, classpathToString("qdist012/qdist012-happy.xml"));
+		final String callId = UUID.randomUUID().toString();
+		encryptAndSendStringMessageWithHeaders(qdist012, classpathToString("qdist012/qdist012-happy.xml"), callId);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receive(qdist008);
+			TextMessage responseTextMessage = receiveTextMessage(qdist008);
+			assertThat(responseTextMessage.getStringProperty(CALL_ID), is(callId));
+			String response = responseTextMessage.getText();
 			assertThat(response, is(notNullValue()));
 
 			//Alle felter bortsett fra objektreferanse verifiseres her
@@ -158,7 +163,7 @@ public class Qdist012IT {
 	}
 
 	@Test
-	public void shouldThrowFunctionalExceptionMissingCallId() throws Exception {
+	public void shouldThrowFunctionalExceptionMissingBestillingsId() throws Exception {
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		jmsTemplate.send(qdist012, session -> {
 			TextMessage msg = new ActiveMQTextMessage();
@@ -181,13 +186,13 @@ public class Qdist012IT {
 	}
 
 	@Test
-	public void shouldThrowFunctionalExceptionEmptyCallId() throws Exception {
+	public void shouldThrowFunctionalExceptionEmptyBestillingsId() throws Exception {
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		jmsTemplate.send(qdist012, session -> {
 			TextMessage msg = new ActiveMQTextMessage();
 			final String encryptedMessage = new Crypto(encryptionPassphrase, BESTILLINGS_ID).encrypt(message);
 			msg.setText(encryptedMessage);
-			msg.setStringProperty(CALL_ID, "");
+			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, "");
 			msg.setStringProperty(JOURNALPOST_ID_ATTRIBUTE, JOURNALPOST_ID);
 			return msg;
 		});
@@ -196,7 +201,7 @@ public class Qdist012IT {
 			TextMessage responseTextMessage = receiveTextMessage(qdist012FunksjonellFeil);
 			assertThat(responseTextMessage, is(notNullValue()));
 			assertThat(decryptXml(responseTextMessage.getText()), is(message));
-			assertThat(responseTextMessage.getStringProperty(CALL_ID), is(""));
+			assertThat(responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE), is(""));
 			assertThat(responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE), is(JOURNALPOST_ID));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
@@ -212,14 +217,14 @@ public class Qdist012IT {
 			TextMessage msg = new ActiveMQTextMessage();
 			final String encryptedMessage = new Crypto(encryptionPassphrase, BESTILLINGS_ID).encrypt(message);
 			msg.setText(encryptedMessage);
-			msg.setStringProperty(CALL_ID, BESTILLINGS_ID);
+			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, BESTILLINGS_ID);
 			return msg;
 		});
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			TextMessage responseTextMessage = receiveTextMessage(qdist012FunksjonellFeil);
 			assertThat(responseTextMessage, is(notNullValue()));
 			assertThat(decryptXml(responseTextMessage.getText()), is(message));
-			assertThat(responseTextMessage.getStringProperty(CALL_ID), is(BESTILLINGS_ID));
+			assertThat(responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE), is(BESTILLINGS_ID));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
@@ -234,7 +239,7 @@ public class Qdist012IT {
 			TextMessage msg = new ActiveMQTextMessage();
 			final String encryptedMessage = new Crypto(encryptionPassphrase, BESTILLINGS_ID).encrypt(message);
 			msg.setText(encryptedMessage);
-			msg.setStringProperty(CALL_ID, BESTILLINGS_ID);
+			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, BESTILLINGS_ID);
 			msg.setStringProperty(JOURNALPOST_ID_ATTRIBUTE, "");
 			return msg;
 		});
@@ -243,7 +248,7 @@ public class Qdist012IT {
 			TextMessage responseTextMessage = receiveTextMessage(qdist012FunksjonellFeil);
 			assertThat(responseTextMessage, is(notNullValue()));
 			assertThat(decryptXml(responseTextMessage.getText()), is(message));
-			assertThat(responseTextMessage.getStringProperty(CALL_ID), is(BESTILLINGS_ID));
+			assertThat(responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE), is(BESTILLINGS_ID));
 			assertThat(responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE), is(""));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
@@ -259,7 +264,7 @@ public class Qdist012IT {
 			TextMessage msg = new ActiveMQTextMessage();
 			final String encryptedMessage = new Crypto(encryptionPassphrase, "thisKeyShouldBeBestillingsId").encrypt(message);
 			msg.setText(encryptedMessage);
-			msg.setStringProperty(CALL_ID, BESTILLINGS_ID);
+			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, BESTILLINGS_ID);
 			msg.setStringProperty(JOURNALPOST_ID_ATTRIBUTE, JOURNALPOST_ID);
 			return msg;
 		});
@@ -281,7 +286,7 @@ public class Qdist012IT {
 		jmsTemplate.send(qdist012, session -> {
 			TextMessage msg = new ActiveMQTextMessage();
 			msg.setText(message);
-			msg.setStringProperty(CALL_ID, BESTILLINGS_ID);
+			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, BESTILLINGS_ID);
 			msg.setStringProperty(JOURNALPOST_ID_ATTRIBUTE, JOURNALPOST_ID);
 			return msg;
 		});
@@ -388,11 +393,18 @@ public class Qdist012IT {
 	}
 
 	private void encryptAndSendStringMessageWithHeaders(Queue queue, final String message) {
+		encryptAndSendStringMessageWithHeaders(queue, message, null);
+	}
+
+	private void encryptAndSendStringMessageWithHeaders(Queue queue, final String message, final String callId) {
 		jmsTemplate.send(queue, session -> {
 			TextMessage msg = new ActiveMQTextMessage();
 			final String encryptedMessage = new Crypto(encryptionPassphrase, BESTILLINGS_ID).encrypt(message);
 			msg.setText(encryptedMessage);
-			msg.setStringProperty(CALL_ID, BESTILLINGS_ID);
+			if (callId != null) {
+				msg.setStringProperty(CALL_ID, callId);
+			}
+			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, BESTILLINGS_ID);
 			msg.setStringProperty(JOURNALPOST_ID_ATTRIBUTE, JOURNALPOST_ID);
 			return msg;
 		});
@@ -416,7 +428,7 @@ public class Qdist012IT {
 	@SuppressWarnings("unchecked")
 	private String receiveFromBoqAndAssertHeaders(Queue queue) throws JMSException {
 		TextMessage textMessage = (TextMessage) jmsTemplate.receive(queue);
-		assertThat(textMessage.getStringProperty(CALL_ID), is(BESTILLINGS_ID));
+		assertThat(textMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE), is(BESTILLINGS_ID));
 		assertThat(textMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE), is(JOURNALPOST_ID));
 		return textMessage.getText();
 	}

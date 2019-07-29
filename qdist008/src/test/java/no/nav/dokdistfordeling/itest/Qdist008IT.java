@@ -17,6 +17,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACHE;
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.storage.S3Configuration.BUCKET_NAME;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -59,6 +60,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -512,6 +514,36 @@ public class Qdist008IT {
 	}
 
 	@Test
+	public void shouldPassOnCallId() throws Exception {
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
+		stubFor(post("/aktoerv2")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("bestemkanal/distribusjonsKanalTrygderetten.json")));
+		stubFor(post("/arkiverdokumentproduksjon/v1")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
+		stubFor(post("/administrerforsendelse/v1")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+
+		final String callId = UUID.randomUUID().toString();
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"), callId);
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			TextMessage responseTextMsg = receiveTextMessage(qdist013);
+			assertThat(responseTextMsg.getStringProperty(CALL_ID), is(callId));
+		});
+	}
+
+	@Test
 	public void shouldThrowForsendelseMapperException() throws Exception {
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_mapperfail_bad_arkivsystemkode.xml"));
@@ -912,9 +944,16 @@ public class Qdist008IT {
 	}
 
 	private void sendStringMessage(Queue queue, final String message) {
+		sendStringMessage(queue, message, null);
+	}
+
+	private void sendStringMessage(Queue queue, final String message, final String callId) {
 		jmsTemplate.send(queue, session -> {
 			TextMessage msg = new ActiveMQTextMessage();
 			msg.setText(message);
+			if (callId != null) {
+				msg.setStringProperty(CALL_ID, callId);
+			}
 			return msg;
 		});
 	}
@@ -933,6 +972,10 @@ public class Qdist008IT {
 			response = ((JAXBElement) response).getValue();
 		}
 		return (T) response;
+	}
+
+	protected TextMessage receiveTextMessage(final Queue queue) {
+		return (TextMessage) jmsTemplate.receive(queue);
 	}
 
 	private String getRequestAsJson(String filename) throws IOException {
