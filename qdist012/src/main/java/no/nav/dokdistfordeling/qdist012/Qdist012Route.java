@@ -1,6 +1,5 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
@@ -12,7 +11,6 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.ValidationException;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.spring.SpringRouteBuilder;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
