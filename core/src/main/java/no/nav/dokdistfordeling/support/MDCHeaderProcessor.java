@@ -16,11 +16,11 @@ public class MDCHeaderProcessor implements Processor {
 
 	@Override
 	public void process(Exchange exchange) {
-		setCallIdToMdc(exchange);
+		setCallIdToMdcAndHeader(exchange);
 		setConsumerIdToMdc(exchange);
 	}
 
-	private void setCallIdToMdc(Exchange exchange) {
+	private void setCallIdToMdcAndHeader(Exchange exchange) {
 		String callId = exchange.getIn().getHeader(CALL_ID, String.class);
 		if (callId == null || callId.isEmpty()) {
 			callId = UUID.randomUUID().toString();
