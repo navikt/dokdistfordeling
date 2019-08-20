@@ -6,10 +6,14 @@ import static no.nav.dokdistfordeling.util.Qdist008Util.countHoveddokument;
 import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
+import no.nav.dokdistfordeling.storage.DokdistDokument;
+import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.camel.Handler;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.UUID;
 
 /**
@@ -30,6 +34,10 @@ public class ForsendelseValidator {
 		assertThatForsendelseContainsExactlyOneHoveddokument(distribusjonbestillingTo);
 		assertThatAdresseIsPresentIfMottakerIsSamhandler(distribusjonbestillingTo);
 		assertThatBestillingsIdIsAValidUuid(distribusjonbestillingTo.getBestillingsId());
+
+		//TODO This is only for testing and must be removed
+		persistTestDocumentsToS3(distribusjonbestillingTo);
+
 		assertThatDocumentsAreAvailableInS3(distribusjonbestillingTo);
 	}
 
@@ -60,6 +68,25 @@ public class ForsendelseValidator {
 				.forEach(dokumentInformasjonTo -> {
 					storage.get(dokumentInformasjonTo.getDokumentObjektReferanse());
 				});
+	}
+
+
+	//TODO Remove the methods below after testing
+	private void persistTestDocumentsToS3(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
+		distribusjonbestillingTo.getDokumenter()
+				.forEach(dokumentInformasjonTo -> {
+					storage.put(dokumentInformasjonTo.getDokumentObjektReferanse(), JsonSerializer.serialize(DokdistDokument.builder()
+							.pdf(readTestFileToBytes()).build()));
+				});
+	}
+
+	private byte[] readTestFileToBytes() {
+		try {
+			String data = FileUtils.readFileToString((new File("C:\\Projects\\dokdistfordeling\\qdist008\\src\\main\\java\\no\\nav\\dokdistfordeling\\qdist008\\Brev000050.pdf")), "UTF-8");
+			return data.getBytes();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 }

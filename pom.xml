@@ -35,7 +35,7 @@
 		<lombok.version>1.18.6</lombok.version>
 		<junit5.mockito.version>2.23.0</junit5.mockito.version>
 		<aws-java-sdk-s3.version>1.11.534</aws-java-sdk-s3.version>
-		<cxf.version>3.3.0</cxf.version>
+		<cxf.version>3.3.1</cxf.version>
 		<aktoer.version>2.0.1</aktoer.version>
 		<dokkat-api>10.4.0</dokkat-api>
 		<wmq.version>8.0.0.6</wmq.version>

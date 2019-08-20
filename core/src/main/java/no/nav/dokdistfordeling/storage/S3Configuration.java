@@ -114,6 +114,7 @@ public class S3Configuration {
 				.withCannedAcl(CannedAccessControlList.Private));
 	}
 
+
 	private SecretKey key(String passphrase) {
 		if (passphrase.getBytes().length == 32) {
 			return new SecretKeySpec(passphrase.getBytes(), "AES");
