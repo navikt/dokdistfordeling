@@ -80,7 +80,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		//TODO Only used for testing in prod (read test document from file). Must be removed after testing is done
+<!--		TODO Only used for testing in prod (read test document from file). Must be removed after testing is done-->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
