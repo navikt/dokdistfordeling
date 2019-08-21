@@ -10,14 +10,13 @@ import no.nav.dokdistfordeling.storage.DokdistDokument;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.camel.Handler;
-import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -86,11 +85,10 @@ public class ForsendelseValidator {
 
 	private byte[] readTestFileToBytes() {
 		try {
-			URL resource = this.getClass().getClassLoader().getResource("Brev000050.pdf");
-			File file = Paths.get(resource.toURI()).toFile();
-
-//			File file = new ClassPathResource("Brev000050.pdf", this.getClass().getClassLoader()).getFile();
-			return FileUtils.readFileToByteArray(file);
+			File file = new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource("Brev000050.pdf"))
+					.toURI()
+					.getPath());
+			return Files.readAllBytes(file.toPath());
 		} catch (IOException | URISyntaxException e) {
 			throw new RuntimeException(format("Problem med å lese inn testdokument. Feilmelding=%s", e.getMessage(), e));
 		}
