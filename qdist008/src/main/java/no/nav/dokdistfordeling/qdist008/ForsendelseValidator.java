@@ -11,14 +11,11 @@ import no.nav.dokdistfordeling.storage.DokdistDokument;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.camel.Handler;
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.UUID;
 
 /**
@@ -88,14 +85,18 @@ public class ForsendelseValidator {
 
 	private byte[] readTestFileToBytes() {
 		try {
-			URI uri = getClass().getClassLoader().getResource("Brev000050.pdf").toURI();
-			log.info(String.format("uri string=%s", uri.toString()));
-			Path path = Paths.get(uri);
-			log.info(String.format("path string=%s", path.toString()));
-			log.info(String.format("absolute path string=%s", path.toAbsolutePath()));
-			log.info(String.format("file system string=%s", path.getFileSystem().toString()));
-			return Files.readAllBytes(path);
-		} catch (IOException | URISyntaxException e) {
+//			URI uri = getClass().getClassLoader().getResource("Brev000050.pdf").toURI();
+//			log.info(String.format("uri string=%s", uri.toString()));
+//			Path path = Paths.get(uri);
+//			log.info(String.format("path string=%s", path.toString()));
+//			log.info(String.format("absolute path string=%s", path.toAbsolutePath()));
+//			log.info(String.format("file system string=%s", path.getFileSystem().toString()));
+//			return Files.readAllBytes(path);
+
+			InputStream in = getClass().getResourceAsStream("Brev000050.pdf");
+			return IOUtils.toByteArray(in);
+
+		} catch (IOException e) {
 			throw new RuntimeException(format("Problem med å lese inn testdokument. Feilmelding=%s", e.getMessage(), e));
 		}
 	}
