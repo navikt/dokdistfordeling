@@ -15,6 +15,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -83,10 +84,10 @@ public class ForsendelseValidator {
 
 	private byte[] readTestFileToBytes() {
 		try {
-			File file = new ClassPathResource("Brev000050.pdf").getFile();
+			File file = new ClassPathResource("Brev000050.pdf", this.getClass().getClassLoader()).getFile();
 			return FileUtils.readFileToByteArray(file);
-		} catch (Exception e) {
-			return null;
+		} catch (IOException e) {
+			throw new RuntimeException(format("Problem med å lese inn testdokument. Feilmelding=%s", e.getMessage(), e));
 		}
 	}
 
