@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.qdist008;
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.util.Qdist008Util.countHoveddokument;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
@@ -12,16 +13,18 @@ import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.Objects;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
+@Slf4j
 @Component
 public class ForsendelseValidator {
 
@@ -85,10 +88,13 @@ public class ForsendelseValidator {
 
 	private byte[] readTestFileToBytes() {
 		try {
-			File file = new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource("Brev000050.pdf"))
-					.toURI()
-					.getPath());
-			return Files.readAllBytes(file.toPath());
+			URI uri = getClass().getClassLoader().getResource("Brev000050.pdf").toURI();
+			log.info(String.format("uri string=%s", uri.toString()));
+			Path path = Paths.get(uri);
+			log.info(String.format("path string=%s", path.toString()));
+			log.info(String.format("absolute path string=%s", path.toAbsolutePath()));
+			log.info(String.format("file system string=%s", path.getFileSystem().toString()));
+			return Files.readAllBytes(path);
 		} catch (IOException | URISyntaxException e) {
 			throw new RuntimeException(format("Problem med å lese inn testdokument. Feilmelding=%s", e.getMessage(), e));
 		}
