@@ -11,6 +11,7 @@ import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.camel.Handler;
 import org.apache.commons.io.FileUtils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -82,8 +83,8 @@ public class ForsendelseValidator {
 
 	private byte[] readTestFileToBytes() {
 		try {
-			String data = FileUtils.readFileToString((new File("C:\\Projects\\dokdistfordeling\\qdist008\\src\\main\\java\\no\\nav\\dokdistfordeling\\qdist008\\Brev000050.pdf")), "UTF-8");
-			return data.getBytes();
+			File file = new ClassPathResource("Brev000050.pdf").getFile();
+			return FileUtils.readFileToByteArray(file);
 		} catch (Exception e) {
 			return null;
 		}
