@@ -93,7 +93,11 @@ public class ForsendelseValidator {
 //			log.info(String.format("file system string=%s", path.getFileSystem().toString()));
 //			return Files.readAllBytes(path);
 
-			InputStream in = getClass().getResourceAsStream("Brev000050.pdf");
+			InputStream in = getClass().getClassLoader().getResourceAsStream("/Brev000050.pdf");
+			if(in == null){
+				throw new RuntimeException("Problem med å lese inn testdokument. Inputstream=null");
+
+			}
 			return IOUtils.toByteArray(in);
 
 		} catch (IOException e) {
