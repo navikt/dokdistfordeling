@@ -209,6 +209,7 @@ public class Qdist008IT {
 					.replaceAll("\t", "")));
 		});
 
+
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
 		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
