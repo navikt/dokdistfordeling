@@ -1,6 +1,5 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
@@ -31,7 +30,6 @@ public class Qdist008Route extends SpringRouteBuilder {
 	static final String PROPERTY_BESTILLINGS_ID = "bestillingsId";
 	static final String PROPERTY_FORSENDELSE_ID = "forsendelseId";
 	static final String PROPERTY_DISTRIBUSJONSKANAL = "distribusjonskanal";
-	static final String PROPERTY_DISTRIBUSJONS_OBJEKT = "distribusjonsObjekt";
 
 	private final Qdist008Service qdist008Service;
 	private final DistribuerForsendelseMapper distribuerForsendelseMapper;
