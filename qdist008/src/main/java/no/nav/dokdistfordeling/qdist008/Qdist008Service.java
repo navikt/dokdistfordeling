@@ -61,11 +61,11 @@ public class Qdist008Service {
 		DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling = distribuerForsendelseTo.getDistribusjonbestilling();
 
 		final DokumenttypeInfoTo dokumenttypeInfoTo = getTittelFromDokkkatIfNotProvided(distribusjonbestilling);
-		final String mottakerHentIdentForAktoerIdResponseTo = getFoedselsnummerIfIdentifikatorIsAktoerId(distribusjonbestilling.getMottaker());
-		final String brukerHentIdentForAktoerIdResponseTo = getFoedselsnummerIfIdentifikatorIsAktoerId(distribusjonbestilling.getBruker());
+		final String mottakerFnr = getFnr(distribusjonbestilling.getMottaker());
+		final String brukerFnr = getFnr(distribusjonbestilling.getBruker());
 
 		final DistribusjonsKanalCode distribusjonsKanal = bestemDistribusjonskanal.bestemKanal(
-				mapDokDistKanalRequest(distribusjonbestilling, mottakerHentIdentForAktoerIdResponseTo, brukerHentIdentForAktoerIdResponseTo));
+				mapDokDistKanalRequest(distribusjonbestilling, mottakerFnr, brukerFnr));
 		exchange.setProperty(PROPERTY_DISTRIBUSJONSKANAL, distribusjonsKanal);
 
 		DistribuerTilKanal distribuerTilKanal = new DistribuerTilKanal();
@@ -73,7 +73,7 @@ public class Qdist008Service {
 		if (!(distribusjonsKanal.equals(DistribusjonsKanalCode.INGEN_DISTRIBUSJON) || distribusjonsKanal.equals(DistribusjonsKanalCode.LOKAL_PRINT))) {
 
 			final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
-					.map(distribusjonbestilling, dokumenttypeInfoTo, mottakerHentIdentForAktoerIdResponseTo, distribusjonsKanal);
+					.map(distribusjonbestilling, dokumenttypeInfoTo, mottakerFnr, distribusjonsKanal);
 
 			PersisterForsendelseResponseTo persisterForsendelseResponseTo = administrerForsendelse.persisterForsendelse(persisterForsendelseRequestTo);
 			exchange.setProperty(PROPERTY_FORSENDELSE_ID, persisterForsendelseResponseTo.getForsendelseId());
@@ -95,11 +95,11 @@ public class Qdist008Service {
 		}
 	}
 
-	private String getFoedselsnummerIfIdentifikatorIsAktoerId(DistribuerForsendelseTo.AktoerTo aktoer) {
+	private String getFnr(DistribuerForsendelseTo.AktoerTo aktoer) {
 		if (aktoer.isIdentifikatorAktoerId()) {
 			return aktoerregister.hentIdentForAktoerId(aktoer.getIdentifikator());
 		} else {
-			return null;
+			return aktoer.getIdentifikator();
 		}
 	}
 
