@@ -11,6 +11,8 @@ public final class Constants {
 	public static final String JOURNALPOST_ID = "journalpostId";
 	public static final String USER_ID = "userId";
 	public static final String DITT_NAV = "DITT_NAV";
+	public static final String APP_NAME = "dokdistfordeling";
+	public static final String BEARER_PREFIX = "Bearer ";
 
 	private Constants() {
 	}

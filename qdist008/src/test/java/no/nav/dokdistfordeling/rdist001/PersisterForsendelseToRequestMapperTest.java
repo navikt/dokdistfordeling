@@ -3,7 +3,6 @@ package no.nav.dokdistfordeling.rdist001;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
@@ -63,8 +62,7 @@ class PersisterForsendelseToRequestMapperTest {
 	@Test
 	public void shouldMapHappyPath() {
 		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder().build(),
-				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
-				HentIdentForAktoerIdResponseTo.builder().build());
+				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(), null);
 
 		assertCommon(persisterForsendelseRequestTo);
 		assertMottakerIsPerson(persisterForsendelseRequestTo.getMottaker());
@@ -78,7 +76,7 @@ class PersisterForsendelseToRequestMapperTest {
 						.mottaker(createMottakerToWithAktoerId())
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
-				HentIdentForAktoerIdResponseTo.builder().foedselsnr(AKTOER_IDENTIFIKATOR).build());
+				AKTOER_IDENTIFIKATOR);
 
 		assertMottakerIsAktoerId(persisterForsendelseRequestTo.getMottaker());
 	}
@@ -90,7 +88,7 @@ class PersisterForsendelseToRequestMapperTest {
 						.mottaker(createMottakerToWithOrganisasjonsNr())
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
-				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
+				PERSON_IDENTIFIKATOR);
 
 		assertMottakerIsOrganisasjonNr(persisterForsendelseRequestTo.getMottaker());
 	}
@@ -101,7 +99,7 @@ class PersisterForsendelseToRequestMapperTest {
 						.mottaker(createMottakerToWithSamhandlerHpr())
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
-				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
+				PERSON_IDENTIFIKATOR);
 
 		assertMottakerWithSamhandlerHpr(persisterForsendelseRequestTo.getMottaker());
 	}
@@ -112,7 +110,7 @@ class PersisterForsendelseToRequestMapperTest {
 						.mottaker(createMottakerToWithSamhandlerUtlOrg())
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
-				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
+				PERSON_IDENTIFIKATOR);
 
 		assertMottakerWithSamhandlerUtlOrg(persisterForsendelseRequestTo.getMottaker());
 	}
@@ -123,7 +121,7 @@ class PersisterForsendelseToRequestMapperTest {
 						.adresse(createUtenlandsPostadresseTo())
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
-				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
+				PERSON_IDENTIFIKATOR);
 
 		assertResponseIsPostaddresseUtenlands(persisterForsendelseRequestTo.getPostadresse());
 	}
@@ -134,7 +132,7 @@ class PersisterForsendelseToRequestMapperTest {
 						.adresse(null)
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
-				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
+				PERSON_IDENTIFIKATOR);
 
 		assertNull(persisterForsendelseRequestTo.getPostadresse());
 	}
@@ -145,7 +143,7 @@ class PersisterForsendelseToRequestMapperTest {
 						.forsendelseTittel(null)
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
-				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
+				PERSON_IDENTIFIKATOR);
 		assertResponseWithTomTittel(persisterForsendelseRequestTo);
 	}
 
@@ -155,7 +153,7 @@ class PersisterForsendelseToRequestMapperTest {
 						.arkivInformasjon(null)
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
-				HentIdentForAktoerIdResponseTo.builder().foedselsnr(PERSON_IDENTIFIKATOR).build());
+				PERSON_IDENTIFIKATOR);
 
 		assertNull(persisterForsendelseRequestTo.getArkivInformasjon());
 	}
@@ -245,7 +243,7 @@ class PersisterForsendelseToRequestMapperTest {
 
 	private PersisterForsendelseRequestTo performMapping(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo,
 														 DokumenttypeInfoTo dokumenttypeInfoTo,
-														 HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo) {
+														 String hentIdentForAktoerIdResponseTo) {
 		return persisterForsendelseToRequestMapper.map(
 				distribusjonbestillingTo,
 				dokumenttypeInfoTo,

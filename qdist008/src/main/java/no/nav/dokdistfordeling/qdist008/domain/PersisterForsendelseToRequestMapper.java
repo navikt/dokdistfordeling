@@ -1,6 +1,5 @@
 package no.nav.dokdistfordeling.qdist008.domain;
 
-import no.nav.dokdistfordeling.consumer.aktoerv2.HentIdentForAktoerIdResponseTo;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
@@ -17,7 +16,7 @@ public class PersisterForsendelseToRequestMapper {
 
 	public PersisterForsendelseRequestTo map(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling,
 											 DokumenttypeInfoTo dokumenttypeInfoTo,
-											 HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo,
+											 String hentIdentForAktoerIdResponseTo,
 											 DistribusjonsKanalCode distribusjonsKanal) {
 		final DistribuerForsendelseTo.AktoerTo mottaker = distribusjonbestilling.getMottaker();
 		final DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon = distribusjonbestilling.getArkivInformasjon();
@@ -56,7 +55,7 @@ public class PersisterForsendelseToRequestMapper {
 				.build();
 	}
 
-	private PersisterForsendelseRequestTo.MottakerTo mapMottaker(DistribuerForsendelseTo.AktoerTo mottaker, HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo) {
+	private PersisterForsendelseRequestTo.MottakerTo mapMottaker(DistribuerForsendelseTo.AktoerTo mottaker, String hentIdentForAktoerIdResponseTo) {
 		return PersisterForsendelseRequestTo.MottakerTo.builder()
 				.mottakerId(getMottakerId(mottaker, hentIdentForAktoerIdResponseTo))
 				.mottakerNavn(mottaker.getNavn())
@@ -82,8 +81,8 @@ public class PersisterForsendelseToRequestMapper {
 				.build();
 	}
 
-	private String getMottakerId(DistribuerForsendelseTo.AktoerTo mottaker, HentIdentForAktoerIdResponseTo hentIdentForAktoerIdResponseTo) {
-		return mottaker.isIdentifikatorAktoerId() ? hentIdentForAktoerIdResponseTo.getFoedselsnr() : mottaker.getIdentifikator();
+	private String getMottakerId(DistribuerForsendelseTo.AktoerTo mottaker, String hentIdentForAktoerIdResponseTo) {
+		return mottaker.isIdentifikatorAktoerId() ? hentIdentForAktoerIdResponseTo : mottaker.getIdentifikator();
 	}
 
 	private String getPostnummer(DistribuerForsendelseTo.AdresseTo adresse) {

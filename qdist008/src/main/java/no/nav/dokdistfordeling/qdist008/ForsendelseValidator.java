@@ -7,15 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
-import no.nav.dokdistfordeling.storage.DokdistDokument;
-import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.camel.Handler;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.UUID;
 
 /**
@@ -37,9 +32,6 @@ public class ForsendelseValidator {
 		assertThatForsendelseContainsExactlyOneHoveddokument(distribusjonbestillingTo);
 		assertThatAdresseIsPresentIfMottakerIsSamhandler(distribusjonbestillingTo);
 		assertThatBestillingsIdIsAValidUuid(distribusjonbestillingTo.getBestillingsId());
-
-		//TODO This is only for testing and must be removed
-		persistTestDocumentsToS3(distribusjonbestillingTo);
 
 		assertThatDocumentsAreAvailableInS3(distribusjonbestillingTo);
 	}
@@ -72,37 +64,4 @@ public class ForsendelseValidator {
 					storage.get(dokumentInformasjonTo.getDokumentObjektReferanse());
 				});
 	}
-
-
-	//TODO Remove the methods below after testing
-	private void persistTestDocumentsToS3(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
-		distribusjonbestillingTo.getDokumenter()
-				.forEach(dokumentInformasjonTo -> {
-					storage.put(dokumentInformasjonTo.getDokumentObjektReferanse(), JsonSerializer.serialize(DokdistDokument.builder()
-							.pdf(readTestFileToBytes()).build()));
-				});
-	}
-
-	private byte[] readTestFileToBytes() {
-		try {
-//			URI uri = getClass().getClassLoader().getResource("Brev000050.pdf").toURI();
-//			log.info(String.format("uri string=%s", uri.toString()));
-//			Path path = Paths.get(uri);
-//			log.info(String.format("path string=%s", path.toString()));
-//			log.info(String.format("absolute path string=%s", path.toAbsolutePath()));
-//			log.info(String.format("file system string=%s", path.getFileSystem().toString()));
-//			return Files.readAllBytes(path);
-
-			InputStream in = getClass().getClassLoader().getResourceAsStream("/Brev000050.pdf");
-			if(in == null){
-				throw new RuntimeException("Problem med å lese inn testdokument. Inputstream=null");
-
-			}
-			return IOUtils.toByteArray(in);
-
-		} catch (IOException e) {
-			throw new RuntimeException(format("Problem med å lese inn testdokument. Feilmelding=%s", e.getMessage(), e));
-		}
-	}
-
 }

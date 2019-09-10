@@ -5,6 +5,5 @@ package no.nav.dokdistfordeling.kodeverk;
  */
 public enum ArkivSystemCode {
 
-	JOARK,
-	INGEN; //TODO ikke relevant?
+	JOARK
 }
