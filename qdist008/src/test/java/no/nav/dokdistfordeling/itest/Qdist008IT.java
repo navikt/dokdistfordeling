@@ -790,7 +790,6 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowBestemDokdistKanalMappingException() throws Exception {
-
 		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
