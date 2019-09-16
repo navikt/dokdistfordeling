@@ -114,9 +114,9 @@ public class Qdist008Service {
 		}
 	}
 
-	private String getIdentifikator(DistribuerForsendelseTo.AktoerTo aktoerTo, String hentIdentForAktoerIdResponseTo) {
+	private String getIdentifikator(DistribuerForsendelseTo.AktoerTo aktoerTo, String fnrMottaker) {
 		if (aktoerTo.isIdentifikatorAktoerId()) {
-			return hentIdentForAktoerIdResponseTo;
+			return fnrMottaker;
 		}
 		return aktoerTo.getIdentifikator();
 	}
