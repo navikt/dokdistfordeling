@@ -122,13 +122,13 @@ public class Qdist008Service {
 	}
 
 	private DokDistKanalRequest mapDokDistKanalRequest(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo,
-													   String mottakerHentIdentForAktoerIdResponseTo,
-													   String brukerHentIdentForAktoerIdResponseTo) {
+													   String fnrMottaker,
+													   String fnrBruker) {
 		return DokDistKanalRequest.builder()
 				.dokumentTypeId(getDokumenttypeIdHoveddokument(distribusjonbestillingTo))
-				.mottakerId(getIdentifikator(distribusjonbestillingTo.getMottaker(), mottakerHentIdentForAktoerIdResponseTo))
+				.mottakerId(getIdentifikator(distribusjonbestillingTo.getMottaker(), fnrMottaker))
 				.mottakerType(distribusjonbestillingTo.getMottaker().getAktoerType().name())
-				.brukerId(getIdentifikator(distribusjonbestillingTo.getBruker(), brukerHentIdentForAktoerIdResponseTo))
+				.brukerId(getIdentifikator(distribusjonbestillingTo.getBruker(), fnrBruker))
 				.erArkivert(distribusjonbestillingTo.getArkivInformasjon() != null)
 				.build();
 	}
