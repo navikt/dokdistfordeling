@@ -79,14 +79,6 @@
 			<version>${commons-io.version}</version>
 			<scope>test</scope>
 		</dependency>
-
-<!--		TODO Only used for testing in prod (read test document from file). Must be removed after testing is done-->
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.7-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
 	</dependencies>
 
 

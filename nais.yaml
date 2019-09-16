@@ -38,8 +38,8 @@ fasitResources:
     resourceType: restservice
   - alias: administrerforsendelse_v1
     resourceType: restservice
-  - alias: Aktoer_v2
-    resourceType: webserviceendpoint
+  - alias: "aktoerregister.api.v1"
+    resourceType: restservice
   - alias: securityTokenService
     resourceType: baseurl
   - alias: security-token-service-token

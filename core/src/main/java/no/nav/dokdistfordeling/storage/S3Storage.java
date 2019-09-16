@@ -6,6 +6,7 @@ import static no.nav.dokdistfordeling.storage.S3Configuration.BUCKET_NAME;
 
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
+import no.nav.dokdistfordeling.exception.functional.DocumentNotFoundInS3FunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.S3FailedToGetDocumentTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.S3FailedToPutDocumentTechnicalException;
@@ -38,7 +39,12 @@ public class S3Storage implements Storage {
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public String get(String key) {
 		try {
-			return s3WithStrictEncryption.getObjectAsString(BUCKET_NAME, key);
+			String object = s3WithStrictEncryption.getObjectAsString(BUCKET_NAME, key);
+			if (object == null) {
+				throw new DocumentNotFoundInS3FunctionalException(String.format("Fant ingen dokument i s3 lagret på kanalreferanseId=%s", key));
+			} else {
+				return object;
+			}
 		} catch (SdkClientException e) {
 			throw new S3FailedToGetDocumentTechnicalException(String.format("Teknisk feil mot AmazonS3 ved henting på key=%s. feilmelding=%s", key, e
 					.getMessage()), e);

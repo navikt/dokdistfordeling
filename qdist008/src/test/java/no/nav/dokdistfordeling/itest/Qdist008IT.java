@@ -13,7 +13,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACHE;
@@ -34,13 +33,11 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import no.nav.dokdistfordeling.itest.config.Qdist008ItestConfig;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
-import no.nav.dokdistfordeling.storage.Storage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -74,7 +71,6 @@ import java.util.concurrent.TimeUnit;
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
-@Disabled("Midlertidig disablet for test i prod") //TODO FIKS!
 public class Qdist008IT {
 
 	private static final String FORSENDELSE_ID = "33333";
@@ -108,9 +104,6 @@ public class Qdist008IT {
 	private AmazonS3 amazonS3;
 
 	@Inject
-	private Storage awsStorage;
-
-	@Inject
 	public CacheManager cacheManager;
 
 
@@ -127,12 +120,17 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalPrint() throws Exception {
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
@@ -156,8 +154,8 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
@@ -173,12 +171,17 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalDittNav() throws Exception {
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalDittNav.json")));
@@ -202,8 +205,8 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
@@ -219,12 +222,17 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalSDP() throws Exception {
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalSDP.json")));
@@ -249,8 +257,8 @@ public class Qdist008IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-			verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-					.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+			verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+			verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 					.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
@@ -267,12 +275,17 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalTrygderetten() throws Exception {
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalTrygderetten.json")));
@@ -296,8 +309,8 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/bestemkanal/bestemkanal-happy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
@@ -314,12 +327,17 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalLokalPrint() throws Exception {
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalLokalPrint.json")));
@@ -331,8 +349,8 @@ public class Qdist008IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-			verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-					.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+			verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+			verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 					.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
@@ -349,12 +367,17 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalIngenDistribusjon() throws Exception {
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalIngenDistribusjon.json")));
@@ -366,8 +389,8 @@ public class Qdist008IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-			verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-					.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+			verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+			verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 					.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
@@ -384,12 +407,17 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseOnlyRequiredInputFieds() throws Exception {
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
@@ -414,8 +442,8 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(0), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/bestemkanal/bestemkanal-erArkivertFalse-happy.json"))));
@@ -428,12 +456,17 @@ public class Qdist008IT {
 	@Test
 	public void shouldProcessWithoutContactingDokkat() throws Exception {
 
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
@@ -457,8 +490,8 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
@@ -473,9 +506,9 @@ public class Qdist008IT {
 	}
 
 	@Test
-	public void shouldProcessForsendelseWithoutContactingAktoerV2() throws Exception {
+	public void shouldProcessForsendelseWithoutContactingAktoerregister() throws Exception {
 
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
@@ -491,7 +524,7 @@ public class Qdist008IT {
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
-		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_avoid_aktoerv2_happypath.xml"));
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_avoid_aktoerregister_happypath.xml"));
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			String response = receive(qdist009);
@@ -501,7 +534,8 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(0), postRequestedFor(urlEqualTo("/aktoerv2")));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
@@ -517,12 +551,17 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldPassOnCallId() throws Exception {
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalTrygderetten.json")));
@@ -610,7 +649,7 @@ public class Qdist008IT {
 	@Test
 	public void shouldThrowDokkatTechnicalException() throws Exception {
 
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBody("")));
@@ -626,14 +665,19 @@ public class Qdist008IT {
 	}
 
 	@Test
-	public void shouldThrowAktoerV2FunctionalException() throws Exception {
+	public void shouldThrowAktoerregisterFunctionalException() throws Exception {
 
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/hentIdentForAktoerIdFunctionalFail.xml")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.BAD_REQUEST.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerFail.json")));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -644,18 +688,22 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/aktoerv2")));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 	}
 
 	@Test
-	public void shouldThrowAktoerV2TechicalException() throws Exception {
-
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+	public void shouldThrowAktoerregisterTechicalException() throws Exception {
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/hentIdentForAktoerIdTechnicalFail.xml")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR
+				.value())
+				.withBody("")));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -666,18 +714,24 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/aktoerv2")));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 	}
 
 	@Test
 	public void shouldThrowBestemDokdistKanalFunctionalException() throws Exception {
 
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.BAD_REQUEST.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBody("")));
@@ -692,20 +746,25 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal")));
 	}
 
 	@Test
 	public void shouldThrowBestemDokdistKanalTechnicalException() throws Exception {
 
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBody("")));
@@ -718,20 +777,24 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal")));
 	}
 
 	@Test
 	public void shouldThrowBestemDokdistKanalMappingException() throws Exception {
-
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/bestemkanal-invalidCodeValue.json")));
@@ -746,19 +809,24 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal")));
 	}
 
 	@Test
 	public void shouldThrowPersisterForsendelseFunctionalException() throws Exception {
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
@@ -775,8 +843,8 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//bestemkanal/bestemkanal-happy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
@@ -787,12 +855,17 @@ public class Qdist008IT {
 	@Test
 	public void shouldThrowPersisterForsendelseTechicalException() throws Exception {
 
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
@@ -809,8 +882,8 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//bestemkanal/bestemkanal-happy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
@@ -820,12 +893,17 @@ public class Qdist008IT {
 	@Test
 	public void shouldThrowSettJournalpostAttributterTechnicalException() throws Exception {
 
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
@@ -844,8 +922,8 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
@@ -858,13 +936,17 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowOppdaterForsendelseFunctionalException() throws Exception {
-
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
@@ -886,8 +968,8 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
@@ -904,12 +986,17 @@ public class Qdist008IT {
 	@Test
 	public void shouldThrowOppdaterForsendelseTechnicalException() throws Exception {
 
-		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPE_ID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/aktoerv2")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("aktoerv2/aktoerV2HentIdentForAktoerHappy.xml")));
+		stubFor(get("/stsRest?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+				.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerHappy.json")));
 		stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
@@ -930,8 +1017,8 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), postRequestedFor(urlEqualTo("/aktoerv2"))
-				.withRequestBody(matchingXPath("//aktoerId/text()", equalTo("***gammelt_fnr***01"))));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
 				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/bestemDistribusjonKanal"))
