@@ -76,12 +76,12 @@ public class SafGraphqlConsumer {
 
 	private HttpHeaders createAuthHeaderFromToken(String authorizationHeader) {
 		HttpHeaders headers = new HttpHeaders();
-		if (!OIDC_TOKEN_PREFIX.equalsIgnoreCase(authorizationHeader.split(" ")[0])) {
+		if (authorizationHeader == null || !OIDC_TOKEN_PREFIX.equalsIgnoreCase(authorizationHeader.split(" ")[0])) {
 			throw new ValidationException("Authorization header må være på formen Bearer {token}");
 		}
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add(HttpHeaders.AUTHORIZATION, OIDC_TOKEN_PREFIX + " " + authorizationHeader.split(" ")[2]);
+		headers.add(HttpHeaders.AUTHORIZATION, OIDC_TOKEN_PREFIX + " " + authorizationHeader.split(" ")[1]);
 		return headers;
 	}
 
