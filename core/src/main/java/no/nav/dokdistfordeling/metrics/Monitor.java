@@ -28,6 +28,8 @@ public @interface Monitor {
 
 	String[] extraTags() default {};
 
+	String process() default "";
+
 	double[] percentiles() default {};
 
 	boolean histogram() default false;
