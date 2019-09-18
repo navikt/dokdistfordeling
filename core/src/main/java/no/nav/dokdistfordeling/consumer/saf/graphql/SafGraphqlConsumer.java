@@ -58,27 +58,30 @@ public class SafGraphqlConsumer {
 
 			ResponseEntity<SafJsonJournalpost> responseEntity = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(requestToJson(graphQLRequest), httpHeaders), SafJsonJournalpost.class);
 
-			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null || responseEntity.getBody().getData().getJournalpost() == null) {
+			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null || responseEntity.getBody()
+					.getData().getJournalpost() == null) {
 				throw new SafJournalpostIkkeFunnetFunctionalException("Ingen journalpost ble funnet");
 			}
 
 			return responseEntity.getBody().getJournalpost();
 
 		} catch (HttpClientErrorException e) {
-			throw new SafJournalpostQueryUnauthorizedException(String.format("Henting av journalpost feilet med status: %s, feilmelding: %s", e.getStatusCode(), e.getMessage()), e);
+			throw new SafJournalpostQueryUnauthorizedException(String.format("Henting av journalpost feilet med status: %s, feilmelding: %s", e
+					.getStatusCode(), e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
-			throw new SafJournalpostQueryTechnicalException(String.format("Tjenesten SAF (graphQL) feilet med status: %s, feilmelding: %s", e.getStatusCode(), e.getMessage()), e);
+			throw new SafJournalpostQueryTechnicalException(String.format("Tjenesten SAF (graphQL) feilet med status: %s, feilmelding: %s", e
+					.getStatusCode(), e.getMessage()), e);
 		}
 	}
 
 	private HttpHeaders createAuthHeaderFromToken(String authorizationHeader) {
 		HttpHeaders headers = new HttpHeaders();
-		if (!OIDC_TOKEN_PREFIX.equals(authorizationHeader.split(" ")[0])) {
+		if (authorizationHeader == null || !OIDC_TOKEN_PREFIX.equalsIgnoreCase(authorizationHeader.split(" ")[0])) {
 			throw new ValidationException("Authorization header må være på formen Bearer {token}");
 		}
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add(HttpHeaders.AUTHORIZATION, authorizationHeader);
+		headers.add(HttpHeaders.AUTHORIZATION, OIDC_TOKEN_PREFIX + " " + authorizationHeader.split(" ")[1]);
 		return headers;
 	}
 
@@ -86,7 +89,8 @@ public class SafGraphqlConsumer {
 		try {
 			return new ObjectMapper().writeValueAsString(graphQLRequest);
 		} catch (JsonProcessingException e) {
-			throw new MarshalGraphqlRequestToJsonTechnicalException(String.format("Kunne ikke konvertere graphQlRequest til json, feilmelding=%s", e.getMessage()), e);
+			throw new MarshalGraphqlRequestToJsonTechnicalException(String.format("Kunne ikke konvertere graphQlRequest til json, feilmelding=%s", e
+					.getMessage()), e);
 		}
 	}
 }

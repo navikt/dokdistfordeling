@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.sts.StsRestConsumer;
 import no.nav.dokdistfordeling.exception.functional.AktoerHentIdentForAktoerIdFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AktoerHentIdentForAktoerIdTechnicalException;
-import no.nav.dokdistfordeling.metrics.Monitor;
+import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -55,7 +55,7 @@ public class AktoerregisterConsumer implements Aktoerregister {
 		this.stsRestConsumer = stsRestConsumer;
 	}
 
-	@Monitor(value = "dok_metric", extraTags = {"process", "hentIdentForAktoerId"}, percentiles = {0.5, 0.95}, histogram = true)
+	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "hentIdentForAktoerId"}, histogram = true)
 	@Retryable(include = AktoerHentIdentForAktoerIdTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
 	public String hentIdentForAktoerId(String aktoerId) {
 		try {

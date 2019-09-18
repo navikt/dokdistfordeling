@@ -15,6 +15,12 @@
  */
 package no.nav.dokdistfordeling.metrics;
 
+import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_ERROR_TYPE;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_EXCEPTION_NAME;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_PROCESS;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.TYPE_FUNCTIONAL_EXCEPTION;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.TYPE_TECHNICAL_EXCEPTION;
+
 import io.micrometer.core.annotation.Incubating;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -27,7 +33,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.util.function.Function;
@@ -46,6 +51,8 @@ import java.util.function.Function;
 public class DokMonitoringAspect {
 	private final MeterRegistry registry;
 	private final Function<ProceedingJoinPoint, Iterable<Tag>> tagsBasedOnJoinpoint;
+	private static final String EXCEPTION_COUNTER = "dok_metric_exception_total";
+
 
 	public DokMonitoringAspect(MeterRegistry registry) {
 		this(registry, pjp ->
@@ -72,17 +79,17 @@ public class DokMonitoringAspect {
 		try {
 			return pjp.proceed();
 		} catch (Exception e) {
-			Counter.builder(monitor.value() + "_exception")
-					.tags("error_type", isFunctionalException(e) ? "functional" : "technical")
-					.tags("exception_name", e.getClass().getSimpleName())
-					.tags(monitor.extraTags())
-					.tags(tagsBasedOnJoinpoint.apply(pjp))
+			Counter.builder(EXCEPTION_COUNTER)
+					.tags(LABEL_ERROR_TYPE, isFunctionalException(e) ? TYPE_FUNCTIONAL_EXCEPTION : TYPE_TECHNICAL_EXCEPTION)
+					.tags(LABEL_EXCEPTION_NAME, e.getClass().getSimpleName())
+					.tags(LABEL_PROCESS, monitor.process())
 					.register(registry)
 					.increment();
 			throw e;
 		} finally {
 			sample.stop(Timer.builder(monitor.value())
 					.description(monitor.description().isEmpty() ? null : monitor.description())
+					.tags(LABEL_PROCESS, monitor.process())
 					.tags(monitor.extraTags())
 					.tags(tagsBasedOnJoinpoint.apply(pjp))
 					.publishPercentileHistogram(monitor.histogram())
