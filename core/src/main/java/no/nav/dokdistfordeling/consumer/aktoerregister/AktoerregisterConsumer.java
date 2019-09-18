@@ -3,7 +3,8 @@ package no.nav.dokdistfordeling.consumer.aktoerregister;
 import static no.nav.dokdistfordeling.constants.Constants.APP_NAME;
 import static no.nav.dokdistfordeling.constants.Constants.BEARER_PREFIX;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
+import static no.nav.dokdistfordeling.constants.Constants.NAV_CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.NAV_CONSUMER_ID;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 
 import lombok.extern.slf4j.Slf4j;
@@ -80,8 +81,8 @@ public class AktoerregisterConsumer implements Aktoerregister {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.set(HttpHeaders.AUTHORIZATION, BEARER_PREFIX + stsRestConsumer.getOidcToken());
-		headers.add(CONSUMER_ID, APP_NAME);
-		headers.add(CALL_ID, MDC.get(CALL_ID));
+		headers.add(NAV_CONSUMER_ID, APP_NAME);
+		headers.add(NAV_CALL_ID, MDC.get(CALL_ID));
 		return headers;
 	}
 

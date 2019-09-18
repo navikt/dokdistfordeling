@@ -102,7 +102,7 @@ public class Qdist008IT {
 
 	@Inject
 	private AmazonS3 amazonS3;
-	
+
 	@Inject
 	public CacheManager cacheManager;
 
@@ -203,7 +203,6 @@ public class Qdist008IT {
 					.replaceAll("\t", ""), is(classpathToString("out/out-happy.txt").replaceAll("\r", "")
 					.replaceAll("\t", "")));
 		});
-
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest?grant_type=client_credentials&scope=openid")));
@@ -675,9 +674,10 @@ public class Qdist008IT {
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse().withStatus(HttpStatus.BAD_REQUEST
-				.value())
-				.withBody("")));
+		stubFor(get("/aktoerregister/identer?gjeldende=true&identgruppe=NorskIdent").willReturn(aResponse()
+				.withStatus(HttpStatus.BAD_REQUEST.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("aktoerregister/aktoerregisterHentIdentForAktoerFail.json")));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
