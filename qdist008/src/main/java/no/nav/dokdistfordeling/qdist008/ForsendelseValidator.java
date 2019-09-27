@@ -21,6 +21,7 @@ import java.util.UUID;
 public class ForsendelseValidator {
 
 	private final Storage storage;
+	private static final String BDOK001_PREFIX = "BDOK100";
 
 	public ForsendelseValidator(Storage storage) {
 		this.storage = storage;
@@ -51,10 +52,12 @@ public class ForsendelseValidator {
 	}
 
 	private void assertThatBestillingsIdIsAValidUuid(String bestillingsId) {
-		try {
-			UUID.fromString(bestillingsId);
-		} catch (IllegalArgumentException exception) {
-			throw new BestillingsIdInvalidUuidFunctionalException(format("bestillingsId er ikke en gyldig UUID (universally unique identifier). Fikk bestilling=%s", bestillingsId));
+		if (!bestillingsId.startsWith(BDOK001_PREFIX)) {
+			try {
+				UUID.fromString(bestillingsId);
+			} catch (IllegalArgumentException exception) {
+				throw new BestillingsIdInvalidUuidFunctionalException(format("bestillingsId er ikke en gyldig UUID (universally unique identifier). Fikk bestilling=%s", bestillingsId));
+			}
 		}
 	}
 
