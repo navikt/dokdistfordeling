@@ -1,40 +1,11 @@
 package no.nav.dokdistfordeling.itest;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static no.nav.dokdistfordeling.constants.Constants.BESTILLINGS_ID;
-import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
-import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
-import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
-import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
-import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
-import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ARKIV_SYSTEM;
-import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOK_INFO_ID_1;
-import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOK_INFO_ID_2;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.OrderingComparison.greaterThan;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-
 import com.github.tomakehurst.wiremock.client.WireMock;
 import no.nav.dokdistfordeling.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.DistribuerJournalpostResponseTo;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
 import no.nav.dokdistfordeling.crypto.Crypto;
+import no.nav.dokdistfordeling.util.MappingUtil;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.AktoerId;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Distribusjonbestilling;
@@ -75,6 +46,36 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static no.nav.dokdistfordeling.constants.Constants.BESTILLINGS_ID;
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
+import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
+import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ARKIV_SYSTEM;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOK_INFO_ID_1;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOK_INFO_ID_2;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.OrderingComparison.greaterThan;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @SpringBootTest(classes = {Rdist002TestConfig.class},
@@ -106,18 +107,14 @@ public class Rdist002IT {
 	private static final String MOTTAKER_ID = "***gammelt_fnr***";
 	private static final String MOTTAKER_NAVN = "Jan Neimansen";
 	private static final String BRUKER_ID = "***gammelt_fnr***";
-
-	private @Value("${hentdokumenter_fra_joark_crypto_password}")
-	String encryptionPassphrase;
-
-	@Inject
-	private JmsTemplate jmsTemplate;
-
-	@Inject
-	private Queue qdist012;
-
 	@Inject
 	protected TestRestTemplate restTemplate;
+	private @Value("${hentdokumenter_fra_joark_crypto_password}")
+	String encryptionPassphrase;
+	@Inject
+	private JmsTemplate jmsTemplate;
+	@Inject
+	private Queue qdist012;
 
 	@BeforeEach
 	public void setupBefore() {
@@ -201,6 +198,36 @@ public class Rdist002IT {
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+
+			assertNotNull(qdist012Result);
+			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
+			assertEquals(classpathToString("__files/rdist002IT-hentDokumenterFraJoarkWithUtenlandskAdresse-happy.xml"), qdist012ResultWithoutBestillingsId);
+		});
+
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
+	}
+
+	@Test
+	public void shouldDistribuerAdressetypeWithCaseInsensitiveHappyily() {
+
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withBodyFile("saf/safGraphQlResponse-happy.json")));
+
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokkat/tkat020-happy.json")));
+
+		DistribuerJournalpostRequestTo distribuerJournalpostRequestTo = MappingUtil.jsonStringToObject(classpathToString("__files/rdist002/rdist002-happy-adressetype.json"), DistribuerJournalpostRequestTo.class);
+		HttpEntity requestEntity = new HttpEntity<>(distribuerJournalpostRequestTo, createHappyPathHeaders());
+		DistribuerJournalpostResponseTo response = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
+
+		assertEquals(36, response.getBestillingsId().length());
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
@@ -395,6 +422,7 @@ public class Rdist002IT {
 		return createHappyPathHeaders(null);
 	}
 
+
 	private HttpHeaders createHappyPathHeaders(String callId) {
 		return createHappyPathHeaders(callId, null);
 	}
@@ -465,4 +493,5 @@ public class Rdist002IT {
 		}
 		return message;
 	}
+
 }

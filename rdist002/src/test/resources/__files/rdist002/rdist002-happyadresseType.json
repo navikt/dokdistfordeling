@@ -1,0 +1,10 @@
+{
+  "adresse":
+
+  { "adresselinje1": "Kongens Vænge 8", "adresselinje2": "3400 Hillerød", "adresselinje3": null, "adresseType": "utenlandskPostadresse", "land": "DK", "postnummer": null, "poststed": "null" }
+,
+  "batchId": null,
+  "bestillendeFagsystem": "FS38",
+  "dokumentProdApp": "FS38",
+  "journalpostId": "429687996"
+}
