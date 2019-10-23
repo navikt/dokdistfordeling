@@ -132,4 +132,16 @@ public class UnitTestUtil {
 		);
 	}
 
+	public static DistribuerJournalpostRequestTo.AdresseTo createPostadresseAdresstypeNull() {
+		return new DistribuerJournalpostRequestTo.AdresseTo(
+				null,
+				null,
+				null,
+				ADRESSELINJE1,
+				ADRESSELINJE2,
+				ADRESSELINJE3,
+				LAND_US
+		);
+	}
+
 }

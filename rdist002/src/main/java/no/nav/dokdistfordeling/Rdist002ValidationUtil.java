@@ -38,14 +38,15 @@ public class Rdist002ValidationUtil {
 
 		if (adresseTo != null) {
 			assertNotNullOrEmpty("land", adresseTo.getLand());
+			assertNotNullOrEmpty("adressetype",adresseTo.getAdressetype());
 
-			if (adresseTo.getAdresseType().equals(NORSK_POSTADRESSE)) {
+			if (adresseTo.getAdressetype().equals(NORSK_POSTADRESSE)) {
 				assertNotNullOrEmpty("poststed", adresseTo.getPoststed());
 				assertNotNullOrEmpty("postnummer", adresseTo.getPostnummer());
-			} else if (adresseTo.getAdresseType().equals(UTENLANDSK_POSTADRESSE)) {
+			} else if (adresseTo.getAdressetype().equals(UTENLANDSK_POSTADRESSE)) {
 				assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
 			} else {
-				throw new ValidationException(String.format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, mottok %s", adresseTo.getAdresseType()));
+				throw new ValidationException(String.format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, mottok %s", adresseTo.getAdressetype()));
 			}
 		}
 	}
