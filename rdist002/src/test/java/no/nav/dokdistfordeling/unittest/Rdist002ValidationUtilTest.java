@@ -16,6 +16,7 @@ import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createDokumentInfo1B
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createDokumentInfo2Builder;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createJournalpostBuilder;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createNorskPostadresse;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createPostadresseAdresstypeNull;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createUtenlandskPostadresse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -125,6 +126,19 @@ public class Rdist002ValidationUtilTest {
 		);
 		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(adresseWithNullLand, mottaker));
 		assertEquals("Feltet land kan ikke være null eller tomt. Fikk land=null", thrownException.getMessage());
+	}
+
+
+	@Test
+	public void shouldThrowValidationExceptionForMissingAdresseType(){
+		Person mottaker = new Person()
+				.withNavn(MOTTAKER_NAVN)
+				.withPersonidentifikator(MOTTAKER_ID);
+
+		DistribuerJournalpostRequestTo.AdresseTo adresseWithNullAdressType = createPostadresseAdresstypeNull();
+		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(adresseWithNullAdressType, mottaker));
+		assertEquals("Feltet adressetype kan ikke være null eller tomt. Fikk adressetype=null", thrownException.getMessage());
+
 	}
 
 	// validate journalpostAndDokumenter

@@ -71,7 +71,7 @@ public class HentDokumenterFraJoarkMapper {
 	private Adresse mapAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo) {
 		if (adresseTo == null) {
 			return null;
-		} else if (adresseTo.getAdresseType().equals(NORSK_POSTADRESSE)) {
+		} else if (adresseTo.getAdressetype().equals(NORSK_POSTADRESSE)) {
 			return new NorskPostadresse()
 					.withAdresselinje1(adresseTo.getAdresselinje1())
 					.withAdresselinje2(adresseTo.getAdresselinje2())

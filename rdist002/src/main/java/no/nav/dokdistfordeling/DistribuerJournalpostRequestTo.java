@@ -25,8 +25,8 @@ public class DistribuerJournalpostRequestTo {
 	@Getter
 	@AllArgsConstructor
 	public static class AdresseTo {
-		@ApiModelProperty(name = "adresseType", value = "\"norskPostadresse\" eller \"utenlandskPostadresse\"", example = "norskPostadresse", position = 5)
-		private final String adresseType;
+		@ApiModelProperty(name = "adressetype", value = "\"norskPostadresse\" eller \"utenlandskPostadresse\"", example = "norskPostadresse", position = 5)
+		private final String adressetype;
 		@ApiModelProperty(name = "postnummer", value = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "0505", position = 6)
 		private final String postnummer;
 		@ApiModelProperty(name = "postnummer", value = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "Oslo", position = 7)
