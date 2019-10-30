@@ -30,6 +30,7 @@ public class HentDokumenterFraJoarkMapper {
 
 	public static final String NORSK_POSTADRESSE = "norskPostadresse";
 	public static final String UTENLANDSK_POSTADRESSE = "utenlandskPostadresse";
+	public static final String DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID = "U000001";
 
 	public HentDokumenterFraJoark map(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost, Aktoer mottaker, String bestillingsId) {
 		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
@@ -56,7 +57,7 @@ public class HentDokumenterFraJoarkMapper {
 										.mapToObj(i -> {
 											Journalpost.DokumentInfo dokumentInfo = dokumenter.get(i);
 											return new DokumentInformasjon()
-													.withDokumenttypeId(dokumenter.get(0).getBrevkode())
+													.withDokumenttypeId(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID)
 													.withTilknyttetSom(i == 0 ? HOVEDDOKUMENT.name() : VEDLEGG.name())
 													.withVariantFormat(
 															dokumentInfo.getDokumentvarianter().stream()

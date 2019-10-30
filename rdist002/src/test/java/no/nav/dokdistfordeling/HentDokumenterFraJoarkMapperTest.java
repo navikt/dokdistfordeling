@@ -1,5 +1,6 @@
-package no.nav.dokdistfordeling.unittest;
+package no.nav.dokdistfordeling;
 
+import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
@@ -147,7 +148,7 @@ public class HentDokumenterFraJoarkMapperTest {
 				assertEquals(ARKIV, dokument.getVariantFormat());
 				assertEquals(DOK_INFO_ID_2, dokument.getArkivDokumentInfoId());
 			}
-			assertEquals(DOKUMENTTYPEID, dokument.getDokumenttypeId());
+			assertEquals(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID, dokument.getDokumenttypeId());
 
 		});
 	}
