@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.unittest;
+package no.nav.dokdistfordeling;
 
 import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.ADRESSELINJE1;

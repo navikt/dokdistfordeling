@@ -16,6 +16,7 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.UtenlandskPostadres
 import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,6 +59,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.constants.Constants.BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
@@ -152,7 +154,7 @@ public class Rdist002IT {
 		});
 
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	@Test
@@ -181,7 +183,7 @@ public class Rdist002IT {
 		});
 
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	@Test
@@ -209,7 +211,7 @@ public class Rdist002IT {
 		});
 
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	@Test
@@ -239,7 +241,7 @@ public class Rdist002IT {
 		});
 
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	@Test
@@ -313,6 +315,7 @@ public class Rdist002IT {
 	}
 
 	@Test
+	@Disabled
 	public void distribuerJournalpostThrowsDokkatGetDokumenttypeInfoFunctionalException() {
 		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
@@ -326,10 +329,11 @@ public class Rdist002IT {
 
 		assertNull(restResponse.getBestillingsId());
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	@Test
+	@Disabled
 	public void distribuerJournalpostThrowsDokkatGetDokumenttypeInfoTechnicalException() {
 		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
@@ -343,7 +347,7 @@ public class Rdist002IT {
 
 		assertNull(restResponse.getBestillingsId());
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
-		verify(exactly(3), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
+		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
 	}
 
 	private void assertQdist012Result(Distribusjonbestilling qdist012Result, String restResponseBestillingsId) {
@@ -407,7 +411,7 @@ public class Rdist002IT {
 				assertEquals(ARKIV, dokumentInformasjon.getVariantFormat());
 				assertEquals(DOK_INFO_ID_2, dokumentInformasjon.getArkivDokumentInfoId());
 			}
-			assertEquals(DOKUMENTTYPEID, dokumentInformasjon.getDokumenttypeId());
+			assertEquals(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID, dokumentInformasjon.getDokumenttypeId());
 		});
 	}
 

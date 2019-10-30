@@ -46,12 +46,6 @@ public class DistribuerJournalpostService {
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
 		rdist002ValidationUtil.validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
 
-		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
-		Journalpost.DokumentInfo hovedDokumentInfo = dokumenter.iterator().next();
-
-		// brevkode for utgående dokumenter tilsvarer dokumenttypeid
-		dokumentkatalogAdmin.getDokumenttypeInfo(hovedDokumentInfo.getBrevkode());
-
 		distribuerForsendelseProducer.produce(hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, bestillingsId),
 				bestillingsId,
 				distribuerJournalpostRequestTo.getJournalpostId());
