@@ -15,6 +15,7 @@ public final class Constants {
 	public static final String DITT_NAV = "DITT_NAV";
 	public static final String APP_NAME = "dokdistfordeling";
 	public static final String BEARER_PREFIX = "Bearer ";
+	public static final String DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID = "U000001";
 
 	private Constants() {
 	}

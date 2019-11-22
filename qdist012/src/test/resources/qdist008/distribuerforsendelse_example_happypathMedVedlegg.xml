@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:distribuerForsendelse xmlns:ns2="http://nav.no/melding/virksomhet/dokdistfordeling">
+	<distribusjonbestilling>
+		<bestillingsId>4a7d638a-6a63-11e9-a923-1681be663d3e</bestillingsId>
+		<batchId>55555</batchId>
+		<bestillendeFagsystem>example1</bestillendeFagsystem>
+		<tema>PEN</tema>
+		<arkivInformasjon>
+			<arkivSystem>JOARK</arkivSystem>
+			<arkivId>arkivId</arkivId>
+		</arkivInformasjon>
+		<mottaker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns2:Person">
+			<personidentifikator>***gammelt_fnr***</personidentifikator>
+			<navn>Ola-Johnny</navn>
+		</mottaker>
+		<bruker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns2:Person">
+			<personidentifikator>***gammelt_fnr***</personidentifikator>
+			<navn>Roy Roger Testersen</navn>
+		</bruker>
+		<adresse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns2:NorskPostadresse">
+			<adresselinje1>adresselinje1</adresselinje1>
+			<adresselinje2>adresselinje2</adresselinje2>
+			<adresselinje3>adresselinje3</adresselinje3>
+			<postnummer>1337</postnummer>
+			<poststed>OSLO</poststed>
+			<land>NO</land>
+		</adresse>
+		<dokumentProdApp>dokprodApp</dokumentProdApp>
+		<dokumenter>
+			<dokumentInformasjon>
+				<dokumenttypeId>doktypeId1</dokumenttypeId>
+				<dokumentObjektReferanse>dokumentObjektReferanse</dokumentObjektReferanse>
+				<tilknyttetSom>HOVEDDOKUMENT</tilknyttetSom>
+				<arkivDokumentInfoId>arkivDokumentInfoIdHoveddok</arkivDokumentInfoId>
+				<rekkefolge>1</rekkefolge>
+			</dokumentInformasjon>
+			<dokumentInformasjon>
+				<dokumenttypeId>U000001</dokumenttypeId>
+				<dokumentObjektReferanse>dokumentObjektReferanse</dokumentObjektReferanse>
+				<tilknyttetSom>VEDLEGG</tilknyttetSom>
+				<arkivDokumentInfoId>arkivDokumentInfoIdVedlegg</arkivDokumentInfoId>
+				<rekkefolge>2</rekkefolge>
+			</dokumentInformasjon>
+			<dokumentInformasjon>
+				<dokumenttypeId>U000001</dokumenttypeId>
+				<dokumentObjektReferanse>dokumentObjektReferanse</dokumentObjektReferanse>
+				<tilknyttetSom>VEDLEGG</tilknyttetSom>
+				<arkivDokumentInfoId>arkivDokumentInfoIdVedlegg2</arkivDokumentInfoId>
+				<rekkefolge>3</rekkefolge>
+			</dokumentInformasjon>
+		</dokumenter>
+	</distribusjonbestilling>
+</ns2:distribuerForsendelse>
