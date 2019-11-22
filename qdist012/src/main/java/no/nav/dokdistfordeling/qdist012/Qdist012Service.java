@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -52,7 +53,7 @@ public class Qdist012Service {
 
 	@Handler
 	public DistribuerForsendelse copyDocumentsFromJoarkToDokdistmellomlagerS3Storage(HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo) {
-		final HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
+		HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
 		final String arkivId = distribusjonbestilling.getArkivInformasjon().getArkivId();
 
 		// tilknyttVedlegg legger til vedlegg etter at dokprod forsendelse er opprettet, så legg på evt. manglende vedlegg her
@@ -76,8 +77,8 @@ public class Qdist012Service {
 		}
 		List<HentDokumenterFraJoarkTo.DokumentInformasjonTo> prosesserteDokumenter =
 				hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDokumenter();
-		List<String> prosesserteDokumentIder = prosesserteDokumenter.stream()
-				.map(HentDokumenterFraJoarkTo.DokumentInformasjonTo::getArkivDokumentInfoId).collect(Collectors.toList());
+		Set<String> prosesserteDokumentIder = prosesserteDokumenter.stream()
+				.map(HentDokumenterFraJoarkTo.DokumentInformasjonTo::getArkivDokumentInfoId).collect(Collectors.toSet());
 
 		Journalpost journalpost = safJournalpostQueryService.hentJournalpost(journalpostId, getAuthorizationHeader());
 		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
