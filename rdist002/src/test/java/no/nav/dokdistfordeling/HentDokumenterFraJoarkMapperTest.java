@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling;
 
-import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
+import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
@@ -13,7 +13,6 @@ import static no.nav.dokdistfordeling.unittest.UnitTestUtil.BATCH_ID;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.BESTILLENDEFAGSYSTEM;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.BRUKER_ID;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOKUMENTPRODAPP;
-import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOKUMENTTYPEID;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOK_INFO_ID_1;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.DOK_INFO_ID_2;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.JOURNALPOST_ID;
@@ -40,8 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import no.nav.dokdistfordeling.DistribuerJournalpostRequestTo;
-import no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Distribusjonbestilling;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.DokumentInformasjon;

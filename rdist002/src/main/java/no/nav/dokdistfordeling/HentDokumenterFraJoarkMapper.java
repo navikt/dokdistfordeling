@@ -1,5 +1,6 @@
 package no.nav.dokdistfordeling;
 
+import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
@@ -30,7 +31,6 @@ public class HentDokumenterFraJoarkMapper {
 
 	public static final String NORSK_POSTADRESSE = "norskPostadresse";
 	public static final String UTENLANDSK_POSTADRESSE = "utenlandskPostadresse";
-	public static final String DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID = "U000001";
 
 	public HentDokumenterFraJoark map(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost, Aktoer mottaker, String bestillingsId) {
 		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
