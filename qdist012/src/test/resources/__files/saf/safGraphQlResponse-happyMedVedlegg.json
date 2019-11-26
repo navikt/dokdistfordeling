@@ -47,7 +47,7 @@
           "dokumentInfoId": "arkivDokumentInfoIdVedlegg2",
           "tittel": "MASKERT_FELT",
           "brevkode": "000001",
-          "dokumentstatus": "FERDIGSTILT",
+          "dokumentstatus": null,
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
