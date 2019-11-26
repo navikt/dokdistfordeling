@@ -84,12 +84,16 @@ public class Qdist012Service {
 		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
 		dokumenter.stream()
 				.filter(dokument -> !prosesserteDokumentIder.contains(dokument.getDokumentInfoId()))
-				.filter(dokument -> FERDIGSTILT.equals(dokument.getDokumentstatus()))
+				.filter(dokument -> isDokumentFerdigstilt(dokument.getDokumentstatus()))
 				.forEach(dokument -> prosesserteDokumenter.add(mapDokumentInformasjonTo(dokument, prosesserteDokumenter.size() + 1)));
 	}
 
 	private String getAuthorizationHeader() {
 		return BEARER_PREFIX + stsRestConsumer.getOidcToken();
+	}
+
+	private boolean isDokumentFerdigstilt(String dokumentStatus) {
+		return isBlank(dokumentStatus) || FERDIGSTILT.equals(dokumentStatus);
 	}
 
 	private HentDokumenterFraJoarkTo.DokumentInformasjonTo mapDokumentInformasjonTo(Journalpost.DokumentInfo dokumentInfo, int rekkefolge) {
