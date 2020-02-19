@@ -7,8 +7,6 @@ metadata:
     team: teamdokumenthandtering
 spec:
   env:
-    - name: DOKDISTFORDELING_S3_CREDS_USERNAME
-      value: {{ DOKDISTFORDELING_S3_CREDS_USERNAME }}
     - name: DOKUMENTTYPEINFO_V4_URL
       value: {{ DOKUMENTTYPEINFO_V4_URL }}
     - name: ADMINISTRERFORSENDELSE_V1_URL
