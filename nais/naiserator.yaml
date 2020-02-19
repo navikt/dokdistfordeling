@@ -1,0 +1,82 @@
+kind: Application
+apiVersion: nais.io/v1alpha1
+metadata:
+  name: dokdistfordeling
+  namespace: {{ NAMESPACE }}
+  labels:
+    team: teamdokumenthandtering
+spec:
+  env:
+    - name: DOKDISTFORDELING_S3_CREDS_USERNAME
+      value: {{ DOKDISTFORDELING_S3_CREDS_USERNAME }}
+    - name: DOKUMENTTYPEINFO_V4_URL
+      value: {{ DOKUMENTTYPEINFO_V4_URL }}
+    - name: ADMINISTRERFORSENDELSE_V1_URL
+      value: {{ ADMINISTRERFORSENDELSE_V1_URL }}
+    - name: AKTOERREGISTER_API_V1_URL
+      value: {{ AKTOERREGISTER_API_V1_URL }}
+    - name: SECURITYTOKENSERVICE_URL
+      value: {{ SECURITYTOKENSERVICE_URL }}
+    - name: SECURITY_TOKEN_SERVICE_TOKEN_URL
+      value: {{ SECURITY_TOKEN_SERVICE_TOKEN_URL }}
+    - name: DOKDISTFORDELING_CHANNEL_NAME
+      value: {{ DOKDISTFORDELING_CHANNEL_NAME }}
+    - name: MQGATEWAY01_HOSTNAME
+      value: {{ MQGATEWAY01_HOSTNAME }}
+    - name: MQGATEWAY01_PORT
+      value: "{{ MQGATEWAY01_PORT }}"
+    - name: MQGATEWAY01_NAME
+      value: {{ MQGATEWAY01_NAME }}
+    - name: DOKDISTFORDELING_QDIST008_DIST_FORSENDELS_QUEUENAME
+      value: {{ DOKDISTFORDELING_QDIST008_DIST_FORSENDELS_QUEUENAME }}
+    - name: DOKDISTFORDELING_QDIST008_FUNK_FEIL_QUEUENAME
+      value: {{ DOKDISTFORDELING_QDIST008_FUNK_FEIL_QUEUENAME }}
+    - name: DOKDISTSENTRALPRINT_QDIST009_DIST_S_PRINT_QUEUENAME
+      value: {{ DOKDISTSENTRALPRINT_QDIST009_DIST_S_PRINT_QUEUENAME }}
+    - name: DOKDISTDITTNAV_QDIST010_DIST_DITT_NAV_QUEUENAME
+      value: {{ DOKDISTDITTNAV_QDIST010_DIST_DITT_NAV_QUEUENAME }}
+    - name: DOKDISTEFORMIDLING_QDIST011_DIST_TIL_DPI_QUEUENAME
+      value: {{ DOKDISTEFORMIDLING_QDIST011_DIST_TIL_DPI_QUEUENAME }}
+    - name: DOKDISTFORDELING_QDIST012_HENT_DOK_JOARK_QUEUENAME
+      value: {{ DOKDISTFORDELING_QDIST012_HENT_DOK_JOARK_QUEUENAME }}
+    - name: DOKDISTFORDELING_QDIST012_FUNK_FEIL_QUEUENAME
+      value: {{ DOKDISTFORDELING_QDIST012_FUNK_FEIL_QUEUENAME }}
+    - name: DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME
+      value: {{ DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME }}
+  image: {{ image }}
+  ingresses:
+    {{#each INGRESSES}}
+       - {{this }}
+      {{/each}}
+  liveness:
+    path: /isAlive
+    port: 8080
+    initialDelay: 30
+    failureThreshold: 10
+  port: 8080
+  prometheus:
+    enabled: true
+    path: /actuator/prometheus
+  readiness:
+    path: /isReady
+    port: 8080
+    initialDelay: 30
+    timeout: 3
+  replicas:
+    min: 2
+    max: 10
+    cpuThresholdPercentage: 50
+  resources:
+    limits:
+      cpu: 3000m
+      memory: 1536Mi
+    requests:
+      cpu: 60m
+      memory: 1024Mi
+  vault:
+    enabled: true
+    paths:
+      - kvPath: {{ SRVDOKDISTFORDELING }}
+        mountPath: /var/run/secrets/nais.io/srvdokdistfordeling
+      - kvPath: {{ VAULT }}
+        mountPath: /var/run/secrets/nais.io/vault
