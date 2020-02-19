@@ -1,5 +1,5 @@
-naisPipeline {
+naiseratorPipeline {
     applicationName = "dokdistfordeling"
     dockerfileDir = "."
-    deployEnvironmentT = "t8"
+    deployEnvironmentQ = "q1,q2"
 }
