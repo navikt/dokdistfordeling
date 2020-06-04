@@ -12,7 +12,6 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -77,6 +76,12 @@ public class DistribuerJournalpostService {
 						.withNavn(avsenderMottaker.getNavn())
 						.withSamhandleridentifikator(avsenderMottaker.getId())
 						.withSamhandlerkategori(SamhandlerKategoriCode.UTL_ORG.name());
+				break;
+			case UKJENT:
+				output = new Samhandler()
+						.withNavn(avsenderMottaker.getNavn())
+						.withSamhandleridentifikator(avsenderMottaker.getId())
+						.withSamhandlerkategori(SamhandlerKategoriCode.UKJENT.name());
 				break;
 			default:
 				output = null;
