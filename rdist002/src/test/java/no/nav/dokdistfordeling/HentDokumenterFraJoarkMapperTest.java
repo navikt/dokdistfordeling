@@ -29,6 +29,9 @@ import static no.nav.dokdistfordeling.unittest.UnitTestUtil.SAMHANDLER_KATOGORI;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.SAMHANDLER_NAVN;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.TEMA;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.TITTEL;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.TSS_ID;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.TSS_KATEGORI;
+import static no.nav.dokdistfordeling.unittest.UnitTestUtil.TSS_NAVN;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createBrukerWithOrgnrId;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createJournalpostBuilder;
 import static no.nav.dokdistfordeling.unittest.UnitTestUtil.createNorskPostadresse;
@@ -39,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Distribusjonbestilling;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.DokumentInformasjon;
@@ -119,6 +123,17 @@ public class HentDokumenterFraJoarkMapperTest {
 	}
 
 	@Test
+	public void shouldMapWithMottakerAsTSS(){
+		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder().build(),
+				createJournalpostBuilder().build(),
+				createTSSMottaker(),
+				BESTILLINGS_ID);
+
+		assertNotNull(result.getDistribusjonbestilling());
+		assertUKJENTSamhandlerMottaker((Samhandler) result.getDistribusjonbestilling().getMottaker());
+	}
+
+	@Test
 	public void shouldMapWithBrukerAsOrganisasjon() {
 		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder().build(),
 				createJournalpostBuilder()
@@ -187,6 +202,12 @@ public class HentDokumenterFraJoarkMapperTest {
 		assertEquals(SAMHANDLER_NAVN, mottaker.getNavn());
 	}
 
+	private void assertUKJENTSamhandlerMottaker(Samhandler mottaker) {
+		assertEquals(TSS_ID, mottaker.getSamhandleridentifikator());
+		assertEquals(TSS_KATEGORI, mottaker.getSamhandlerkategori());
+		assertEquals(TSS_NAVN, mottaker.getNavn());
+	}
+
 	private void assertNorskPostadresse(NorskPostadresse adresse) {
 		assertEquals(LAND_NO, adresse.getLand());
 		assertEquals(POSTNUMMER, adresse.getPostnummer());
@@ -229,6 +250,13 @@ public class HentDokumenterFraJoarkMapperTest {
 				.withSamhandleridentifikator(SAMHANDLER_ID)
 				.withSamhandlerkategori(SAMHANDLER_KATOGORI)
 				.withNavn(SAMHANDLER_NAVN);
+	}
+
+	private Samhandler createTSSMottaker() {
+		return new Samhandler()
+				.withSamhandleridentifikator(TSS_ID)
+				.withSamhandlerkategori(SamhandlerKategoriCode.UKJENT.toString())
+				.withNavn(TSS_NAVN);
 	}
 
 }

@@ -1,0 +1,48 @@
+{
+  "data": {
+    "journalpost": {
+      "journalposttype": "U",
+      "journalstatus": "FERDIGSTILT",
+      "tema": "OPP",
+      "bruker": {
+        "id": "***gammelt_fnr***",
+        "type": "AKTOERID"
+      },
+      "avsenderMottaker": {
+        "id": "***gammelt_fnr***",
+        "type": "UKJENT",
+        "navn": "TSS id Mottaker"
+      },
+      "dokumenter": [
+        {
+          "dokumentInfoId": "666666666",
+          "tittel": "MASKERT_FELT",
+          "brevkode": "000001",
+          "dokumentstatus": "FERDIGSTILT",
+          "dokumentvarianter": [
+            {
+              "saksbehandlerHarTilgang": true,
+              "variantformat": "SLADDET"
+            },
+            {
+              "saksbehandlerHarTilgang": false,
+              "variantformat": "ARKIV"
+            }
+          ]
+        },
+        {
+          "dokumentInfoId": "777777777",
+          "tittel": "MASKERT_FELT",
+          "brevkode": "000001",
+          "dokumentstatus": "FERDIGSTILT",
+          "dokumentvarianter": [
+            {
+              "saksbehandlerHarTilgang": true,
+              "variantformat": "ARKIV"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
