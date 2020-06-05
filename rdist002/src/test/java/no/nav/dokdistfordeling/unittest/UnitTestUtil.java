@@ -39,6 +39,9 @@ public class UnitTestUtil {
 	public static final String BRUKER_ID = "***gammelt_fnr***";
 	public static final String ORGNR = "776677665";
 	public static final String ORG_NAVN = "eksempelcorp ASA";
+	public static final String TSS_ID = "***gammelt_fnr***";
+	public static final String TSS_NAVN = "TSS Mottaker";
+	public static final String TSS_KATEGORI = "UKJENT";
 	public static final String SAMHANDLER_KATOGORI = "HPR";
 	public static final String SAMHANDLER_NAVN = "Betina Samhandlerson";
 	public static final String SAMHANDLER_ID = "33322211";

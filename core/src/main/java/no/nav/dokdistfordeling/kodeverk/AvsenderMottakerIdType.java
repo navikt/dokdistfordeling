@@ -7,5 +7,6 @@ public enum AvsenderMottakerIdType {
 	FNR,
 	ORGNR,
 	HPRNR,
-	UTL_ORG
+	UTL_ORG,
+	UKJENT
 }
