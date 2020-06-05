@@ -76,10 +76,6 @@ public class UnitTestUtil {
 		return Journalpost.Bruker.builder().id(ORGNR).type(BrukerIdType.ORGNR).build();
 	}
 
-	public static Journalpost.Bruker createBrukerWithTSSId() {
-		return Journalpost.Bruker.builder().id(TSS_ID).type(BrukerIdType.ORGNR).build();
-	}
-
 	public Journalpost.Bruker createBrukerWithSamhandlerId() {
 		return Journalpost.Bruker.builder().id(SAMHANDLER_ID).type(BrukerIdType.AKTOERID).build();
 	}
