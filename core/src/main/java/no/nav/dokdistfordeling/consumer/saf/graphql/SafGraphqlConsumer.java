@@ -6,6 +6,8 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHOR
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokdistfordeling.constants.Constants;
+import no.nav.dokdistfordeling.consumer.NavHeaders;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonJournalpost;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
@@ -14,6 +16,7 @@ import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.exception.technical.MarshalGraphqlRequestToJsonTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostQueryTechnicalException;
 import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -81,7 +84,8 @@ public class SafGraphqlConsumer {
 		}
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add(HttpHeaders.AUTHORIZATION, OIDC_TOKEN_PREFIX + " " + authorizationHeader.split(" ")[1]);
+		headers.set(NavHeaders.NAV_CALL_ID, MDC.get(Constants.CALL_ID));
+		headers.set(HttpHeaders.AUTHORIZATION, OIDC_TOKEN_PREFIX + " " + authorizationHeader.split(" ")[1]);
 		return headers;
 	}
 

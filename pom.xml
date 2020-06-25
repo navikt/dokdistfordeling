@@ -19,34 +19,39 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.3.RELEASE</version>
+		<version>2.1.15.RELEASE</version>
 	</parent>
 
 	<properties>
-		<camel.version>2.23.1</camel.version>
+		<camel.version>2.23.4</camel.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<javax.inject.version>1</javax.inject.version>
 		<logback-syslog4j.version>1.0.0</logback-syslog4j.version>
-		<logstash-logback-encoder.version>5.3</logstash-logback-encoder.version>
-		<junit5.version>5.3.2</junit5.version>
+		<logstash-logback-encoder.version>6.4</logstash-logback-encoder.version>
 		<resilience4j.version>0.11.0</resilience4j.version>
-		<lombok.version>1.18.6</lombok.version>
-		<junit5.mockito.version>2.23.0</junit5.mockito.version>
 		<aws-java-sdk-s3.version>1.11.534</aws-java-sdk-s3.version>
-		<cxf.version>3.3.1</cxf.version>
+		<cxf.version>3.3.6</cxf.version>
 		<aktoer.version>2.0.1</aktoer.version>
 		<dokkat-api>10.4.0</dokkat-api>
 		<wmq.version>8.0.0.6</wmq.version>
-		<awaitility.version>3.1.6</awaitility.version>
 		<activemq.version>5.15.9</activemq.version>
 		<commons-io.version>2.4</commons-io.version>
 		<micrometer.version>1.1.4</micrometer.version>
-		<spring-wiremock.version>1.2.5.RELEASE</spring-wiremock.version>
-		<wiremock-standalone.version>2.19.0</wiremock-standalone.version>
 		<melding-virksomhet-dokdistfordeling.version>2.0.7</melding-virksomhet-dokdistfordeling.version>
+		<arkiverdokumentproduksjon-tjenestespesifikasjon.version>3.4.1
+		</arkiverdokumentproduksjon-tjenestespesifikasjon.version>
 		<io.springfox.version>2.9.2</io.springfox.version>
+		<lombok.version>1.18.12</lombok.version>
+		<jaxb2-basics-runtime.version>0.12.0</jaxb2-basics-runtime.version>
+		<commons-lang3.version>3.7</commons-lang3.version>
+		<!-- test -->
+		<junit5.version>5.3.2</junit5.version>
+		<junit5.mockito.version>2.23.0</junit5.mockito.version>
+		<awaitility.version>3.1.6</awaitility.version>
+		<spring-wiremock.version>1.2.7.RELEASE</spring-wiremock.version>
+		<wiremock-standalone.version>2.19.0</wiremock-standalone.version>
 	</properties>
 
 	<dependencyManagement>
@@ -71,11 +76,72 @@
 				<artifactId>qdist012</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-spring-boot-starter</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-jms</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-jaxb</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.ibm.mq</groupId>
+				<artifactId>com.ibm.mq.allclient</artifactId>
+				<version>${wmq.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>aws-java-sdk-s3</artifactId>
+				<version>${aws-java-sdk-s3.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-spring-boot-starter-jaxws</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-ws-security</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jvnet.jaxb2_commons</groupId>
+				<artifactId>jaxb2-basics-runtime</artifactId>
+				<version>${jaxb2-basics-runtime.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons-lang3.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>no.nav.meldinger.virksomhet</groupId>
 				<artifactId>melding-virksomhet-dokdistfordeling</artifactId>
 				<version>${melding-virksomhet-dokdistfordeling.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.dokkat</groupId>
+				<artifactId>dokkat-api</artifactId>
+				<version>${dokkat-api}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.tjenester.brevogarkiv</groupId>
+				<artifactId>arkiverdokumentproduksjon-tjenestespesifikasjon</artifactId>
+				<version>${arkiverdokumentproduksjon-tjenestespesifikasjon.version}</version>
+				<classifier>jaxws</classifier>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.tjenester.fim</groupId>
+				<artifactId>nav-fim-aktoer-v2-tjenestespesifikasjon</artifactId>
+				<version>${aktoer.version}</version>
+				<classifier>jaxws</classifier>
 			</dependency>
 			<dependency>
 				<groupId>javax.inject</groupId>
@@ -93,12 +159,6 @@
 				<version>${logback-syslog4j.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok</artifactId>
-				<version>${lombok.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
 				<groupId>io.micrometer</groupId>
 				<artifactId>micrometer-registry-prometheus</artifactId>
 				<version>${micrometer.version}</version>
@@ -113,7 +173,37 @@
 				<artifactId>springfox-swagger-ui</artifactId>
 				<version>${io.springfox.version}</version>
 			</dependency>
-
+			<dependency>
+				<groupId>io.github.resilience4j</groupId>
+				<artifactId>resilience4j-spring-boot</artifactId>
+				<version>${resilience4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.resilience4j</groupId>
+				<artifactId>resilience4j-metrics</artifactId>
+				<version>${resilience4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.resilience4j</groupId>
+				<artifactId>resilience4j-prometheus</artifactId>
+				<version>${resilience4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.resilience4j</groupId>
+				<artifactId>resilience4j-timelimiter</artifactId>
+				<version>${resilience4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.resilience4j</groupId>
+				<artifactId>resilience4j-circuitbreaker</artifactId>
+				<version>${resilience4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+				<scope>provided</scope>
+			</dependency>
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
 				<artifactId>junit-jupiter-engine</artifactId>
@@ -144,33 +234,6 @@
 				<version>${wiremock-standalone.version}</version>
 				<scope>test</scope>
 			</dependency>
-
-			<!--Selftest metrics-->
-			<dependency>
-				<groupId>io.github.resilience4j</groupId>
-				<artifactId>resilience4j-spring-boot</artifactId>
-				<version>${resilience4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.github.resilience4j</groupId>
-				<artifactId>resilience4j-metrics</artifactId>
-				<version>${resilience4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.github.resilience4j</groupId>
-				<artifactId>resilience4j-prometheus</artifactId>
-				<version>${resilience4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.github.resilience4j</groupId>
-				<artifactId>resilience4j-timelimiter</artifactId>
-				<version>${resilience4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.github.resilience4j</groupId>
-				<artifactId>resilience4j-circuitbreaker</artifactId>
-				<version>${resilience4j.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>org.awaitility</groupId>
 				<artifactId>awaitility</artifactId>
@@ -181,6 +244,12 @@
 				<groupId>org.apache.activemq</groupId>
 				<artifactId>activemq-broker</artifactId>
 				<version>${activemq.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons-io.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
@@ -199,7 +268,6 @@
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
-<!--				<filtering>true</filtering>-->
 			</resource>
 		</resources>
 		<extensions>

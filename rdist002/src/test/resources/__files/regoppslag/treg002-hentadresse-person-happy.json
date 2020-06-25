@@ -1,0 +1,12 @@
+{
+  "identifikator": "***gammelt_fnr***",
+  "navn": "Jan Neimansen",
+  "adresse": {
+    "adresselinje1": "eksempelveien 23 A",
+    "adresselinje2": "eksempelveien 24 A",
+    "adresselinje3": "eksempelveien 25 A",
+    "postnummer": "1337",
+    "poststed": "poststed",
+    "landkode": "NO"
+  }
+}
