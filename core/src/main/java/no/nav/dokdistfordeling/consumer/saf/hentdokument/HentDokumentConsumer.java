@@ -3,11 +3,14 @@ package no.nav.dokdistfordeling.consumer.saf.hentdokument;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
+import no.nav.dokdistfordeling.constants.Constants;
+import no.nav.dokdistfordeling.consumer.NavHeaders;
 import no.nav.dokdistfordeling.consumer.sts.StsRestConsumer;
 import no.nav.dokdistfordeling.exception.functional.SafHentDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafHentDokumentTechnicalException;
 import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -78,6 +81,7 @@ public class HentDokumentConsumer implements HentDokument {
 	private HttpHeaders createAuthorizationHeader() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.set(NavHeaders.NAV_CALL_ID, MDC.get(Constants.CALL_ID));
 		headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + stsRestConsumer.getOidcToken());
 		return headers;
 	}

@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Value;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 @ApiModel(value = "DistribuerJournalpostRequestTo model")
 public class DistribuerJournalpostRequestTo {
 	@ApiModelProperty(name = "journalpostId", value = "Journalpost som skal distribueres", example = "343752389")
@@ -22,6 +22,7 @@ public class DistribuerJournalpostRequestTo {
 	@ApiModelProperty(name = "dokumentProdApp", value = "Applikasjon som har produsert hoveddokumentet (for sporing og feilsøking)", example = "ELIN_STANDARD", position = 4)
 	private final String dokumentProdApp;
 
+	@Builder
 	@Getter
 	@AllArgsConstructor
 	public static class AdresseTo {

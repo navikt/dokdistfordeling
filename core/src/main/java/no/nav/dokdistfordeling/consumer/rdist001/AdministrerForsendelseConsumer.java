@@ -5,6 +5,8 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
+import no.nav.dokdistfordeling.constants.Constants;
+import no.nav.dokdistfordeling.consumer.NavHeaders;
 import no.nav.dokdistfordeling.exception.functional.OppdaterForsendelseFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.PersisterForsendelseFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
@@ -85,7 +87,9 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	private HttpHeaders createHeaders() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.set(CALL_ID, MDC.get(CALL_ID));
+		final String callId = MDC.get(CALL_ID);
+		headers.set(CALL_ID, callId);
+		headers.set(NavHeaders.NAV_CALL_ID, callId);
 		return headers;
 	}
 
