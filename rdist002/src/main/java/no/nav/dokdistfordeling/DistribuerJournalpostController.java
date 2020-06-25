@@ -59,16 +59,16 @@ public class DistribuerJournalpostController {
 			return ResponseEntity.ok().body(response);
 		} catch (ValidationException | PersonErDoedUkjentAdresseException | UkjentAdresseException e) {
 			log.warn("rdist002 - validering av distribusjonsforespørsel for journalpostId={} feilet, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
-			throw new ValidationException(String.format("validering av distribusjonsforespørsel for journalpostId=%s feilet, feilmelding=%s", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage()));
+			throw new ValidationException(String.format("Validering av distribusjonsforespørsel for journalpostId=%s feilet. %s", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage()));
 		} catch (SafJournalpostIkkeFunnetFunctionalException e) {
 			log.warn("rdist002 - journalpost med journalpostId={} ble ikke funnet, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
-			throw new SafJournalpostIkkeFunnetFunctionalException(String.format("journalpost med journalpostId=%s ble ikke funnet", distribuerJournalpostRequestTo.getJournalpostId()));
+			throw new SafJournalpostIkkeFunnetFunctionalException(String.format("Journalpost med journalpostId=%s ble ikke funnet", distribuerJournalpostRequestTo.getJournalpostId()));
 		} catch (SafJournalpostQueryUnauthorizedException e) {
 			log.warn("rdist002 - utilstrekkelig tilgang til journalpost med journalpostid={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
-			throw new SafJournalpostQueryUnauthorizedException(String.format("bruker har ikke tilgang til journalpost med journalpostId=%s", distribuerJournalpostRequestTo.getJournalpostId()));
+			throw new SafJournalpostQueryUnauthorizedException(String.format("Bruker har ikke tilgang til journalpost med journalpostId=%s", distribuerJournalpostRequestTo.getJournalpostId()));
 		} catch (BrukerManglerTilgangTilDokumentFunctionalException e) {
 			log.warn("rdist002 - bruker har ikke tilgang til noen av dokumentvariantene på journalposten med journalpostId={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
-			throw new BrukerManglerTilgangTilDokumentFunctionalException(String.format("bruker har ikke tilgang til noen av dokumentvariantene på journalposten med journalpostId=%s", distribuerJournalpostRequestTo.getJournalpostId()));
+			throw new BrukerManglerTilgangTilDokumentFunctionalException(String.format("Bruker har ikke tilgang til noen av dokumentvariantene på journalposten med journalpostId=%s", distribuerJournalpostRequestTo.getJournalpostId()));
 		} catch (DokkatGetDokumenttypeInfoFunctionalException e) {
 			log.warn("rdist002 - Ugyldig dokumenttypeid på hoveddokumentet for journalpost med journalpostid={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw new DokkatGetDokumenttypeInfoFunctionalException(String.format("Ugyldig dokumenttypeid på hoveddokumentet for journalpost med journalpostid=%s", distribuerJournalpostRequestTo.getJournalpostId()));
