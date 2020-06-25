@@ -34,12 +34,12 @@ public class UnitTestUtil {
 	public static final String TITTEL = "journalpostTittel";
 	public static final String TEMA = "OPP";
 	public static final String ARKIV_SYSTEM = "JOARK";
-	public static final String MOTTAKER_ID = "***gammelt_fnr***";
+	public static final String MOTTAKER_ID = "09876543210";
 	public static final String MOTTAKER_NAVN = "Jan Neimansen";
-	public static final String BRUKER_ID = "***gammelt_fnr***";
+	public static final String BRUKER_ID = "12345678901";
 	public static final String ORGNR = "776677665";
 	public static final String ORG_NAVN = "eksempelcorp ASA";
-	public static final String TSS_ID = "***gammelt_fnr***";
+	public static final String TSS_ID = "88998899890";
 	public static final String TSS_NAVN = "TSS Mottaker";
 	public static final String TSS_KATEGORI = "UKJENT";
 	public static final String SAMHANDLER_KATOGORI = "HPR";

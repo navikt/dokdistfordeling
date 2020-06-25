@@ -5,11 +5,11 @@
       "journalstatus": "FERDIGSTILT",
       "tema": "OPP",
       "bruker": {
-        "id": "***gammelt_fnr***",
+        "id": "12345678901",
         "type": "AKTOERID"
       },
       "avsenderMottaker": {
-        "id": "***gammelt_fnr***",
+        "id": "09876543210",
         "type": "FNR",
         "navn": "Jan Neimansen"
       },

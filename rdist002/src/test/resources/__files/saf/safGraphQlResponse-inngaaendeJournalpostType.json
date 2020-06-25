@@ -6,11 +6,11 @@
       "tema": "OPP",
       "tittel": "journalpostTittel",
       "bruker": {
-        "id": "***gammelt_fnr***",
+        "id": "12345678901",
         "type": "AKTOERID"
       },
       "avsenderMottaker": {
-        "id": "***gammelt_fnr***",
+        "id": "09876543210",
         "navn": "Jan Neimansen",
         "land": "NO",
         "erLikBruker": false

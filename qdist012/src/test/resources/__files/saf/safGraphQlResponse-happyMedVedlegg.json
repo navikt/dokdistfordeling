@@ -5,12 +5,12 @@
       "journalstatus": "FERDIGSTILT",
       "tema": "PEN",
       "bruker": {
-        "id": "***gammelt_fnr***",
+        "id": "22104248784",
         "type": "FNR",
         "navn": "Roy Roger Testersen"
       },
       "avsenderMottaker": {
-        "id": "***gammelt_fnr***",
+        "id": "12345678910",
         "type": "FNR",
         "navn": "Ola-Johnny"
       },

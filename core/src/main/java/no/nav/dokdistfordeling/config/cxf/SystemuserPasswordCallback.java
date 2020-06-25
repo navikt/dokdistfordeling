@@ -15,12 +15,12 @@ public class SystemuserPasswordCallback implements CallbackHandler {
 	private final String systemUserPassword;
 
 	public SystemuserPasswordCallback(String systemUserPassword) {
-		this.systemUser***passord=gammelt_passord***;
+		this.systemUserPassword = systemUserPassword;
 	}
 
 	@Override
 	public void handle(Callback[] callbacks) {
-		WS***passord=gammelt_passord***];
+		WSPasswordCallback wsPasswordCallback = (WSPasswordCallback) callbacks[0];
 
 		wsPasswordCallback.setPassword(systemUserPassword);
 	}

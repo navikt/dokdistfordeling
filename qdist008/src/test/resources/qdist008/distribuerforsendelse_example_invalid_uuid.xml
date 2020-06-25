@@ -11,11 +11,11 @@
 			<arkivId>1234</arkivId>
 		</arkivInformasjon>
 		<mottaker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
-			<aktoerId>***gammelt_fnr***01</aktoerId>
+			<aktoerId>1000075457001</aktoerId>
 			<navn>Bjarne Betjent</navn>
 		</mottaker>
 		<bruker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
-			<aktoerId>***gammelt_fnr***01</aktoerId>
+			<aktoerId>1000075457001</aktoerId>
 			<navn>Bjarne Betjent</navn>
 		</bruker>
 		<!--Optional:-->

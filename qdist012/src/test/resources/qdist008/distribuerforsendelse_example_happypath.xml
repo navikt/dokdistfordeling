@@ -10,11 +10,11 @@
 			<arkivId>arkivId</arkivId>
 		</arkivInformasjon>
 		<mottaker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns2:Person">
-			<personidentifikator>***gammelt_fnr***</personidentifikator>
+			<personidentifikator>12345678910</personidentifikator>
 			<navn>Ola-Johnny</navn>
 		</mottaker>
 		<bruker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns2:Person">
-			<personidentifikator>***gammelt_fnr***</personidentifikator>
+			<personidentifikator>22104248784</personidentifikator>
 			<navn>Roy Roger Testersen</navn>
 		</bruker>
 		<adresse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns2:NorskPostadresse">

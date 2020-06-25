@@ -5,11 +5,11 @@
       "journalstatus": "FERDIGSTILT",
       "tema": "OPP",
       "bruker": {
-        "id": "***gammelt_fnr***",
+        "id": "12345678901",
         "type": "AKTOERID"
       },
       "avsenderMottaker": {
-        "id": "***gammelt_fnr***",
+        "id": "89898989898",
         "type": "UKJENT",
         "navn": "TSS id Mottaker"
       },

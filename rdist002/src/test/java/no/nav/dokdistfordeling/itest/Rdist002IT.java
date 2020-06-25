@@ -104,9 +104,9 @@ public class Rdist002IT {
 
     private static final String DOKUMENTTYPEID = "000001";
     private static final String TEMA = "OPP";
-    private static final String MOTTAKER_ID = "***gammelt_fnr***";
+    private static final String MOTTAKER_ID = "09876543210";
     private static final String MOTTAKER_NAVN = "Jan Neimansen";
-    private static final String BRUKER_ID = "***gammelt_fnr***";
+    private static final String BRUKER_ID = "12345678901";
     @Inject
     protected TestRestTemplate restTemplate;
     private @Value("${hentdokumenter_fra_joark_crypto_password}")

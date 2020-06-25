@@ -9,12 +9,12 @@
             <arkivId>555555555</arkivId>
         </arkivInformasjon>
         <mottaker xsi:type="ns2:Samhandler" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <samhandleridentifikator>***gammelt_fnr***</samhandleridentifikator>
+            <samhandleridentifikator>89898989898</samhandleridentifikator>
             <navn>TSS id Mottaker</navn>
             <samhandlerkategori>UKJENT</samhandlerkategori>
         </mottaker>
         <bruker xsi:type="ns2:AktoerId" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <aktoerId>***gammelt_fnr***</aktoerId>
+            <aktoerId>12345678901</aktoerId>
         </bruker>
         <adresse xsi:type="ns2:NorskPostadresse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <adresselinje1>eksempelveien 23 A</adresselinje1>
