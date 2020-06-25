@@ -54,7 +54,8 @@ public class DistribuerJournalpostService {
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
 		if(distribuerJournalpostRequestTo.getAdresse() == null) {
-			log.info("rdist002 request mangler adresse. Henter adresse fra regoppslag for mottaker på journalpostId={}.", distribuerJournalpostRequestTo.getJournalpostId());
+			log.info("rdist002 request mangler adresse. Henter adresse fra regoppslag for mottaker på journalpostId={}, bestillingsId={}.",
+					distribuerJournalpostRequestTo.getJournalpostId(), bestillingsId);
 			DistribuerJournalpostRequestTo.AdresseTo regoppslagAdresse = hentAdresse(journalpost.getAvsenderMottaker());
 			return doDistribuerForsendelse(distribuerJournalpostRequestTo.toBuilder()
 					.adresse(regoppslagAdresse)
