@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ApiKey;
@@ -25,7 +28,7 @@ import java.util.Collections;
 
 @Configuration
 @EnableSwagger2
-public class SwaggerConfig {
+public class SwaggerConfig implements WebMvcConfigurer {
 
 	@Value("${APP_VERSION:0.0.0}")
 	private String version;
@@ -76,5 +79,18 @@ public class SwaggerConfig {
 	private ApiKey apiKey() {
 
 		return new ApiKey("apiKey", HttpHeaders.AUTHORIZATION, "header");
+	}
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/swagger-ui/**")
+				.addResourceLocations("classpath:/META-INF/resources/webjars/springfox-swagger-ui/")
+				.resourceChain(false);
+	}
+
+	@Override
+	public void addViewControllers(ViewControllerRegistry registry) {
+		registry.addViewController("/swagger-ui/")
+				.setViewName("forward:" + "/swagger-ui/index.html");
 	}
 }

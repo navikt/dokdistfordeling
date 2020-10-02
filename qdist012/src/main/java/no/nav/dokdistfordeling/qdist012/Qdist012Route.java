@@ -83,7 +83,7 @@ public class Qdist012Route extends SpringRouteBuilder {
 				.bean(qdist012Service)
 				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
 				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
-				.inOnly("jms:" + qdist008.getQueueName())
+				.to(ExchangePattern.InOnly, "jms:" + qdist008.getQueueName())
 				.log(LoggingLevel.INFO, log, "qdist012 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist008 for distribusjon av forsendelse");
 	}
 

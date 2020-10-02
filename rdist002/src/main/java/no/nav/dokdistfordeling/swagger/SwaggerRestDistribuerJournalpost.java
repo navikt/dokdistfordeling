@@ -24,8 +24,5 @@ import java.lang.annotation.Target;
 }
 )
 public @interface SwaggerRestDistribuerJournalpost {
-	@AliasFor(
-			annotation = RequestMapping.class
-	)
 	String value() default "";
 }

@@ -22,6 +22,7 @@
   "NAMESPACE": "q1",
   "INGRESSES": [
     "https://dokdistfordeling-q1.nais.preprod.local",
-    "https://dokdistfordeling-q1.dev-fss.nais.io"
+    "https://dokdistfordeling-q1.dev-fss.nais.io",
+    "https://dokdistfordeling-q1.dev.nav.no"
   ]
 }

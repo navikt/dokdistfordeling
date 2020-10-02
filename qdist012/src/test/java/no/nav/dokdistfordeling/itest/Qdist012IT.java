@@ -545,10 +545,9 @@ public class Qdist012IT {
 	}
 
 	private String classpathToString(String classpathResource) throws IOException {
-		InputStream inputStream = new ClassPathResource(classpathResource).getInputStream();
-		String message = IOUtils.toString(inputStream, UTF_8);
-		IOUtils.closeQuietly(inputStream);
-		return message;
+		try(InputStream inputStream = new ClassPathResource(classpathResource).getInputStream()) {
+			return IOUtils.toString(inputStream, UTF_8);
+		}
 	}
 
 	protected TextMessage receiveTextMessage(final Queue queue) {
