@@ -23,6 +23,6 @@
   "INGRESSES": [
     "https://dokdistfordeling-q1.nais.preprod.local",
     "https://dokdistfordeling-q1.dev-fss.nais.io",
-    "https://dokdistfordeling-q1.dev.nav.no"
+    "https://dokdistfordeling-q1.dev.adeo.no"
   ]
 }
