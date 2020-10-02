@@ -5,7 +5,7 @@ import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_BESTILLING
 import no.nav.dokdistfordeling.exception.functional.ForsendelseManglerBestillingsIdFunctionalException;
 import no.nav.dokdistfordeling.support.MDCHeaderProcessor;
 import org.apache.camel.Exchange;
-import org.apache.camel.builder.xml.XPathBuilder;
+import org.apache.camel.language.xpath.XPathBuilder;
 
 /**
  * @author Erik Bråten, Visma Consulting.
