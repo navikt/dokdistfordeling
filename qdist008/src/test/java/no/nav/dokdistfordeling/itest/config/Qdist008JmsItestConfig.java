@@ -41,7 +41,7 @@ public class Qdist008JmsItestConfig {
 	}
 
 	@Bean
-	public Queue qdist011(@Value("${dokdisteformidling_qdist011_dist_til_dpi.queuename}") String qdist011QueueName) {
+	public Queue qdist011(@Value("${dokdistdpi_qdist011_dist_til_dpi.queuename}") String qdist011QueueName) {
 		return new ActiveMQQueue(qdist011QueueName);
 	}
 
