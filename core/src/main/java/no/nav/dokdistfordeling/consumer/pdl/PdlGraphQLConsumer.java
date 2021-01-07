@@ -1,0 +1,108 @@
+package no.nav.dokdistfordeling.consumer.pdl;
+
+import lombok.extern.slf4j.Slf4j;
+import no.nav.dokdistfordeling.config.props.PdlProperties;
+import no.nav.dokdistfordeling.consumer.sts.StsRestConsumer;
+import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentForAktoerIdFunctionalException;
+import no.nav.dokdistfordeling.exception.technical.PdlHentFolkeregisteridentForAktoerIdTechnicalException;
+import org.slf4j.MDC;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Optional;
+
+import static java.util.Objects.requireNonNull;
+import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
+
+/**
+ * https://navikt.github.io/pdl
+ *
+ * @author Joakim Bjørnstad, Jbit AS
+ * @author Erlend Axelsson, NAV IT
+ */
+@Slf4j
+@Component
+public class PdlGraphQLConsumer {
+    private static final String HEADER_PDL_NAV_CONSUMER_TOKEN = "Nav-Consumer-Token";
+    private final RestTemplate restTemplate;
+    private final StsRestConsumer stsConsumer;
+    private final String pdlUrl;
+
+    public PdlGraphQLConsumer(RestTemplateBuilder restTemplateBuilder,
+                              StsRestConsumer stsConsumer,
+                              PdlProperties pdlProperties) {
+        this.restTemplate = restTemplateBuilder
+                .setConnectTimeout(Duration.ofSeconds(3))
+                .setReadTimeout(Duration.ofSeconds(20))
+                .build();
+        this.stsConsumer = stsConsumer;
+        this.pdlUrl = pdlProperties.getUrl();
+    }
+
+    @Retryable(include = HttpServerErrorException.class)
+    public String hentFolkeregisteridentForAktoerId(final String personnummer) {
+        try {
+            final UriComponents uri = UriComponentsBuilder.fromHttpUrl(pdlUrl).build();
+            final String serviceuserToken = "Bearer " + stsConsumer.getOidcToken();
+            final RequestEntity<PdlRequest> requestEntity = RequestEntity.post(uri.toUri())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .header(HttpHeaders.AUTHORIZATION, serviceuserToken)
+                    .header(HEADER_PDL_NAV_CONSUMER_TOKEN, serviceuserToken)
+                    .header(NAV_CALL_ID, MDC.get(NAV_CALL_ID))
+                    .body(mapRequest(personnummer));
+            final PdlHentIdenterResponse pdlHentIdenterResponse = requireNonNull(restTemplate.exchange(requestEntity, PdlHentIdenterResponse.class).getBody());
+            if (pdlHentIdenterResponse.getErrors() == null || pdlHentIdenterResponse.getErrors().isEmpty()) {
+                return getFolkeregisteridentFromResponse(pdlHentIdenterResponse);
+            } else {
+                throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Kunne ikke hente aktørid ident fra PDL." + pdlHentIdenterResponse.getErrors());
+            }
+        } catch (HttpClientErrorException e) {
+            throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Funksjonell feil ved kall mot PDL.", e);
+        } catch (HttpServerErrorException e) {
+            throw new PdlHentFolkeregisteridentForAktoerIdTechnicalException("Teknisk feil ved kall mot PDL.", e);
+        }
+    }
+
+    private String getFolkeregisteridentFromResponse(PdlHentIdenterResponse pdlHentIdenterResponse){
+        return Optional.ofNullable(pdlHentIdenterResponse.getData())
+                .map(PdlHentIdenterResponse.PdlHentIdenterData::getHentIdenter)
+                .map(PdlHentIdenterResponse.PdlIdenter::getIdenter)
+                .flatMap(identer -> identer.stream()
+                        .filter(it -> it.getGruppe() == IdentType.FOLKEREGISTERIDENT)
+                        .filter(it -> !it.isHistorisk())
+                        .map(PdlHentIdenterResponse.PdlIdentTo::getIdent)
+                        .findFirst())
+                .orElseThrow(()-> {
+                    throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Kunne ikke hente aktørid ident fra PDL. Respons fra PDL inneholdt ikke gjeldende aktørid");
+                });
+    }
+
+    private PdlRequest mapRequest(final String aktoerId) {
+        final HashMap<String, Object> variables = new HashMap<>();
+        variables.put("ident", aktoerId);
+        return PdlRequest.builder()
+                .query("query($ident: ID!) {\n" +
+                        "  hentIdenter(ident: $ident, historikk: false, grupper: FOLKEREGISTERIDENT) {\n" +
+                        "    identer {\n" +
+                        "      ident\n" +
+                        "      historisk\n" +
+                        "      gruppe\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}\n")
+                .variables(variables)
+                .build();
+    }
+}

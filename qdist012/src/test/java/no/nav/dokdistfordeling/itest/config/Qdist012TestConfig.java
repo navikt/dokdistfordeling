@@ -6,6 +6,7 @@ import no.nav.dokdistfordeling.CoreConfig;
 import no.nav.dokdistfordeling.config.alias.ArkiverDokumentproduksjonV1Alias;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
+import no.nav.dokdistfordeling.config.props.PdlProperties;
 import no.nav.dokdistfordeling.config.props.SrvAppserverProperties;
 import no.nav.dokdistfordeling.storage.Storage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -25,7 +26,9 @@ import org.springframework.retry.annotation.EnableRetry;
 		ServiceuserAlias.class,
 		ArkiverDokumentproduksjonV1Alias.class,
 		MqGatewayAlias.class,
-		SrvAppserverProperties.class})
+		SrvAppserverProperties.class,
+		PdlProperties.class
+})
 @Import({
 		Qdist012JmsItestConfig.class,
 		STSTestConfig.class,
