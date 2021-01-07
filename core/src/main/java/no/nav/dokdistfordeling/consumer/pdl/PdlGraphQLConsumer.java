@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.PdlProperties;
 import no.nav.dokdistfordeling.consumer.sts.StsRestConsumer;
 import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentForAktoerIdFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.PdlPersonIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.PdlHentFolkeregisteridentForAktoerIdTechnicalException;
 import org.slf4j.MDC;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -34,6 +35,7 @@ import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
 @Slf4j
 @Component
 public class PdlGraphQLConsumer {
+    private static final String PERSON_IKKE_FUNNET_CODE = "not_found";
     private static final String HEADER_PDL_NAV_CONSUMER_TOKEN = "Nav-Consumer-Token";
     private final RestTemplate restTemplate;
     private final StsRestConsumer stsConsumer;
@@ -51,7 +53,7 @@ public class PdlGraphQLConsumer {
     }
 
     @Retryable(include = HttpServerErrorException.class)
-    public String hentFolkeregisteridentForAktoerId(final String personnummer) {
+    public String hentFolkeregisteridentForAktoerId(final String aktorId) {
         try {
             final UriComponents uri = UriComponentsBuilder.fromHttpUrl(pdlUrl).build();
             final String serviceuserToken = "Bearer " + stsConsumer.getOidcToken();
@@ -61,12 +63,15 @@ public class PdlGraphQLConsumer {
                     .header(HttpHeaders.AUTHORIZATION, serviceuserToken)
                     .header(HEADER_PDL_NAV_CONSUMER_TOKEN, serviceuserToken)
                     .header(NAV_CALL_ID, MDC.get(NAV_CALL_ID))
-                    .body(mapRequest(personnummer));
+                    .body(mapRequest(aktorId));
             final PdlHentIdenterResponse pdlHentIdenterResponse = requireNonNull(restTemplate.exchange(requestEntity, PdlHentIdenterResponse.class).getBody());
             if (pdlHentIdenterResponse.getErrors() == null || pdlHentIdenterResponse.getErrors().isEmpty()) {
                 return getFolkeregisteridentFromResponse(pdlHentIdenterResponse);
             } else {
-                throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Kunne ikke hente aktørid ident fra PDL." + pdlHentIdenterResponse.getErrors());
+                if (PERSON_IKKE_FUNNET_CODE.equals(pdlHentIdenterResponse.getErrors().get(0).getExtensions().getCode())) {
+                    throw new PdlPersonIkkeFunnetFunctionalException("Fant ikke folkeregisterident for person i PDL.");
+                }
+                throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Kunne ikke hente folkeregisterident fra PDL." + pdlHentIdenterResponse.getErrors());
             }
         } catch (HttpClientErrorException e) {
             throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Funksjonell feil ved kall mot PDL.", e);
@@ -85,7 +90,7 @@ public class PdlGraphQLConsumer {
                         .map(PdlHentIdenterResponse.PdlIdentTo::getIdent)
                         .findFirst())
                 .orElseThrow(()-> {
-                    throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Kunne ikke hente aktørid ident fra PDL. Respons fra PDL inneholdt ikke gjeldende aktørid");
+                    throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Kunne ikke hente folkeregisterident fra PDL. Respons fra PDL inneholdt ikke gjeldende folkeregisterident");
                 });
     }
 
