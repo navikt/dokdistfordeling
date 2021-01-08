@@ -11,8 +11,8 @@ spec:
       value: {{ DOKUMENTTYPEINFO_V4_URL }}
     - name: ADMINISTRERFORSENDELSE_V1_URL
       value: {{ ADMINISTRERFORSENDELSE_V1_URL }}
-    - name: AKTOERREGISTER_API_V1_URL
-      value: {{ AKTOERREGISTER_API_V1_URL }}
+    - name: PDL_URL
+      value: "{{PDL_URL}}"
     - name: SECURITYTOKENSERVICE_URL
       value: {{ SECURITYTOKENSERVICE_URL }}
     - name: SECURITY_TOKEN_SERVICE_TOKEN_URL

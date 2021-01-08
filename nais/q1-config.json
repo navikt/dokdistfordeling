@@ -1,7 +1,6 @@
 {
   "DOKUMENTTYPEINFO_V4_URL": "https://app-q1.adeo.no/dokkat/rest/dokumenttypeinfo/v4",
   "ADMINISTRERFORSENDELSE_V1_URL": "https://app-q1.adeo.no/dokdist/rest/v1/administrerforsendelse",
-  "AKTOERREGISTER_API_V1_URL": "https://app-q1.adeo.no/aktoerregister/api/v1",
   "SECURITYTOKENSERVICE_URL": "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts",
   "REGOPPSLAG_URL": "https://regoppslag-q1.nais.preprod.local/rest",
@@ -19,6 +18,7 @@
   "DOKDISTFORDELING_QDIST012_FUNK_FEIL_QUEUENAME": "QA.Q1_DOKDISTFORDELING.QDIST012_FUNK_FEIL",
   "DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME": "QA.Q1_DOKDISTEFORMIDLING.QDIST013_DIST_TRYGDERE",
   "SRVDOKDISTFORDELING": "/serviceuser/data/dev/srvdokdistfordeling",
+  "PDL_URL": "https://pdl-api.dev.adeo.no/graphql",
   "VAULT": "/kv/preprod/fss/dokdistfordeling/q1",
   "NAMESPACE": "q1",
   "INGRESSES": [

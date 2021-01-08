@@ -7,7 +7,7 @@ import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
 import static org.springframework.util.StringUtils.isEmpty;
 
-import no.nav.dokdistfordeling.consumer.aktoerregister.Aktoerregister;
+import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanal;
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.DokDistKanalRequest;
 import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
@@ -34,7 +34,7 @@ import javax.inject.Inject;
 @Service
 public class Qdist008Service {
 
-	private final Aktoerregister aktoerregister;
+	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final ArkiverDokumentproduksjon arkiverDokumentproduksjon;
 	private final DokumentkatalogAdmin dokumentkatalogAdmin;
 	private final BestemDistribusjonskanal bestemDistribusjonskanal;
@@ -42,13 +42,13 @@ public class Qdist008Service {
 	private final PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper;
 
 	@Inject
-	public Qdist008Service(Aktoerregister aktoerregister,
+	public Qdist008Service(PdlGraphQLConsumer pdlGraphQLConsumer,
 						   ArkiverDokumentproduksjon arkiverDokumentproduksjon,
 						   DokumentkatalogAdmin dokumentkatalogAdmin,
 						   BestemDistribusjonskanal bestemDistribusjonskanal,
 						   AdministrerForsendelse administrerForsendelse,
 						   PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper) {
-		this.aktoerregister = aktoerregister;
+		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.arkiverDokumentproduksjon = arkiverDokumentproduksjon;
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.bestemDistribusjonskanal = bestemDistribusjonskanal;
@@ -97,7 +97,7 @@ public class Qdist008Service {
 
 	private String getFnr(DistribuerForsendelseTo.AktoerTo aktoer) {
 		if (aktoer.isIdentifikatorAktoerId()) {
-			return aktoerregister.hentIdentForAktoerId(aktoer.getIdentifikator());
+			return pdlGraphQLConsumer.hentFolkeregisteridentForAktoerId(aktoer.getIdentifikator());
 		} else {
 			return aktoer.getIdentifikator();
 		}
