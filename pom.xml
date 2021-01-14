@@ -28,7 +28,7 @@
         <javax.inject.version>1</javax.inject.version>
         <logstash-logback-encoder.version>6.4</logstash-logback-encoder.version>
         <resilience4j.version>1.5.0</resilience4j.version>
-        <aws-java-sdk-s3.version>1.11.908</aws-java-sdk-s3.version>
+        <aws-java-sdk-s3.version>1.11.925</aws-java-sdk-s3.version>
         <cxf.version>3.4.1</cxf.version>
         <jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
         <saaj-impl.version>1.5.2</saaj-impl.version>
