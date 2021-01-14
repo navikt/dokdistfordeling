@@ -43,7 +43,7 @@
         <lombok.version>1.18.12</lombok.version>
         <jaxb2-basics-runtime.version>0.12.0</jaxb2-basics-runtime.version>
         <commons-lang3.version>3.11</commons-lang3.version>
-        <rxjava.version>2.2.19</rxjava.version>
+        <rxjava.version>2.2.20</rxjava.version>
         <!-- test -->
         <junit5.mockito.version>3.5.13</junit5.mockito.version>
         <awaitility.version>4.0.3</awaitility.version>
