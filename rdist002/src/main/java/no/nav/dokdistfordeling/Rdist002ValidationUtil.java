@@ -52,7 +52,6 @@ public class Rdist002ValidationUtil {
 	}
 
 	public void validateJournalpostAndDokumenter(Journalpost journalpost) {
-
 		assertNotNull(JournalpostType.class, journalpost.getJournalposttype());
 		assertParameterIsAsExpected("journalposttype", journalpost.getJournalposttype().name(), UTGAAENDE);
 		assertParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus(), FERDIGSTILT);
@@ -79,12 +78,6 @@ public class Rdist002ValidationUtil {
 	}
 
 	private void validateDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
-		try {
-			assertParameterIsAsExpected("dokumentstatus", dokumentInfo.getDokumentstatus(), FERDIGSTILT);
-		} catch (ValidationException e) {
-			throw new ValidationException(String.format(e.getMessage() + ", dokumentInfoId=%s", dokumentInfo.getDokumentInfoId()));
-		}
-
 		if (checkIfNoDokumentvariantWithTilgang(dokumentInfo.getDokumentvarianter())) {
 			throw new BrukerManglerTilgangTilDokumentFunctionalException(String.format("Saksbehandler har ikke tilgang til noen av dokumentets variantformater. dokumentInfoId=%s", dokumentInfo.getDokumentInfoId()));
 		}

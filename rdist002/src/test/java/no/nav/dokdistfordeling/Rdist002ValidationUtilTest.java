@@ -1,6 +1,18 @@
 package no.nav.dokdistfordeling;
 
-import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.ValidationException;
+import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
+import no.nav.dokdistfordeling.kodeverk.Journalposttype;
+import no.nav.dokdistfordeling.kodeverk.Variantformat;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+
 import static no.nav.dokdistfordeling.UnitTestUtil.ADRESSELINJE1;
 import static no.nav.dokdistfordeling.UnitTestUtil.ADRESSETYPE_NORSK;
 import static no.nav.dokdistfordeling.UnitTestUtil.BATCH_ID;
@@ -18,20 +30,8 @@ import static no.nav.dokdistfordeling.UnitTestUtil.createJournalpostBuilder;
 import static no.nav.dokdistfordeling.UnitTestUtil.createNorskPostadresse;
 import static no.nav.dokdistfordeling.UnitTestUtil.createPostadresseAdresstypeNull;
 import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresse;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
-import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
-import no.nav.dokdistfordeling.exception.functional.ValidationException;
-import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
-import no.nav.dokdistfordeling.kodeverk.Journalposttype;
-import no.nav.dokdistfordeling.kodeverk.Variantformat;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
-import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
 
 public class Rdist002ValidationUtilTest {
 
@@ -147,6 +147,18 @@ public class Rdist002ValidationUtilTest {
 	}
 
 	@Test
+	public void shouldValidateWithDokumentstatusNotEqualFerdigstilt() {
+		Journalpost journalpost = createJournalpostBuilder()
+				.dokumenter(Arrays.asList(
+						createDokumentInfo1Builder()
+								.dokumentstatus("UNDER_REDIGERING")
+								.build(),
+						createDokumentInfo2Builder().build()))
+				.build();
+		rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost);
+	}
+
+	@Test
 	public void shouldThrowValidationExceptionFromWrongJournalposttype() {
 		Journalpost journalpost = createJournalpostBuilder()
 				.journalposttype(Journalposttype.I)
@@ -156,7 +168,7 @@ public class Rdist002ValidationUtilTest {
 	}
 
 	@Test
-	public void shouldThrowValidationExceptionFromWrongJournalpoststatus() {
+	public void shouldNotThrowValidationExceptionFromWrongJournalpoststatus() {
 		Journalpost journalpost = createJournalpostBuilder()
 				.journalstatus(EKSPEDERT)
 				.build();
@@ -225,32 +237,6 @@ public class Rdist002ValidationUtilTest {
 				.build();
 		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("For hoveddokumentet kan feltet brevkode ikke være null eller tomt. Fikk brevkode=null, dokumentInfoId=666666666", thrownException.getMessage());
-	}
-
-	@Test
-	public void shouldThrowValidationExceptionFromNullDokumentstatus() {
-		Journalpost journalpost = createJournalpostBuilder()
-				.dokumenter(Arrays.asList(
-						createDokumentInfo1Builder()
-								.dokumentstatus(null)
-								.build(),
-						createDokumentInfo2Builder().build()))
-				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
-		assertEquals("dokumentstatus er ikke som forventet, fikk: null, men forventet FERDIGSTILT, dokumentInfoId=666666666", thrownException.getMessage());
-	}
-
-	@Test
-	public void shouldThrowValidationExceptionFromWrongDokumentstatus() {
-		Journalpost journalpost = createJournalpostBuilder()
-				.dokumenter(Arrays.asList(
-						createDokumentInfo1Builder()
-								.dokumentstatus("UNDER_REDIGERING")
-								.build(),
-						createDokumentInfo2Builder().build()))
-				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
-		assertEquals("dokumentstatus er ikke som forventet, fikk: UNDER_REDIGERING, men forventet FERDIGSTILT, dokumentInfoId=666666666", thrownException.getMessage());
 	}
 
 	@Test
