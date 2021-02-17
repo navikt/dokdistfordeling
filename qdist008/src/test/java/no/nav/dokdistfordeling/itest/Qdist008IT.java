@@ -21,10 +21,10 @@ import static no.nav.dokdistfordeling.storage.S3Configuration.BUCKET_NAME;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -111,7 +111,7 @@ public class Qdist008IT {
 	public void setupBefore() {
 		cacheManager.getCache(TKAT020_CACHE).clear();
 		reset(amazonS3);
-		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), any(String.class))).thenReturn(" ");
+		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), anyString())).thenReturn(" ");
 
 		WireMock.reset();
 		WireMock.resetAllRequests();
@@ -636,7 +636,7 @@ public class Qdist008IT {
 	@Test
 	public void shouldThrowNotAvailableInS3ValidationException() throws Exception {
 
-		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), any(String.class))).thenReturn(null);
+		when(amazonS3.getObjectAsString(eq(BUCKET_NAME), anyString())).thenReturn(null);
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
@@ -1050,7 +1050,7 @@ public class Qdist008IT {
 	private String classpathToString(String classpathResource) throws IOException {
 		InputStream inputStream = new ClassPathResource(classpathResource).getInputStream();
 		String message = IOUtils.toString(inputStream, UTF_8);
-		IOUtils.closeQuietly(inputStream);
+		IOUtils.close(inputStream);
 		return message;
 	}
 
@@ -1058,7 +1058,7 @@ public class Qdist008IT {
 	private <T> T receive(Queue queue) {
 		Object response = jmsTemplate.receiveAndConvert(queue);
 		if (response instanceof JAXBElement) {
-			response = ((JAXBElement) response).getValue();
+			response =  ((JAXBElement) response).getValue();
 		}
 		return (T) response;
 	}
