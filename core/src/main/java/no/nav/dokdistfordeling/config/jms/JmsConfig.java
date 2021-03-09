@@ -89,15 +89,16 @@ public class JmsConfig {
         connectionFactory.setCCSID(UTF_8_WITH_PUA);
         connectionFactory.setIntProperty(WMQConstants.JMS_IBM_ENCODING, MQConstants.MQENC_NATIVE);
         connectionFactory.setIntProperty(WMQConstants.JMS_IBM_CHARACTER_SET, UTF_8_WITH_PUA);
+        connectionFactory.setBooleanProperty(JmsConstants.USER_AUTHENTICATION_MQCSP,false);
         UserCredentialsConnectionFactoryAdapter adapter = new UserCredentialsConnectionFactoryAdapter();
         adapter.setTargetConnectionFactory(connectionFactory);
         if (mqGatewayAlias.isTlsbroker()) {
             // Konfigurasjon for IBM MQ broker med TLS og autorisasjon med serviceuser mot onpremise Active Directory.
-            connectionFactory.setBooleanProperty(JmsConstants.USER_AUTHENTICATION_MQCSP, true);
             adapter.setUsername(serviceuserAlias.getUsername());
             adapter.setPassword(serviceuserAlias.getPassword());
         } else {
             // Legacy IBM MQ broker
+            connectionFactory.setBooleanProperty(JmsConstants.USER_AUTHENTICATION_MQCSP, false);
             adapter.setUsername(srvAppserverProperties.getUsername());
             adapter.setPassword(srvAppserverProperties.getPassword());
         }
