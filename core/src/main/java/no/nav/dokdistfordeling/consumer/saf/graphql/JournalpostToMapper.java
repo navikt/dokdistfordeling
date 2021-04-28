@@ -16,6 +16,7 @@ public class JournalpostToMapper {
 
 	public Journalpost map(SafJournalpostTo safJournalpostTo) {
 		return Journalpost.builder()
+				.tittel(safJournalpostTo.getTittel())
 				.journalposttype(stringToEnum(Journalposttype.class, safJournalpostTo.getJournalposttype()))
 				.journalstatus(safJournalpostTo.getJournalstatus())
 				.tema(safJournalpostTo.getTema())

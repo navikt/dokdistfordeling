@@ -16,6 +16,7 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 	private static final String JOURNALPOST_QUERY =
 			"query journalpost($queryJournalpostId: String!) {\n" +
 					"  journalpost(journalpostId: $queryJournalpostId) {\n" +
+					"    tittel\n" +
 					"    journalposttype\n" +
 					"    journalstatus\n" +
 					"    tema\n" +

@@ -1,10 +1,5 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import static no.nav.dokdistfordeling.constants.Constants.BEARER_PREFIX;
-import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
-import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.hentdokument.HentDokument;
 import no.nav.dokdistfordeling.consumer.saf.hentdokument.HentDokumentResponseTo;
@@ -24,6 +19,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static no.nav.dokdistfordeling.constants.Constants.BEARER_PREFIX;
+import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.

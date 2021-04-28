@@ -1,15 +1,8 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
-import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
-import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
-import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist008Metrics;
-import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
-import static org.springframework.util.StringUtils.isEmpty;
-
-import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanal;
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.DokDistKanalRequest;
+import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseResponseTo;
@@ -27,6 +20,13 @@ import org.apache.camel.Handler;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+
+import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
+import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
+import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
+import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist008Metrics;
+import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
+import static org.springframework.util.StringUtils.isEmpty;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
