@@ -15,7 +15,6 @@ public class JournalpostToValidator {
 		assertJournalpostFieldNotNullOrEmpty("journalposttype", safJournalpostTo.getJournalposttype());
 		assertJournalpostFieldNotNullOrEmpty("journalstatus", safJournalpostTo.getJournalstatus());
 		assertJournalpostFieldNotNullOrEmpty("tema", safJournalpostTo.getTema());
-		assertJournalpostFieldNotNullOrEmpty("tittel", safJournalpostTo.getTittel()); //todo remove
 
 		assertJournalpostFieldNotNull(SafJournalpostTo.Bruker.class, safJournalpostTo.getBruker());
 		validateBruker(safJournalpostTo.getBruker());
