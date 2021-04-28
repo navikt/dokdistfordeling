@@ -5,6 +5,7 @@ import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKU
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.hentdokument.HentDokument;
 import no.nav.dokdistfordeling.consumer.saf.hentdokument.HentDokumentResponseTo;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  * @author Sigurd Midttun, Visma Consulting.
  */
 @Service
+@Slf4j
 public class Qdist012Service {
 
 	private final HentDokument hentDokument;
@@ -53,6 +55,9 @@ public class Qdist012Service {
 
 	@Handler
 	public DistribuerForsendelse copyDocumentsFromJoarkToDokdistmellomlagerS3Storage(HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo) {
+		log.info("qdist012 hand;ler:  tittel={}.",
+				hentDokumenterFraJoarkTo.getDistribusjonbestilling().getForsendelseTittel());
+
 		HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
 		final String arkivId = distribusjonbestilling.getArkivInformasjon().getArkivId();
 

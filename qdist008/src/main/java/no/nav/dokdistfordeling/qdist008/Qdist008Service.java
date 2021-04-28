@@ -7,6 +7,7 @@ import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
 import static org.springframework.util.StringUtils.isEmpty;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanal;
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.DokDistKanalRequest;
@@ -32,6 +33,7 @@ import javax.inject.Inject;
  * @author Sigurd Midttun, Visma Consulting.
  */
 @Service
+@Slf4j
 public class Qdist008Service {
 
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
@@ -88,6 +90,9 @@ public class Qdist008Service {
 	}
 
 	private DokumenttypeInfoTo getTittelFromDokkkatIfNotProvided(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
+		log.info("qdist008:  tittel={}.",
+				 distribusjonbestilling.getForsendelseTittel());
+
 		if (isEmpty(distribusjonbestilling.getForsendelseTittel())) {
 			return dokumentkatalogAdmin.getDokumenttypeInfo(getDokumenttypeIdHoveddokument(distribusjonbestilling));
 		} else {
