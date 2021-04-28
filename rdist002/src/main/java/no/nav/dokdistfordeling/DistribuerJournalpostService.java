@@ -52,9 +52,6 @@ public class DistribuerJournalpostService {
 		Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
 		rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost);
 
-		log.info("rdist002: journalpostId={}, tittel={}.",
-				distribuerJournalpostRequestTo.getJournalpostId(), journalpost.getTittel());
-
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
 		if(distribuerJournalpostRequestTo.getAdresse() == null) {
 			log.info("rdist002 request mangler adresse. Henter adresse fra regoppslag for mottaker på journalpostId={}, bestillingsId={}.",

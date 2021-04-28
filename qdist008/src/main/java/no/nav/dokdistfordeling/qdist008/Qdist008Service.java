@@ -33,7 +33,6 @@ import javax.inject.Inject;
  * @author Sigurd Midttun, Visma Consulting.
  */
 @Service
-@Slf4j
 public class Qdist008Service {
 
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
@@ -90,9 +89,6 @@ public class Qdist008Service {
 	}
 
 	private DokumenttypeInfoTo getTittelFromDokkkatIfNotProvided(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
-		log.info("qdist008:  tittel={}.",
-				 distribusjonbestilling.getForsendelseTittel());
-
 		if (isEmpty(distribusjonbestilling.getForsendelseTittel())) {
 			return dokumentkatalogAdmin.getDokumenttypeInfo(getDokumenttypeIdHoveddokument(distribusjonbestilling));
 		} else {
