@@ -66,6 +66,8 @@ public class SafGraphqlConsumer {
 				throw new SafJournalpostIkkeFunnetFunctionalException("Ingen journalpost ble funnet");
 			}
 
+			log.info("performQuery, tittel {} ", responseEntity.getBody().getJournalpost().getTittel());
+
 			return responseEntity.getBody().getJournalpost();
 
 		} catch (HttpClientErrorException e) {

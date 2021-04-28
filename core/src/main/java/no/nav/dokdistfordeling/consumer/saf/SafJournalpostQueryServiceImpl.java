@@ -1,19 +1,16 @@
 package no.nav.dokdistfordeling.consumer.saf;
 
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.saf.graphql.GraphQLRequest;
 import no.nav.dokdistfordeling.consumer.saf.graphql.JournalpostToMapper;
 import no.nav.dokdistfordeling.consumer.saf.graphql.JournalpostToValidator;
 import no.nav.dokdistfordeling.consumer.saf.graphql.SafGraphqlConsumer;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 
 @Component
-@Slf4j
 public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryService {
 
 	private static final String JOURNALPOST_QUERY =
@@ -54,25 +51,13 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 
 	public Journalpost hentJournalpost(String journalpostid, String authorizationHeader) {
 
-
-		SafJournalpostTo safJournalpostTo = safGraphqlConsumer.performQuery(GraphQLRequest.builder()
-				.query(JOURNALPOST_QUERY)
-				.operationName("journalpost")
-				.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
-				.build(), authorizationHeader);
-
-		log.info("hentJournalpost - tittel {}", safJournalpostTo.getTittel());
-
-		return journalpostMapper.map(journalpostToValidator.validateAndReturn(safJournalpostTo));
-//
-//
-//		return journalpostMapper.map(
-//				journalpostToValidator.validateAndReturn(
-//						safGraphqlConsumer.performQuery(GraphQLRequest.builder()
-//								.query(JOURNALPOST_QUERY)
-//								.operationName("journalpost")
-//								.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
-//								.build(), authorizationHeader))
-//		);
+		return journalpostMapper.map(
+				journalpostToValidator.validateAndReturn(
+						safGraphqlConsumer.performQuery(GraphQLRequest.builder()
+								.query(JOURNALPOST_QUERY)
+								.operationName("journalpost")
+								.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
+								.build(), authorizationHeader))
+		);
 	}
 }
