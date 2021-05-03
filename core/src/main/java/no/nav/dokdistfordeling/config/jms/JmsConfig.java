@@ -95,7 +95,7 @@ public class JmsConfig {
 
         PooledConnectionFactory pooledFactory = new PooledConnectionFactory();
         pooledFactory.setConnectionFactory(adapter);
-        pooledFactory.setMaxConnections(100);
+        pooledFactory.setMaxConnections(5);
 
         if (mqGatewayAlias.isTlsbroker()) {
             // Konfigurasjon for IBM MQ broker med TLS og autorisasjon med serviceuser mot onpremise Active Directory.
