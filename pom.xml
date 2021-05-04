@@ -48,7 +48,7 @@
         <junit5.mockito.version>3.5.13</junit5.mockito.version>
         <awaitility.version>4.0.3</awaitility.version>
         <spring-wiremock.version>3.0.0</spring-wiremock.version>
-        <activemq.version>5.15.13</activemq.version>
+        <activemq.version>5.16.1</activemq.version>
 
         <!-- maven -->
         <maven-plugin.version>3.0.0-M5</maven-plugin.version>
@@ -87,6 +87,11 @@
                 <groupId>com.ibm.mq</groupId>
                 <artifactId>com.ibm.mq.allclient</artifactId>
                 <version>${wmq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-jms-pool</artifactId>
+                <version>${activemq.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.amazonaws</groupId>

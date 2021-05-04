@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
+import org.apache.activemq.jms.pool.PooledConnectionFactory;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -22,7 +23,7 @@ import javax.jms.Queue;
 /**
  * @author Sigurd Midttun, Visma Consulting AS
  */
-@Profile("nais")
+@Profile({"nais", "local"})
 @Configuration
 public class JmsConfig {
 
@@ -76,7 +77,7 @@ public class JmsConfig {
         return createConnectionFactory(mqGatewayAlias, channelName, srvAppserverProperties, serviceuserAlias);
     }
 
-    private UserCredentialsConnectionFactoryAdapter createConnectionFactory(final MqGatewayAlias mqGatewayAlias,
+    private PooledConnectionFactory createConnectionFactory(final MqGatewayAlias mqGatewayAlias,
                                                                             final String channelName,
                                                                             final SrvAppserverProperties srvAppserverProperties,
                                                                             final ServiceuserAlias serviceuserAlias) throws JMSException {
@@ -91,6 +92,12 @@ public class JmsConfig {
         connectionFactory.setIntProperty(WMQConstants.JMS_IBM_CHARACTER_SET, UTF_8_WITH_PUA);
         UserCredentialsConnectionFactoryAdapter adapter = new UserCredentialsConnectionFactoryAdapter();
         adapter.setTargetConnectionFactory(connectionFactory);
+
+        PooledConnectionFactory pooledFactory = new PooledConnectionFactory();
+        pooledFactory.setConnectionFactory(adapter);
+        pooledFactory.setMaxConnections(10);
+        pooledFactory.setMaximumActiveSessionPerConnection(10);
+
         if (mqGatewayAlias.isTlsbroker()) {
             // Konfigurasjon for IBM MQ broker med TLS og autorisasjon med serviceuser mot onpremise Active Directory.
             adapter.setUsername(serviceuserAlias.getUsername());
@@ -101,6 +108,6 @@ public class JmsConfig {
             adapter.setUsername(srvAppserverProperties.getUsername());
             adapter.setPassword(srvAppserverProperties.getPassword());
         }
-        return adapter;
+        return pooledFactory;
     }
 }
