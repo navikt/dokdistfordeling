@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling;
 
 import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseResponseTo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
@@ -12,11 +13,12 @@ import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_PO
 @Component
 public class RegoppslagAdresseMapper {
     private static final String ISO_3166_ALPHA_2_NORGE = "NO";
+    private static final String TEST_VALUE = "";
 
     DistribuerJournalpostRequestTo.AdresseTo mapAdresseTo(final HentMottakerOgAdresseResponseTo.AdresseTo regoppslagAdresseTo) {
         if (ISO_3166_ALPHA_2_NORGE.equals(regoppslagAdresseTo.getLandkode())) {
             return DistribuerJournalpostRequestTo.AdresseTo.builder()
-                    .adresselinje1(regoppslagAdresseTo.getAdresselinje1())
+                    .adresselinje1(StringUtils.isBlank(regoppslagAdresseTo.getAdresselinje1())? null : regoppslagAdresseTo.getAdresselinje1())
                     .adresselinje2(regoppslagAdresseTo.getAdresselinje2())
                     .adresselinje3(regoppslagAdresseTo.getAdresselinje3())
                     .postnummer(regoppslagAdresseTo.getPostnummer())
