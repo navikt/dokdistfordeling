@@ -33,6 +33,18 @@ class RegoppslagAdresseMapperTest {
     }
 
     @Test
+    void shouldMapBlankNorskAdresselinje1ToNull() {
+        final DistribuerJournalpostRequestTo.AdresseTo adresseTo = regoppslagAdresseMapper.mapAdresseTo(createNorskAdresseWithBlank());
+        assertThat(adresseTo.getAdresselinje1()).isEqualTo(null);
+        assertThat(adresseTo.getAdresselinje2()).isEqualTo(ADRESSELINJE2);
+        assertThat(adresseTo.getAdresselinje3()).isEqualTo(ADRESSELINJE3);
+        assertThat(adresseTo.getPostnummer()).isEqualTo(POSTNUMMER);
+        assertThat(adresseTo.getPoststed()).isEqualTo(POSTSTED);
+        assertThat(adresseTo.getLand()).isEqualTo(LAND_NO);
+        assertThat(adresseTo.getAdressetype()).isEqualTo(NORSK_POSTADRESSE);
+    }
+
+    @Test
     void shouldMapUtenlandskAddresse() {
         final DistribuerJournalpostRequestTo.AdresseTo adresseTo = regoppslagAdresseMapper.mapAdresseTo(createUtenlandskAdresse());
         assertThat(adresseTo.getAdresselinje1()).isEqualTo(ADRESSELINJE1);
@@ -47,6 +59,17 @@ class RegoppslagAdresseMapperTest {
     private HentMottakerOgAdresseResponseTo.AdresseTo createNorskAdresse() {
         return HentMottakerOgAdresseResponseTo.AdresseTo.builder()
                 .adresselinje1(ADRESSELINJE1)
+                .adresselinje2(ADRESSELINJE2)
+                .adresselinje3(ADRESSELINJE3)
+                .postnummer(POSTNUMMER)
+                .poststed(POSTSTED)
+                .landkode(LAND_NO)
+                .build();
+    }
+
+    private HentMottakerOgAdresseResponseTo.AdresseTo createNorskAdresseWithBlank() {
+        return HentMottakerOgAdresseResponseTo.AdresseTo.builder()
+                .adresselinje1("")
                 .adresselinje2(ADRESSELINJE2)
                 .adresselinje3(ADRESSELINJE3)
                 .postnummer(POSTNUMMER)

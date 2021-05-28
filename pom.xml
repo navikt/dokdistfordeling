@@ -28,7 +28,7 @@
         <javax.inject.version>1</javax.inject.version>
         <logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
         <resilience4j.version>1.5.0</resilience4j.version>
-        <aws-java-sdk-s3.version>1.11.983</aws-java-sdk-s3.version>
+        <aws-java-sdk-s3.version>1.11.1026</aws-java-sdk-s3.version>
         <cxf.version>3.4.3</cxf.version>
         <jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
         <saaj-impl.version>1.5.2</saaj-impl.version>
@@ -36,7 +36,7 @@
         <dokkat-api>10.4.0</dokkat-api>
         <wmq.version>9.2.2.0</wmq.version>
         <commons-io.version>2.8.0</commons-io.version>
-        <melding-virksomhet-dokdistfordeling.version>2.0.7</melding-virksomhet-dokdistfordeling.version>
+        <melding-virksomhet-dokdistfordeling.version>2.0.9</melding-virksomhet-dokdistfordeling.version>
         <arkiverdokumentproduksjon-tjenestespesifikasjon.version>3.4.1
         </arkiverdokumentproduksjon-tjenestespesifikasjon.version>
         <io.springfox.version>3.0.0</io.springfox.version>
