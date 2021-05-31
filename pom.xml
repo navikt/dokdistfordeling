@@ -27,7 +27,7 @@
         <camel.version>3.10.0</camel.version>
         <javax.inject.version>1</javax.inject.version>
         <logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
-        <resilience4j.version>1.5.0</resilience4j.version>
+        <resilience4j.version>1.7.0</resilience4j.version>
         <aws-java-sdk-s3.version>1.11.1030</aws-java-sdk-s3.version>
         <cxf.version>3.4.3</cxf.version>
         <jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
@@ -40,7 +40,7 @@
         <arkiverdokumentproduksjon-tjenestespesifikasjon.version>3.4.1
         </arkiverdokumentproduksjon-tjenestespesifikasjon.version>
         <io.springfox.version>3.0.0</io.springfox.version>
-        <lombok.version>1.18.18</lombok.version>
+        <lombok.version>1.18.20</lombok.version>
         <jaxb2-basics-runtime.version>0.12.0</jaxb2-basics-runtime.version>
         <commons-lang3.version>3.11</commons-lang3.version>
         <rxjava.version>2.2.19</rxjava.version>
