@@ -3,5 +3,6 @@
   "dokumentTypeId": "1111111",
   "mottakerType": "ORGANISASJON",
   "brukerId": "555555555",
-  "erArkivert" : true
+  "erArkivert" : true,
+  "tema" : "FS22"
 }

@@ -17,16 +17,17 @@ import no.nav.dokdistfordeling.qdist008.domain.PersisterForsendelseToRequestMapp
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
+import static java.lang.String.format;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
 import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist008Metrics;
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
-import static org.springframework.util.StringUtils.isEmpty;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -34,102 +35,111 @@ import static org.springframework.util.StringUtils.isEmpty;
 @Service
 public class Qdist008Service {
 
-	private final PdlGraphQLConsumer pdlGraphQLConsumer;
-	private final ArkiverDokumentproduksjon arkiverDokumentproduksjon;
-	private final DokumentkatalogAdmin dokumentkatalogAdmin;
-	private final BestemDistribusjonskanal bestemDistribusjonskanal;
-	private final AdministrerForsendelse administrerForsendelse;
-	private final PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper;
+    private final PdlGraphQLConsumer pdlGraphQLConsumer;
+    private final ArkiverDokumentproduksjon arkiverDokumentproduksjon;
+    private final DokumentkatalogAdmin dokumentkatalogAdmin;
+    private final BestemDistribusjonskanal bestemDistribusjonskanal;
+    private final AdministrerForsendelse administrerForsendelse;
+    private final PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper;
 
-	@Inject
-	public Qdist008Service(PdlGraphQLConsumer pdlGraphQLConsumer,
-						   ArkiverDokumentproduksjon arkiverDokumentproduksjon,
-						   DokumentkatalogAdmin dokumentkatalogAdmin,
-						   BestemDistribusjonskanal bestemDistribusjonskanal,
-						   AdministrerForsendelse administrerForsendelse,
-						   PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper) {
-		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
-		this.arkiverDokumentproduksjon = arkiverDokumentproduksjon;
-		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
-		this.bestemDistribusjonskanal = bestemDistribusjonskanal;
-		this.administrerForsendelse = administrerForsendelse;
-		this.persisterForsendelseToRequestMapper = persisterForsendelseToRequestMapper;
-	}
+    @Inject
+    public Qdist008Service(PdlGraphQLConsumer pdlGraphQLConsumer,
+                           ArkiverDokumentproduksjon arkiverDokumentproduksjon,
+                           DokumentkatalogAdmin dokumentkatalogAdmin,
+                           BestemDistribusjonskanal bestemDistribusjonskanal,
+                           AdministrerForsendelse administrerForsendelse,
+                           PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper) {
+        this.pdlGraphQLConsumer = pdlGraphQLConsumer;
+        this.arkiverDokumentproduksjon = arkiverDokumentproduksjon;
+        this.dokumentkatalogAdmin = dokumentkatalogAdmin;
+        this.bestemDistribusjonskanal = bestemDistribusjonskanal;
+        this.administrerForsendelse = administrerForsendelse;
+        this.persisterForsendelseToRequestMapper = persisterForsendelseToRequestMapper;
+    }
 
-	@Handler
-	public DistribuerTilKanal distribuerForsendelseService(DistribuerForsendelseTo distribuerForsendelseTo, Exchange exchange) {
-		DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling = distribuerForsendelseTo.getDistribusjonbestilling();
+    @Handler
+    public DistribuerTilKanal distribuerForsendelseService(DistribuerForsendelseTo distribuerForsendelseTo, Exchange exchange) {
+        DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling = distribuerForsendelseTo.getDistribusjonbestilling();
 
-		final DokumenttypeInfoTo dokumenttypeInfoTo = getTittelFromDokkkatIfNotProvided(distribusjonbestilling);
-		final String mottakerFnr = getFnr(distribusjonbestilling.getMottaker());
-		final String brukerFnr = getFnr(distribusjonbestilling.getBruker());
+        final DokumenttypeInfoTo dokumenttypeInfoTo = getTittelFromDokkkatIfNotProvided(distribusjonbestilling);
+        final String mottakerFnr = getFnr(distribusjonbestilling.getMottaker());
+        final String brukerFnr = getFnr(distribusjonbestilling.getBruker());
 
-		final DistribusjonsKanalCode distribusjonsKanal = bestemDistribusjonskanal.bestemKanal(
-				mapDokDistKanalRequest(distribusjonbestilling, mottakerFnr, brukerFnr));
-		exchange.setProperty(PROPERTY_DISTRIBUSJONSKANAL, distribusjonsKanal);
+        final DistribusjonsKanalCode distribusjonsKanal = bestemDistribusjonskanal.bestemKanal(
+                mapDokDistKanalRequest(distribusjonbestilling, mottakerFnr, brukerFnr));
+        exchange.setProperty(PROPERTY_DISTRIBUSJONSKANAL, distribusjonsKanal);
 
-		DistribuerTilKanal distribuerTilKanal = new DistribuerTilKanal();
+        DistribuerTilKanal distribuerTilKanal = new DistribuerTilKanal();
 
-		if (!(distribusjonsKanal.equals(DistribusjonsKanalCode.INGEN_DISTRIBUSJON) || distribusjonsKanal.equals(DistribusjonsKanalCode.LOKAL_PRINT))) {
+        if (!(distribusjonsKanal.equals(DistribusjonsKanalCode.INGEN_DISTRIBUSJON) || distribusjonsKanal.equals(DistribusjonsKanalCode.LOKAL_PRINT))) {
 
-			final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
-					.map(distribusjonbestilling, dokumenttypeInfoTo, mottakerFnr, distribusjonsKanal);
+            final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
+                    .map(distribusjonbestilling, dokumenttypeInfoTo, mottakerFnr, distribusjonsKanal);
 
-			PersisterForsendelseResponseTo persisterForsendelseResponseTo = administrerForsendelse.persisterForsendelse(persisterForsendelseRequestTo);
-			exchange.setProperty(PROPERTY_FORSENDELSE_ID, persisterForsendelseResponseTo.getForsendelseId());
+            PersisterForsendelseResponseTo persisterForsendelseResponseTo = administrerForsendelse.persisterForsendelse(persisterForsendelseRequestTo);
+            exchange.setProperty(PROPERTY_FORSENDELSE_ID, persisterForsendelseResponseTo.getForsendelseId());
 
-			distribuerTilKanal.setForsendelseId(persisterForsendelseResponseTo.getForsendelseId());
-		}
+            distribuerTilKanal.setForsendelseId(persisterForsendelseResponseTo.getForsendelseId());
+        }
 
-		updateArkivIfArkivsystemIsJoark(distribusjonbestilling, distribusjonsKanal);
-		updateQdist008Metrics(distribusjonbestilling);
+        updateArkivIfArkivsystemIsJoark(distribusjonbestilling, distribusjonsKanal);
+        updateQdist008Metrics(distribusjonbestilling);
 
-		return distribuerTilKanal;
-	}
+        return distribuerTilKanal;
+    }
 
-	private DokumenttypeInfoTo getTittelFromDokkkatIfNotProvided(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
-		if (isEmpty(distribusjonbestilling.getForsendelseTittel())) {
-			return dokumentkatalogAdmin.getDokumenttypeInfo(getDokumenttypeIdHoveddokument(distribusjonbestilling));
-		} else {
-			return null;
-		}
-	}
+    private DokumenttypeInfoTo getTittelFromDokkkatIfNotProvided(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
+        if (StringUtils.isBlank(distribusjonbestilling.getForsendelseTittel())) {
+            return dokumentkatalogAdmin.getDokumenttypeInfo(getDokumenttypeIdHoveddokument(distribusjonbestilling));
+        } else {
+            return null;
+        }
+    }
 
-	private String getFnr(DistribuerForsendelseTo.AktoerTo aktoer) {
-		if (aktoer.isIdentifikatorAktoerId()) {
-			return pdlGraphQLConsumer.hentFolkeregisteridentForAktoerId(aktoer.getIdentifikator());
-		} else {
-			return aktoer.getIdentifikator();
-		}
-	}
+    private String getFnr(DistribuerForsendelseTo.AktoerTo aktoer) {
+        if (aktoer.isIdentifikatorAktoerId()) {
+            return pdlGraphQLConsumer.hentFolkeregisteridentForAktoerId(aktoer.getIdentifikator());
+        } else {
+            return aktoer.getIdentifikator();
+        }
+    }
 
-	private void updateArkivIfArkivsystemIsJoark(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling, DistribusjonsKanalCode distribusjonsKanal) {
-		final DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon = distribusjonbestilling.getArkivInformasjon();
-		if (arkivInformasjon != null && arkivInformasjon.getArkivSystem().equals(ArkivSystemCode.JOARK)) {
-			arkiverDokumentproduksjon.settJournalpostAttributter(SettJournalpostAttributterRequestTo.builder()
-							.journalpostId(arkivInformasjon.getArkivId())
-							.utsendingskanal(distribusjonsKanal.getJoarkUtsendingsKanal())
-							.build(),
-					SERVICE_ID);
-		}
-	}
+    private void updateArkivIfArkivsystemIsJoark(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling, DistribusjonsKanalCode distribusjonsKanal) {
+        final DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon = distribusjonbestilling.getArkivInformasjon();
+        if (arkivInformasjon != null && arkivInformasjon.getArkivSystem().equals(ArkivSystemCode.JOARK)) {
+            arkiverDokumentproduksjon.settJournalpostAttributter(SettJournalpostAttributterRequestTo.builder()
+                            .journalpostId(arkivInformasjon.getArkivId())
+                            .utsendingskanal(distribusjonsKanal.getJoarkUtsendingsKanal())
+                            .build(),
+                    SERVICE_ID);
+        }
+    }
 
-	private String getIdentifikator(DistribuerForsendelseTo.AktoerTo aktoerTo, String fnrMottaker) {
-		if (aktoerTo.isIdentifikatorAktoerId()) {
-			return fnrMottaker;
-		}
-		return aktoerTo.getIdentifikator();
-	}
+    private String getIdentifikator(DistribuerForsendelseTo.AktoerTo aktoerTo, String fnrMottaker) {
+        if (aktoerTo.isIdentifikatorAktoerId()) {
+            return fnrMottaker;
+        }
+        return aktoerTo.getIdentifikator();
+    }
 
-	private DokDistKanalRequest mapDokDistKanalRequest(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo,
-													   String fnrMottaker,
-													   String fnrBruker) {
-		return DokDistKanalRequest.builder()
-				.dokumentTypeId(getDokumenttypeIdHoveddokument(distribusjonbestillingTo))
-				.mottakerId(getIdentifikator(distribusjonbestillingTo.getMottaker(), fnrMottaker))
-				.mottakerType(distribusjonbestillingTo.getMottaker().getAktoerType().name())
-				.brukerId(getIdentifikator(distribusjonbestillingTo.getBruker(), fnrBruker))
-				.erArkivert(distribusjonbestillingTo.getArkivInformasjon() != null)
-				.build();
-	}
+    private DokDistKanalRequest mapDokDistKanalRequest(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo,
+                                                       String fnrMottaker,
+                                                       String fnrBruker) {
+        return DokDistKanalRequest.builder()
+                .dokumentTypeId(getDokumenttypeIdHoveddokument(distribusjonbestillingTo))
+                .mottakerId(getIdentifikator(distribusjonbestillingTo.getMottaker(), fnrMottaker))
+                .mottakerType(distribusjonbestillingTo.getMottaker().getAktoerType().name())
+                .brukerId(getIdentifikator(distribusjonbestillingTo.getBruker(), fnrBruker))
+                .erArkivert(distribusjonbestillingTo.getArkivInformasjon() != null)
+                .tema(getTema(distribusjonbestillingTo.getTema()))
+                .build();
+    }
+
+    private String getTema(String tema) {
+        if (StringUtils.isBlank(tema)) {
+            throw new IllegalArgumentException(format("Ugyldig input: Feltet tema kan ikke være null. Fikk tema=%s", tema));
+        } else {
+            return tema;
+        }
+    }
 }
