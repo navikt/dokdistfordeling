@@ -17,6 +17,7 @@ import no.nav.dokdistfordeling.qdist008.domain.PersisterForsendelseToRequestMapp
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -26,7 +27,7 @@ import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELS
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
 import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist008Metrics;
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
-import static org.springframework.util.StringUtils.isEmpty;
+import static org.apache.cxf.common.util.StringUtils.isEmpty;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -130,6 +131,15 @@ public class Qdist008Service {
 				.mottakerType(distribusjonbestillingTo.getMottaker().getAktoerType().name())
 				.brukerId(getIdentifikator(distribusjonbestillingTo.getBruker(), fnrBruker))
 				.erArkivert(distribusjonbestillingTo.getArkivInformasjon() != null)
+				.tema(getTema(distribusjonbestillingTo.getTema()))
 				.build();
+	}
+
+	private String getTema(String tema) {
+		if (StringUtils.isBlank(tema)) {
+			throw new IllegalArgumentException("Ugyldig input: Feltet tema kan ikke være null eller blank.");
+		} else {
+			return tema;
+		}
 	}
 }
