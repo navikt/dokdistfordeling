@@ -48,7 +48,7 @@ class PersisterForsendelseToRequestMapperTest {
 	private static final AktoerTypeCode SAMHANDLER_TYPE_CODE_HPR = AktoerTypeCode.SAMHANDLER_HPR;
 	private static final AktoerTypeCode SAMHANDLER_TYPE_CODE_UTL_ORG = AktoerTypeCode.SAMHANDLER_UTL_ORG;
 	private static final AktoerTypeCode ORGANISASJON_TYPE_CODE = AktoerTypeCode.ORGANISASJON;
-	private static final String TEMA = "FS22";
+	private static final String TEMA = "DAG";
 	private static final TilknyttetSomCode TILKNYTTET_SOM_CODE_1 = TilknyttetSomCode.HOVEDDOKUMENT;
 	private static final TilknyttetSomCode TILKNYTTET_SOM_CODE_2 = TilknyttetSomCode.VEDLEGG;
 	private static final ArkivSystemCode ARKIV_SYSTEM_CODE = ArkivSystemCode.JOARK;

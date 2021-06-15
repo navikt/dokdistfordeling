@@ -33,7 +33,7 @@ class HentDokumenterFraJoarkMapperTest {
 	private static final String BESTILLINGS_ID = "bestillingsId";
 	private static final String BATCH_ID = "batchId";
 	private static final String BESTILLENDE_FAGSYSTEM = "bestillendeFagsystem";
-	private static final String TEMA = "FS22";
+	private static final String TEMA = "DAG";
 	private static final String FORSENDELSE_TITTEL = "forsendelseTittel";
 	private static final String ARKIV_SYSTEM = "JOARK";
 	private static final String ARKIV_ID = "arkivId";

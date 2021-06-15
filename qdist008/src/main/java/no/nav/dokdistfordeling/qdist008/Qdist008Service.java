@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
-import static java.lang.String.format;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
@@ -138,7 +137,7 @@ public class Qdist008Service {
 
 	private String getTema(String tema) {
 		if (StringUtils.isBlank(tema)) {
-			throw new IllegalArgumentException(format("Ugyldig input: Feltet tema kan ikke være null. Fikk tema=%s", tema));
+			throw new IllegalArgumentException("Ugyldig input: Feltet tema kan ikke være null eller blank.");
 		} else {
 			return tema;
 		}
