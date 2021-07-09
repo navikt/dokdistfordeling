@@ -43,6 +43,8 @@ spec:
       value: {{ DOKDISTFORDELING_QDIST012_FUNK_FEIL_QUEUENAME }}
     - name: DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME
       value: {{ DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME }}
+    - name: APPD_NAME
+      value: {{ APPD_NAME }}
   image: {{ image }}
   ingresses:
     {{#each INGRESSES}}

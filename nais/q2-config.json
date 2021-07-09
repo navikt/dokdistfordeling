@@ -19,6 +19,7 @@
   "SRVDOKDISTFORDELING": "/serviceuser/data/dev/srvdokdistfordeling",
   "PDL_URL": "https://pdl-api.dev.adeo.no/graphql",
   "VAULT": "/kv/preprod/fss/dokdistfordeling/q2",
+  "APPD_NAME": "dokdistfordeling-q2",
   "NAMESPACE": "q2",
   "INGRESSES": [
     "https://dokdistfordeling-q2.nais.preprod.local",

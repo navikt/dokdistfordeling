@@ -28,8 +28,8 @@ public abstract class AbstractCxfEndpointConfig {
 		factoryBean.setBus(bus);
 	}
 
-	void setAdress(String aktoerUrl) {
-		factoryBean.setAddress(aktoerUrl);
+	void setAdress(String adressUrl) {
+		factoryBean.setAddress(adressUrl);
 	}
 
 	void setWsdlUrl(String classPathResourceWsdlUrl) {
