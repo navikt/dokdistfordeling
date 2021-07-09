@@ -19,6 +19,7 @@
   "SRVDOKDISTFORDELING": "/serviceuser/data/dev/srvdokdistfordeling",
   "PDL_URL": "https://pdl-api.dev.adeo.no/graphql",
   "VAULT": "/kv/preprod/fss/dokdistfordeling/q2",
+  "APPDYNAMICS": "/apikey/appdynamics/dev",
   "APPD_NAME": "dokdistfordeling-q2",
   "NAMESPACE": "q2",
   "INGRESSES": [

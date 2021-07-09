@@ -82,3 +82,5 @@ spec:
         mountPath: /var/run/secrets/nais.io/srvdokdistfordeling
       - kvPath: {{ VAULT }}
         mountPath: /var/run/secrets/nais.io/vault
+      - kvPath: {{ APPDYNAMICS }}
+        mountPath: /var/run/secrets/nais.io/appdynamics
