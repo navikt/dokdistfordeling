@@ -19,8 +19,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
-		<!--Caching-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-cache</artifactId>
@@ -29,7 +27,6 @@
 			<groupId>com.github.ben-manes.caffeine</groupId>
 			<artifactId>caffeine</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.retry</groupId>
 			<artifactId>spring-retry</artifactId>
@@ -79,11 +76,6 @@
 			<artifactId>logstash-logback-encoder</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
@@ -95,31 +87,24 @@
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-jms-pool</artifactId>
 		</dependency>
-
-		<!--camel-->
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-jms</artifactId>
 		</dependency>
-
-		<!--Tjenestegrensesnitt-->
-
 		<dependency>
 			<groupId>no.nav.tjenester.brevogarkiv</groupId>
 			<artifactId>arkiverdokumentproduksjon-tjenestespesifikasjon</artifactId>
 			<classifier>jaxws</classifier>
 		</dependency>
 		<dependency>
-			<groupId>no.nav.tjenester.fim</groupId>
-			<artifactId>nav-fim-aktoer-v2-tjenestespesifikasjon</artifactId>
-			<classifier>jaxws</classifier>
-		</dependency>
-		<dependency>
 			<groupId>no.nav.dokkat</groupId>
 			<artifactId>dokkat-api</artifactId>
 		</dependency>
-
-		<!--test-->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-broker</artifactId>

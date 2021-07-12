@@ -3,7 +3,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.2</version>
+    </parent>
     <groupId>no.nav.dokdistfordeling</groupId>
     <artifactId>dokdistfordeling</artifactId>
     <packaging>pom</packaging>
@@ -16,23 +20,17 @@
         <module>rdist002</module>
         <module>qdist012</module>
     </modules>
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.5</version>
-    </parent>
 
     <properties>
         <java.version>11</java.version>
-        <camel.version>3.10.0</camel.version>
+        <camel.version>3.11.0</camel.version>
         <javax.inject.version>1</javax.inject.version>
         <logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
-        <resilience4j.version>1.7.0</resilience4j.version>
-        <aws-java-sdk-s3.version>1.11.1030</aws-java-sdk-s3.version>
-        <cxf.version>3.4.3</cxf.version>
+        <resilience4j.version>1.7.1</resilience4j.version>
+        <aws-java-sdk-s3.version>1.11.1034</aws-java-sdk-s3.version>
+        <cxf.version>3.4.4</cxf.version>
         <jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
         <saaj-impl.version>1.5.2</saaj-impl.version>
-        <aktoer.version>2.0.1</aktoer.version>
         <dokkat-api>10.4.0</dokkat-api>
         <wmq.version>9.2.2.0</wmq.version>
         <commons-io.version>2.8.0</commons-io.version>
@@ -42,17 +40,18 @@
         <io.springfox.version>3.0.0</io.springfox.version>
         <lombok.version>1.18.20</lombok.version>
         <jaxb2-basics-runtime.version>0.12.0</jaxb2-basics-runtime.version>
-        <commons-lang3.version>3.11</commons-lang3.version>
-        <rxjava.version>2.2.19</rxjava.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <rxjava.version>2.2.21</rxjava.version>
         <!-- test -->
         <junit5.mockito.version>3.5.13</junit5.mockito.version>
         <awaitility.version>4.0.3</awaitility.version>
         <spring-wiremock.version>3.0.0</spring-wiremock.version>
-        <activemq.version>5.16.1</activemq.version>
+        <activemq.version>5.16.2</activemq.version>
 
         <!-- maven -->
         <maven-plugin.version>3.0.0-M5</maven-plugin.version>
-    </properties>
+		<maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
+	</properties>
 
     <dependencyManagement>
         <dependencies>
@@ -155,12 +154,6 @@
                 <classifier>jaxws</classifier>
             </dependency>
             <dependency>
-                <groupId>no.nav.tjenester.fim</groupId>
-                <artifactId>nav-fim-aktoer-v2-tjenestespesifikasjon</artifactId>
-                <version>${aktoer.version}</version>
-                <classifier>jaxws</classifier>
-            </dependency>
-            <dependency>
                 <groupId>javax.inject</groupId>
                 <artifactId>javax.inject</artifactId>
                 <version>${javax.inject.version}</version>
@@ -206,6 +199,11 @@
                 <version>${rxjava.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-bom.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
@@ -246,11 +244,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
         </dependency>
@@ -266,7 +259,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-jms</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -289,7 +286,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-toolchains-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>${maven-toolchains-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
