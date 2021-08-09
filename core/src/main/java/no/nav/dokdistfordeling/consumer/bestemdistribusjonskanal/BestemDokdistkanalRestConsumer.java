@@ -41,7 +41,7 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 	@Inject
 	public BestemDokdistkanalRestConsumer(RestTemplateBuilder restTemplateBuilder,
 										  final ServiceuserAlias serviceuserAlias,
-										  @Value("${bestemDistribusjonKanal_url}") String bestemDistKanalUrl) {
+										  @Value("${bestemdistribusjonkanal_url}") String bestemDistKanalUrl) {
 		this.bestemDokdistKanalUrl = bestemDistKanalUrl;
 		this.restTemplate = restTemplateBuilder
 				.setReadTimeout(Duration.ofSeconds(20))
