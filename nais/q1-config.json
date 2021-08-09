@@ -17,14 +17,15 @@
   "DOKDISTFORDELING_QDIST012_FUNK_FEIL_QUEUENAME": "QA.Q1_DOKDISTFORDELING.QDIST012_FUNK_FEIL",
   "DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME": "QA.Q1_DOKDISTEFORMIDLING.QDIST013_DIST_TRYGDERE",
   "SRVDOKDISTFORDELING": "/serviceuser/data/dev/srvdokdistfordeling",
-  "PDL_URL": "https://pdl-api.dev.adeo.no/graphql",
+  "PDL_URL": "https://pdl-api-q1.dev.intern.nav.no/graphql",
   "VAULT": "/kv/preprod/fss/dokdistfordeling/q1",
   "APPDYNAMICS": "/apikey/appdynamics/dev",
   "APPD_NAME": "dokdistfordeling-q1",
-  "NAMESPACE": "q1",
+  "NAMESPACE": "teamdokumenthandtering",
   "INGRESSES": [
     "https://dokdistfordeling-q1.nais.preprod.local",
     "https://dokdistfordeling-q1.dev-fss.nais.io",
-    "https://dokdistfordeling-q1.dev.adeo.no"
+    "https://dokdistfordeling-q1.dev.adeo.no",
+    "https://dokdistfordeling.dev.intern.nav.no"
   ]
 }
