@@ -23,14 +23,13 @@
 
     <properties>
         <java.version>11</java.version>
-        <camel.version>3.11.0</camel.version>
+        <camel.version>3.11.1</camel.version>
         <javax.inject.version>1</javax.inject.version>
         <logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
         <resilience4j.version>1.7.1</resilience4j.version>
         <aws-java-sdk-s3.version>1.11.1034</aws-java-sdk-s3.version>
         <cxf.version>3.4.4</cxf.version>
         <jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
-        <saaj-impl.version>1.5.2</saaj-impl.version>
         <dokkat-api>10.4.0</dokkat-api>
         <wmq.version>9.2.2.0</wmq.version>
         <commons-io.version>2.8.0</commons-io.version>
@@ -47,9 +46,7 @@
         <awaitility.version>4.0.3</awaitility.version>
         <spring-wiremock.version>3.0.0</spring-wiremock.version>
         <activemq.version>5.16.2</activemq.version>
-
         <!-- maven -->
-        <maven-plugin.version>3.0.0-M5</maven-plugin.version>
 		<maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
 	</properties>
 
@@ -111,11 +108,6 @@
                 <groupId>jakarta.xml.ws</groupId>
                 <artifactId>jakarta.xml.ws-api</artifactId>
                 <version>${jakarta.xml.ws-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.xml.messaging.saaj</groupId>
-                <artifactId>saaj-impl</artifactId>
-                <version>${saaj-impl.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
@@ -276,12 +268,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${maven-plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
