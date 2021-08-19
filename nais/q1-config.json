@@ -3,7 +3,7 @@
   "ADMINISTRERFORSENDELSE_V1_URL": "https://app-q1.adeo.no/dokdist/rest/v1/administrerforsendelse",
   "SECURITYTOKENSERVICE_URL": "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.preprod.local/rest/v1/sts",
-  "REGOPPSLAG_URL": "https://regoppslag-q1.nais.preprod.local/rest",
+  "REGOPPSLAG_URL": "https://regoppslag-q1.dev.intern.nav.no/rest",
   "DOKDISTFORDELING_CHANNEL_NAME": "Q1_DOKDISTFORDELING",
   "MQGATEWAY01_HOSTNAME": "b27apvl219.preprod.local",
   "MQGATEWAY01_PORT": "1413",
@@ -18,18 +18,18 @@
   "DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME": "QA.Q1_DOKDISTEFORMIDLING.QDIST013_DIST_TRYGDERE",
   "SRVDOKDISTFORDELING": "/serviceuser/data/dev/srvdokdistfordeling",
   "PDL_URL": "https://pdl-api-q1.dev.intern.nav.no/graphql",
-  "SAF_GRAPHQL_URL": "https://saf.dev.intern.nav.no/graphql",
-  "HENTDOKUMENT_URL": "https://saf.dev.intern.nav.no/rest/hentdokument",
-  "BESTEMDISTRIBUSJONKANAL_URL": "https://dokdistkanal.dev.intern.nav.no/rest/bestemKanal",
-  "ARKIVERDOKUMENTPRODUKSJON_V1_ENDPOINTURL": "https://dokarkiv.dev.intern.nav.no/services/arkiverdokumentproduksjon/v1",
+  "SAF_GRAPHQL_URL": "https://saf-q1.dev.intern.nav.no/graphql",
+  "HENTDOKUMENT_URL": "https://saf-q1.dev.intern.nav.no/rest/hentdokument",
+  "BESTEMDISTRIBUSJONKANAL_URL": "https://dokdistkanal-q1.dev.intern.nav.no/rest/bestemKanal",
+  "ARKIVERDOKUMENTPRODUKSJON_V1_ENDPOINTURL": "https://dokarkiv-q1.dev.intern.nav.no/services/arkiverdokumentproduksjon/v1",
   "VAULT": "/kv/preprod/fss/dokdistfordeling/q1",
   "APPDYNAMICS": "/apikey/appdynamics/dev",
   "APPD_NAME": "dokdistfordeling-q1",
-  "NAMESPACE": "teamdokumenthandtering",
+  "NAMESPACE": "q1",
   "INGRESSES": [
     "https://dokdistfordeling-q1.nais.preprod.local",
     "https://dokdistfordeling-q1.dev-fss.nais.io",
     "https://dokdistfordeling-q1.dev.adeo.no",
-    "https://dokdistfordeling.dev.intern.nav.no"
+    "https://dokdistfordeling-q1.dev.intern.nav.no"
   ]
 }
