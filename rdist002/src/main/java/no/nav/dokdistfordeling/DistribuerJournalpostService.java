@@ -56,7 +56,7 @@ public class DistribuerJournalpostService {
 		if(distribuerJournalpostRequestTo.getAdresse() == null) {
 			log.info("rdist002 request mangler adresse. Henter adresse fra regoppslag for mottaker på journalpostId={}, bestillingsId={}.",
 					distribuerJournalpostRequestTo.getJournalpostId(), bestillingsId);
-			DistribuerJournalpostRequestTo.AdresseTo regoppslagAdresse = hentAdresse(journalpost.getAvsenderMottaker());
+			DistribuerJournalpostRequestTo.AdresseTo regoppslagAdresse = hentAdresse(journalpost.getAvsenderMottaker(), journalpost.getTema());
 			return doDistribuerForsendelse(distribuerJournalpostRequestTo.toBuilder()
 					.adresse(regoppslagAdresse)
 					.build(), bestillingsId, journalpost, mottaker);
@@ -79,10 +79,10 @@ public class DistribuerJournalpostService {
 		return bestillingsId;
 	}
 
-	private DistribuerJournalpostRequestTo.AdresseTo hentAdresse(Journalpost.AvsenderMottaker avsenderMottaker) {
+	private DistribuerJournalpostRequestTo.AdresseTo hentAdresse(Journalpost.AvsenderMottaker avsenderMottaker, String tema) {
 		switch (avsenderMottaker.getType()) {
 			case FNR:
-				return regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentPersonAdresse(avsenderMottaker.getId()));
+				return regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentPersonAdresse(avsenderMottaker.getId(), tema));
 			case ORGNR:
 				return regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentOrganisasjonAdresse(avsenderMottaker.getId()));
 			default:

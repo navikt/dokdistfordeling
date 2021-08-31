@@ -8,5 +8,5 @@ import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseRespo
  */
 public interface Regoppslag {
     HentMottakerOgAdresseResponseTo.AdresseTo hentOrganisasjonAdresse(final String orgnummer);
-    HentMottakerOgAdresseResponseTo.AdresseTo hentPersonAdresse(final String foedselsnummer);
+    HentMottakerOgAdresseResponseTo.AdresseTo hentPersonAdresse(final String foedselsnummer, String tema);
 }
