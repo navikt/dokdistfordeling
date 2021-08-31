@@ -30,10 +30,11 @@ class RegoppslagService implements Regoppslag {
     }
 
     @Override
-    public HentMottakerOgAdresseResponseTo.AdresseTo hentPersonAdresse(String foedselsnummer) {
+    public HentMottakerOgAdresseResponseTo.AdresseTo hentPersonAdresse(String foedselsnummer, String tema) {
         return regoppslagRestConsumer.hentAdresse(HentMottakerOgAdresseRequestTo.builder()
                 .identifikator(foedselsnummer)
                 .type(PERSON_TYPE)
+                .tema(tema)
                 .build());
     }
 }

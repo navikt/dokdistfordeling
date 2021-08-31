@@ -8,4 +8,5 @@ import lombok.Value;
 public class HentMottakerOgAdresseRequestTo {
 	private final String identifikator;
 	private final String type;
+	private final String tema;
 }
