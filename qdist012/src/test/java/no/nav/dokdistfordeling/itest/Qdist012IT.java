@@ -99,6 +99,9 @@ public class Qdist012IT {
 	private Queue backoutQueue;
 
 	@Inject
+	private Queue qdist012Backout;
+
+	@Inject
 	private Storage awsStorage;
 
 	@Value("${hentdokumenter_fra_joark_crypto_password}")

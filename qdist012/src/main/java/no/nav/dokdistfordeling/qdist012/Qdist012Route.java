@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.qdist012;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.metrics.Qdist012MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
@@ -33,6 +34,7 @@ public class Qdist012Route extends SpringRouteBuilder {
 	private final Queue qdist012;
 	private final Queue qdist012FunksjonellFeil;
 	private final Queue qdist008;
+	private final Queue qdist012Backout;
 	private final Qdist012MetricsRoutePolicy qdist012MetricsRoutePolicy;
 	private final HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper;
 	private final HentDokumenterFraJoarkDecrypter hentDokumenterFraJoarkDecrypter;
@@ -43,6 +45,7 @@ public class Qdist012Route extends SpringRouteBuilder {
 						 Queue qdist012FunksjonellFeil,
 						 Queue qdist008,
 						 Qdist012Service qdist012Service,
+						 Queue qdist012Backout,
 						 Qdist012MetricsRoutePolicy qdist012MetricsRoutePolicy,
 						 HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper,
 						 HentDokumenterFraJoarkDecrypter hentDokumenterFraJoarkDecrypter) {
@@ -50,6 +53,7 @@ public class Qdist012Route extends SpringRouteBuilder {
 		this.qdist012FunksjonellFeil = qdist012FunksjonellFeil;
 		this.qdist008 = qdist008;
 		this.qdist012Service = qdist012Service;
+		this.qdist012Backout = qdist012Backout;
 		this.qdist012MetricsRoutePolicy = qdist012MetricsRoutePolicy;
 		this.hentDokumenterFraJoarkMapper = hentDokumenterFraJoarkMapper;
 		this.hentDokumenterFraJoarkDecrypter = hentDokumenterFraJoarkDecrypter;
@@ -62,6 +66,12 @@ public class Qdist012Route extends SpringRouteBuilder {
 				.log(log)
 				.logExhaustedMessageBody(false)
 				.loggingLevel(ERROR));
+
+		onException(SafJournalpostIkkeFunnetFunctionalException.class)
+				.handled(true)
+				.useOriginalMessage()
+				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
+				.to("jms:" + qdist012Backout.getQueueName());
 
 		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)

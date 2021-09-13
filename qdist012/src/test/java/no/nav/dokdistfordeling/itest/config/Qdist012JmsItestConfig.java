@@ -36,6 +36,11 @@ public class Qdist012JmsItestConfig {
 	}
 
 	@Bean
+	public Queue qdist012Backout(@Value("${dokdistfordeling_qdist012_backout.queuename}") String qdist012BackoutQueueName) {
+		return new ActiveMQQueue(qdist012BackoutQueueName);
+	}
+
+	@Bean
 	public Queue backoutQueue() {
 		return new ActiveMQQueue("ActiveMQ.DLQ");
 	}
