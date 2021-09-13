@@ -65,7 +65,7 @@ public class JmsConfig {
     }
 
     @Bean
-    public Queue qdist012Backout(@Value("${dokdistfordeling_qdist012_backout_queuename}") String qdist012BackoutQueueName) throws JMSException {
+    public Queue qdist012Backout(@Value("${dokdistfordeling_qdist012_backout.queuename}") String qdist012BackoutQueueName) throws JMSException {
         return new MQQueue(qdist012BackoutQueueName);
     }
 
