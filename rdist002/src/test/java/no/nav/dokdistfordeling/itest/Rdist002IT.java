@@ -298,7 +298,7 @@ public class Rdist002IT {
     }
 
     @Test
-    public void distribuerJournalpostThrowsSafJournalpostIkkeFunnetFunctionalException() {
+    public void distribuerJournalpostThrowsSafJournalpostIkkeFunnetTechnicalException() {
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
                 .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)));
 
