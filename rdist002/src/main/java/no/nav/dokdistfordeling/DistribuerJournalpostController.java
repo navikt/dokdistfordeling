@@ -1,9 +1,6 @@
 package no.nav.dokdistfordeling;
 
 
-import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -13,7 +10,6 @@ import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokum
 import no.nav.dokdistfordeling.exception.functional.DokkatGetDokumenttypeInfoFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.InvalidMappingToEnumFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseException;
-import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
 import no.nav.dokdistfordeling.exception.functional.UkjentAdresseException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
@@ -29,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
+
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
 
 @RestController
 @RequestMapping("rest/v1/")
@@ -60,9 +59,6 @@ public class DistribuerJournalpostController {
 		} catch (ValidationException | PersonErDoedUkjentAdresseException | UkjentAdresseException e) {
 			log.warn("rdist002 - validering av distribusjonsforespørsel for journalpostId={} feilet, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw new ValidationException(String.format("Validering av distribusjonsforespørsel for journalpostId=%s feilet. %s", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage()));
-		} catch (SafJournalpostIkkeFunnetFunctionalException e) {
-			log.warn("rdist002 - journalpost med journalpostId={} ble ikke funnet, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
-			throw new SafJournalpostIkkeFunnetFunctionalException(String.format("Journalpost med journalpostId=%s ble ikke funnet", distribuerJournalpostRequestTo.getJournalpostId()));
 		} catch (SafJournalpostQueryUnauthorizedException e) {
 			log.warn("rdist002 - utilstrekkelig tilgang til journalpost med journalpostid={}, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw new SafJournalpostQueryUnauthorizedException(String.format("Bruker har ikke tilgang til journalpost med journalpostId=%s", distribuerJournalpostRequestTo.getJournalpostId()));
