@@ -395,7 +395,7 @@ public class Rdist002IT {
 
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
         final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.GONE);
         assertThat(responseEntity.getBody()).contains("Mottaker er død og har ukjent adresse");
     }
 
