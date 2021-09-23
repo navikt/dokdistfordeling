@@ -62,7 +62,7 @@ public class DistribuerJournalpostController {
 			throw new ValidationException(String.format("Validering av distribusjonsforespørsel for journalpostId=%s feilet. %s", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage()));
 		} catch (PersonErDoedUkjentAdresseException e) {
 			log.warn("rdist002 - Mottaker er død og har ukjent adresse. journalpostId={} feilet,feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
-			throw new PersonErDoedUkjentAdresseException("Mottaker er død og har ukjent adresse.", e);
+			throw e;
 		} catch (SafJournalpostIkkeFunnetTechnicalException e) {
 			log.warn("rdist002 - journalpost med journalpostId={} ble ikke funnet, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw e;
