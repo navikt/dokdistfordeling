@@ -57,9 +57,12 @@ public class DistribuerJournalpostController {
 		try {
 			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(distribuerJournalpostService.distribuerForsendelse(distribuerJournalpostRequestTo, authorizationHeader));
 			return ResponseEntity.ok().body(response);
-		} catch (ValidationException | PersonErDoedUkjentAdresseException | UkjentAdresseException e) {
+		} catch (ValidationException | UkjentAdresseException e) {
 			log.warn("rdist002 - validering av distribusjonsforespørsel for journalpostId={} feilet, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw new ValidationException(String.format("Validering av distribusjonsforespørsel for journalpostId=%s feilet. %s", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage()));
+		} catch (PersonErDoedUkjentAdresseException e) {
+			log.warn("rdist002 - Mottaker er død og har ukjent adresse. journalpostId={} feilet,feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
+			throw e;
 		} catch (SafJournalpostIkkeFunnetTechnicalException e) {
 			log.warn("rdist002 - journalpost med journalpostId={} ble ikke funnet, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw e;
