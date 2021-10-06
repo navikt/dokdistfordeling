@@ -1,5 +1,6 @@
 package no.nav.dokdistfordeling;
 
+import static java.lang.String.format;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
@@ -46,7 +47,7 @@ public class Rdist002ValidationUtil {
 			} else if (adresseTo.getAdressetype().equals(UTENLANDSK_POSTADRESSE)) {
 				assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
 			} else {
-				throw new ValidationException(String.format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, mottok %s", adresseTo.getAdressetype()));
+				throw new ValidationException(format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, adresseType= %s", adresseTo.getAdressetype()));
 			}
 		}
 	}
@@ -73,13 +74,13 @@ public class Rdist002ValidationUtil {
 			assertHovedokumentFieldNotNullOrEmpty("tittel", dokumentInfo.getTittel());
 			assertHovedokumentFieldNotNullOrEmpty("brevkode", dokumentInfo.getBrevkode());
 		} catch (ValidationException e) {
-			throw new ValidationException(String.format(e.getMessage() + ", dokumentInfoId=%s", dokumentInfo.getDokumentInfoId()));
+			throw new ValidationException(format(e.getMessage() + ", dokumentInfoId=%s", dokumentInfo.getDokumentInfoId()));
 		}
 	}
 
 	private void validateDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
 		if (checkIfNoDokumentvariantWithTilgang(dokumentInfo.getDokumentvarianter())) {
-			throw new BrukerManglerTilgangTilDokumentFunctionalException(String.format("Saksbehandler har ikke tilgang til noen av dokumentets variantformater. dokumentInfoId=%s", dokumentInfo.getDokumentInfoId()));
+			throw new BrukerManglerTilgangTilDokumentFunctionalException(format("Saksbehandler har ikke tilgang til noen av dokumentets variantformater. dokumentInfoId=%s", dokumentInfo.getDokumentInfoId()));
 		}
 	}
 

@@ -2,21 +2,27 @@ package no.nav.dokdistfordeling;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
+import no.nav.dokdistfordeling.constants.Constants;
 import no.nav.dokdistfordeling.consumer.regoppslag.Regoppslag;
-import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseResponseTo;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
-import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
+
+import static java.lang.System.getProperty;
+import static java.lang.System.setProperty;
+import static no.nav.dokdistfordeling.constants.Constants.KANALNAVN;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 
 @Component
 @Slf4j
@@ -24,23 +30,23 @@ public class DistribuerJournalpostService {
 
 	private final SafJournalpostQueryService safJournalpostQueryService;
 	private final DistribuerForsendelseProducer distribuerForsendelseProducer;
-	private final DokumentkatalogAdmin dokumentkatalogAdmin;
 	private final HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper;
 	private final Rdist002ValidationUtil rdist002ValidationUtil;
 	private final Regoppslag regoppslag;
 	private final RegoppslagAdresseMapper regoppslagAdresseMapper;
+	private final HentBestemDokdistKanal hentBestemDokdistKanal;
 
 	public DistribuerJournalpostService(SafJournalpostQueryService safJournalpostQueryService,
 										DistribuerForsendelseProducer distribuerForsendelseProducer,
-										DokumentkatalogAdmin dokumentkatalogAdmin, Regoppslag regoppslag,
-										RegoppslagAdresseMapper regoppslagAdresseMapper) {
+										Regoppslag regoppslag, RegoppslagAdresseMapper regoppslagAdresseMapper,
+										HentBestemDokdistKanal hentBestemDokdistKanal) {
 		this.safJournalpostQueryService = safJournalpostQueryService;
 		this.distribuerForsendelseProducer = distribuerForsendelseProducer;
-		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.regoppslagAdresseMapper = regoppslagAdresseMapper;
 		this.hentDokumenterFraJoarkMapper = new HentDokumenterFraJoarkMapper();
 		this.rdist002ValidationUtil = new Rdist002ValidationUtil();
 		this.regoppslag = regoppslag;
+		this.hentBestemDokdistKanal = hentBestemDokdistKanal;
 	}
 
 	public String distribuerForsendelse(final DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
@@ -53,7 +59,9 @@ public class DistribuerJournalpostService {
 		rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost);
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
-		if(distribuerJournalpostRequestTo.getAdresse() == null) {
+		DistribusjonsKanalCode distribusjonsKanalCode = hentBestemDokdistKanal.bestemDistribusjonskanal(journalpost);
+		setProperty(KANALNAVN, distribusjonsKanalCode.PRINT.name());
+		if (distribuerJournalpostRequestTo.getAdresse() == null && PRINT.equals(distribusjonsKanalCode)) {
 			log.info("rdist002 request mangler adresse. Henter adresse fra regoppslag for mottaker på journalpostId={}, bestillingsId={}.",
 					distribuerJournalpostRequestTo.getJournalpostId(), bestillingsId);
 			DistribuerJournalpostRequestTo.AdresseTo regoppslagAdresse = hentAdresse(journalpost.getAvsenderMottaker(), journalpost.getTema());
@@ -69,7 +77,10 @@ public class DistribuerJournalpostService {
 										   final String bestillingsId,
 										   final Journalpost journalpost,
 										   final Aktoer mottaker) {
-		rdist002ValidationUtil.validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
+
+		if (PRINT.name().equals(getProperty(KANALNAVN))) {
+			rdist002ValidationUtil.validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
+		}
 
 		final HentDokumenterFraJoark hentDokumenterFraJoark = hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, bestillingsId);
 		distribuerForsendelseProducer.produce(hentDokumenterFraJoark,
