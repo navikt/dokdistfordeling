@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.qdist012;
 import static org.apache.camel.LoggingLevel.ERROR;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseException;
 import no.nav.dokdistfordeling.metrics.Qdist012MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
@@ -62,6 +63,11 @@ public class Qdist012Route extends SpringRouteBuilder {
 				.log(log)
 				.logExhaustedMessageBody(false)
 				.loggingLevel(ERROR));
+
+		onException(PersonErDoedUkjentAdresseException.class)
+				.handled(true)
+				.useOriginalMessage()
+				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging());
 
 		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
