@@ -75,6 +75,7 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.springframework.http.HttpStatus.GONE;
 
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
@@ -483,7 +484,7 @@ public class Rdist002IT {
                 .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
 
-        stubFor(post(urlMatching("/regoppslag/hentMottakerOgAdresse")).willReturn(aResponse().withStatus(HttpStatus.GONE.value())
+        stubFor(post(urlMatching("/regoppslag/hentMottakerOgAdresse")).willReturn(aResponse().withStatus(GONE.value())
                 .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBody("")));
 
@@ -493,7 +494,7 @@ public class Rdist002IT {
 
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
         final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(GONE);
         assertThat(responseEntity.getBody()).contains("Mottaker er død og har ukjent adresse");
     }
 
@@ -545,11 +546,11 @@ public class Rdist002IT {
     }
 
     private void assertDokumenter(List<DokumentInformasjon> dokumenter) {
-        assertThat(dokumenter.size()).isGreaterThan(0);
+        assertThat(dokumenter.size()).isPositive();
 
         dokumenter.forEach(dokumentInformasjon -> {
             if (HOVEDDOKUMENT.name().equals(dokumentInformasjon.getTilknyttetSom())) {
-                assertEquals(dokumentInformasjon.getRekkefolge(), 1);
+                assertEquals(1, dokumentInformasjon.getRekkefolge());
                 assertEquals(SLADDET, dokumentInformasjon.getVariantFormat());
                 assertEquals(DOK_INFO_ID_1, dokumentInformasjon.getArkivDokumentInfoId());
             } else {
