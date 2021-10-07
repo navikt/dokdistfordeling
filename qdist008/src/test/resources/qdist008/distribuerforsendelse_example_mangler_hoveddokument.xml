@@ -3,6 +3,7 @@
 		<bestillingsId>7882d37e-34f7-11e9-b210-d663bd873d93</bestillingsId>
 		<!--Optional:-->
 		<batchId>batchId</batchId>
+		<distribusjonKanal>PRINT</distribusjonKanal>
 		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
 		<tema>FS22</tema>
 		<!--Optional:-->

@@ -1,9 +1,9 @@
 <dok:distribuerForsendelse xmlns:dok="http://nav.no/melding/virksomhet/dokdistfordeling">
 	<distribusjonbestilling>
-		<bestillingsId>invalid1-uuid-11e9-b210-d663bd873d9</bestillingsId>
+		<bestillingsId>7882d37e-34f7-11e9-b210-d663bd873d93</bestillingsId>
 		<!--Optional:-->
 		<batchId>batchId</batchId>
-		<distribusjonKanal>PRINT</distribusjonKanal>
+		<distribusjonKanal>DITTNAV</distribusjonKanal>
 		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
 		<tema>DAG</tema>
 		<!--Optional:-->

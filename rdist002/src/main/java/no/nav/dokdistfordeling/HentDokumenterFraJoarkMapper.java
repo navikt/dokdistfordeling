@@ -1,17 +1,5 @@
 package no.nav.dokdistfordeling;
 
-import static java.lang.System.getProperty;
-import static java.util.Objects.isNull;
-import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
-import static no.nav.dokdistfordeling.constants.Constants.KANALNAVN;
-import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
-import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
-import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
-import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
@@ -29,19 +17,28 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.NorskPostadresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.UtenlandskPostadresse;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static java.util.Objects.isNull;
+import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
+import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class HentDokumenterFraJoarkMapper {
 
 	public static final String NORSK_POSTADRESSE = "norskPostadresse";
 	public static final String UTENLANDSK_POSTADRESSE = "utenlandskPostadresse";
 
-	public HentDokumenterFraJoark map(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost, Aktoer mottaker, String bestillingsId) {
+	public HentDokumenterFraJoark map(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost,
+									  Aktoer mottaker, String bestillingsId, DistribusjonsKanalCode distribusjonsKanal) {
 		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
 
 		return new HentDokumenterFraJoark()
@@ -49,6 +46,7 @@ public class HentDokumenterFraJoarkMapper {
 						new Distribusjonbestilling()
 								.withBestillingsId(bestillingsId)
 								.withBatchId(distribuerJournalpostRequestTo.getBatchId())
+								.withDistribusjonKanal(distribusjonsKanal.name())
 								.withBestillendeFagsystem(distribuerJournalpostRequestTo.getBestillendeFagsystem())
 								.withTema(journalpost.getTema())
 								.withForsendelseTittel(journalpost.getTittel())
@@ -59,7 +57,7 @@ public class HentDokumenterFraJoarkMapper {
 								)
 								.withMottaker(mottaker)
 								.withBruker(mapBruker(journalpost.getBruker()))
-								.withAdresse(PRINT.name().equals(getProperty(KANALNAVN)) ? mapAdresse(distribuerJournalpostRequestTo.getAdresse()) : null)
+								.withAdresse(PRINT.name().equals(distribusjonsKanal.name()) ? mapAdresse(distribuerJournalpostRequestTo.getAdresse()) : null)
 								.withDokumentProdApp(distribuerJournalpostRequestTo.getDokumentProdApp())
 								.withDokumenter(IntStream
 										.range(0, dokumenter.size())

@@ -1,8 +1,5 @@
 package no.nav.dokdistfordeling.rdist001;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
@@ -16,11 +13,16 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 class PersisterForsendelseToRequestMapperTest {
 
 	private static final String FORSENDELSE_TITTEL = "forsendelseTittel";
 	private static final String BESTILLINGS_ID = "bestillingsId";
 	private static final String BATCH_ID = "batchId";
+	private static final String DISTRIBUSJONKANAL_PRINT = "PRINT";
+	private static final String DISTRIBUSJONKANAL_SDP = "SDP";
 	private static final String BESTILLENDE_FAGSYSTEM = "bestillendeFagsystem";
 	private static final String ARKIV_ID = "arkivId";
 	private static final String PERSON_IDENTIFIKATOR = "personId";
@@ -61,7 +63,8 @@ class PersisterForsendelseToRequestMapperTest {
 	// Happy path: Person with norsk postaddresse
 	@Test
 	public void shouldMapHappyPath() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder().build(),
+		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+						.distribusjonKanal(DISTRIBUSJONKANAL_PRINT).build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(), null);
 
 		assertCommon(persisterForsendelseRequestTo);
@@ -118,6 +121,7 @@ class PersisterForsendelseToRequestMapperTest {
 	@Test
 	public void shouldMapWithUtenlandsPostaddresse() {
 		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+						.distribusjonKanal(DISTRIBUSJONKANAL_PRINT)
 						.adresse(createUtenlandsPostadresseTo())
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),

@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling.qdist008;
 
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanal;
-import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.DokDistKanalRequest;
 import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
@@ -17,11 +16,12 @@ import no.nav.dokdistfordeling.qdist008.domain.PersisterForsendelseToRequestMapp
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DISTRIBUSJON;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
@@ -63,15 +63,13 @@ public class Qdist008Service {
 
 		final DokumenttypeInfoTo dokumenttypeInfoTo = getTittelFromDokkkatIfNotProvided(distribusjonbestilling);
 		final String mottakerFnr = getFnr(distribusjonbestilling.getMottaker());
-		final String brukerFnr = getFnr(distribusjonbestilling.getBruker());
 
-		final DistribusjonsKanalCode distribusjonsKanal = bestemDistribusjonskanal.bestemKanal(
-				mapDokDistKanalRequest(distribusjonbestilling, mottakerFnr, brukerFnr));
-		exchange.setProperty(PROPERTY_DISTRIBUSJONSKANAL, distribusjonsKanal);
+		final DistribusjonsKanalCode distribusjonsKanal = DistribusjonsKanalCode.valueOf(distribusjonbestilling.getDistribusjonKanal());
+		exchange.setProperty(PROPERTY_DISTRIBUSJONSKANAL, distribusjonbestilling.getDistribusjonKanal());
 
 		DistribuerTilKanal distribuerTilKanal = new DistribuerTilKanal();
 
-		if (!(distribusjonsKanal.equals(DistribusjonsKanalCode.INGEN_DISTRIBUSJON) || distribusjonsKanal.equals(DistribusjonsKanalCode.LOKAL_PRINT))) {
+		if (!(INGEN_DISTRIBUSJON.equals(distribusjonsKanal) || LOKAL_PRINT.equals(distribusjonsKanal))) {
 
 			final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
 					.map(distribusjonbestilling, dokumenttypeInfoTo, mottakerFnr, distribusjonsKanal);
@@ -115,31 +113,4 @@ public class Qdist008Service {
 		}
 	}
 
-	private String getIdentifikator(DistribuerForsendelseTo.AktoerTo aktoerTo, String fnrMottaker) {
-		if (aktoerTo.isIdentifikatorAktoerId()) {
-			return fnrMottaker;
-		}
-		return aktoerTo.getIdentifikator();
-	}
-
-	private DokDistKanalRequest mapDokDistKanalRequest(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo,
-													   String fnrMottaker,
-													   String fnrBruker) {
-		return DokDistKanalRequest.builder()
-				.dokumentTypeId(getDokumenttypeIdHoveddokument(distribusjonbestillingTo))
-				.mottakerId(getIdentifikator(distribusjonbestillingTo.getMottaker(), fnrMottaker))
-				.mottakerType(distribusjonbestillingTo.getMottaker().getAktoerType().name())
-				.brukerId(getIdentifikator(distribusjonbestillingTo.getBruker(), fnrBruker))
-				.erArkivert(distribusjonbestillingTo.getArkivInformasjon() != null)
-				.tema(getTema(distribusjonbestillingTo.getTema()))
-				.build();
-	}
-
-	private String getTema(String tema) {
-		if (StringUtils.isBlank(tema)) {
-			throw new IllegalArgumentException("Ugyldig input: Feltet tema kan ikke være null eller blank.");
-		} else {
-			return tema;
-		}
-	}
 }

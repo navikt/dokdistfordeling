@@ -1,13 +1,5 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import static org.assertj.core.groups.Tuple.tuple;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
@@ -28,6 +20,14 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static org.assertj.core.groups.Tuple.tuple;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
@@ -35,6 +35,8 @@ class DistribuerForsendelseMapperTest {
 
 	private static final String BESTILLINGS_ID = "bestillingsId";
 	private static final String BATCH_ID = "batchId";
+	private static final String DISTRIBUSJONKANAL_PRINT = "PRINT";
+	private static final String DISTRIBUSJONKANAL_SDP = "SDP";
 	private static final String BESTILLENDE_FAGSYSTEM = "bestillendeFagsystem";
 	private static final String TEMA = "DAG";
 	private static final String FORSENDELSE_TITTEL = "forsendelseTittel";
@@ -82,6 +84,7 @@ class DistribuerForsendelseMapperTest {
 	public void shouldMapUtenlandskAdresse() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
 		distribuerForsendelse.getDistribusjonbestilling().withAdresse(createUtenlandskPostadresse());
+		distribuerForsendelse.getDistribusjonbestilling().withDistribusjonKanal(DISTRIBUSJONKANAL_PRINT);
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
@@ -287,6 +290,7 @@ class DistribuerForsendelseMapperTest {
 				.withDistribusjonbestilling(new Distribusjonbestilling()
 						.withBestillingsId(BESTILLINGS_ID)
 						.withBatchId(BATCH_ID)
+						.withDistribusjonKanal(DISTRIBUSJONKANAL_PRINT)
 						.withBestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
 						.withTema(TEMA)
 						.withForsendelseTittel(FORSENDELSE_TITTEL)

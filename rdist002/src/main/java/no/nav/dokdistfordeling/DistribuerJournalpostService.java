@@ -2,7 +2,6 @@ package no.nav.dokdistfordeling;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
-import no.nav.dokdistfordeling.constants.Constants;
 import no.nav.dokdistfordeling.consumer.regoppslag.Regoppslag;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
@@ -14,14 +13,11 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJo
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static java.lang.System.getProperty;
-import static java.lang.System.setProperty;
-import static no.nav.dokdistfordeling.constants.Constants.KANALNAVN;
+import static java.util.Objects.isNull;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 
 @Component
@@ -60,29 +56,33 @@ public class DistribuerJournalpostService {
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
 		DistribusjonsKanalCode distribusjonsKanalCode = hentBestemDokdistKanal.bestemDistribusjonskanal(journalpost);
-		setProperty(KANALNAVN, distribusjonsKanalCode.PRINT.name());
-		if (distribuerJournalpostRequestTo.getAdresse() == null && PRINT.equals(distribusjonsKanalCode)) {
-			log.info("rdist002 request mangler adresse. Henter adresse fra regoppslag for mottaker på journalpostId={}, bestillingsId={}.",
-					distribuerJournalpostRequestTo.getJournalpostId(), bestillingsId);
-			DistribuerJournalpostRequestTo.AdresseTo regoppslagAdresse = hentAdresse(journalpost.getAvsenderMottaker(), journalpost.getTema());
-			return doDistribuerForsendelse(distribuerJournalpostRequestTo.toBuilder()
-					.adresse(regoppslagAdresse)
-					.build(), bestillingsId, journalpost, mottaker);
-		} else {
-			return doDistribuerForsendelse(distribuerJournalpostRequestTo, bestillingsId, journalpost, mottaker);
-		}
+
+		DistribuerJournalpostRequestTo distribuerRequest = isNull(distribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonsKanalCode) ?
+				hentDistribuerAdresseFraRegoppslag(distribuerJournalpostRequestTo, journalpost) : distribuerJournalpostRequestTo;
+
+		return doDistribuerForsendelse(distribuerRequest, bestillingsId, journalpost, mottaker, distribusjonsKanalCode);
+	}
+
+	private DistribuerJournalpostRequestTo hentDistribuerAdresseFraRegoppslag(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
+																			  Journalpost journalpost) {
+		log.info("rdist002 request mangler adresse. Henter adresse fra regoppslag for mottaker på journalpostId={}",
+				distribuerJournalpostRequestTo.getJournalpostId());
+
+		return distribuerJournalpostRequestTo.toBuilder()
+				.adresse(hentAdresse(journalpost.getAvsenderMottaker(), journalpost.getTema()))
+				.build();
 	}
 
 	private String doDistribuerForsendelse(final DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
 										   final String bestillingsId,
 										   final Journalpost journalpost,
-										   final Aktoer mottaker) {
+										   final Aktoer mottaker, DistribusjonsKanalCode distribusjonsKanalCode) {
 
-		if (PRINT.name().equals(getProperty(KANALNAVN))) {
+		if (PRINT.name().equals(distribusjonsKanalCode.name())) {
 			rdist002ValidationUtil.validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
 		}
 
-		final HentDokumenterFraJoark hentDokumenterFraJoark = hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, bestillingsId);
+		final HentDokumenterFraJoark hentDokumenterFraJoark = hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, bestillingsId, distribusjonsKanalCode);
 		distribuerForsendelseProducer.produce(hentDokumenterFraJoark,
 				bestillingsId,
 				distribuerJournalpostRequestTo.getJournalpostId());

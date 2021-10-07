@@ -1,8 +1,5 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import static java.lang.String.format;
-import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
-
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
@@ -26,6 +23,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
+
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
@@ -48,6 +49,7 @@ public class DistribuerForsendelseMapper {
 		return DistribuerForsendelseTo.DistribusjonbestillingTo.builder()
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
 				.batchId(distribusjonbestilling.getBatchId())
+				.distribusjonKanal(distribusjonbestilling.getDistribusjonKanal())
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
 				.tema(distribusjonbestilling.getTema())
 				.forsendelseTittel(distribusjonbestilling.getForsendelseTittel())
@@ -55,7 +57,7 @@ public class DistribuerForsendelseMapper {
 						mapArkivInformasjon(distribusjonbestilling.getArkivInformasjon()))
 				.mottaker(mapAktoer(distribusjonbestilling.getMottaker()))
 				.bruker(mapAktoer(distribusjonbestilling.getBruker()))
-				.adresse(mapAdresse(distribusjonbestilling.getAdresse()))
+				.adresse(PRINT.name().equals(distribusjonbestilling.getDistribusjonKanal()) ? mapAdresse(distribusjonbestilling.getAdresse()) : null)
 				.dokumentProdApp(distribusjonbestilling.getDokumentProdApp())
 				.dokumenter(distribusjonbestilling.getDokumenter().stream()
 						.map(dokumentInformasjon -> DistribuerForsendelseTo.DokumentInformasjonTo.builder()
@@ -116,7 +118,7 @@ public class DistribuerForsendelseMapper {
 
 	private DistribuerForsendelseTo.AdresseTo mapAdresse(Adresse adresse) {
 		if (adresse == null) {
-			return null;
+			throw new ValidationException("Adresse kan ikke være null");
 		} else if (adresse instanceof NorskPostadresse) {
 			NorskPostadresse norskPostadresse = (NorskPostadresse) adresse;
 			return DistribuerForsendelseTo.NorskPostadresseTo.builder()
@@ -145,7 +147,7 @@ public class DistribuerForsendelseMapper {
 			throw new ValidationException("Ugyldig input: samhandlerkategori kan ikke være null");
 		} else if (SamhandlerKategoriCode.HPR.name().equals(samhandlerKategori)) {
 			return AktoerTypeCode.SAMHANDLER_HPR;
-		} else if (SamhandlerKategoriCode.UTL_ORG.name().equals(samhandlerKategori)){
+		} else if (SamhandlerKategoriCode.UTL_ORG.name().equals(samhandlerKategori)) {
 			return AktoerTypeCode.SAMHANDLER_UTL_ORG;
 		} else {
 			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR og UTL_ORG støttes. Fikk samhandlerkategori=%s", samhandlerKategori));

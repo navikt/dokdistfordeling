@@ -49,7 +49,6 @@ public class HentBestemDokdistKanal {
 
 	}
 
-
 	private String hentIdent(Journalpost.Bruker bruker) {
 		return AKTOERID.equals(bruker.getType()) ? pdlGraphQLConsumer.hentFolkeregisteridentForAktoerId(bruker.getId()) : bruker.getId();
 	}
