@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.2</version>
+        <version>2.5.5</version>
     </parent>
     <groupId>no.nav.dokdistfordeling</groupId>
     <artifactId>dokdistfordeling</artifactId>
@@ -27,7 +27,7 @@
         <javax.inject.version>1</javax.inject.version>
         <logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
         <resilience4j.version>1.7.1</resilience4j.version>
-        <aws-java-sdk-s3.version>1.12.82</aws-java-sdk-s3.version>
+        <aws-java-sdk-s3.version>1.12.84</aws-java-sdk-s3.version>
         <cxf.version>3.4.4</cxf.version>
         <jakarta.xml.ws-api.version>2.3.3</jakarta.xml.ws-api.version>
         <dokkat-api>10.4.0</dokkat-api>
@@ -37,15 +37,15 @@
         <arkiverdokumentproduksjon-tjenestespesifikasjon.version>3.4.1
         </arkiverdokumentproduksjon-tjenestespesifikasjon.version>
         <io.springfox.version>3.0.0</io.springfox.version>
-        <lombok.version>1.18.20</lombok.version>
+        <lombok.version>1.18.22</lombok.version>
         <jaxb2-basics-runtime.version>0.12.0</jaxb2-basics-runtime.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <rxjava.version>2.2.21</rxjava.version>
         <!-- test -->
-        <junit5.mockito.version>3.12.4</junit5.mockito.version>
-        <awaitility.version>4.0.3</awaitility.version>
-        <spring-wiremock.version>3.0.0</spring-wiremock.version>
-        <activemq.version>5.16.2</activemq.version>
+        <junit5.mockito.version>4.0.0</junit5.mockito.version>
+        <awaitility.version>4.1.0</awaitility.version>
+        <spring-wiremock.version>3.0.4</spring-wiremock.version>
+        <activemq.version>5.16.3</activemq.version>
         <!-- maven -->
 		<maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
 	</properties>
