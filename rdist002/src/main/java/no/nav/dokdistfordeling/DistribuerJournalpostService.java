@@ -30,12 +30,12 @@ public class DistribuerJournalpostService {
 	private final Rdist002ValidationUtil rdist002ValidationUtil;
 	private final Regoppslag regoppslag;
 	private final RegoppslagAdresseMapper regoppslagAdresseMapper;
-	private final HentBestemDokdistKanal hentBestemDokdistKanal;
+	private final HentBestemDokdistKanalService hentBestemDokdistKanal;
 
 	public DistribuerJournalpostService(SafJournalpostQueryService safJournalpostQueryService,
 										DistribuerForsendelseProducer distribuerForsendelseProducer,
 										Regoppslag regoppslag, RegoppslagAdresseMapper regoppslagAdresseMapper,
-										HentBestemDokdistKanal hentBestemDokdistKanal) {
+										HentBestemDokdistKanalService hentBestemDokdistKanal) {
 		this.safJournalpostQueryService = safJournalpostQueryService;
 		this.distribuerForsendelseProducer = distribuerForsendelseProducer;
 		this.regoppslagAdresseMapper = regoppslagAdresseMapper;

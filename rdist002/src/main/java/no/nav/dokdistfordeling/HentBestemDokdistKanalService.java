@@ -17,7 +17,7 @@ import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
 
 @Slf4j
 @Component
-public class HentBestemDokdistKanal {
+public class HentBestemDokdistKanalService {
 
 	private static final String ORGANISASJON = "ORGANISASJON";
 	private static final String PERSON = "PERSON";
@@ -27,7 +27,7 @@ public class HentBestemDokdistKanal {
 	private PdlGraphQLConsumer pdlGraphQLConsumer;
 
 	@Inject
-	public HentBestemDokdistKanal(BestemDokdistkanalRestConsumer bestemDokdistkanalRestConsumer, PdlGraphQLConsumer pdlGraphQLConsumer) {
+	public HentBestemDokdistKanalService(BestemDokdistkanalRestConsumer bestemDokdistkanalRestConsumer, PdlGraphQLConsumer pdlGraphQLConsumer) {
 		this.bestemDokdistkanal = bestemDokdistkanalRestConsumer;
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 	}
