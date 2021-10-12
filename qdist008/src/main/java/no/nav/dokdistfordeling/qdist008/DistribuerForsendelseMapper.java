@@ -4,7 +4,6 @@ import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunc
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
-import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
@@ -24,7 +23,11 @@ import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
+import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
 
 /**
@@ -119,7 +122,9 @@ public class DistribuerForsendelseMapper {
 	private DistribuerForsendelseTo.AdresseTo mapAdresse(Adresse adresse) {
 		if (adresse == null) {
 			throw new ValidationException("Adresse kan ikke være null");
-		} else if (adresse instanceof NorskPostadresse) {
+		}
+
+		if (adresse instanceof NorskPostadresse) {
 			NorskPostadresse norskPostadresse = (NorskPostadresse) adresse;
 			return DistribuerForsendelseTo.NorskPostadresseTo.builder()
 					.adresselinje1(norskPostadresse.getAdresselinje1())
@@ -145,10 +150,12 @@ public class DistribuerForsendelseMapper {
 	private AktoerTypeCode mapSamhandlerKategoriToSamhandlerType(String samhandlerKategori) {
 		if (samhandlerKategori == null) {
 			throw new ValidationException("Ugyldig input: samhandlerkategori kan ikke være null");
-		} else if (SamhandlerKategoriCode.HPR.name().equals(samhandlerKategori)) {
-			return AktoerTypeCode.SAMHANDLER_HPR;
-		} else if (SamhandlerKategoriCode.UTL_ORG.name().equals(samhandlerKategori)) {
-			return AktoerTypeCode.SAMHANDLER_UTL_ORG;
+		}
+
+		if (HPR.name().equals(samhandlerKategori)) {
+			return SAMHANDLER_HPR;
+		} else if (UTL_ORG.name().equals(samhandlerKategori)) {
+			return SAMHANDLER_UTL_ORG;
 		} else {
 			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR og UTL_ORG støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
 		}
