@@ -45,6 +45,7 @@ public class HentDokumenterFraJoarkMapper {
 		return HentDokumenterFraJoarkTo.DistribusjonbestillingTo.builder()
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
 				.batchId(distribusjonbestilling.getBatchId())
+				.distribusjonKanal(distribusjonbestilling.getDistribusjonKanal())
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
 				.tema(distribusjonbestilling.getTema())
 				.forsendelseTittel(distribusjonbestilling.getForsendelseTittel())
