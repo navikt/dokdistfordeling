@@ -1,15 +1,10 @@
 package no.nav.dokdistfordeling;
 
-import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
-import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
-import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
-import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
-import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
-
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Adresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
@@ -27,12 +22,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.util.Objects.isNull;
+import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
+import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class HentDokumenterFraJoarkMapper {
 
 	public static final String NORSK_POSTADRESSE = "norskPostadresse";
 	public static final String UTENLANDSK_POSTADRESSE = "utenlandskPostadresse";
 
-	public HentDokumenterFraJoark map(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost, Aktoer mottaker, String bestillingsId) {
+	public HentDokumenterFraJoark map(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost,
+									  Aktoer mottaker, String bestillingsId, DistribusjonsKanalCode distribusjonsKanal) {
 		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
 
 		return new HentDokumenterFraJoark()
@@ -40,6 +46,7 @@ public class HentDokumenterFraJoarkMapper {
 						new Distribusjonbestilling()
 								.withBestillingsId(bestillingsId)
 								.withBatchId(distribuerJournalpostRequestTo.getBatchId())
+								.withDistribusjonKanal(distribusjonsKanal.name())
 								.withBestillendeFagsystem(distribuerJournalpostRequestTo.getBestillendeFagsystem())
 								.withTema(journalpost.getTema())
 								.withForsendelseTittel(journalpost.getTittel())
@@ -50,7 +57,7 @@ public class HentDokumenterFraJoarkMapper {
 								)
 								.withMottaker(mottaker)
 								.withBruker(mapBruker(journalpost.getBruker()))
-								.withAdresse(mapAdresse(distribuerJournalpostRequestTo.getAdresse()))
+								.withAdresse(PRINT.name().equals(distribusjonsKanal.name()) ? mapAdresse(distribuerJournalpostRequestTo.getAdresse()) : null)
 								.withDokumentProdApp(distribuerJournalpostRequestTo.getDokumentProdApp())
 								.withDokumenter(IntStream
 										.range(0, dokumenter.size())
@@ -70,12 +77,12 @@ public class HentDokumenterFraJoarkMapper {
 	}
 
 	private Adresse mapAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo) {
-		if (adresseTo == null) {
-			return null;
+		if (isNull(adresseTo)) {
+			throw new ValidationException("Adresse kan ikke være null");
 		} else if (adresseTo.getAdressetype().equals(NORSK_POSTADRESSE)) {
 			return new NorskPostadresse()
 					.withAdresselinje1(adresseTo.getAdresselinje1())
-					.withAdresselinje2(adresseTo.getAdresselinje2())
+					.withAdresselinje2(isNotBlank(adresseTo.getAdresselinje2()) ? adresseTo.getAdresselinje2() : null)
 					.withAdresselinje3(adresseTo.getAdresselinje3())
 					.withPostnummer(adresseTo.getPostnummer())
 					.withPoststed(adresseTo.getPoststed())
@@ -83,7 +90,7 @@ public class HentDokumenterFraJoarkMapper {
 		} else {
 			return new UtenlandskPostadresse()
 					.withAdresselinje1(adresseTo.getAdresselinje1())
-					.withAdresselinje2(adresseTo.getAdresselinje2())
+					.withAdresselinje2(isBlank(adresseTo.getAdresselinje2()) ? null : adresseTo.getAdresselinje2())
 					.withAdresselinje3(adresseTo.getAdresselinje3())
 					.withLand(adresseTo.getLand());
 		}

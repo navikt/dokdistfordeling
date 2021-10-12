@@ -1,10 +1,7 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import static java.lang.String.format;
-import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
-import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
-
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.AktoerId;
@@ -20,6 +17,11 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.UtenlandskPostad
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
+
+import static java.lang.String.format;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
+import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -41,6 +43,7 @@ public class Qdist008DistribuerForsendelseMapper {
 		return new Distribusjonbestilling()
 				.withBestillingsId(distribusjonbestillingTo.getBestillingsId())
 				.withBatchId(distribusjonbestillingTo.getBatchId())
+				.withDistribusjonKanal(distribusjonbestillingTo.getDistribusjonKanal())
 				.withBestillendeFagsystem(distribusjonbestillingTo.getBestillendeFagsystem())
 				.withTema(distribusjonbestillingTo.getTema())
 				.withForsendelseTittel(distribusjonbestillingTo.getForsendelseTittel())
@@ -48,7 +51,7 @@ public class Qdist008DistribuerForsendelseMapper {
 						mapArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon()))
 				.withMottaker(mapAktoerTo(distribusjonbestillingTo.getMottaker()))
 				.withBruker(mapAktoerTo(distribusjonbestillingTo.getBruker()))
-				.withAdresse(mapAdresse(distribusjonbestillingTo.getAdresse()))
+				.withAdresse(PRINT.name().equals(distribusjonbestillingTo.getDistribusjonKanal()) ? mapAdresse(distribusjonbestillingTo.getAdresse()) : null)
 				.withDokumentProdApp(distribusjonbestillingTo.getDokumentProdApp())
 				.withDokumenter(distribusjonbestillingTo.getDokumenter().stream()
 						.map(dokumentInformasjon -> new DokumentInformasjon()
@@ -106,7 +109,7 @@ public class Qdist008DistribuerForsendelseMapper {
 
 	private Adresse mapAdresse(HentDokumenterFraJoarkTo.AdresseTo adresse) {
 		if (adresse == null) {
-			return null;
+			throw new ValidationException("Adresse kan ikke være null");
 		} else if (adresse instanceof HentDokumenterFraJoarkTo.NorskPostadresseTo) {
 			HentDokumenterFraJoarkTo.NorskPostadresseTo norskPostadresse = (HentDokumenterFraJoarkTo.NorskPostadresseTo) adresse;
 			return new NorskPostadresse()

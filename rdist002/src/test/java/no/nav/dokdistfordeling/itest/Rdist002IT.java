@@ -69,12 +69,13 @@ import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.HttpStatus.GONE;
 
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
@@ -126,12 +127,26 @@ public class Rdist002IT {
     @Test
     public void distribuerJournalpostHappyPath() {
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("saf/safGraphQlResponse-happy.json")));
 
         stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("dokkat/tkat020-happy.json")));
+
+        stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+                        .value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("sts/stsResponse_happy.json")));
+
+        stubFor(post("/pdl").willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("pdl/pdl-happy.json")));
+
+        stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
+                .withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
 
         final String callId = UUID.randomUUID().toString();
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
@@ -157,12 +172,26 @@ public class Rdist002IT {
     @Test
     public void distribuerJournalpostWithUkjentAvsenderMottakerIdHappyPath() {
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("saf/safGraphQlResponse-TSS-happy.json")));
 
         stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("dokkat/tkat020-happy.json")));
+
+        stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+                        .value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("sts/stsResponse_happy.json")));
+
+        stubFor(post("/pdl").willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("pdl/pdl-happy.json")));
+
+        stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
+                .withBodyFile("bestemkanal/distribusjonsKanalSDP.json")));
 
         final String callId = UUID.randomUUID().toString();
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
@@ -189,19 +218,33 @@ public class Rdist002IT {
     @Test
     public void distribuerJournalpostWithoutAdresseHappyPath() {
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("saf/safGraphQlResponse-happy.json")));
 
         stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("dokkat/tkat020-happy.json")));
 
+        stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+                        .value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("sts/stsResponse_happy.json")));
+
+        stubFor(post("/pdl").willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("pdl/pdl-happy.json")));
+
+        stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
+                .withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
+
         stubFor(post(urlMatching("/regoppslag/hentMottakerOgAdresse")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("regoppslag/treg002-hentadresse-person-happy.json")));
 
         stubFor(get(urlMatching("/stsRest/samltoken")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("reststs/reststs-saml-happy.json")));
 
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
@@ -226,12 +269,26 @@ public class Rdist002IT {
     @Test
     public void distribuerJournalpostWithUtenlandskAdresseHappyPath() {
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("saf/safGraphQlResponse-happy.json")));
 
         stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("dokkat/tkat020-happy.json")));
+
+        stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+                        .value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("sts/stsResponse_happy.json")));
+
+        stubFor(post("/pdl").willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("pdl/pdl-happy.json")));
+
+        stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
+                .withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
 
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(createUtenlandskAdresse()).build(), createHappyPathHeaders());
         DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
@@ -255,12 +312,26 @@ public class Rdist002IT {
     public void shouldDistribuerAdressetypeWithCaseInsensitiveHappy() {
 
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("saf/safGraphQlResponse-happy.json")));
 
         stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("dokkat/tkat020-happy.json")));
+
+        stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+                        .value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("sts/stsResponse_happy.json")));
+
+        stubFor(post("/pdl").willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("pdl/pdl-happy.json")));
+
+        stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
+                .withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
 
         DistribuerJournalpostRequestTo distribuerJournalpostRequestTo = MappingUtil.jsonStringToObject(classpathToString("__files/rdist002/rdist002-happy-adressetype.json"), DistribuerJournalpostRequestTo.class);
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(distribuerJournalpostRequestTo, createHappyPathHeaders());
@@ -298,9 +369,9 @@ public class Rdist002IT {
     }
 
     @Test
-    public void distribuerJournalpostThrowsSafJournalpostIkkeFunnetTechnicalException() {
+    public void distribuerJournalpostThrowsSafJournalpostIkkeFunnetFunctionalException() {
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)));
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())));
 
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
         DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.NOT_FOUND);
@@ -313,7 +384,7 @@ public class Rdist002IT {
     @Test
     public void distribuerJournalpostThrowsSafJournalpostQueryUnauthorizedException() {
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.UNAUTHORIZED.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBody("{}")));
 
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
@@ -327,7 +398,7 @@ public class Rdist002IT {
     @Test
     public void distribuerJournalpostThrowsSafJournalpostQueryTechnicalException() {
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)));
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())));
 
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
         DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -340,7 +411,7 @@ public class Rdist002IT {
     @Test
     public void distribuerJournalpostWithInngaaendeJournalposttype() {
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("saf/safGraphQlResponse-inngaaendeJournalpostType.json")));
 
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
@@ -354,19 +425,33 @@ public class Rdist002IT {
     @Test
     void shouldReturnNotFoundWhenRequestHasNoAdresseAndAdresseIsUkjentInRegoppslag() {
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("saf/safGraphQlResponse-happy.json")));
 
         stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("dokkat/tkat020-happy.json")));
 
+        stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+                        .value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("sts/stsResponse_happy.json")));
+
+        stubFor(post("/pdl").willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("pdl/pdl-happy.json")));
+
+        stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
+                .withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
+
         stubFor(post(urlMatching("/regoppslag/hentMottakerOgAdresse")).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBody("")));
 
         stubFor(get(urlMatching("/stsRest/samltoken")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("reststs/reststs-saml-happy.json")));
 
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
@@ -378,24 +463,38 @@ public class Rdist002IT {
     @Test
     void shouldReturnNotFoundWhenRequestHasNoAdresseAndMottakerErDoed() {
         stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("saf/safGraphQlResponse-happy.json")));
 
         stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("dokkat/tkat020-happy.json")));
 
-        stubFor(post(urlMatching("/regoppslag/hentMottakerOgAdresse")).willReturn(aResponse().withStatus(HttpStatus.GONE.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+        stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+                        .value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("sts/stsResponse_happy.json")));
+
+        stubFor(post("/pdl").willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                .withBodyFile("pdl/pdl-happy.json")));
+
+        stubFor(post("/bestemDistribusjonKanal").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+                .withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
+                .withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
+
+        stubFor(post(urlMatching("/regoppslag/hentMottakerOgAdresse")).willReturn(aResponse().withStatus(GONE.value())
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBody("")));
 
         stubFor(get(urlMatching("/stsRest/samltoken")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withBodyFile("reststs/reststs-saml-happy.json")));
 
         HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
         final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.GONE);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(GONE);
         assertThat(responseEntity.getBody()).contains("Mottaker er død og har ukjent adresse");
     }
 
@@ -447,11 +546,11 @@ public class Rdist002IT {
     }
 
     private void assertDokumenter(List<DokumentInformasjon> dokumenter) {
-        assertThat(dokumenter.size()).isGreaterThan(0);
+        assertThat(dokumenter.size()).isPositive();
 
         dokumenter.forEach(dokumentInformasjon -> {
             if (HOVEDDOKUMENT.name().equals(dokumentInformasjon.getTilknyttetSom())) {
-                assertEquals(dokumentInformasjon.getRekkefolge(), 1);
+                assertEquals(1, dokumentInformasjon.getRekkefolge());
                 assertEquals(SLADDET, dokumentInformasjon.getVariantFormat());
                 assertEquals(DOK_INFO_ID_1, dokumentInformasjon.getArkivDokumentInfoId());
             } else {

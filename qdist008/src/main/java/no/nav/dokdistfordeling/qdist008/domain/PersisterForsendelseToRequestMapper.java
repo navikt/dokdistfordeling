@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+
 /**
  * @author Sigurd Midttun, Visma Consulting.
  */
@@ -33,7 +35,7 @@ public class PersisterForsendelseToRequestMapper {
 				.dokumentProdApp(distribusjonbestilling.getDokumentProdApp())
 				.mottaker(mapMottaker(mottaker, fnrMottaker))
 				.arkivInformasjon(mapArkivInformasjon(arkivInformasjon))
-				.postadresse(mapPostadresse(adresse))
+				.postadresse((PRINT.name().equals(distribusjonbestilling.getDistribusjonKanal())) ? mapPostadresse(adresse) : null)
 				.dokumenter(dokumentInformasjonToList.stream()
 						.map(this::mapDokument)
 						.collect(Collectors.toList()))

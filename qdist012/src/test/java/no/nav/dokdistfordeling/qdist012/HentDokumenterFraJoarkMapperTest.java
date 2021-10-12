@@ -1,12 +1,5 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import static org.assertj.core.groups.Tuple.tuple;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.AktoerId;
@@ -23,6 +16,14 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static org.assertj.core.groups.Tuple.tuple;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting.
@@ -239,6 +240,7 @@ class HentDokumenterFraJoarkMapperTest {
 				.withDistribusjonbestilling(new Distribusjonbestilling()
 						.withBestillingsId(BESTILLINGS_ID)
 						.withBatchId(BATCH_ID)
+						.withDistribusjonKanal(PRINT.name())
 						.withBestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
 						.withTema(TEMA)
 						.withForsendelseTittel(FORSENDELSE_TITTEL)

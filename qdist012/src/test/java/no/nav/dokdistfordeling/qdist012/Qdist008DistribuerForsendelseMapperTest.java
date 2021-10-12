@@ -1,11 +1,5 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import static org.assertj.core.groups.Tuple.tuple;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.AktoerId;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
@@ -20,6 +14,13 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static org.assertj.core.groups.Tuple.tuple;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting.
@@ -68,21 +69,24 @@ class Qdist008DistribuerForsendelseMapperTest {
 
 	@Test
 	public void shouldMap() {
-		DistribuerForsendelse distribuerForsendelse = qdist008DistribuerForsendelseMapper.map(HentDokumenterFraJoarkTo.builder()
-				.distribusjonbestilling(createDistribusjonbestillingToBuilder()
-						.build())
-				.build());
+		DistribuerForsendelse distribuerForsendelse = qdist008DistribuerForsendelseMapper.map(
+				HentDokumenterFraJoarkTo.builder()
+						.distribusjonbestilling(createDistribusjonbestillingToBuilder().distribusjonKanal(PRINT.name())
+								.build())
+						.build());
 
 		assertResponse(distribuerForsendelse);
 	}
 
 	@Test
 	public void shouldMapUtenlandskAdresse() {
-		DistribuerForsendelse distribuerForsendelse = qdist008DistribuerForsendelseMapper.map(HentDokumenterFraJoarkTo.builder()
-				.distribusjonbestilling(createDistribusjonbestillingToBuilder()
-						.adresse(createUtenlandskPostadresse())
-						.build())
-				.build());
+		DistribuerForsendelse distribuerForsendelse = qdist008DistribuerForsendelseMapper.map(
+				HentDokumenterFraJoarkTo.builder()
+						.distribusjonbestilling(createDistribusjonbestillingToBuilder()
+								.distribusjonKanal(PRINT.name())
+								.adresse(createUtenlandskPostadresse())
+								.build())
+						.build());
 
 		assertDistribuerForsendelse(distribuerForsendelse);
 		assertUtenlandskPostadresseTo(distribuerForsendelse.getDistribusjonbestilling());

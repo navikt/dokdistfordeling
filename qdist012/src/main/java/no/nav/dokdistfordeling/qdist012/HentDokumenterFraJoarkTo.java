@@ -24,6 +24,7 @@ public class HentDokumenterFraJoarkTo {
 	public static class DistribusjonbestillingTo {
 		private final String bestillingsId;
 		private final String batchId;
+		private final String distribusjonKanal;
 		private final String bestillendeFagsystem;
 		private final String tema;
 		private final String forsendelseTittel;

@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.qdist012;
 
 import static java.lang.String.format;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
@@ -51,7 +52,7 @@ public class HentDokumenterFraJoarkMapper {
 						mapArkivInformasjon(distribusjonbestilling.getArkivInformasjon()))
 				.mottaker(mapAktoer(distribusjonbestilling.getMottaker()))
 				.bruker(mapAktoer(distribusjonbestilling.getBruker()))
-				.adresse(mapAdresse(distribusjonbestilling.getAdresse()))
+				.adresse(PRINT.name().equals(distribusjonbestilling.getDistribusjonKanal()) ? mapAdresse(distribusjonbestilling.getAdresse()) : null)
 				.dokumentProdApp(distribusjonbestilling.getDokumentProdApp())
 				.dokumenter(distribusjonbestilling.getDokumenter().stream()
 						.map(dokumentInformasjon -> HentDokumenterFraJoarkTo.DokumentInformasjonTo.builder()
@@ -112,7 +113,7 @@ public class HentDokumenterFraJoarkMapper {
 
 	private HentDokumenterFraJoarkTo.AdresseTo mapAdresse(Adresse adresse) {
 		if (adresse == null) {
-			return null;
+			throw new ValidationException("Adresse kan ikke være null");
 		} else if (adresse instanceof NorskPostadresse) {
 			NorskPostadresse norskPostadresse = (NorskPostadresse) adresse;
 			return HentDokumenterFraJoarkTo.NorskPostadresseTo.builder()
