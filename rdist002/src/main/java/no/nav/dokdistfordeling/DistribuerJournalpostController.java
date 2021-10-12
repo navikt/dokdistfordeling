@@ -1,9 +1,6 @@
 package no.nav.dokdistfordeling;
 
 
-import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,6 +26,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
+
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
+import static org.springframework.http.HttpStatus.GONE;
 
 @RestController
 @RequestMapping("rest/v1/")
@@ -61,7 +62,7 @@ public class DistribuerJournalpostController {
 			log.warn("rdist002 - validering av distribusjonsforespørsel for journalpostId={} feilet, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw new ValidationException(String.format("Validering av distribusjonsforespørsel for journalpostId=%s feilet. %s", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage()));
 		} catch (PersonErDoedUkjentAdresseException e) {
-			log.warn("rdist002 - Mottaker er død og har ukjent adresse. journalpostId={} feilet,feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
+			log.warn("rdist002 - Mottaker er død og har ukjent adresse. status={}, journalpostId={} feilet,feilmelding: {}", GONE, distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
 			throw e;
 		} catch (SafJournalpostIkkeFunnetTechnicalException e) {
 			log.warn("rdist002 - journalpost med journalpostId={} ble ikke funnet, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
