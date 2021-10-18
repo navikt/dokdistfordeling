@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.qdist012;
 
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.AktoerId;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
@@ -74,6 +75,13 @@ class HentDokumenterFraJoarkMapperTest {
 	public void shouldMap() {
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(createHentDokumentFraJoark());
 		assertResponse(hentDokumenterFraJoarkTo);
+	}
+
+	@Test
+	public void shouldMapDitt_NAV() {
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(createHentDokumentFraJoarkDittNav());
+
+		assertEquals(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonKanal(), DistribusjonsKanalCode.DITTNAV.name());
 	}
 
 	@Test
@@ -241,6 +249,38 @@ class HentDokumenterFraJoarkMapperTest {
 						.withBestillingsId(BESTILLINGS_ID)
 						.withBatchId(BATCH_ID)
 						.withDistribusjonKanal(PRINT.name())
+						.withBestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
+						.withTema(TEMA)
+						.withForsendelseTittel(FORSENDELSE_TITTEL)
+						.withArkivInformasjon(new ArkivInformasjon()
+								.withArkivId(ARKIV_ID)
+								.withArkivSystem(ARKIV_SYSTEM))
+						.withMottaker(createAktoerPerson(PERSON_NAVN_MOTTAKER, PERSON_IDENTIFIKATOR_MOTTAKER))
+						.withBruker(createAktoerPerson(PERSON_NAVN_BRUKER, PERSON_IDENTIFIKATOR_BRUKER))
+						.withAdresse(createNorskPostadresse())
+						.withDokumentProdApp(DOKUMENT_PROD_APP)
+						.withDokumenter(Arrays.asList(new DokumentInformasjon()
+										.withDokumenttypeId(DOKUMENTTYPE_ID_1)
+										.withVariantFormat(VARIANTFORMAT_1)
+										.withTilknyttetSom(TILKNYTTET_SOM_HOVEDDOK)
+										.withArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_1)
+										.withRekkefolge(REKKEFOLGE_1),
+								new DokumentInformasjon()
+										.withDokumenttypeId(DOKUMENTTYPE_ID_2)
+										.withVariantFormat(VARIANTFORMAT_2)
+										.withTilknyttetSom(TILKNYTTET_SOM_VEDLEGG)
+										.withArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_2)
+										.withRekkefolge(REKKEFOLGE_2)
+						))
+				);
+	}
+
+	private HentDokumenterFraJoark createHentDokumentFraJoarkDittNav() {
+		return new HentDokumenterFraJoark()
+				.withDistribusjonbestilling(new Distribusjonbestilling()
+						.withBestillingsId(BESTILLINGS_ID)
+						.withBatchId(BATCH_ID)
+						.withDistribusjonKanal("DITT_NAV")
 						.withBestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
 						.withTema(TEMA)
 						.withForsendelseTittel(FORSENDELSE_TITTEL)
