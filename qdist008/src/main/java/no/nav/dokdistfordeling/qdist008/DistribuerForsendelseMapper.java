@@ -23,8 +23,10 @@ import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
@@ -52,7 +54,7 @@ public class DistribuerForsendelseMapper {
 		return DistribuerForsendelseTo.DistribusjonbestillingTo.builder()
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
 				.batchId(distribusjonbestilling.getBatchId())
-				.distribusjonKanal(distribusjonbestilling.getDistribusjonKanal())
+				.distribusjonKanal(mapKanalCode(distribusjonbestilling.getDistribusjonKanal()))
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
 				.tema(distribusjonbestilling.getTema())
 				.forsendelseTittel(distribusjonbestilling.getForsendelseTittel())
@@ -159,5 +161,9 @@ public class DistribuerForsendelseMapper {
 		} else {
 			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR og UTL_ORG støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
 		}
+	}
+
+	private String mapKanalCode(String distribusjonKanal) {
+		return DITT_NAV.equals(distribusjonKanal) ?  DITTNAV.name() : distribusjonKanal;
 	}
 }

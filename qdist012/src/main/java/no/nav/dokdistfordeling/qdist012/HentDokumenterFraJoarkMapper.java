@@ -1,6 +1,8 @@
 package no.nav.dokdistfordeling.qdist012;
 
 import static java.lang.String.format;
+import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
@@ -45,7 +47,7 @@ public class HentDokumenterFraJoarkMapper {
 		return HentDokumenterFraJoarkTo.DistribusjonbestillingTo.builder()
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
 				.batchId(distribusjonbestilling.getBatchId())
-				.distribusjonKanal(distribusjonbestilling.getDistribusjonKanal())
+				.distribusjonKanal(mapKanalCode(distribusjonbestilling.getDistribusjonKanal()))
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
 				.tema(distribusjonbestilling.getTema())
 				.forsendelseTittel(distribusjonbestilling.getForsendelseTittel())
@@ -148,6 +150,10 @@ public class HentDokumenterFraJoarkMapper {
 		} else {
 			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR og UTL_ORG støttes støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
 		}
+	}
+
+	private String mapKanalCode(String distribusjonKanal) {
+		return DITT_NAV.equals(distribusjonKanal) ?  DITTNAV.name() : distribusjonKanal;
 	}
 }
 
