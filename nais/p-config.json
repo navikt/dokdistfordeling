@@ -27,6 +27,8 @@
   "APP_NAME": "dokdistfordeling",
   "APPD_NAME": "dokdistfordeling",
   "NAMESPACE": "teamdokumenthandtering",
+  "MIN_REPLICAS": "2",
+  "MAX_REPLICAS": "10",
   "INGRESSES": [
     "https://dokdistfordeling.nais.adeo.no",
     "https://dokdistfordeling.prod-fss.nais.io",
