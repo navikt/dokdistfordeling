@@ -51,6 +51,8 @@ import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.SDP;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.UMIDDELBART;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VEDTAK;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -68,7 +70,10 @@ public class HentDokumenterFraJoarkMapperTest {
 
 	@Test
 	public void shouldMap() {
-		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder().build(),
+		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder()
+						.distribusjonstype(VEDTAK.name())
+						.distribusjonstidspunkt(UMIDDELBART.name())
+						.build(),
 				createJournalpostBuilder().build(),
 				createPersonMottaker(),
 				BESTILLINGS_ID, PRINT);
@@ -81,6 +86,8 @@ public class HentDokumenterFraJoarkMapperTest {
 		assertEquals(BESTILLENDEFAGSYSTEM, bestilling.getBestillendeFagsystem());
 		assertEquals(TEMA, bestilling.getTema());
 		assertEquals(TITTEL, bestilling.getForsendelseTittel());
+		assertEquals(bestilling.getDistribusjonstidspunkt(), UMIDDELBART.name());
+		assertEquals(bestilling.getDistribusjonstype(), VEDTAK.name());
 
 		assertArkivinformasjon(bestilling.getArkivInformasjon());
 		assertPersonMottaker((Person) bestilling.getMottaker());

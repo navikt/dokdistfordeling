@@ -19,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.UMIDDELBART;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VEDTAK;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -73,8 +75,23 @@ class HentDokumenterFraJoarkMapperTest {
 
 	@Test
 	public void shouldMap() {
-		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(createHentDokumentFraJoark());
+		HentDokumenterFraJoark hentDokumentFraJoark = createHentDokumentFraJoark();
+		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstype(VEDTAK.name());
+		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstidspunkt(UMIDDELBART.name());
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumentFraJoark);
+
 		assertResponse(hentDokumenterFraJoarkTo);
+	}
+
+	@Test
+	public void shouldNotMapDistribusjonstypeAndDistribusjonstidspunktIfNullOrInvalidValue() {
+		HentDokumenterFraJoark hentDokumentFraJoark = createHentDokumentFraJoark();
+		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstype(null);
+		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstidspunkt("umiddelbart");
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumentFraJoark);
+
+		assertEquals(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstidspunkt(), UMIDDELBART.name());
+		assertNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstype());
 	}
 
 	@Test
@@ -181,6 +198,8 @@ class HentDokumenterFraJoarkMapperTest {
 		assertEquals(distBestilling.getTema(), TEMA);
 		assertEquals(distBestilling.getForsendelseTittel(), FORSENDELSE_TITTEL);
 		assertEquals(distBestilling.getDokumentProdApp(), DOKUMENT_PROD_APP);
+		assertEquals(distBestilling.getDistribusjonstype(), VEDTAK.name());
+		assertEquals(distBestilling.getDistribusjonstidspunkt(), UMIDDELBART.name());
 
 		//assert Arkivinformasjon
 		assertNotNull(distBestilling.getArkivInformasjon());

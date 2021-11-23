@@ -4,6 +4,8 @@ import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunc
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
@@ -31,6 +33,8 @@ import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
+import static org.apache.commons.lang3.EnumUtils.isValidEnum;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -51,7 +55,7 @@ public class DistribuerForsendelseMapper {
 	}
 
 	private DistribuerForsendelseTo.DistribusjonbestillingTo mapDokumentbestillingsinformasjon(Distribusjonbestilling distribusjonbestilling) {
-		return DistribuerForsendelseTo.DistribusjonbestillingTo.builder()
+		DistribuerForsendelseTo.DistribusjonbestillingTo.DistribusjonbestillingToBuilder distribusjonbestillingToBuilder = DistribuerForsendelseTo.DistribusjonbestillingTo.builder()
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
 				.batchId(distribusjonbestilling.getBatchId())
 				.distribusjonKanal(mapKanalCode(distribusjonbestilling.getDistribusjonKanal()))
@@ -72,8 +76,12 @@ public class DistribuerForsendelseMapper {
 								.arkivDokumentInfoId(dokumentInformasjon.getArkivDokumentInfoId())
 								.rekkefolge(dokumentInformasjon.getRekkefolge())
 								.build())
-						.collect(Collectors.toList()))
-				.build();
+						.collect(Collectors.toList()));
+
+		setDistribusjonstype(distribusjonbestillingToBuilder, distribusjonbestilling.getDistribusjonstype());
+		setDistribusjonstidspunkt(distribusjonbestillingToBuilder, distribusjonbestilling.getDistribusjonstidspunkt());
+
+		return distribusjonbestillingToBuilder.build();
 	}
 
 	private DistribuerForsendelseTo.ArkivInformasjonTo mapArkivInformasjon(ArkivInformasjon arkivInformasjon) {
@@ -165,5 +173,17 @@ public class DistribuerForsendelseMapper {
 
 	private String mapKanalCode(String distribusjonKanal) {
 		return DITT_NAV.equals(distribusjonKanal) ?  DITTNAV.name() : distribusjonKanal;
+	}
+
+	private void setDistribusjonstidspunkt(DistribuerForsendelseTo.DistribusjonbestillingTo.DistribusjonbestillingToBuilder distribusjonbestilling, String distribusjonstidspunkt) {
+		if (isNotBlank(distribusjonstidspunkt) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunkt.toUpperCase())) {
+			distribusjonbestilling.distribusjonstidspunkt(distribusjonstidspunkt.toUpperCase());
+		}
+	}
+
+	private void setDistribusjonstype(DistribuerForsendelseTo.DistribusjonbestillingTo.DistribusjonbestillingToBuilder distribusjonbestilling, String distribusjonstype) {
+		if (isNotBlank(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.toUpperCase())) {
+			distribusjonbestilling.distribusjonstype(distribusjonstype.toUpperCase());
+		}
 	}
 }

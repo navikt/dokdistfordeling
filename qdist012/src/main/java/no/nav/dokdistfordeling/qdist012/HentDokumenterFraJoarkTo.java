@@ -28,6 +28,8 @@ public class HentDokumenterFraJoarkTo {
 		private final String bestillendeFagsystem;
 		private final String tema;
 		private final String forsendelseTittel;
+		private final String distribusjonstype;
+		private final String distribusjonstidspunkt;
 		private final ArkivInformasjonTo arkivInformasjon;
 		private final AktoerTo mottaker;
 		private final AktoerTo bruker;

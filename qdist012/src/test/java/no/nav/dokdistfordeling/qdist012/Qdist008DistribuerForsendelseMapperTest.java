@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VEDTAK;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -71,11 +73,15 @@ class Qdist008DistribuerForsendelseMapperTest {
 	public void shouldMap() {
 		DistribuerForsendelse distribuerForsendelse = qdist008DistribuerForsendelseMapper.map(
 				HentDokumenterFraJoarkTo.builder()
-						.distribusjonbestilling(createDistribusjonbestillingToBuilder().distribusjonKanal(PRINT.name())
+						.distribusjonbestilling(createDistribusjonbestillingToBuilder()
+								.distribusjonstype(VEDTAK.name())
+								.distribusjonstidspunkt(KJERNETID.name())
+								.distribusjonKanal(PRINT.name())
 								.build())
 						.build());
 
 		assertResponse(distribuerForsendelse);
+
 	}
 
 	@Test
@@ -209,6 +215,8 @@ class Qdist008DistribuerForsendelseMapperTest {
 		assertEquals(distBestilling.getTema(), TEMA);
 		assertEquals(distBestilling.getForsendelseTittel(), FORSENDELSE_TITTEL);
 		assertEquals(distBestilling.getDokumentProdApp(), DOKUMENT_PROD_APP);
+		assertEquals(distBestilling.getDistribusjonstype(), VEDTAK.name());
+		assertEquals(distBestilling.getDistribusjonstidspunkt(), KJERNETID.name());
 
 		//assert Arkivinformasjon
 		assertNotNull(distBestilling.getArkivInformasjon());

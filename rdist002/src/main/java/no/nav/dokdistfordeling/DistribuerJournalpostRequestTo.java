@@ -21,24 +21,28 @@ public class DistribuerJournalpostRequestTo {
 	private final AdresseTo adresse;
 	@ApiModelProperty(name = "dokumentProdApp", value = "Applikasjon som har produsert hoveddokumentet (for sporing og feilsøking)", example = "ELIN_STANDARD", position = 4)
 	private final String dokumentProdApp;
+	@ApiModelProperty(name = "distribusjonstype", value = "Forteller dokumentdistribusjon hva slags dokument som distribueres. \"VEDTAK\", \"VIKTIG\" eller \"ANNET\"", example = "VEDTAK", position = 5)
+	private final String distribusjonstype;
+	@ApiModelProperty(name = "distribusjonstidspunkt", value = "Forteller dokumentdistribusjon når dokumentet kan distribueres. \"UMIDDELBART\" eller \"KJERNETID\"", example = "UMIDDELBART", position = 6)
+	private final String distribusjonstidspunkt;
 
 	@Builder
 	@Getter
 	@AllArgsConstructor
 	public static class AdresseTo {
-		@ApiModelProperty(name = "adressetype", value = "\"norskPostadresse\" eller \"utenlandskPostadresse\"", example = "norskPostadresse", position = 5)
+		@ApiModelProperty(name = "adressetype", value = "\"norskPostadresse\" eller \"utenlandskPostadresse\"", example = "norskPostadresse", position = 7)
 		private final String adressetype;
-		@ApiModelProperty(name = "postnummer", value = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "0505", position = 6)
+		@ApiModelProperty(name = "postnummer", value = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "0505", position = 8)
 		private final String postnummer;
-		@ApiModelProperty(name = "postnummer", value = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "Oslo", position = 7)
+		@ApiModelProperty(name = "postnummer", value = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "Oslo", position = 9)
 		private final String poststed;
-		@ApiModelProperty(name = "adresselinje1", value = "Påkrevd hvis adressetype = \"utenlandskPostadresse\"", example = "\"Eksempelveien 11B\"", position = 8)
+		@ApiModelProperty(name = "adresselinje1", value = "Påkrevd hvis adressetype = \"utenlandskPostadresse\"", example = "\"Eksempelveien 11B\"", position = 10)
 		private final String adresselinje1;
-		@ApiModelProperty(name = "adresselinje2", value = "Alternativ postadresse 2", example = "\"Eksempelveien 12B\"", position = 9)
+		@ApiModelProperty(name = "adresselinje2", value = "Alternativ postadresse 2", example = "\"Eksempelveien 12B\"", position = 11)
 		private final String adresselinje2;
-		@ApiModelProperty(name = "adresselinje3", value = "Alternativ postadresse 3", example = "\"Eksempelveien 13B\"", position = 10)
+		@ApiModelProperty(name = "adresselinje3", value = "Alternativ postadresse 3", example = "\"Eksempelveien 13B\"", position = 12)
 		private final String adresselinje3;
-		@ApiModelProperty(name = "land", value = "To-bokstavers landkode ihht iso3166-1 alfa-2", example = "NO", position = 11)
+		@ApiModelProperty(name = "land", value = "To-bokstavers landkode ihht iso3166-1 alfa-2", example = "NO", position = 13)
 		private final String land;
 	}
 }
