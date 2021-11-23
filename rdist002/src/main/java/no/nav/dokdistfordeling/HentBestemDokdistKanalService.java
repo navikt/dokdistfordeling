@@ -11,8 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
-import static no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType.FNR;
-import static no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType.ORGNR;
+import static no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType.UTL_ORG;
 import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
 
 @Slf4j
@@ -21,10 +20,11 @@ public class HentBestemDokdistKanalService {
 
 	private static final String ORGANISASJON = "ORGANISASJON";
 	private static final String PERSON = "PERSON";
-	private static final String SAMHANDLER = "SAMHANDLER";
+	private static final String SAMHANDLER_PREFIX = "SAMHANDLER";
+	private static final String SAMHANDLER_UTL_ORG = SAMHANDLER_PREFIX + "_" + UTL_ORG.name();
 
-	private BestemDokdistkanalRestConsumer bestemDokdistkanal;
-	private PdlGraphQLConsumer pdlGraphQLConsumer;
+	private final BestemDokdistkanalRestConsumer bestemDokdistkanal;
+	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 
 	@Inject
 	public HentBestemDokdistKanalService(BestemDokdistkanalRestConsumer bestemDokdistkanalRestConsumer, PdlGraphQLConsumer pdlGraphQLConsumer) {
@@ -44,9 +44,7 @@ public class HentBestemDokdistKanalService {
 				.tema(journalpost.getTema())
 				.build();
 
-
 		return bestemDokdistkanal.bestemKanal(request);
-
 	}
 
 	private String hentIdent(Journalpost.Bruker bruker) {
@@ -54,10 +52,15 @@ public class HentBestemDokdistKanalService {
 	}
 
 	private String getMottakerType(Journalpost.AvsenderMottaker avsenderMottaker) {
-		if (FNR.equals(avsenderMottaker.getType()) || ORGNR.equals(avsenderMottaker.getType())) {
-			return FNR.equals(avsenderMottaker.getType()) ? PERSON : ORGANISASJON;
-		} else {
-			return SAMHANDLER;
+		switch (avsenderMottaker.getType()) {
+			case FNR:
+				return PERSON;
+			case ORGNR:
+				return ORGANISASJON;
+			case UKJENT:
+				return SAMHANDLER_UTL_ORG;
+			default:
+				return SAMHANDLER_PREFIX + "_" + avsenderMottaker.getType();
 		}
 	}
 }
