@@ -26,6 +26,7 @@ import static java.lang.String.format;
 import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -48,13 +49,15 @@ public class HentDokumenterFraJoarkMapper {
 	}
 
 	private HentDokumenterFraJoarkTo.DistribusjonbestillingTo mapDokumentbestillingsinformasjon(Distribusjonbestilling distribusjonbestilling) {
-		HentDokumenterFraJoarkTo.DistribusjonbestillingTo.DistribusjonbestillingToBuilder distribusjonbestillingToBuilder = HentDokumenterFraJoarkTo.DistribusjonbestillingTo.builder()
+		return HentDokumenterFraJoarkTo.DistribusjonbestillingTo.builder()
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
 				.batchId(distribusjonbestilling.getBatchId())
 				.distribusjonKanal(mapKanalCode(distribusjonbestilling.getDistribusjonKanal()))
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
 				.tema(distribusjonbestilling.getTema())
 				.forsendelseTittel(distribusjonbestilling.getForsendelseTittel())
+				.distribusjonstype(mapDistribusjonstype(distribusjonbestilling.getDistribusjonstype()))
+				.distribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestilling.getDistribusjonstidspunkt()))
 				.arkivInformasjon(distribusjonbestilling.getArkivInformasjon() == null ? null :
 						mapArkivInformasjon(distribusjonbestilling.getArkivInformasjon()))
 				.mottaker(mapAktoer(distribusjonbestilling.getMottaker()))
@@ -69,12 +72,8 @@ public class HentDokumenterFraJoarkMapper {
 								.rekkefolge(dokumentInformasjon.getRekkefolge())
 								.variantFormat(dokumentInformasjon.getVariantFormat())
 								.build())
-						.collect(Collectors.toList()));
-
-		setDistribusjonstype(distribusjonbestillingToBuilder, distribusjonbestilling.getDistribusjonstype());
-		setDistribusjonstidspunkt(distribusjonbestillingToBuilder, distribusjonbestilling.getDistribusjonstidspunkt());
-
-		return distribusjonbestillingToBuilder.build();
+						.collect(Collectors.toList()))
+				.build();
 	}
 
 	private HentDokumenterFraJoarkTo.ArkivInformasjonTo mapArkivInformasjon(ArkivInformasjon arkivInformasjon) {
@@ -164,17 +163,16 @@ public class HentDokumenterFraJoarkMapper {
 		return DITT_NAV.equals(distribusjonKanal) ? DITTNAV.name() : distribusjonKanal;
 	}
 
-	private void setDistribusjonstidspunkt(HentDokumenterFraJoarkTo.DistribusjonbestillingTo.DistribusjonbestillingToBuilder distribusjonbestilling, String distribusjonstidspunkt) {
-		if (isNotBlank(distribusjonstidspunkt) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunkt.toUpperCase())) {
-			distribusjonbestilling.distribusjonstidspunkt(distribusjonstidspunkt.toUpperCase());
-		}
+	private DistribusjonstidspunktCode mapDistribusjonstidspunkt(String distribusjonstidspunkt) {
+		return (isNotBlank(distribusjonstidspunkt) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunkt.toUpperCase())) ?
+				getEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt) : null;
 	}
 
-	private void setDistribusjonstype(HentDokumenterFraJoarkTo.DistribusjonbestillingTo.DistribusjonbestillingToBuilder distribusjonbestilling, String distribusjonstype) {
-		if (isNotBlank(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.toUpperCase())) {
-			distribusjonbestilling.distribusjonstype(distribusjonstype.toUpperCase());
-		}
+	private DistribusjonstypeCode mapDistribusjonstype(String distribusjonstype) {
+		return (isNotBlank(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.toUpperCase())) ?
+				getEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype) : null;
 	}
+
 }
 
 

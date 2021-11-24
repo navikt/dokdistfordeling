@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 
 import java.util.List;
 
@@ -28,8 +30,8 @@ public class HentDokumenterFraJoarkTo {
 		private final String bestillendeFagsystem;
 		private final String tema;
 		private final String forsendelseTittel;
-		private final String distribusjonstype;
-		private final String distribusjonstidspunkt;
+		private final DistribusjonstypeCode distribusjonstype;
+		private final DistribusjonstidspunktCode distribusjonstidspunkt;
 		private final ArkivInformasjonTo arkivInformasjon;
 		private final AktoerTo mottaker;
 		private final AktoerTo bruker;

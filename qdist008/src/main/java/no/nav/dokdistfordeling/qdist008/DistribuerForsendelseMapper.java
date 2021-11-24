@@ -33,7 +33,9 @@ import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
+import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
+import static org.apache.commons.lang3.EnumUtils.isValidEnumIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
@@ -55,13 +57,15 @@ public class DistribuerForsendelseMapper {
 	}
 
 	private DistribuerForsendelseTo.DistribusjonbestillingTo mapDokumentbestillingsinformasjon(Distribusjonbestilling distribusjonbestilling) {
-		DistribuerForsendelseTo.DistribusjonbestillingTo.DistribusjonbestillingToBuilder distribusjonbestillingToBuilder = DistribuerForsendelseTo.DistribusjonbestillingTo.builder()
+		return DistribuerForsendelseTo.DistribusjonbestillingTo.builder()
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
 				.batchId(distribusjonbestilling.getBatchId())
 				.distribusjonKanal(mapKanalCode(distribusjonbestilling.getDistribusjonKanal()))
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
 				.tema(distribusjonbestilling.getTema())
 				.forsendelseTittel(distribusjonbestilling.getForsendelseTittel())
+				.distribusjonstype(mapDistribusjonstype(distribusjonbestilling.getDistribusjonstype()))
+				.distribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestilling.getDistribusjonstidspunkt()))
 				.arkivInformasjon(distribusjonbestilling.getArkivInformasjon() == null ? null :
 						mapArkivInformasjon(distribusjonbestilling.getArkivInformasjon()))
 				.mottaker(mapAktoer(distribusjonbestilling.getMottaker()))
@@ -76,12 +80,8 @@ public class DistribuerForsendelseMapper {
 								.arkivDokumentInfoId(dokumentInformasjon.getArkivDokumentInfoId())
 								.rekkefolge(dokumentInformasjon.getRekkefolge())
 								.build())
-						.collect(Collectors.toList()));
-
-		setDistribusjonstype(distribusjonbestillingToBuilder, distribusjonbestilling.getDistribusjonstype());
-		setDistribusjonstidspunkt(distribusjonbestillingToBuilder, distribusjonbestilling.getDistribusjonstidspunkt());
-
-		return distribusjonbestillingToBuilder.build();
+						.collect(Collectors.toList()))
+				.build();
 	}
 
 	private DistribuerForsendelseTo.ArkivInformasjonTo mapArkivInformasjon(ArkivInformasjon arkivInformasjon) {
@@ -172,18 +172,16 @@ public class DistribuerForsendelseMapper {
 	}
 
 	private String mapKanalCode(String distribusjonKanal) {
-		return DITT_NAV.equals(distribusjonKanal) ?  DITTNAV.name() : distribusjonKanal;
+		return DITT_NAV.equals(distribusjonKanal) ? DITTNAV.name() : distribusjonKanal;
 	}
 
-	private void setDistribusjonstidspunkt(DistribuerForsendelseTo.DistribusjonbestillingTo.DistribusjonbestillingToBuilder distribusjonbestilling, String distribusjonstidspunkt) {
-		if (isNotBlank(distribusjonstidspunkt) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunkt.toUpperCase())) {
-			distribusjonbestilling.distribusjonstidspunkt(distribusjonstidspunkt.toUpperCase());
-		}
+	private DistribusjonstidspunktCode mapDistribusjonstidspunkt(String distribusjonstidspunkt) {
+		return (isNotBlank(distribusjonstidspunkt) && isValidEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt)) ?
+				getEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt) : null;
 	}
 
-	private void setDistribusjonstype(DistribuerForsendelseTo.DistribusjonbestillingTo.DistribusjonbestillingToBuilder distribusjonbestilling, String distribusjonstype) {
-		if (isNotBlank(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.toUpperCase())) {
-			distribusjonbestilling.distribusjonstype(distribusjonstype.toUpperCase());
-		}
+	private DistribusjonstypeCode mapDistribusjonstype(String distribusjonstype) {
+		return (isNotBlank(distribusjonstype) && isValidEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype)) ?
+				getEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype) : null;
 	}
 }

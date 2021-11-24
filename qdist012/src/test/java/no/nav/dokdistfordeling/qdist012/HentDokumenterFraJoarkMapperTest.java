@@ -87,10 +87,10 @@ class HentDokumenterFraJoarkMapperTest {
 	public void shouldNotMapDistribusjonstypeAndDistribusjonstidspunktIfNullOrInvalidValue() {
 		HentDokumenterFraJoark hentDokumentFraJoark = createHentDokumentFraJoark();
 		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstype(null);
-		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstidspunkt("umiddelbart");
+		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstidspunkt(UMIDDELBART.name().toLowerCase());
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumentFraJoark);
 
-		assertEquals(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstidspunkt(), UMIDDELBART.name());
+		assertEquals(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstidspunkt(), UMIDDELBART);
 		assertNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstype());
 	}
 
@@ -198,8 +198,8 @@ class HentDokumenterFraJoarkMapperTest {
 		assertEquals(distBestilling.getTema(), TEMA);
 		assertEquals(distBestilling.getForsendelseTittel(), FORSENDELSE_TITTEL);
 		assertEquals(distBestilling.getDokumentProdApp(), DOKUMENT_PROD_APP);
-		assertEquals(distBestilling.getDistribusjonstype(), VEDTAK.name());
-		assertEquals(distBestilling.getDistribusjonstidspunkt(), UMIDDELBART.name());
+		assertEquals(distBestilling.getDistribusjonstype(), VEDTAK);
+		assertEquals(distBestilling.getDistribusjonstidspunkt(), UMIDDELBART);
 
 		//assert Arkivinformasjon
 		assertNotNull(distBestilling.getArkivInformasjon());

@@ -21,11 +21,11 @@ import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -44,13 +44,15 @@ public class Qdist008DistribuerForsendelseMapper {
 	}
 
 	private Distribusjonbestilling mapDokumentbestillingsinformasjon(HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestillingTo) {
-		Distribusjonbestilling distribusjonbestilling = new Distribusjonbestilling()
+		return new Distribusjonbestilling()
 				.withBestillingsId(distribusjonbestillingTo.getBestillingsId())
 				.withBatchId(distribusjonbestillingTo.getBatchId())
 				.withDistribusjonKanal(distribusjonbestillingTo.getDistribusjonKanal())
 				.withBestillendeFagsystem(distribusjonbestillingTo.getBestillendeFagsystem())
 				.withTema(distribusjonbestillingTo.getTema())
 				.withForsendelseTittel(distribusjonbestillingTo.getForsendelseTittel())
+				.withDistribusjonstype(mapDistribusjonstype(distribusjonbestillingTo.getDistribusjonstype()))
+				.withDistribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestillingTo.getDistribusjonstidspunkt()))
 				.withArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon() == null ? null :
 						mapArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon()))
 				.withMottaker(mapAktoerTo(distribusjonbestillingTo.getMottaker()))
@@ -66,10 +68,6 @@ public class Qdist008DistribuerForsendelseMapper {
 								.withDokumentObjektReferanse(dokumentInformasjon.getDokumentObjektReferanse()))
 						.collect(Collectors.toList()));
 
-		setDistribusjonstype(distribusjonbestilling, distribusjonbestillingTo.getDistribusjonstype());
-		setDistribusjonstidspunkt(distribusjonbestilling, distribusjonbestillingTo.getDistribusjonstidspunkt());
-
-		return distribusjonbestilling;
 	}
 
 	private ArkivInformasjon mapArkivInformasjon(HentDokumenterFraJoarkTo.ArkivInformasjonTo arkivInformasjonTo) {
@@ -140,16 +138,15 @@ public class Qdist008DistribuerForsendelseMapper {
 		}
 	}
 
-	private void setDistribusjonstidspunkt(Distribusjonbestilling distribusjonbestilling, String distribusjonstidspunkt) {
-		if (isNotBlank(distribusjonstidspunkt) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunkt)) {
-			distribusjonbestilling.setDistribusjonstidspunkt(distribusjonstidspunkt);
-		}
+	private String mapDistribusjonstidspunkt(DistribusjonstidspunktCode distribusjonstidspunktCode) {
+		return (nonNull(distribusjonstidspunktCode) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunktCode.name())) ?
+				distribusjonstidspunktCode.name() : null;
 	}
 
-	private void setDistribusjonstype(Distribusjonbestilling distribusjonbestilling, String distribusjonstype) {
-		if (isNotBlank(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype)) {
-			distribusjonbestilling.setDistribusjonstype(distribusjonstype);
-		}
+	private String mapDistribusjonstype(DistribusjonstypeCode distribusjonstype) {
+		return (nonNull(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.name())) ?
+				distribusjonstype.name() : null;
 	}
+
 
 }

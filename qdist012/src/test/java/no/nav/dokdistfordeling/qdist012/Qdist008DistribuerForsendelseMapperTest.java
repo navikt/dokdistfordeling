@@ -74,8 +74,8 @@ class Qdist008DistribuerForsendelseMapperTest {
 		DistribuerForsendelse distribuerForsendelse = qdist008DistribuerForsendelseMapper.map(
 				HentDokumenterFraJoarkTo.builder()
 						.distribusjonbestilling(createDistribusjonbestillingToBuilder()
-								.distribusjonstype(VEDTAK.name())
-								.distribusjonstidspunkt(KJERNETID.name())
+								.distribusjonstype(VEDTAK)
+								.distribusjonstidspunkt(KJERNETID)
 								.distribusjonKanal(PRINT.name())
 								.build())
 						.build());

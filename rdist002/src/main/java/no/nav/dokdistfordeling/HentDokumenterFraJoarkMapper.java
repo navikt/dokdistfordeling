@@ -31,7 +31,9 @@ import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
+import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
+import static org.apache.commons.lang3.EnumUtils.isValidEnumIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -50,6 +52,8 @@ public class HentDokumenterFraJoarkMapper {
 				.withBestillendeFagsystem(distribuerJournalpostRequestTo.getBestillendeFagsystem())
 				.withTema(journalpost.getTema())
 				.withForsendelseTittel(journalpost.getTittel())
+				.withDistribusjonstype(mapDistribusjonstype(distribuerJournalpostRequestTo.getDistribusjonstype()))
+				.withDistribusjonstidspunkt(mapDistribusjonstidspunkt(distribuerJournalpostRequestTo.getDistribusjonstidspunkt()))
 				.withArkivInformasjon(
 						new ArkivInformasjon()
 								.withArkivId(distribuerJournalpostRequestTo.getJournalpostId())
@@ -73,9 +77,6 @@ public class HentDokumenterFraJoarkMapper {
 									.withRekkefolge(i + 1);
 						})
 						.collect(Collectors.toList()));
-
-		setDistribusjonstidspunkt(distribusjonbestilling, distribuerJournalpostRequestTo.getDistribusjonstidspunkt());
-		setDistribusjonstype(distribusjonbestilling, distribuerJournalpostRequestTo.getDistribusjonstype());
 
 		return new HentDokumenterFraJoark()
 				.withDistribusjonbestilling(distribusjonbestilling);
@@ -116,15 +117,13 @@ public class HentDokumenterFraJoarkMapper {
 		}
 	}
 
-	private void setDistribusjonstidspunkt(Distribusjonbestilling distribusjonbestilling, String distribusjonstidspunkt) {
-		if (isNotBlank(distribusjonstidspunkt) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunkt.toUpperCase())) {
-			distribusjonbestilling.setDistribusjonstidspunkt(distribusjonstidspunkt.toUpperCase());
-		}
+	private String mapDistribusjonstidspunkt(String distribusjonstidspunkt) {
+		return (isNotBlank(distribusjonstidspunkt) && isValidEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt)) ?
+				getEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt).name() : null;
 	}
 
-	private void setDistribusjonstype(Distribusjonbestilling distribusjonbestilling, String distribusjonstype) {
-		if (isNotBlank(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.toUpperCase())) {
-			distribusjonbestilling.setDistribusjonstype(distribusjonstype.toUpperCase());
-		}
+	private String mapDistribusjonstype(String distribusjonstype) {
+		return (isNotBlank(distribusjonstype) && isValidEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype)) ?
+				getEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype).name() : null;
 	}
 }
