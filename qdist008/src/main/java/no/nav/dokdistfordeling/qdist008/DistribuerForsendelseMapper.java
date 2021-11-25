@@ -4,6 +4,8 @@ import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunc
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
@@ -31,6 +33,10 @@ import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
+import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
+import static org.apache.commons.lang3.EnumUtils.isValidEnum;
+import static org.apache.commons.lang3.EnumUtils.isValidEnumIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -58,6 +64,8 @@ public class DistribuerForsendelseMapper {
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
 				.tema(distribusjonbestilling.getTema())
 				.forsendelseTittel(distribusjonbestilling.getForsendelseTittel())
+				.distribusjonstype(mapDistribusjonstype(distribusjonbestilling.getDistribusjonstype()))
+				.distribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestilling.getDistribusjonstidspunkt()))
 				.arkivInformasjon(distribusjonbestilling.getArkivInformasjon() == null ? null :
 						mapArkivInformasjon(distribusjonbestilling.getArkivInformasjon()))
 				.mottaker(mapAktoer(distribusjonbestilling.getMottaker()))
@@ -164,6 +172,16 @@ public class DistribuerForsendelseMapper {
 	}
 
 	private String mapKanalCode(String distribusjonKanal) {
-		return DITT_NAV.equals(distribusjonKanal) ?  DITTNAV.name() : distribusjonKanal;
+		return DITT_NAV.equals(distribusjonKanal) ? DITTNAV.name() : distribusjonKanal;
+	}
+
+	private DistribusjonstidspunktCode mapDistribusjonstidspunkt(String distribusjonstidspunkt) {
+		return (isNotBlank(distribusjonstidspunkt) && isValidEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt)) ?
+				getEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt) : null;
+	}
+
+	private DistribusjonstypeCode mapDistribusjonstype(String distribusjonstype) {
+		return (isNotBlank(distribusjonstype) && isValidEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype)) ?
+				getEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype) : null;
 	}
 }
