@@ -1,8 +1,5 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import static java.lang.String.format;
-import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
-
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
@@ -25,6 +22,9 @@ import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
+
+import static java.lang.String.format;
+import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -120,9 +120,9 @@ public class DistribuerForsendelseMapper {
 		} else if (adresse instanceof NorskPostadresse) {
 			NorskPostadresse norskPostadresse = (NorskPostadresse) adresse;
 			return DistribuerForsendelseTo.NorskPostadresseTo.builder()
-					.adresselinje1(norskPostadresse.getAdresselinje1())
-					.adresselinje2(norskPostadresse.getAdresselinje2())
-					.adresselinje3(norskPostadresse.getAdresselinje3())
+					.adresselinje1(trimAdresse(norskPostadresse.getAdresselinje1()))
+					.adresselinje2(trimAdresse(norskPostadresse.getAdresselinje2()))
+					.adresselinje3(trimAdresse(norskPostadresse.getAdresselinje3()))
 					.postnummer(norskPostadresse.getPostnummer())
 					.poststed(norskPostadresse.getPoststed())
 					.land(norskPostadresse.getLand())
@@ -130,9 +130,9 @@ public class DistribuerForsendelseMapper {
 		} else if (adresse instanceof UtenlandskPostadresse) {
 			UtenlandskPostadresse utenlandskPostadresse = (UtenlandskPostadresse) adresse;
 			return DistribuerForsendelseTo.UtenlandskPostadresseTo.builder()
-					.adresselinje1(utenlandskPostadresse.getAdresselinje1())
-					.adresselinje2(utenlandskPostadresse.getAdresselinje2())
-					.adresselinje3(utenlandskPostadresse.getAdresselinje3())
+					.adresselinje1(trimAdresse(utenlandskPostadresse.getAdresselinje1()))
+					.adresselinje2(trimAdresse(utenlandskPostadresse.getAdresselinje2()))
+					.adresselinje3(trimAdresse(utenlandskPostadresse.getAdresselinje3()))
 					.land(utenlandskPostadresse.getLand())
 					.build();
 		} else {
@@ -140,12 +140,19 @@ public class DistribuerForsendelseMapper {
 		}
 	}
 
+	private String trimAdresse(String adresselinje) {
+		if (adresselinje == null || adresselinje.trim().equals("")) {
+			return null;
+		}
+		return adresselinje.trim();
+	}
+
 	private AktoerTypeCode mapSamhandlerKategoriToSamhandlerType(String samhandlerKategori) {
 		if (samhandlerKategori == null) {
 			throw new ValidationException("Ugyldig input: samhandlerkategori kan ikke være null");
 		} else if (SamhandlerKategoriCode.HPR.name().equals(samhandlerKategori)) {
 			return AktoerTypeCode.SAMHANDLER_HPR;
-		} else if (SamhandlerKategoriCode.UTL_ORG.name().equals(samhandlerKategori)){
+		} else if (SamhandlerKategoriCode.UTL_ORG.name().equals(samhandlerKategori)) {
 			return AktoerTypeCode.SAMHANDLER_UTL_ORG;
 		} else {
 			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR og UTL_ORG støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
