@@ -231,6 +231,23 @@ class DistribuerForsendelseMapperTest {
 				"Expected distribuerForsendelseMapper.map() to throw AbstractDokdistfordelingFunctionalException, but it didn't");
 	}
 
+	@Test
+	public void shouldMapNorskAdresseWithEmptyString() {
+		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
+		NorskPostadresse adresse = createNorskPostadresse();
+		adresse.setAdresselinje1("    ");
+		adresse.setAdresselinje2("           ");
+		adresse.setAdresselinje3("          "+adresse.getAdresselinje3());
+		distribuerForsendelse.getDistribusjonbestilling().withAdresse(adresse);
+		distribuerForsendelse.getDistribusjonbestilling().withDistribusjonKanal(DISTRIBUSJONKANAL_PRINT);
+		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
+
+		assertDistribuerForsendelseTo(distribuerForsendelseTo);
+		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse().getAdresselinje1());
+		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse().getAdresselinje2());
+		assertEquals(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse().getAdresselinje3(), ADRESSELINJE_3);
+	}
+
 	private void assertResponse(DistribuerForsendelseTo distribuerForsendelseTo) {
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
 
