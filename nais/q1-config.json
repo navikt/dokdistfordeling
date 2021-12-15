@@ -25,7 +25,7 @@
   "VAULT": "/kv/preprod/fss/dokdistfordeling/q1",
   "APPDYNAMICS": "/apikey/appdynamics/dev",
   "APPD_NAME": "dokdistfordeling-q1",
-  "NAMESPACE": "q1",
+  "NAMESPACE": "teamdokumenthandtering",
   "INGRESSES": [
     "https://dokdistfordeling-q1.nais.preprod.local",
     "https://dokdistfordeling-q1.dev-fss.nais.io",
