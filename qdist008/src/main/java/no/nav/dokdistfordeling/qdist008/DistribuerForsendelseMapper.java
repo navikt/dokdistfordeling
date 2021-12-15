@@ -1,13 +1,11 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import static java.lang.String.format;
-import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
-
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
-import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
@@ -25,6 +23,20 @@ import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
+
+import static java.lang.String.format;
+import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
+import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
+import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
+import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
+import static org.apache.commons.lang3.EnumUtils.isValidEnum;
+import static org.apache.commons.lang3.EnumUtils.isValidEnumIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -48,14 +60,17 @@ public class DistribuerForsendelseMapper {
 		return DistribuerForsendelseTo.DistribusjonbestillingTo.builder()
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
 				.batchId(distribusjonbestilling.getBatchId())
+				.distribusjonKanal(mapKanalCode(distribusjonbestilling.getDistribusjonKanal()))
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
 				.tema(distribusjonbestilling.getTema())
 				.forsendelseTittel(distribusjonbestilling.getForsendelseTittel())
+				.distribusjonstype(mapDistribusjonstype(distribusjonbestilling.getDistribusjonstype()))
+				.distribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestilling.getDistribusjonstidspunkt()))
 				.arkivInformasjon(distribusjonbestilling.getArkivInformasjon() == null ? null :
 						mapArkivInformasjon(distribusjonbestilling.getArkivInformasjon()))
 				.mottaker(mapAktoer(distribusjonbestilling.getMottaker()))
 				.bruker(mapAktoer(distribusjonbestilling.getBruker()))
-				.adresse(mapAdresse(distribusjonbestilling.getAdresse()))
+				.adresse(PRINT.name().equals(distribusjonbestilling.getDistribusjonKanal()) ? mapAdresse(distribusjonbestilling.getAdresse()) : null)
 				.dokumentProdApp(distribusjonbestilling.getDokumentProdApp())
 				.dokumenter(distribusjonbestilling.getDokumenter().stream()
 						.map(dokumentInformasjon -> DistribuerForsendelseTo.DokumentInformasjonTo.builder()
@@ -116,13 +131,15 @@ public class DistribuerForsendelseMapper {
 
 	private DistribuerForsendelseTo.AdresseTo mapAdresse(Adresse adresse) {
 		if (adresse == null) {
-			return null;
-		} else if (adresse instanceof NorskPostadresse) {
+			throw new ValidationException("Adresse kan ikke være null");
+		}
+
+		if (adresse instanceof NorskPostadresse) {
 			NorskPostadresse norskPostadresse = (NorskPostadresse) adresse;
 			return DistribuerForsendelseTo.NorskPostadresseTo.builder()
-					.adresselinje1(trimAdresse(norskPostadresse.getAdresselinje1()))
-					.adresselinje2(trimAdresse(norskPostadresse.getAdresselinje2()))
-					.adresselinje3(trimAdresse(norskPostadresse.getAdresselinje3()))
+					.adresselinje1(norskPostadresse.getAdresselinje1())
+					.adresselinje2(norskPostadresse.getAdresselinje2())
+					.adresselinje3(norskPostadresse.getAdresselinje3())
 					.postnummer(norskPostadresse.getPostnummer())
 					.poststed(norskPostadresse.getPoststed())
 					.land(norskPostadresse.getLand())
@@ -130,9 +147,9 @@ public class DistribuerForsendelseMapper {
 		} else if (adresse instanceof UtenlandskPostadresse) {
 			UtenlandskPostadresse utenlandskPostadresse = (UtenlandskPostadresse) adresse;
 			return DistribuerForsendelseTo.UtenlandskPostadresseTo.builder()
-					.adresselinje1(trimAdresse(utenlandskPostadresse.getAdresselinje1()))
-					.adresselinje2(trimAdresse(utenlandskPostadresse.getAdresselinje2()))
-					.adresselinje3(trimAdresse(utenlandskPostadresse.getAdresselinje3()))
+					.adresselinje1(utenlandskPostadresse.getAdresselinje1())
+					.adresselinje2(utenlandskPostadresse.getAdresselinje2())
+					.adresselinje3(utenlandskPostadresse.getAdresselinje3())
 					.land(utenlandskPostadresse.getLand())
 					.build();
 		} else {
@@ -140,22 +157,31 @@ public class DistribuerForsendelseMapper {
 		}
 	}
 
-	private String trimAdresse(String adresselinje) {
-		if (adresselinje == null || adresselinje.trim().equals("")) {
-			return null;
-		}
-		return adresselinje.trim();
-	}
-
 	private AktoerTypeCode mapSamhandlerKategoriToSamhandlerType(String samhandlerKategori) {
 		if (samhandlerKategori == null) {
 			throw new ValidationException("Ugyldig input: samhandlerkategori kan ikke være null");
-		} else if (SamhandlerKategoriCode.HPR.name().equals(samhandlerKategori)) {
-			return AktoerTypeCode.SAMHANDLER_HPR;
-		} else if (SamhandlerKategoriCode.UTL_ORG.name().equals(samhandlerKategori)) {
-			return AktoerTypeCode.SAMHANDLER_UTL_ORG;
+		}
+
+		if (HPR.name().equals(samhandlerKategori)) {
+			return SAMHANDLER_HPR;
+		} else if (UTL_ORG.name().equals(samhandlerKategori)) {
+			return SAMHANDLER_UTL_ORG;
 		} else {
 			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR og UTL_ORG støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
 		}
+	}
+
+	private String mapKanalCode(String distribusjonKanal) {
+		return DITT_NAV.equals(distribusjonKanal) ? DITTNAV.name() : distribusjonKanal;
+	}
+
+	private DistribusjonstidspunktCode mapDistribusjonstidspunkt(String distribusjonstidspunkt) {
+		return (isNotBlank(distribusjonstidspunkt) && isValidEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt)) ?
+				getEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt) : null;
+	}
+
+	private DistribusjonstypeCode mapDistribusjonstype(String distribusjonstype) {
+		return (isNotBlank(distribusjonstype) && isValidEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype)) ?
+				getEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype) : null;
 	}
 }

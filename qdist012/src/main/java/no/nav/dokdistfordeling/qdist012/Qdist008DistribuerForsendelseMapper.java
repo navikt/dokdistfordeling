@@ -1,10 +1,9 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import static java.lang.String.format;
-import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
-import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
-
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.ValidationException;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.AktoerId;
@@ -20,6 +19,13 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.UtenlandskPostad
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
+
+import static java.lang.String.format;
+import static java.util.Objects.nonNull;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
+import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
+import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -41,14 +47,17 @@ public class Qdist008DistribuerForsendelseMapper {
 		return new Distribusjonbestilling()
 				.withBestillingsId(distribusjonbestillingTo.getBestillingsId())
 				.withBatchId(distribusjonbestillingTo.getBatchId())
+				.withDistribusjonKanal(distribusjonbestillingTo.getDistribusjonKanal())
 				.withBestillendeFagsystem(distribusjonbestillingTo.getBestillendeFagsystem())
 				.withTema(distribusjonbestillingTo.getTema())
 				.withForsendelseTittel(distribusjonbestillingTo.getForsendelseTittel())
+				.withDistribusjonstype(mapDistribusjonstype(distribusjonbestillingTo.getDistribusjonstype()))
+				.withDistribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestillingTo.getDistribusjonstidspunkt()))
 				.withArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon() == null ? null :
 						mapArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon()))
 				.withMottaker(mapAktoerTo(distribusjonbestillingTo.getMottaker()))
 				.withBruker(mapAktoerTo(distribusjonbestillingTo.getBruker()))
-				.withAdresse(mapAdresse(distribusjonbestillingTo.getAdresse()))
+				.withAdresse(PRINT.name().equals(distribusjonbestillingTo.getDistribusjonKanal()) ? mapAdresse(distribusjonbestillingTo.getAdresse()) : null)
 				.withDokumentProdApp(distribusjonbestillingTo.getDokumentProdApp())
 				.withDokumenter(distribusjonbestillingTo.getDokumenter().stream()
 						.map(dokumentInformasjon -> new DokumentInformasjon()
@@ -58,6 +67,7 @@ public class Qdist008DistribuerForsendelseMapper {
 								.withRekkefolge(dokumentInformasjon.getRekkefolge())
 								.withDokumentObjektReferanse(dokumentInformasjon.getDokumentObjektReferanse()))
 						.collect(Collectors.toList()));
+
 	}
 
 	private ArkivInformasjon mapArkivInformasjon(HentDokumenterFraJoarkTo.ArkivInformasjonTo arkivInformasjonTo) {
@@ -106,7 +116,7 @@ public class Qdist008DistribuerForsendelseMapper {
 
 	private Adresse mapAdresse(HentDokumenterFraJoarkTo.AdresseTo adresse) {
 		if (adresse == null) {
-			return null;
+			throw new ValidationException("Adresse kan ikke være null");
 		} else if (adresse instanceof HentDokumenterFraJoarkTo.NorskPostadresseTo) {
 			HentDokumenterFraJoarkTo.NorskPostadresseTo norskPostadresse = (HentDokumenterFraJoarkTo.NorskPostadresseTo) adresse;
 			return new NorskPostadresse()
@@ -127,5 +137,16 @@ public class Qdist008DistribuerForsendelseMapper {
 			return null;
 		}
 	}
+
+	private String mapDistribusjonstidspunkt(DistribusjonstidspunktCode distribusjonstidspunktCode) {
+		return (nonNull(distribusjonstidspunktCode) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunktCode.name())) ?
+				distribusjonstidspunktCode.name() : null;
+	}
+
+	private String mapDistribusjonstype(DistribusjonstypeCode distribusjonstype) {
+		return (nonNull(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.name())) ?
+				distribusjonstype.name() : null;
+	}
+
 
 }

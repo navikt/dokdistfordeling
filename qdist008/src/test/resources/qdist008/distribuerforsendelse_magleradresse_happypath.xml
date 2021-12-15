@@ -1,0 +1,34 @@
+<dok:distribuerForsendelse xmlns:dok="http://nav.no/melding/virksomhet/dokdistfordeling">
+	<distribusjonbestilling>
+		<bestillingsId>7882d37e-34f7-11e9-b210-d663bd873d93</bestillingsId>
+		<!--Optional:-->
+		<batchId>batchId</batchId>
+		<distribusjonKanal>PRINT</distribusjonKanal>
+		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
+		<tema>DAG</tema>
+		<!--Optional:-->
+		<arkivInformasjon>
+			<arkivSystem>JOARK</arkivSystem>
+			<arkivId>1234</arkivId>
+		</arkivInformasjon>
+		<mottaker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
+			<aktoerId>1000075457001</aktoerId>
+			<navn>Bjarne Betjent</navn>
+		</mottaker>
+		<bruker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
+			<aktoerId>1000075457001</aktoerId>
+			<navn>Bjarne Betjent</navn>
+		</bruker>
+		<dokumentProdApp>token</dokumentProdApp>
+		<dokumenter>
+			<dokumentInformasjon>
+				<dokumenttypeId>1111111</dokumenttypeId>
+				<dokumentObjektReferanse>testKey</dokumentObjektReferanse>
+				<tilknyttetSom>HOVEDDOKUMENT</tilknyttetSom>
+				<!--Optional:-->
+				<arkivDokumentInfoId>1234</arkivDokumentInfoId>
+				<rekkefolge>1</rekkefolge>
+			</dokumentInformasjon>
+		</dokumenter>
+	</distribusjonbestilling>
+</dok:distribuerForsendelse>

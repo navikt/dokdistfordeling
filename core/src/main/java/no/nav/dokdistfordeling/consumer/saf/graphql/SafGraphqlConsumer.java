@@ -10,10 +10,10 @@ import no.nav.dokdistfordeling.constants.Constants;
 import no.nav.dokdistfordeling.consumer.NavHeaders;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonJournalpost;
-import no.nav.dokdistfordeling.exception.functional.SafJournalpostIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.exception.technical.MarshalGraphqlRequestToJsonTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.SafJournalpostIkkeFunnetTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostQueryTechnicalException;
 import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import org.slf4j.MDC;
@@ -63,7 +63,7 @@ public class SafGraphqlConsumer {
 
 			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null || responseEntity.getBody()
 					.getData().getJournalpost() == null) {
-				throw new SafJournalpostIkkeFunnetFunctionalException("Ingen journalpost ble funnet");
+				throw new SafJournalpostIkkeFunnetTechnicalException("Ingen journalpost ble funnet");
 			}
 
 			return responseEntity.getBody().getJournalpost();

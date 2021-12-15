@@ -1,8 +1,10 @@
 package no.nav.dokdistfordeling.util;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
+import org.apache.commons.lang3.StringUtils;
 
 public final class ValidationUtil {
 
@@ -10,7 +12,7 @@ public final class ValidationUtil {
 	}
 
 	public static void assertNotNullOrEmpty(String field, String value) {
-		if (value == null || value.isEmpty()) {
+		if (isBlank(value)) {
 			throw new ValidationException(format("Feltet %s kan ikke være null eller tomt. Fikk %s=%s", field, field, value));
 		}
 	}
@@ -35,19 +37,19 @@ public final class ValidationUtil {
 	}
 
 	public static void assertJournalpostFieldNotNullOrEmpty(String field, String value) {
-		if (value == null || value.isEmpty()) {
+		if (isBlank(value)) {
 			throw new ValidationException(format("For journalposter kan feltet %s ikke være null eller tomt. Fikk %s=%s", field, field, value));
 		}
 	}
 
 	public static void assertDokumentFieldNotNullOrEmpty(String field, String value) {
-		if (value == null || value.isEmpty()) {
+		if (isBlank(value)) {
 			throw new ValidationException(format("For dokumenter kan feltet %s ikke være null eller tomt. Fikk %s=%s", field, field, value));
 		}
 	}
 
 	public static void assertHovedokumentFieldNotNullOrEmpty(String field, String value) {
-		if (value == null || value.isEmpty()) {
+		if (isBlank(value)) {
 			throw new ValidationException(format("For hoveddokumentet kan feltet %s ikke være null eller tomt. Fikk %s=%s", field, field, value));
 		}
 	}

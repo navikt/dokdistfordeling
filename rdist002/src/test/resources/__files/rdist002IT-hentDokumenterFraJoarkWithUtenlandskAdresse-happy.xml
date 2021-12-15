@@ -1,42 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:hentDokumenterFraJoark xmlns:ns2="http://nav.no/melding/virksomhet/dokdistfordeling">
-    <distribusjonbestilling>
-        <batchId>66666</batchId>
-        <bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
-        <tema>OPP</tema>
-        <arkivInformasjon>
-            <arkivSystem>JOARK</arkivSystem>
-            <arkivId>555555555</arkivId>
-        </arkivInformasjon>
-        <mottaker xsi:type="ns2:Person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <personidentifikator>09876543210</personidentifikator>
-            <navn>Jan Neimansen</navn>
-        </mottaker>
-        <bruker xsi:type="ns2:AktoerId" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <aktoerId>12345678901</aktoerId>
-        </bruker>
-        <adresse xsi:type="ns2:UtenlandskPostadresse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <adresselinje1>eksempelveien 23 A</adresselinje1>
-            <adresselinje2>eksempelveien 24 A</adresselinje2>
-            <adresselinje3>eksempelveien 25 A</adresselinje3>
-            <land>US</land>
-        </adresse>
-        <dokumentProdApp>dokumentprodapp</dokumentProdApp>
-        <dokumenter>
-            <dokumentInformasjon>
-                <dokumenttypeId>U000001</dokumenttypeId>
-                <variantFormat>SLADDET</variantFormat>
-                <tilknyttetSom>HOVEDDOKUMENT</tilknyttetSom>
-                <arkivDokumentInfoId>666666666</arkivDokumentInfoId>
-                <rekkefolge>1</rekkefolge>
-            </dokumentInformasjon>
-            <dokumentInformasjon>
-                <dokumenttypeId>U000001</dokumenttypeId>
-                <variantFormat>ARKIV</variantFormat>
-                <tilknyttetSom>VEDLEGG</tilknyttetSom>
-                <arkivDokumentInfoId>777777777</arkivDokumentInfoId>
-                <rekkefolge>2</rekkefolge>
-            </dokumentInformasjon>
-        </dokumenter>
-    </distribusjonbestilling>
+	<distribusjonbestilling>
+		<batchId>66666</batchId>
+		<distribusjonKanal>PRINT</distribusjonKanal>
+		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
+		<tema>OPP</tema>
+		<arkivInformasjon>
+			<arkivSystem>JOARK</arkivSystem>
+			<arkivId>555555555</arkivId>
+		</arkivInformasjon>
+		<mottaker xsi:type="ns2:Person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<personidentifikator>09876543210</personidentifikator>
+			<navn>Jan Neimansen</navn>
+		</mottaker>
+		<bruker xsi:type="ns2:AktoerId" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<aktoerId>12345678901</aktoerId>
+		</bruker>
+		<adresse xsi:type="ns2:UtenlandskPostadresse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<adresselinje1>eksempelveien 23 A</adresselinje1>
+			<adresselinje2>eksempelveien 24 A</adresselinje2>
+			<adresselinje3>eksempelveien 25 A</adresselinje3>
+			<land>US</land>
+		</adresse>
+		<dokumentProdApp>dokumentprodapp</dokumentProdApp>
+		<dokumenter>
+			<dokumentInformasjon>
+				<dokumenttypeId>U000001</dokumenttypeId>
+				<variantFormat>SLADDET</variantFormat>
+				<tilknyttetSom>HOVEDDOKUMENT</tilknyttetSom>
+				<arkivDokumentInfoId>666666666</arkivDokumentInfoId>
+				<rekkefolge>1</rekkefolge>
+			</dokumentInformasjon>
+			<dokumentInformasjon>
+				<dokumenttypeId>U000001</dokumenttypeId>
+				<variantFormat>ARKIV</variantFormat>
+				<tilknyttetSom>VEDLEGG</tilknyttetSom>
+				<arkivDokumentInfoId>777777777</arkivDokumentInfoId>
+				<rekkefolge>2</rekkefolge>
+			</dokumentInformasjon>
+		</dokumenter>
+	</distribusjonbestilling>
 </ns2:hentDokumenterFraJoark>
