@@ -1,5 +1,8 @@
 package no.nav.dokdistfordeling.qdist008;
 
+import static java.lang.String.format;
+import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
+
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
@@ -22,9 +25,6 @@ import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
-
-import static java.lang.String.format;
-import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
