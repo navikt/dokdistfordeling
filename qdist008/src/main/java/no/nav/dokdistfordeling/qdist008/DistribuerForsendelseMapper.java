@@ -137,9 +137,9 @@ public class DistribuerForsendelseMapper {
 		if (adresse instanceof NorskPostadresse) {
 			NorskPostadresse norskPostadresse = (NorskPostadresse) adresse;
 			return DistribuerForsendelseTo.NorskPostadresseTo.builder()
-					.adresselinje1(norskPostadresse.getAdresselinje1())
-					.adresselinje2(norskPostadresse.getAdresselinje2())
-					.adresselinje3(norskPostadresse.getAdresselinje3())
+					.adresselinje1(trimAdresse(norskPostadresse.getAdresselinje1()))
+					.adresselinje2(trimAdresse(norskPostadresse.getAdresselinje2()))
+					.adresselinje3(trimAdresse(norskPostadresse.getAdresselinje3()))
 					.postnummer(norskPostadresse.getPostnummer())
 					.poststed(norskPostadresse.getPoststed())
 					.land(norskPostadresse.getLand())
@@ -147,14 +147,21 @@ public class DistribuerForsendelseMapper {
 		} else if (adresse instanceof UtenlandskPostadresse) {
 			UtenlandskPostadresse utenlandskPostadresse = (UtenlandskPostadresse) adresse;
 			return DistribuerForsendelseTo.UtenlandskPostadresseTo.builder()
-					.adresselinje1(utenlandskPostadresse.getAdresselinje1())
-					.adresselinje2(utenlandskPostadresse.getAdresselinje2())
-					.adresselinje3(utenlandskPostadresse.getAdresselinje3())
+					.adresselinje1(trimAdresse(utenlandskPostadresse.getAdresselinje1()))
+					.adresselinje2(trimAdresse(utenlandskPostadresse.getAdresselinje2()))
+					.adresselinje3(trimAdresse(utenlandskPostadresse.getAdresselinje3()))
 					.land(utenlandskPostadresse.getLand())
 					.build();
 		} else {
 			throw new IllegalArgumentException("Ugyldig adressetype. Adresse er ikke en gyldig NorskPostadresse eller UtenlandskPostadresse");
 		}
+	}
+
+	private String trimAdresse(String adresselinje) {
+		if (adresselinje == null || adresselinje.trim().equals("")) {
+			return null;
+		}
+		return adresselinje.trim();
 	}
 
 	private AktoerTypeCode mapSamhandlerKategoriToSamhandlerType(String samhandlerKategori) {
