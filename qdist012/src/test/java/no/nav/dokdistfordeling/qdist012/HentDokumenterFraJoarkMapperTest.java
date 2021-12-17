@@ -1,13 +1,7 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import static org.assertj.core.groups.Tuple.tuple;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.AktoerId;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
@@ -23,6 +17,16 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.UMIDDELBART;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VEDTAK;
+import static org.assertj.core.groups.Tuple.tuple;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Heidi Elisabeth Sando, Visma Consulting.
@@ -71,8 +75,30 @@ class HentDokumenterFraJoarkMapperTest {
 
 	@Test
 	public void shouldMap() {
-		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(createHentDokumentFraJoark());
+		HentDokumenterFraJoark hentDokumentFraJoark = createHentDokumentFraJoark();
+		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstype(VEDTAK.name());
+		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstidspunkt(UMIDDELBART.name());
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumentFraJoark);
+
 		assertResponse(hentDokumenterFraJoarkTo);
+	}
+
+	@Test
+	public void shouldNotMapDistribusjonstypeAndDistribusjonstidspunktIfNullOrInvalidValue() {
+		HentDokumenterFraJoark hentDokumentFraJoark = createHentDokumentFraJoark();
+		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstype(null);
+		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstidspunkt(UMIDDELBART.name().toLowerCase());
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumentFraJoark);
+
+		assertEquals(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstidspunkt(), UMIDDELBART);
+		assertNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstype());
+	}
+
+	@Test
+	public void shouldMapDitt_NAV() {
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(createHentDokumentFraJoarkDittNav());
+
+		assertEquals(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonKanal(), DistribusjonsKanalCode.DITTNAV.name());
 	}
 
 	@Test
@@ -172,6 +198,8 @@ class HentDokumenterFraJoarkMapperTest {
 		assertEquals(distBestilling.getTema(), TEMA);
 		assertEquals(distBestilling.getForsendelseTittel(), FORSENDELSE_TITTEL);
 		assertEquals(distBestilling.getDokumentProdApp(), DOKUMENT_PROD_APP);
+		assertEquals(distBestilling.getDistribusjonstype(), VEDTAK);
+		assertEquals(distBestilling.getDistribusjonstidspunkt(), UMIDDELBART);
 
 		//assert Arkivinformasjon
 		assertNotNull(distBestilling.getArkivInformasjon());
@@ -239,6 +267,39 @@ class HentDokumenterFraJoarkMapperTest {
 				.withDistribusjonbestilling(new Distribusjonbestilling()
 						.withBestillingsId(BESTILLINGS_ID)
 						.withBatchId(BATCH_ID)
+						.withDistribusjonKanal(PRINT.name())
+						.withBestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
+						.withTema(TEMA)
+						.withForsendelseTittel(FORSENDELSE_TITTEL)
+						.withArkivInformasjon(new ArkivInformasjon()
+								.withArkivId(ARKIV_ID)
+								.withArkivSystem(ARKIV_SYSTEM))
+						.withMottaker(createAktoerPerson(PERSON_NAVN_MOTTAKER, PERSON_IDENTIFIKATOR_MOTTAKER))
+						.withBruker(createAktoerPerson(PERSON_NAVN_BRUKER, PERSON_IDENTIFIKATOR_BRUKER))
+						.withAdresse(createNorskPostadresse())
+						.withDokumentProdApp(DOKUMENT_PROD_APP)
+						.withDokumenter(Arrays.asList(new DokumentInformasjon()
+										.withDokumenttypeId(DOKUMENTTYPE_ID_1)
+										.withVariantFormat(VARIANTFORMAT_1)
+										.withTilknyttetSom(TILKNYTTET_SOM_HOVEDDOK)
+										.withArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_1)
+										.withRekkefolge(REKKEFOLGE_1),
+								new DokumentInformasjon()
+										.withDokumenttypeId(DOKUMENTTYPE_ID_2)
+										.withVariantFormat(VARIANTFORMAT_2)
+										.withTilknyttetSom(TILKNYTTET_SOM_VEDLEGG)
+										.withArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_2)
+										.withRekkefolge(REKKEFOLGE_2)
+						))
+				);
+	}
+
+	private HentDokumenterFraJoark createHentDokumentFraJoarkDittNav() {
+		return new HentDokumenterFraJoark()
+				.withDistribusjonbestilling(new Distribusjonbestilling()
+						.withBestillingsId(BESTILLINGS_ID)
+						.withBatchId(BATCH_ID)
+						.withDistribusjonKanal("DITT_NAV")
 						.withBestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
 						.withTema(TEMA)
 						.withForsendelseTittel(FORSENDELSE_TITTEL)

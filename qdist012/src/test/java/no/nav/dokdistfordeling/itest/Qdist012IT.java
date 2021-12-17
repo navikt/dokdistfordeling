@@ -1,27 +1,5 @@
 package no.nav.dokdistfordeling.itest;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
-
 import com.github.tomakehurst.wiremock.client.WireMock;
 import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.exception.technical.S3FailedToPutDocumentTechnicalException;
@@ -62,6 +40,28 @@ import java.io.StringReader;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -118,7 +118,7 @@ public class Qdist012IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
 		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
 		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
@@ -135,15 +135,15 @@ public class Qdist012IT {
 		final String callId = UUID.randomUUID().toString();
 		encryptAndSendStringMessageWithHeaders(qdist012, classpathToString("qdist012/qdist012-happy.xml"), callId);
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+		await().atMost(100, TimeUnit.SECONDS).untilAsserted(() -> {
 			TextMessage responseTextMessage = receiveTextMessage(qdist008);
-			assertThat(responseTextMessage.getStringProperty(CALL_ID), is(callId));
+			assertEquals(callId, responseTextMessage.getStringProperty(CALL_ID));
 			String response = responseTextMessage.getText();
-			assertThat(response, is(notNullValue()));
+			assertNotNull(response);
 
 			//Alle felter bortsett fra objektreferanse verifiseres her
-			String cleanedResponse = clearAllFormatting(replaceUuidBetween(response, "dokumentObjektReferanse", "<dokumentObjektReferanse>", "</dokumentObjektReferanse>"));
-			assertThat(cleanedResponse, is(clearAllFormatting(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"))));
+			String cleanedResponse = replaceUuidBetween(response, "dokumentObjektReferanse", "<dokumentObjektReferanse>", "</dokumentObjektReferanse>");
+			assertThat(cleanedResponse).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
 			//verifiser at riktige objekt lagres til s3
 			DistribuerForsendelse unmarshaledResponse = unmarshalDistribuerForsendelseFromXmlString(response);
@@ -154,18 +154,18 @@ public class Qdist012IT {
 					.get(0), DokdistDokument.class);
 			DokdistDokument dokdistDokument2 = JsonSerializer.deserialize(argCaptorDokdistDokument.getAllValues()
 					.get(1), DokdistDokument.class);
-			assertThat(new String(dokdistDokument1.getPdf()), is(new String(TEST_FILE_BYTES1)));
-			assertThat(new String(dokdistDokument2.getPdf()), is(new String(TEST_FILE_BYTES2)));
+			assertEquals(new String(TEST_FILE_BYTES1), new String(dokdistDokument1.getPdf()));
+			assertEquals(new String(TEST_FILE_BYTES2), new String(dokdistDokument2.getPdf()));
 
 			//objektreferanse verifiseres her
-			assertThat(unmarshaledResponse.getDistribusjonbestilling()
+			assertEquals(argCaptorDokumentObjektReferanse.getAllValues().get(0), unmarshaledResponse.getDistribusjonbestilling()
 					.getDokumenter()
 					.get(0)
-					.getDokumentObjektReferanse(), is(argCaptorDokumentObjektReferanse.getAllValues().get(0)));
-			assertThat(unmarshaledResponse.getDistribusjonbestilling()
+					.getDokumentObjektReferanse());
+			assertEquals(argCaptorDokumentObjektReferanse.getAllValues().get(1), unmarshaledResponse.getDistribusjonbestilling()
 					.getDokumenter()
 					.get(1)
-					.getDokumentObjektReferanse(), is(argCaptorDokumentObjektReferanse.getAllValues().get(1)));
+					.getDokumentObjektReferanse());
 		});
 	}
 
@@ -175,7 +175,7 @@ public class Qdist012IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
 		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happyMedVedlegg.json")));
 		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
@@ -196,15 +196,15 @@ public class Qdist012IT {
 		final String callId = UUID.randomUUID().toString();
 		encryptAndSendStringMessageWithHeaders(qdist012, classpathToString("qdist012/qdist012-happyUtenVedlegg.xml"), callId);
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+		await().atMost(100, TimeUnit.SECONDS).untilAsserted(() -> {
 			TextMessage responseTextMessage = receiveTextMessage(qdist008);
-			assertThat(responseTextMessage.getStringProperty(CALL_ID), is(callId));
+			assertEquals(callId, responseTextMessage.getStringProperty(CALL_ID));
 			String response = responseTextMessage.getText();
-			assertThat(response, is(notNullValue()));
+			assertNotNull(response);
 
 			//Alle felter bortsett fra objektreferanse verifiseres her
-			String cleanedResponse = clearAllFormatting(replaceUuidBetween(response, "dokumentObjektReferanse", "<dokumentObjektReferanse>", "</dokumentObjektReferanse>"));
-			assertThat(cleanedResponse, is(clearAllFormatting(classpathToString("qdist008/distribuerforsendelse_example_happypathMedVedlegg.xml"))));
+			String cleanedResponse = replaceUuidBetween(response, "dokumentObjektReferanse", "<dokumentObjektReferanse>", "</dokumentObjektReferanse>");
+			assertThat(cleanedResponse).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypathMedVedlegg.xml"));
 
 			//verifiser at riktige objekt lagres til s3
 			DistribuerForsendelse unmarshaledResponse = unmarshalDistribuerForsendelseFromXmlString(response);
@@ -217,23 +217,23 @@ public class Qdist012IT {
 					.get(1), DokdistDokument.class);
 			DokdistDokument dokdistDokument3 = JsonSerializer.deserialize(argCaptorDokdistDokument.getAllValues()
 					.get(2), DokdistDokument.class);
-			assertThat(new String(dokdistDokument1.getPdf()), is(new String(TEST_FILE_BYTES1)));
-			assertThat(new String(dokdistDokument2.getPdf()), is(new String(TEST_FILE_BYTES2)));
-			assertThat(new String(dokdistDokument3.getPdf()), is(new String(TEST_FILE_BYTES3)));
+			assertEquals(new String(TEST_FILE_BYTES1), new String(dokdistDokument1.getPdf()));
+			assertEquals(new String(TEST_FILE_BYTES2), new String(dokdistDokument2.getPdf()));
+			assertEquals(new String(TEST_FILE_BYTES3), new String(dokdistDokument3.getPdf()));
 
 			//objektreferanse verifiseres her
-			assertThat(unmarshaledResponse.getDistribusjonbestilling()
+			assertEquals(argCaptorDokumentObjektReferanse.getAllValues().get(0), unmarshaledResponse.getDistribusjonbestilling()
 					.getDokumenter()
 					.get(0)
-					.getDokumentObjektReferanse(), is(argCaptorDokumentObjektReferanse.getAllValues().get(0)));
-			assertThat(unmarshaledResponse.getDistribusjonbestilling()
+					.getDokumentObjektReferanse());
+			assertEquals(argCaptorDokumentObjektReferanse.getAllValues().get(1), unmarshaledResponse.getDistribusjonbestilling()
 					.getDokumenter()
 					.get(1)
-					.getDokumentObjektReferanse(), is(argCaptorDokumentObjektReferanse.getAllValues().get(1)));
-			assertThat(unmarshaledResponse.getDistribusjonbestilling()
+					.getDokumentObjektReferanse());
+			assertEquals(argCaptorDokumentObjektReferanse.getAllValues().get(2), unmarshaledResponse.getDistribusjonbestilling()
 					.getDokumenter()
 					.get(2)
-					.getDokumentObjektReferanse(), is(argCaptorDokumentObjektReferanse.getAllValues().get(2)));
+					.getDokumentObjektReferanse());
 		});
 	}
 
@@ -250,9 +250,9 @@ public class Qdist012IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			TextMessage responseTextMessage = receiveTextMessage(qdist012FunksjonellFeil);
-			assertThat(responseTextMessage, is(notNullValue()));
-			assertThat(decryptXml(responseTextMessage.getText()), is(message));
-			assertThat(responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE), is(JOURNALPOST_ID));
+			assertNotNull(responseTextMessage);
+			assertEquals(message, decryptXml(responseTextMessage.getText()));
+			assertEquals(JOURNALPOST_ID, responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
@@ -274,10 +274,10 @@ public class Qdist012IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			TextMessage responseTextMessage = receiveTextMessage(qdist012FunksjonellFeil);
-			assertThat(responseTextMessage, is(notNullValue()));
-			assertThat(decryptXml(responseTextMessage.getText()), is(message));
-			assertThat(responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE), is(""));
-			assertThat(responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE), is(JOURNALPOST_ID));
+			assertNotNull(responseTextMessage);
+			assertEquals(message, decryptXml(responseTextMessage.getText()));
+			assertEquals("", responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE));
+			assertEquals(JOURNALPOST_ID, responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
@@ -297,9 +297,9 @@ public class Qdist012IT {
 		});
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			TextMessage responseTextMessage = receiveTextMessage(qdist012FunksjonellFeil);
-			assertThat(responseTextMessage, is(notNullValue()));
-			assertThat(decryptXml(responseTextMessage.getText()), is(message));
-			assertThat(responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE), is(BESTILLINGS_ID));
+			assertNotNull(responseTextMessage);
+			assertEquals(message, decryptXml(responseTextMessage.getText()));
+			assertEquals(BESTILLINGS_ID, responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
@@ -321,10 +321,10 @@ public class Qdist012IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			TextMessage responseTextMessage = receiveTextMessage(qdist012FunksjonellFeil);
-			assertThat(responseTextMessage, is(notNullValue()));
-			assertThat(decryptXml(responseTextMessage.getText()), is(message));
-			assertThat(responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE), is(BESTILLINGS_ID));
-			assertThat(responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE), is(""));
+			assertNotNull(responseTextMessage);
+			assertEquals(message, decryptXml(responseTextMessage.getText()));
+			assertEquals(BESTILLINGS_ID, responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE));
+			assertEquals("", responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
@@ -346,8 +346,8 @@ public class Qdist012IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			String response = receiveFromBoqAndAssertHeaders(qdist012FunksjonellFeil);
-			assertThat(response, is(notNullValue()));
-			assertThat(new Crypto(encryptionPassphrase, "thisKeyShouldBeBestillingsId").decrypt(response), is(message));
+			assertNotNull(response);
+			assertEquals(message, new Crypto(encryptionPassphrase, "thisKeyShouldBeBestillingsId").decrypt(response));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
@@ -368,8 +368,8 @@ public class Qdist012IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			String response = receiveFromBoqAndAssertHeaders(qdist012FunksjonellFeil);
-			assertThat(response, is(notNullValue()));
-			assertThat(response, is(message));
+			assertNotNull(response);
+			assertEquals(message, response);
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
@@ -385,7 +385,7 @@ public class Qdist012IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
 		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
 		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
@@ -397,8 +397,8 @@ public class Qdist012IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			String response = receiveFromBoqAndAssertHeaders(backoutQueue);
-			assertThat(response, is(notNullValue()));
-			assertThat(decryptXml(response), is(message));
+			assertNotNull(response);
+			assertEquals(message, decryptXml(response));
 		});
 		Mockito.verify(awsStorage, times(1)).put(any(), any());
 		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
@@ -418,8 +418,8 @@ public class Qdist012IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			String response = receiveFromBoqAndAssertHeaders(backoutQueue);
-			assertThat(response, is(notNullValue()));
-			assertThat(decryptXml(response), is(message));
+			assertNotNull(response);
+			assertEquals(message, decryptXml(response));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(MAX_ATTEMPTS_SHORT), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
@@ -434,15 +434,15 @@ public class Qdist012IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
 		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)));
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)));
 
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		encryptAndSendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			String response = receiveFromBoqAndAssertHeaders(backoutQueue);
-			assertThat(response, is(notNullValue()));
-			assertThat(decryptXml(response), is(message));
+			assertNotNull(response);
+			assertEquals(message, decryptXml(response));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
@@ -457,15 +457,15 @@ public class Qdist012IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
 		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)));
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)));
 
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		encryptAndSendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			String response = receiveFromBoqAndAssertHeaders(qdist012FunksjonellFeil);
-			assertThat(response, is(notNullValue()));
-			assertThat(decryptXml(response), is(message));
+			assertNotNull(response);
+			assertEquals(message, decryptXml(response));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
@@ -480,7 +480,7 @@ public class Qdist012IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
 		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
 		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
@@ -490,8 +490,8 @@ public class Qdist012IT {
 
 		await().atMost(15, TimeUnit.SECONDS).untilAsserted(() -> {
 			String response = receiveFromBoqAndAssertHeaders(backoutQueue);
-			assertThat(response, is(notNullValue()));
-			assertThat(decryptXml(response), is(message));
+			assertNotNull(response);
+			assertEquals(message, decryptXml(response));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(MAX_ATTEMPTS_SHORT + 1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
@@ -506,7 +506,7 @@ public class Qdist012IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
 		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
 		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
@@ -516,8 +516,8 @@ public class Qdist012IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			String response = receiveFromBoqAndAssertHeaders(qdist012FunksjonellFeil);
-			assertThat(response, is(notNullValue()));
-			assertThat(decryptXml(response), is(message));
+			assertNotNull(response);
+			assertEquals(message, decryptXml(response));
 		});
 		Mockito.verify(awsStorage, times(0)).put(any(), any());
 		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
@@ -545,7 +545,7 @@ public class Qdist012IT {
 	}
 
 	private String classpathToString(String classpathResource) throws IOException {
-		try(InputStream inputStream = new ClassPathResource(classpathResource).getInputStream()) {
+		try (InputStream inputStream = new ClassPathResource(classpathResource).getInputStream()) {
 			return IOUtils.toString(inputStream, UTF_8);
 		}
 	}
@@ -561,20 +561,13 @@ public class Qdist012IT {
 	@SuppressWarnings("unchecked")
 	private String receiveFromBoqAndAssertHeaders(Queue queue) throws JMSException {
 		TextMessage textMessage = (TextMessage) jmsTemplate.receive(queue);
-		assertThat(textMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE), is(BESTILLINGS_ID));
-		assertThat(textMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE), is(JOURNALPOST_ID));
+		assertEquals(BESTILLINGS_ID, textMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE));
+		assertEquals(JOURNALPOST_ID, textMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE));
 		return textMessage.getText();
 	}
 
 	private String replaceUuidBetween(String theString, String value, String open, String close) {
 		return theString.replaceAll("(" + open + ")[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}(" + close + ")", "$1" + value + "$2");
-	}
-
-	private String clearAllFormatting(String theString) {
-		return theString.replaceAll("\r", "")
-				.replaceAll("\n", "")
-				.replaceAll("\t", "")
-				.replaceAll("\\s+", "");
 	}
 
 	private DistribuerForsendelse unmarshalDistribuerForsendelseFromXmlString(String xmlString) {

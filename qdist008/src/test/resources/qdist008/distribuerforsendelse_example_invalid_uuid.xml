@@ -3,6 +3,7 @@
 		<bestillingsId>invalid1-uuid-11e9-b210-d663bd873d9</bestillingsId>
 		<!--Optional:-->
 		<batchId>batchId</batchId>
+		<distribusjonKanal>PRINT</distribusjonKanal>
 		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
 		<tema>DAG</tema>
 		<!--Optional:-->

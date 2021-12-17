@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Value;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 
 import java.util.List;
@@ -26,9 +28,12 @@ public class DistribuerForsendelseTo {
 	public static class DistribusjonbestillingTo {
 		private final String bestillingsId;
 		private final String batchId;
+		private final String distribusjonKanal;
 		private final String bestillendeFagsystem;
 		private final String tema;
 		private final String forsendelseTittel;
+		private final DistribusjonstypeCode distribusjonstype;
+		private final DistribusjonstidspunktCode distribusjonstidspunkt;
 		private final ArkivInformasjonTo arkivInformasjon;
 		private final AktoerTo mottaker;
 		private final AktoerTo bruker;
