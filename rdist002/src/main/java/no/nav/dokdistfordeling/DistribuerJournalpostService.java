@@ -48,7 +48,7 @@ public class DistribuerJournalpostService {
 	public String distribuerForsendelse(final DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
 										final String authorizationHeader) {
 		final String bestillingsId = UUID.randomUUID().toString();
-
+		trimAdresse(distribuerJournalpostRequestTo);
 		rdist002ValidationUtil.validateRequest(distribuerJournalpostRequestTo);
 
 		Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
@@ -61,6 +61,22 @@ public class DistribuerJournalpostService {
 				hentDistribuerAdresseFraRegoppslag(distribuerJournalpostRequestTo, journalpost) : distribuerJournalpostRequestTo;
 
 		return doDistribuerForsendelse(distribuerRequest, bestillingsId, journalpost, mottaker, distribusjonsKanalCode);
+	}
+
+	private void trimAdresse(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
+		if(distribuerJournalpostRequestTo.getAdresse()!=null){
+			DistribuerJournalpostRequestTo.AdresseTo opprinneligAdresse = distribuerJournalpostRequestTo.getAdresse();
+			DistribuerJournalpostRequestTo.AdresseTo adresseTo =
+					DistribuerJournalpostRequestTo.AdresseTo.builder()
+							.adresselinje1(opprinneligAdresse.getAdresselinje1()!=null&&opprinneligAdresse.getAdresselinje1().trim().length()>0? opprinneligAdresse.getAdresselinje1().trim():null)
+							.adresselinje2(opprinneligAdresse.getAdresselinje2()!=null&&opprinneligAdresse.getAdresselinje2().trim().length()>0? opprinneligAdresse.getAdresselinje2().trim():null)
+							.adresselinje3(opprinneligAdresse.getAdresselinje3()!=null&&opprinneligAdresse.getAdresselinje3().trim().length()>0? opprinneligAdresse.getAdresselinje3().trim():null)
+							.postnummer(opprinneligAdresse.getPostnummer())
+							.poststed(opprinneligAdresse.getPoststed())
+							.land(opprinneligAdresse.getLand())
+							.build();
+			distribuerJournalpostRequestTo.toBuilder().adresse(adresseTo).build();
+		}
 	}
 
 	private DistribuerJournalpostRequestTo hentDistribuerAdresseFraRegoppslag(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,

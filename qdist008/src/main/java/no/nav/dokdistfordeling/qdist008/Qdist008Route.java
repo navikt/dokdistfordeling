@@ -95,7 +95,7 @@ public class Qdist008Route extends RouteBuilder {
 				.setExchangePattern(InOnly)
 				.process(new IdsProcessor())
 				.log(LoggingLevel.INFO, log, String.format("qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))
-				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist008/in/v2/distribuerforsendelse.xsd")
+				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist008/in/distribuerforsendelse.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
 				.bean(distribuerForsendelseMapper)
 				.bean(forsendelseValidator)
