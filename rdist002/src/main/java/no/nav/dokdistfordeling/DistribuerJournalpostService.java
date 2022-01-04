@@ -48,19 +48,40 @@ public class DistribuerJournalpostService {
 	public String distribuerForsendelse(final DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
 										final String authorizationHeader) {
 		final String bestillingsId = UUID.randomUUID().toString();
+		DistribuerJournalpostRequestTo trimmetDistribuerJournalpostRequestTo = trimAdresse(distribuerJournalpostRequestTo);
+		rdist002ValidationUtil.validateRequest(trimmetDistribuerJournalpostRequestTo);
 
-		rdist002ValidationUtil.validateRequest(distribuerJournalpostRequestTo);
-
-		Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
+		Journalpost journalpost = safJournalpostQueryService.hentJournalpost(trimmetDistribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
 		rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost);
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
 		DistribusjonsKanalCode distribusjonsKanalCode = hentBestemDokdistKanal.bestemDistribusjonskanal(journalpost);
 
-		DistribuerJournalpostRequestTo distribuerRequest = isNull(distribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonsKanalCode) ?
-				hentDistribuerAdresseFraRegoppslag(distribuerJournalpostRequestTo, journalpost) : distribuerJournalpostRequestTo;
+		DistribuerJournalpostRequestTo distribuerRequest = isNull(trimmetDistribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonsKanalCode) ?
+				hentDistribuerAdresseFraRegoppslag(trimmetDistribuerJournalpostRequestTo, journalpost) : trimmetDistribuerJournalpostRequestTo;
 
 		return doDistribuerForsendelse(distribuerRequest, bestillingsId, journalpost, mottaker, distribusjonsKanalCode);
+	}
+
+	private DistribuerJournalpostRequestTo trimAdresse(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
+		if (distribuerJournalpostRequestTo.getAdresse() != null) {
+			DistribuerJournalpostRequestTo.AdresseTo opprinneligAdresse = distribuerJournalpostRequestTo.getAdresse();
+			DistribuerJournalpostRequestTo.AdresseTo adresseTo =
+					DistribuerJournalpostRequestTo.AdresseTo.builder()
+							.adresselinje1(trimAdresselinje(opprinneligAdresse.getAdresselinje1()))
+							.adresselinje2(trimAdresselinje(opprinneligAdresse.getAdresselinje2()))
+							.adresselinje3(trimAdresselinje(opprinneligAdresse.getAdresselinje3()))
+							.postnummer(opprinneligAdresse.getPostnummer())
+							.poststed(opprinneligAdresse.getPoststed())
+							.land(opprinneligAdresse.getLand())
+							.build();
+			distribuerJournalpostRequestTo.toBuilder().adresse(adresseTo).build();
+		}
+		return distribuerJournalpostRequestTo;
+	}
+
+	private String trimAdresselinje(String opprinneligAdresse) {
+		return opprinneligAdresse != null && opprinneligAdresse.trim().length() > 0 ? opprinneligAdresse.trim() : null;
 	}
 
 	private DistribuerJournalpostRequestTo hentDistribuerAdresseFraRegoppslag(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
