@@ -26,6 +26,7 @@ import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -120,22 +121,26 @@ public class Qdist008DistribuerForsendelseMapper {
 		} else if (adresse instanceof HentDokumenterFraJoarkTo.NorskPostadresseTo) {
 			HentDokumenterFraJoarkTo.NorskPostadresseTo norskPostadresse = (HentDokumenterFraJoarkTo.NorskPostadresseTo) adresse;
 			return new NorskPostadresse()
-					.withAdresselinje1(norskPostadresse.getAdresselinje1())
-					.withAdresselinje2(norskPostadresse.getAdresselinje2())
-					.withAdresselinje3(norskPostadresse.getAdresselinje3())
+					.withAdresselinje1(trimAdresselinje(norskPostadresse.getAdresselinje1()))
+					.withAdresselinje2(trimAdresselinje(norskPostadresse.getAdresselinje2()))
+					.withAdresselinje3(trimAdresselinje(norskPostadresse.getAdresselinje3()))
 					.withPostnummer(norskPostadresse.getPostnummer())
 					.withPoststed(norskPostadresse.getPoststed())
 					.withLand(norskPostadresse.getLand());
 		} else if (adresse instanceof HentDokumenterFraJoarkTo.UtenlandskPostadresseTo) {
 			HentDokumenterFraJoarkTo.UtenlandskPostadresseTo utenlandskPostadresse = (HentDokumenterFraJoarkTo.UtenlandskPostadresseTo) adresse;
 			return new UtenlandskPostadresse()
-					.withAdresselinje1(utenlandskPostadresse.getAdresselinje1())
-					.withAdresselinje2(utenlandskPostadresse.getAdresselinje2())
+					.withAdresselinje1(trimAdresselinje(utenlandskPostadresse.getAdresselinje1()))
+					.withAdresselinje2(trimAdresselinje(utenlandskPostadresse.getAdresselinje2()))
 					.withAdresselinje3(utenlandskPostadresse.getAdresselinje3())
 					.withLand(utenlandskPostadresse.getLand());
 		} else {
 			return null;
 		}
+	}
+
+	private String trimAdresselinje(String adresselinje) {
+		return isBlank(adresselinje) ? null : adresselinje.strip();
 	}
 
 	private String mapDistribusjonstidspunkt(DistribusjonstidspunktCode distribusjonstidspunktCode) {

@@ -34,8 +34,8 @@ import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
 import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
-import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.EnumUtils.isValidEnumIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
@@ -158,10 +158,7 @@ public class DistribuerForsendelseMapper {
 	}
 
 	private String trimAdresse(String adresselinje) {
-		if (adresselinje == null || adresselinje.trim().equals("")) {
-			return null;
-		}
-		return adresselinje.trim();
+		return isBlank(adresselinje) ? null : adresselinje.strip();
 	}
 
 	private AktoerTypeCode mapSamhandlerKategoriToSamhandlerType(String samhandlerKategori) {

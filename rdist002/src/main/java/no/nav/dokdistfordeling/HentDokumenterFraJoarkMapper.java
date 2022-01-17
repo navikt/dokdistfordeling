@@ -87,9 +87,9 @@ public class HentDokumenterFraJoarkMapper {
 			throw new ValidationException("Adresse kan ikke være null");
 		} else if (adresseTo.getAdressetype().equals(NORSK_POSTADRESSE)) {
 			return new NorskPostadresse()
-					.withAdresselinje1(adresseTo.getAdresselinje1())
-					.withAdresselinje2(isNotBlank(adresseTo.getAdresselinje2()) ? adresseTo.getAdresselinje2() : null)
-					.withAdresselinje3(adresseTo.getAdresselinje3())
+					.withAdresselinje1(trimAdresselinje(adresseTo.getAdresselinje1()))
+					.withAdresselinje2(trimAdresselinje(adresseTo.getAdresselinje2()))
+					.withAdresselinje3(trimAdresselinje(adresseTo.getAdresselinje3()))
 					.withPostnummer(adresseTo.getPostnummer())
 					.withPoststed(adresseTo.getPoststed())
 					.withLand(adresseTo.getLand());
@@ -100,6 +100,10 @@ public class HentDokumenterFraJoarkMapper {
 					.withAdresselinje3(adresseTo.getAdresselinje3())
 					.withLand(adresseTo.getLand());
 		}
+	}
+
+	private String trimAdresselinje(String adresselinje) {
+		return isBlank(adresselinje) ? null : adresselinje.strip();
 	}
 
 	private Aktoer mapBruker(Journalpost.Bruker bruker) {
