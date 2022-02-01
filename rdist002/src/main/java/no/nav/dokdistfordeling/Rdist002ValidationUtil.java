@@ -28,14 +28,14 @@ public class Rdist002ValidationUtil {
 
 	public void validateRequest(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
 		assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
-		assertNotNullOrEmpty("bestillendeFagsystem", distribuerJournalpostRequestTo.getBestillendeFagsystem());
-		assertNotNullOrEmpty("dokumentProdapp", distribuerJournalpostRequestTo.getDokumentProdApp());
-		validateDokumentProdApp(distribuerJournalpostRequestTo.getDokumentProdApp());
+		assertNotNullOrEmptyAndCorrectLength("bestillendeFagsystem", distribuerJournalpostRequestTo.getBestillendeFagsystem());
+		assertNotNullOrEmptyAndCorrectLength("dokumentProdapp", distribuerJournalpostRequestTo.getDokumentProdApp());
 	}
 
-	private void validateDokumentProdApp(String dokumentProdApp) {
-		if (dokumentProdApp != null && dokumentProdApp.length() > 20) {
-			throw new ValidationException("DokprodApp/Bestillende Fagsystem kan ikke være mer enn 20 tegn");
+	private void assertNotNullOrEmptyAndCorrectLength(String field, String value) {
+		assertNotNullOrEmpty(field, value);
+		if (value.length() > 20) {
+			throw new ValidationException(String.format("%s kan ikke være mer enn 20 tegn", field));
 		}
 	}
 
