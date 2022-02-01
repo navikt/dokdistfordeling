@@ -1,16 +1,5 @@
 package no.nav.dokdistfordeling;
 
-import static java.lang.String.format;
-import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
-import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
-import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
-import static no.nav.dokdistfordeling.util.ValidationUtil.assertHovedokumentFieldNotNullOrEmpty;
-import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNull;
-import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNullOrEmpty;
-import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
-import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
-import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
-
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
@@ -22,14 +11,32 @@ import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.informasj
 
 import java.util.List;
 
+import static java.lang.String.format;
+import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
+import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertHovedokumentFieldNotNullOrEmpty;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNull;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNullOrEmpty;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
+
 public class Rdist002ValidationUtil {
 
 	private static final String UTGAAENDE = JournalpostType.U.name();
 
 	public void validateRequest(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
 		assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
-		assertNotNullOrEmpty("bestillendeFagsystem", distribuerJournalpostRequestTo.getBestillendeFagsystem());
-		assertNotNullOrEmpty("dokumentProdapp", distribuerJournalpostRequestTo.getDokumentProdApp());
+		assertNotNullOrEmptyAndCorrectLength("bestillendeFagsystem", distribuerJournalpostRequestTo.getBestillendeFagsystem());
+		assertNotNullOrEmptyAndCorrectLength("dokumentProdapp", distribuerJournalpostRequestTo.getDokumentProdApp());
+	}
+
+	private void assertNotNullOrEmptyAndCorrectLength(String field, String value) {
+		assertNotNullOrEmpty(field, value);
+		if (value.length() > 20) {
+			throw new ValidationException(String.format("%s kan ikke være mer enn 20 tegn", field));
+		}
 	}
 
 	public void validateAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo, Aktoer mottaker) {
@@ -39,7 +46,7 @@ public class Rdist002ValidationUtil {
 
 		if (adresseTo != null) {
 			assertNotNullOrEmpty("land", adresseTo.getLand());
-			assertNotNullOrEmpty("adressetype",adresseTo.getAdressetype());
+			assertNotNullOrEmpty("adressetype", adresseTo.getAdressetype());
 
 			if (adresseTo.getAdressetype().equals(NORSK_POSTADRESSE)) {
 				assertNotNullOrEmpty("poststed", adresseTo.getPoststed());

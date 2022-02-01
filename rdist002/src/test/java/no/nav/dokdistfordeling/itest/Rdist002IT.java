@@ -550,6 +550,15 @@ public class Rdist002IT {
 		assertThat(responseEntity.getBody()).contains("Mottaker er død og har ukjent adresse");
 	}
 
+	@Test
+	void shouldReturnBadRequestWithDokProdappLengthTooLong() {
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().dokumentProdApp("ABCDEFGHIJKLMNOPQRSTU").build(), createHappyPathHeaders());
+		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
+		assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat(responseEntity.getBody()).contains("dokumentProdapp kan ikke være mer enn 20 tegn");
+	}
+
+
 	private void assertQdist012Result(Distribusjonbestilling qdist012Result, String restResponseBestillingsId) {
 		assertNotNull(qdist012Result);
 		assertEquals(restResponseBestillingsId, qdist012Result.getBestillingsId());
