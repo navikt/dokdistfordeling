@@ -92,3 +92,6 @@ spec:
         mountPath: /var/run/secrets/nais.io/vault
       - kvPath: {{ APPDYNAMICS }}
         mountPath: /var/run/secrets/nais.io/appdynamics
+  azure:
+    application:
+      enabled: true
