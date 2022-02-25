@@ -1,8 +1,5 @@
 package no.nav.dokdistfordeling.consumer.sts;
 
-import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
-
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
 import no.nav.dokdistfordeling.config.cache.LokalCacheConfig;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
@@ -15,12 +12,12 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriBuilder;
-import org.springframework.web.util.UriBuilderFactory;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.inject.Inject;
 import java.time.Duration;
+
+import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
+import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -48,18 +45,6 @@ public class StsRestConsumer {
 	public String getOidcToken() {
 		try {
 			return restTemplate.getForObject(stsUrl + "/token?grant_type=client_credentials&scope=openid", StsResponseTo.class)
-					.getAccessToken();
-		} catch (HttpStatusCodeException e) {
-			throw new StsTechnicalException(String.format("Kall mot STS feilet med status=%s feilmelding=%s.", e.getStatusCode(), e
-					.getMessage()), e);
-		}
-	}
-
-	@Cacheable(LokalCacheConfig.SAML_TOKEN_CACHE)
-	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	public String getSamlToken() {
-		try {
-			return restTemplate.getForObject(stsUrl + "/samltoken", StsResponseTo.class)
 					.getAccessToken();
 		} catch (HttpStatusCodeException e) {
 			throw new StsTechnicalException(String.format("Kall mot STS feilet med status=%s feilmelding=%s.", e.getStatusCode(), e

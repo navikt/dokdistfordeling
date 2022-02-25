@@ -19,26 +19,21 @@ import java.util.concurrent.TimeUnit;
 @Profile({"nais", "local"})
 public class LokalCacheConfig {
 
-    public static final String TKAT020_CACHE = "tkat020Cache";
-    public static final String OIDC_TOKEN_CACHE = "OidcTokenCache";
-    public static final String SAML_TOKEN_CACHE = "SamlTokenCache";
+	public static final String TKAT020_CACHE = "tkat020Cache";
+	public static final String OIDC_TOKEN_CACHE = "OidcTokenCache";
 
     @Bean
-    @Primary
-    CacheManager cacheManager() {
-        SimpleCacheManager manager = new SimpleCacheManager();
-        manager.setCaches(Arrays.asList(
-                new CaffeineCache(TKAT020_CACHE, Caffeine.newBuilder()
-                        .expireAfterWrite(1, TimeUnit.DAYS)
-                        .build()),
-                new CaffeineCache(OIDC_TOKEN_CACHE, Caffeine.newBuilder()
-                        .expireAfterWrite(55, TimeUnit.MINUTES)
-                        .build()),
-                new CaffeineCache(SAML_TOKEN_CACHE, Caffeine.newBuilder()
-                        .expireAfterWrite(55, TimeUnit.MINUTES)
-                        .build())
-                )
-        );
-        return manager;
-    }
+	@Primary
+	CacheManager cacheManager() {
+		SimpleCacheManager manager = new SimpleCacheManager();
+		manager.setCaches(Arrays.asList(
+				new CaffeineCache(TKAT020_CACHE, Caffeine.newBuilder()
+						.expireAfterWrite(1, TimeUnit.DAYS)
+						.build()),
+				new CaffeineCache(OIDC_TOKEN_CACHE, Caffeine.newBuilder()
+						.expireAfterWrite(55, TimeUnit.MINUTES)
+						.build()))
+		);
+		return manager;
+	}
 }
