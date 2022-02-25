@@ -31,7 +31,7 @@
   "MAX_REPLICAS": "10",
   "INGRESSES": [
     "https://dokdistfordeling.nais.adeo.no",
-    "https://dokdistfordeling.prod-fss.nais.io",
+    "https://dokdistfordeling.prod-fss-pub.nais.io",
     "https://dokdistfordeling.intern.nav.no"
   ]
 }

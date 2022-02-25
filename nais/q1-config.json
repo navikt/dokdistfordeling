@@ -31,7 +31,7 @@
   "MAX_REPLICAS": "2",
   "INGRESSES": [
     "https://dokdistfordeling-q1.nais.preprod.local",
-    "https://dokdistfordeling-q1.dev-fss.nais.io",
+    "https://dokdistfordeling-q1.dev-fss-pub.nais.io",
     "https://dokdistfordeling-q1.dev.adeo.no",
     "https://dokdistfordeling-q1.dev.intern.nav.no"
   ]
