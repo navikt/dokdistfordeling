@@ -53,6 +53,17 @@ spec:
       value: {{ DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME }}
     - name: APPD_NAME
       value: {{ APPD_NAME }}
+    - name: PROXY_HOST
+      value: {{PROXY_HOST}}
+    - name: PROXY_PORT
+      value: "{{PROXY_PORT}}"
+    - name: AZURE_APP_TOKEN_URL
+      value: {{AZURE_APP_TOKEN_URL}}
+    - name: AZURE_APP_SCOPE
+      value: {{AZURE_APP_SCOPE}}
+    - name: JOURNALPOST_API_BASE_URL
+      value: {{JOURNALPOST_API_BASE_URL}}
+
   image: {{ image }}
   ingresses:
     {{#each INGRESSES}}

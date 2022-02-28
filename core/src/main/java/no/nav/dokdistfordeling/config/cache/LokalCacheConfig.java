@@ -22,6 +22,7 @@ public class LokalCacheConfig {
     public static final String TKAT020_CACHE = "tkat020Cache";
     public static final String OIDC_TOKEN_CACHE = "OidcTokenCache";
     public static final String SAML_TOKEN_CACHE = "SamlTokenCache";
+    public static final String AZURE_TOKEN_CACHE = "AzureToken";
 
     @Bean
     @Primary
@@ -36,9 +37,10 @@ public class LokalCacheConfig {
                         .build()),
                 new CaffeineCache(SAML_TOKEN_CACHE, Caffeine.newBuilder()
                         .expireAfterWrite(55, TimeUnit.MINUTES)
-                        .build())
-                )
-        );
+                        .build()),
+                new CaffeineCache(AZURE_TOKEN_CACHE, Caffeine.newBuilder()
+                        .expireAfterWrite(55, TimeUnit.MINUTES)
+                        .build())));
         return manager;
     }
 }

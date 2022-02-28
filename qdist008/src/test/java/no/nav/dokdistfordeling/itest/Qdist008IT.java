@@ -3,7 +3,6 @@ package no.nav.dokdistfordeling.itest;
 import com.amazonaws.services.s3.AmazonS3;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import no.nav.dokdistfordeling.itest.config.Qdist008ItestConfig;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
@@ -33,18 +32,20 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.matchingXPath;
+import static com.github.tomakehurst.wiremock.client.WireMock.patch;
+import static com.github.tomakehurst.wiremock.client.WireMock.patchRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACHE;
@@ -130,15 +131,20 @@ public class Qdist008IT {
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -150,12 +156,8 @@ public class Qdist008IT {
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("S"))));
+		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistibusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
@@ -174,15 +176,20 @@ public class Qdist008IT {
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_kanal_dittnav_happypath.xml"));
 
@@ -194,12 +201,8 @@ public class Qdist008IT {
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("NAV_NO"))));
+		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistibusjonsinfoNAV_NOHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilDittNavOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
@@ -218,15 +221,21 @@ public class Qdist008IT {
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
+
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_sdp_happypath.xml"));
 
@@ -239,12 +248,8 @@ public class Qdist008IT {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 			verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
-			verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-					.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-			verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-					.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-			verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-					.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("SDP"))));
+			verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
+					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistibusjonsinfoSDPHappy.json"))));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilSDPOutputHappy.json"))));
 			verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
@@ -264,15 +269,20 @@ public class Qdist008IT {
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_tregeretten_happypath.xml"));
 
@@ -284,13 +294,8 @@ public class Qdist008IT {
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//utsendingskanal/text()",
-						equalTo(DistribusjonsKanalCode.TRYGDERETTEN.getJoarkUtsendingsKanal()))));
+		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistibusjonsinfoTRYGDERETTENHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilTrygderettenOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
@@ -309,9 +314,14 @@ public class Qdist008IT {
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_localprint_happypath.xml"));
 
@@ -319,12 +329,8 @@ public class Qdist008IT {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 			verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
-			verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-					.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-			verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-					.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-			verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-					.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("L"))));
+			verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
+					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistibusjonsinfoLHappy.json"))));
 			verify(exactly(0), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilLokalPrintOutputHappy.json"))));
 			verify(exactly(0), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
@@ -344,9 +350,15 @@ public class Qdist008IT {
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
+
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_ingendistribusjon_happypath.xml"));
 
@@ -354,12 +366,8 @@ public class Qdist008IT {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 			verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
-			verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-					.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-			verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-					.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-			verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-					.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("INGEN_DISTRIBUSJON"))));
+			verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
+					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistibusjonsinfoINGEN_DISTRIBUSJONHappy.json"))));
 			verify(exactly(0), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilIngenDistribusjonOutputHappy.json"))));
 			verify(exactly(0), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
@@ -379,15 +387,20 @@ public class Qdist008IT {
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_only_required_fields_happypath.xml"));
 
@@ -396,8 +409,6 @@ public class Qdist008IT {
 			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
 		});
 
-		verify(exactly(0), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1")));
-		verify(exactly(0), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1")));
 	}
 
 	@Test
@@ -414,15 +425,20 @@ public class Qdist008IT {
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_har_tittel_happypath.xml"));
 
@@ -434,12 +450,8 @@ public class Qdist008IT {
 		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("S"))));
+		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistibusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseWithTittelAvoidDokkatHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
@@ -451,15 +463,20 @@ public class Qdist008IT {
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_avoid_pdl_happypath.xml"));
 
@@ -471,12 +488,8 @@ public class Qdist008IT {
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), postRequestedFor(urlEqualTo("/pdl")));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("S"))));
+		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistibusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseWithOrganisasjonOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
@@ -495,15 +508,21 @@ public class Qdist008IT {
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
+
 
 		final String callId = UUID.randomUUID().toString();
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_tregeretten_happypath.xml"), callId);
@@ -548,13 +567,19 @@ public class Qdist008IT {
 				.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("rjoark001/administrerForsendelseEmptyTema.json")));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
+
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_avoid_invalid_tema.xml"));
 
@@ -814,7 +839,7 @@ public class Qdist008IT {
 	}
 
 	@Test
-	public void shouldThrowSettJournalpostAttributterTechnicalException() throws Exception {
+	public void shouldThrowJournalpostAPITechnicalException() throws Exception {
 
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
@@ -830,9 +855,14 @@ public class Qdist008IT {
 		stubFor(post("/administrerforsendelse/v1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
-						.withBody("tjoark110/settJournalpostAttributterHappy.xml")));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -844,12 +874,10 @@ public class Qdist008IT {
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
+		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistibusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
 	}
 
 	@Test
@@ -865,14 +893,19 @@ public class Qdist008IT {
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
 		stubFor(post("/administrerforsendelse/v1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.BAD_REQUEST.value())));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -885,12 +918,8 @@ public class Qdist008IT {
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("S"))));
+		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistibusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo(("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST"))));
@@ -910,14 +939,19 @@ public class Qdist008IT {
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(post("/arkiverdokumentproduksjon/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withBodyFile("tjoark110/settJournalpostAttributterHappy.xml")));
 		stubFor(post("/administrerforsendelse/v1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -929,12 +963,8 @@ public class Qdist008IT {
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//endretAvNavn/text()", equalTo("qdist008"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//journalpostIdListe/text()", equalTo("1234"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/arkiverdokumentproduksjon/v1"))
-				.withRequestBody(matchingXPath("//utsendingskanal/text()", equalTo("S"))));
+		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistibusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo(("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST"))));

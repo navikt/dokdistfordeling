@@ -1,0 +1,71 @@
+package no.nav.dokdistfordeling.consumer.dokarkiv;
+
+import lombok.extern.slf4j.Slf4j;
+import no.nav.dokdistfordeling.config.dokarkiv.JournalpostApiConfig;
+import no.nav.dokdistfordeling.constants.Constants;
+import no.nav.dokdistfordeling.consumer.NavHeaders;
+import no.nav.dokdistfordeling.exception.functional.JournalpostApiFunctionalException;
+import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.JournalpostApiTechnicalException;
+import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
+import no.nav.dokdistfordeling.security.AzureToken;
+import no.nav.dokdistfordeling.security.WebClientAzureAuthentication;
+import org.slf4j.MDC;
+import org.springframework.http.MediaType;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
+
+import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
+import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
+
+@Slf4j
+@Component
+public class JournalpostApi {
+
+	private final WebClient webClient;
+
+	public JournalpostApi(AzureToken azureToken,
+						  JournalpostApiConfig journalpostApiConfig,
+						  WebClient.Builder webClientBuilder) {
+		this.webClient = webClientBuilder
+				.baseUrl(journalpostApiConfig.getBaseUrl())
+				.build()
+				.mutate()
+				.filter(new WebClientAzureAuthentication(azureToken))
+				.build();
+	}
+
+	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "oppdaterDistribusjonsinfo"}, histogram = true)
+	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	public void oppdaterDistribusjonsinfo(String journalpostId, OppdaterDistibusjonsinfoTo oppdaterDistibusjonsinfoTo) {
+
+		webClient.patch()
+				.uri(String.format("/%s/oppdaterDistribusjonsinfo", journalpostId))
+				.header(NavHeaders.NAV_CALL_ID, MDC.get(Constants.CALL_ID))
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(Mono.just(oppdaterDistibusjonsinfoTo), OppdaterDistibusjonsinfoTo.class)
+				.retrieve()
+				.toBodilessEntity()
+				.doOnError(this::handleError)
+				.block();
+	}
+
+	private void handleError(Throwable error) {
+		if(error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
+			throw new JournalpostApiFunctionalException(
+					String.format("Kall mot JournalpostAPI feilet med status=%s, feilmelding=%s",
+							response.getRawStatusCode(),
+							response.getMessage()),
+					error);
+		} else {
+			throw new JournalpostApiTechnicalException(
+					String.format("Kall mot JournalpostAPI feilet med feilmelding=%s", error.getMessage()),
+					error);
+		}
+
+	}
+}
