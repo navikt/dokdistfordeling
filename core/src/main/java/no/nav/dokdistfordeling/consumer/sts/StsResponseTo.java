@@ -19,6 +19,5 @@ public class StsResponseTo {
 		this.accessToken = accessToken;
 		this.tokenType = tokenType;
 		this.expiresIn = expiresIn;
-
 	}
 }

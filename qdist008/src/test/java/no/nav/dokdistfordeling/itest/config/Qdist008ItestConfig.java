@@ -1,7 +1,5 @@
 package no.nav.dokdistfordeling.itest.config;
 
-import static org.mockito.Mockito.mock;
-
 import com.amazonaws.services.s3.AmazonS3;
 import no.nav.dokdistfordeling.CoreConfig;
 import no.nav.dokdistfordeling.config.alias.ArkiverDokumentproduksjonV1Alias;
@@ -16,6 +14,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -32,7 +32,6 @@ import org.springframework.context.annotation.Profile;
 @Import({
 		Qdist008JmsItestConfig.class,
 		LokalTestCacheConfig.class,
-		STSTestConfig.class,
 		CoreConfig.class})
 public class Qdist008ItestConfig {
 

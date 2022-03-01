@@ -38,7 +38,6 @@ public class Qdist008Service {
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final ArkiverDokumentproduksjon arkiverDokumentproduksjon;
 	private final DokumentkatalogAdmin dokumentkatalogAdmin;
-	private final BestemDistribusjonskanal bestemDistribusjonskanal;
 	private final AdministrerForsendelse administrerForsendelse;
 	private final PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper;
 
@@ -52,7 +51,6 @@ public class Qdist008Service {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.arkiverDokumentproduksjon = arkiverDokumentproduksjon;
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
-		this.bestemDistribusjonskanal = bestemDistribusjonskanal;
 		this.administrerForsendelse = administrerForsendelse;
 		this.persisterForsendelseToRequestMapper = persisterForsendelseToRequestMapper;
 	}
