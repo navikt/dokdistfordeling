@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.azure.AzureConfig;
 import no.nav.dokdistfordeling.exception.functional.AzureTokenException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
@@ -28,6 +27,7 @@ import java.util.Map;
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.AZURE_TOKEN_CACHE;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
 @Component
@@ -54,7 +54,7 @@ public class AzureToken {
     private String fetchAccessToken() {
 
         HttpClient httpClient = HttpClient.create();
-        if (!StringUtils.isBlank(proxyHost)) {
+        if (!isBlank(proxyHost)) {
             var proxyUri = URI.create(proxyHost);
             httpClient = httpClient
                     .proxy(proxy -> proxy
