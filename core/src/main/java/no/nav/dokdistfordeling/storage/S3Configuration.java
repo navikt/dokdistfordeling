@@ -1,5 +1,6 @@
 package no.nav.dokdistfordeling.storage;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -83,6 +84,7 @@ public class S3Configuration {
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                 .withCryptoConfiguration(new CryptoConfigurationV2().withCryptoMode(CryptoMode.AuthenticatedEncryption))
                 .withEncryptionMaterialsProvider(new StaticEncryptionMaterialsProvider(new EncryptionMaterials(secretKey)))
+                .withClientConfiguration(new ClientConfiguration().withDisableSocketProxy(true))
                 .build();
     }
 
