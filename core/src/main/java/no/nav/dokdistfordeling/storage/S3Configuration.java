@@ -84,7 +84,7 @@ public class S3Configuration {
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                 .withCryptoConfiguration(new CryptoConfigurationV2().withCryptoMode(CryptoMode.AuthenticatedEncryption))
                 .withEncryptionMaterialsProvider(new StaticEncryptionMaterialsProvider(new EncryptionMaterials(secretKey)))
-                .withClientConfiguration(new ClientConfiguration().withDisableSocketProxy(true))
+                .withClientConfiguration(new ClientConfiguration().withNonProxyHosts(s3Endpoint))
                 .build();
     }
 
