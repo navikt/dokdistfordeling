@@ -4,11 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.azure.AzureConfig;
-import no.nav.dokdistfordeling.config.azure.ProxyConfig;
 import no.nav.dokdistfordeling.exception.functional.AzureTokenException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
-
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -23,6 +22,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.ProxyProvider;
 
+import java.net.URI;
 import java.util.Map;
 
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.AZURE_TOKEN_CACHE;
@@ -34,15 +34,15 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 public class AzureToken {
 
     private final AzureConfig azureConfig;
-    private final ProxyConfig proxyConfig;
     private final ObjectMapper objectMapper;
+    private final String proxyHost;
 
     public AzureToken(AzureConfig azureConfig,
-                      ProxyConfig proxyConfig,
-                      ObjectMapper objectMapper) {
+                      ObjectMapper objectMapper,
+                      @Value("${proxy.host:#{null}}") String proxyHost) {
         this.azureConfig = azureConfig;
-        this.proxyConfig = proxyConfig;
         this.objectMapper = objectMapper;
+        this.proxyHost = proxyHost;
     }
 
     @Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
@@ -54,11 +54,13 @@ public class AzureToken {
     private String fetchAccessToken() {
 
         HttpClient httpClient = HttpClient.create();
-        if (!StringUtils.isBlank(proxyConfig.getHost())) {
-            httpClient = httpClient.proxy(proxy -> proxy
-                    .type(ProxyProvider.Proxy.HTTP)
-                    .host(proxyConfig.getHost())
-                    .port(proxyConfig.getPort()));
+        if (!StringUtils.isBlank(proxyHost)) {
+            var proxyUri = URI.create(proxyHost);
+            httpClient = httpClient
+                    .proxy(proxy -> proxy
+                            .type(ProxyProvider.Proxy.HTTP)
+                            .host(proxyUri.getHost())
+                            .port(proxyUri.getPort()));
         }
         ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
 

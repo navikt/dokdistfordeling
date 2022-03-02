@@ -41,13 +41,13 @@ public class JournalpostApi {
 
 	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "oppdaterDistribusjonsinfo"}, histogram = true)
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	public void oppdaterDistribusjonsinfo(String journalpostId, OppdaterDistibusjonsinfoTo oppdaterDistibusjonsinfoTo) {
+	public void oppdaterDistribusjonsinfo(String journalpostId, OppdaterDistribusjonsinfoTo oppdaterDistibusjonsinfoTo) {
 
 		webClient.patch()
 				.uri(String.format("/%s/oppdaterDistribusjonsinfo", journalpostId))
 				.header(NavHeaders.NAV_CALL_ID, MDC.get(Constants.CALL_ID))
 				.contentType(MediaType.APPLICATION_JSON)
-				.body(Mono.just(oppdaterDistibusjonsinfoTo), OppdaterDistibusjonsinfoTo.class)
+				.body(Mono.just(oppdaterDistibusjonsinfoTo), OppdaterDistribusjonsinfoTo.class)
 				.retrieve()
 				.toBodilessEntity()
 				.doOnError(this::handleError)

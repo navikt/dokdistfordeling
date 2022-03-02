@@ -2,7 +2,7 @@ package no.nav.dokdistfordeling.qdist008;
 
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanal;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
-import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterDistibusjonsinfoTo;
+import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterDistribusjonsinfoTo;
 import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
@@ -111,7 +111,7 @@ public class Qdist008Service {
 
 			journalpostApi.oppdaterDistribusjonsinfo(
 					arkivInformasjon.getArkivId(),
-					OppdaterDistibusjonsinfoTo.builder()
+					OppdaterDistribusjonsinfoTo.builder()
 							.settStatusEkspedert(false)
 							.utsendingsKanal(distribusjonsKanal.getJoarkUtsendingsKanal())
 							.build());

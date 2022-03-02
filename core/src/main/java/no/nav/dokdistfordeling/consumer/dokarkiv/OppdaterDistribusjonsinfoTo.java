@@ -5,7 +5,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class OppdaterDistibusjonsinfoTo {
+public class OppdaterDistribusjonsinfoTo {
 	boolean settStatusEkspedert;
 	String utsendingsKanal;
 }
