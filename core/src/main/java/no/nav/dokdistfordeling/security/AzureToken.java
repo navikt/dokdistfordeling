@@ -54,14 +54,14 @@ public class AzureToken {
     private String fetchAccessToken() {
 
         HttpClient httpClient = HttpClient.create();
-        if (!isBlank(proxyHost)) {
-            var proxyUri = URI.create(proxyHost);
-            httpClient = httpClient
-                    .proxy(proxy -> proxy
-                            .type(ProxyProvider.Proxy.HTTP)
-                            .host(proxyUri.getHost())
-                            .port(proxyUri.getPort()));
-        }
+//        if (!isBlank(proxyHost)) {
+//            var proxyUri = URI.create(proxyHost);
+//            httpClient = httpClient
+//                    .proxy(proxy -> proxy
+//                            .type(ProxyProvider.Proxy.HTTP)
+//                            .host(proxyUri.getHost())
+//                            .port(proxyUri.getPort()));
+//        }
         ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
 
         WebClient webClient = WebClient.builder()
