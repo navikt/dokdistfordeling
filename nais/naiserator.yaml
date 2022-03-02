@@ -59,6 +59,8 @@ spec:
       value: {{AZURE_APP_SCOPE}}
     - name: JOURNALPOST_API_BASE_URL
       value: {{JOURNALPOST_API_BASE_URL}}
+    - name: PROXY_HOST
+      value: {{ PROXY_HOST }}
 
   image: {{ image }}
   ingresses:
@@ -102,4 +104,3 @@ spec:
   azure:
     application:
       enabled: true
-  webproxy: true

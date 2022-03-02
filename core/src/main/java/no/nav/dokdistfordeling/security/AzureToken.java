@@ -19,15 +19,12 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.netty.http.client.HttpClient;
-import reactor.netty.transport.ProxyProvider;
 
-import java.net.URI;
 import java.util.Map;
 
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.AZURE_TOKEN_CACHE;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
 @Component
@@ -36,6 +33,7 @@ public class AzureToken {
     private final AzureConfig azureConfig;
     private final ObjectMapper objectMapper;
     private final String proxyHost;
+    private final WebClient webClient;
 
     public AzureToken(AzureConfig azureConfig,
                       ObjectMapper objectMapper,
@@ -43,6 +41,7 @@ public class AzureToken {
         this.azureConfig = azureConfig;
         this.objectMapper = objectMapper;
         this.proxyHost = proxyHost;
+        this.webClient = webClient();
     }
 
     @Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
@@ -52,21 +51,6 @@ public class AzureToken {
     }
 
     private String fetchAccessToken() {
-
-        HttpClient httpClient = HttpClient.create();
-//        if (!isBlank(proxyHost)) {
-//            var proxyUri = URI.create(proxyHost);
-//            httpClient = httpClient
-//                    .proxy(proxy -> proxy
-//                            .type(ProxyProvider.Proxy.HTTP)
-//                            .host(proxyUri.getHost())
-//                            .port(proxyUri.getPort()));
-//        }
-        ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
-
-        WebClient webClient = WebClient.builder()
-                .clientConnector(connector)
-                .build();
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("client_id", azureConfig.getClientId());
@@ -103,7 +87,23 @@ public class AzureToken {
                     String.format("Kall mot Azure feilet med feilmelding=%s", error.getMessage()),
                     error);
         }
-
     }
 
+    private WebClient webClient() {
+        HttpClient httpClient = HttpClient.create();
+//        if (!isBlank(proxyHost)) {
+//            var proxyUri = URI.create(proxyHost);
+//            httpClient = httpClient
+//                    .proxy(proxy -> proxy
+//                            .type(ProxyProvider.Proxy.HTTP)
+//                            .host(proxyUri.getHost())
+//                            .port(proxyUri.getPort()));
+//        }
+
+        ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
+
+        return WebClient.builder()
+                .clientConnector(connector)
+                .build();
+    }
 }

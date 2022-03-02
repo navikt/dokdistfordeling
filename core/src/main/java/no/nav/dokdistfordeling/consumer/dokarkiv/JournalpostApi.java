@@ -44,7 +44,7 @@ public class JournalpostApi {
 	public void oppdaterDistribusjonsinfo(String journalpostId, OppdaterDistribusjonsinfoTo oppdaterDistibusjonsinfoTo) {
 
 		webClient.patch()
-				.uri(String.format("/%s/oppdaterDistribusjonsinfo", journalpostId))
+				.uri("/{journalpostId}/oppdaterDistribusjonsinfo", validateJournalpostId(journalpostId))
 				.header(NavHeaders.NAV_CALL_ID, MDC.get(Constants.CALL_ID))
 				.contentType(MediaType.APPLICATION_JSON)
 				.body(Mono.just(oppdaterDistibusjonsinfoTo), OppdaterDistribusjonsinfoTo.class)
@@ -66,6 +66,14 @@ public class JournalpostApi {
 					String.format("Kall mot JournalpostAPI feilet med feilmelding=%s", error.getMessage()),
 					error);
 		}
+	}
 
+	private Long validateJournalpostId(String journalpostId) {
+		try {
+			return Long.valueOf(journalpostId);
+		} catch (NumberFormatException e) {
+			throw new JournalpostApiTechnicalException(
+					String.format("%s er ikke en gyldig journalpostId. Kan ikke kalle journalpostApi.", journalpostId), e);
+		}
 	}
 }
