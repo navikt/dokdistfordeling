@@ -1,7 +1,5 @@
 package no.nav.dokdistfordeling.itest.config;
 
-import static org.mockito.Mockito.mock;
-
 import no.nav.dokdistfordeling.CoreConfig;
 import no.nav.dokdistfordeling.config.alias.ArkiverDokumentproduksjonV1Alias;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
@@ -20,6 +18,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.retry.annotation.EnableRetry;
 
+import static org.mockito.Mockito.mock;
+
 /**
  * @author Joakim Bjørnstad, Jbit AS
  */
@@ -37,7 +37,6 @@ import org.springframework.retry.annotation.EnableRetry;
 })
 @Import({
 		Qdist012JmsItestConfig.class,
-		STSTestConfig.class,
 		CoreConfig.class,
 		AzureToken.class,
 		JournalpostApi.class

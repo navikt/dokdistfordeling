@@ -1,7 +1,6 @@
 {
   "DOKUMENTTYPEINFO_V4_URL": "https://app.adeo.no/dokkat/rest/dokumenttypeinfo/v4",
   "ADMINISTRERFORSENDELSE_V1_URL": "https://app.adeo.no/dokdist/rest/v1/administrerforsendelse",
-  "SECURITYTOKENSERVICE_URL": "https://sts.adeo.no/SecurityTokenServiceProvider/",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.adeo.no/rest/v1/sts",
   "REGOPPSLAG_URL": "https://regoppslag.nais.adeo.no/rest",
   "DOKDISTFORDELING_CHANNEL_NAME": "P_DOKDISTFORDELING",
@@ -31,7 +30,7 @@
   "MAX_REPLICAS": "10",
   "INGRESSES": [
     "https://dokdistfordeling.nais.adeo.no",
-    "https://dokdistfordeling.prod-fss.nais.io",
+    "https://dokdistfordeling.prod-fss-pub.nais.io",
     "https://dokdistfordeling.intern.nav.no"
   ]
 }

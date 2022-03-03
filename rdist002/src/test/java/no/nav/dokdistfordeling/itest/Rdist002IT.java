@@ -297,10 +297,6 @@ public class Rdist002IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
 				.withBodyFile("regoppslag/treg002-hentadresse-person-happy.json")));
 
-		stubFor(get(urlMatching("/stsRest/samltoken")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
-				.withBodyFile("reststs/reststs-saml-happy.json")));
-
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
@@ -504,10 +500,6 @@ public class Rdist002IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
 				.withBody("")));
 
-		stubFor(get(urlMatching("/stsRest/samltoken")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
-				.withBodyFile("reststs/reststs-saml-happy.json")));
-
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 		assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -541,10 +533,6 @@ public class Rdist002IT {
 		stubFor(post(urlMatching("/regoppslag/hentMottakerOgAdresse")).willReturn(aResponse().withStatus(GONE.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
 				.withBody("")));
-
-		stubFor(get(urlMatching("/stsRest/samltoken")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
-				.withBodyFile("reststs/reststs-saml-happy.json")));
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);

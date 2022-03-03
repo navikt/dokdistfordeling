@@ -1,6 +1,0 @@
-{
-  "access_token": "DummyBase64EncodedSamlToken=",
-  "issued_token_type": "urn:ietf:params:oauth:token-type:saml2",
-  "token_type": "Bearer",
-  "expires_in": 3599
-}

@@ -57,7 +57,7 @@ class RegoppslagRestConsumer {
 	@Monitor(value = "dok_consumer", extraTags = {"process", "treg002HentAdresse"}, histogram = true)
 	@Retryable(include = RegoppslagHentAdresseTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	HentMottakerOgAdresseResponseTo.AdresseTo hentAdresse(HentMottakerOgAdresseRequestTo request) {
-		HttpEntity<HentMottakerOgAdresseRequestTo> entity = createRequestWithHeader(request, retrieveSamlTokenAndCreateHeader());
+		HttpEntity<HentMottakerOgAdresseRequestTo> entity = createRequestWithHeader(request, retrieveOidcTokenAndCreateHeader());
 		try {
 			return restTemplate.postForObject(this.regoppslagUrl + "/hentMottakerOgAdresse", entity, HentMottakerOgAdresseResponseTo.class)
 					.getAdresse();
@@ -79,17 +79,17 @@ class RegoppslagRestConsumer {
 		}
 	}
 
-	private HttpHeaders retrieveSamlTokenAndCreateHeader() {
+	private HttpHeaders retrieveOidcTokenAndCreateHeader() {
 		try {
-			String samlAssertionToken = stsRestConsumer.getSamlToken();
+			String oidcToken = stsRestConsumer.getOidcToken();
 			HttpHeaders httpHeaders = new HttpHeaders();
 			final String callId = MDC.get(Constants.CALL_ID);
 			httpHeaders.set(Constants.CALL_ID, callId);
 			httpHeaders.set(NavHeaders.NAV_CALL_ID, callId);
-			httpHeaders.set(HttpHeaders.AUTHORIZATION, "SAML " + samlAssertionToken);
+			httpHeaders.set(HttpHeaders.AUTHORIZATION, "Bearer " + oidcToken);
 			return httpHeaders;
 		} catch (StsTechnicalException e) {
-			throw new RegoppslagHentAdresseTechnicalException(format("Henting av samltoken fra STS feilet. Feilmelding=%s", e.getMessage()), e);
+			throw new RegoppslagHentAdresseTechnicalException(format("Henting av oidctoken fra STS feilet. Feilmelding=%s", e.getMessage()), e);
 		}
 	}
 
