@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling.consumer.dokarkiv;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.config.dokarkiv.JournalpostApiConfig;
 import no.nav.dokdistfordeling.constants.Constants;
 import no.nav.dokdistfordeling.consumer.NavHeaders;
 import no.nav.dokdistfordeling.exception.functional.JournalpostApiFunctionalException;
@@ -11,7 +10,7 @@ import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import no.nav.dokdistfordeling.security.AzureToken;
 import no.nav.dokdistfordeling.security.WebClientAzureAuthentication;
 import org.slf4j.MDC;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -29,11 +28,8 @@ public class JournalpostApi {
 	private final WebClient webClient;
 
 	public JournalpostApi(AzureToken azureToken,
-						  JournalpostApiConfig journalpostApiConfig,
-						  WebClient.Builder webClientBuilder) {
-		this.webClient = webClientBuilder
-				.baseUrl(journalpostApiConfig.getBaseUrl())
-				.build()
+						  @Qualifier("journalpostApiClient") WebClient webClient) {
+		this.webClient = webClient
 				.mutate()
 				.filter(new WebClientAzureAuthentication(azureToken))
 				.build();
@@ -46,7 +42,6 @@ public class JournalpostApi {
 		webClient.patch()
 				.uri("/{journalpostId}/oppdaterDistribusjonsinfo", validateJournalpostId(journalpostId))
 				.header(NavHeaders.NAV_CALL_ID, MDC.get(Constants.CALL_ID))
-				.contentType(MediaType.APPLICATION_JSON)
 				.body(Mono.just(oppdaterDistibusjonsinfoTo), OppdaterDistribusjonsinfoTo.class)
 				.retrieve()
 				.toBodilessEntity()

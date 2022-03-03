@@ -51,8 +51,6 @@ spec:
       value: {{ DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME }}
     - name: APPD_NAME
       value: {{ APPD_NAME }}
-    - name: AZURE_APP_TOKEN_URL
-      value: {{AZURE_APP_TOKEN_URL}}
     - name: AZURE_APP_SCOPE
       value: {{AZURE_APP_SCOPE}}
     - name: JOURNALPOST_API_BASE_URL
