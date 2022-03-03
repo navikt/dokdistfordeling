@@ -19,12 +19,15 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.transport.ProxyProvider;
 
+import java.net.URI;
 import java.util.Map;
 
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.AZURE_TOKEN_CACHE;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
 @Component
@@ -90,15 +93,17 @@ public class AzureToken {
     }
 
     private WebClient webClient() {
+
         HttpClient httpClient = HttpClient.create();
-//        if (!isBlank(proxyHost)) {
-//            var proxyUri = URI.create(proxyHost);
-//            httpClient = httpClient
-//                    .proxy(proxy -> proxy
-//                            .type(ProxyProvider.Proxy.HTTP)
-//                            .host(proxyUri.getHost())
-//                            .port(proxyUri.getPort()));
-//        }
+
+        if (!isBlank(proxyHost)) {
+            var proxyUri = URI.create(proxyHost);
+            httpClient = httpClient
+                    .proxy(proxy -> proxy
+                            .type(ProxyProvider.Proxy.HTTP)
+                            .host(proxyUri.getHost())
+                            .port(proxyUri.getPort()));
+        }
 
         ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
 
