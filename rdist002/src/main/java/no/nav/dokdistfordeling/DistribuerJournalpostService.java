@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 
 @Component
@@ -55,7 +56,8 @@ public class DistribuerJournalpostService {
 		rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost);
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
-		DistribusjonsKanalCode distribusjonsKanalCode = hentBestemDokdistKanal.bestemDistribusjonskanal(journalpost);
+		boolean harAdresse = nonNull(trimmetDistribuerJournalpostRequestTo.getAdresse());
+		DistribusjonsKanalCode distribusjonsKanalCode = hentBestemDokdistKanal.bestemDistribusjonskanal(journalpost, harAdresse);
 
 		DistribuerJournalpostRequestTo distribuerRequest = isNull(trimmetDistribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonsKanalCode) ?
 				hentDistribuerAdresseFraRegoppslag(trimmetDistribuerJournalpostRequestTo, journalpost) : trimmetDistribuerJournalpostRequestTo;

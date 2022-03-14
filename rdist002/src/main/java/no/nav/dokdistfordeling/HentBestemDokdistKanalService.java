@@ -5,6 +5,7 @@ import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDokdistka
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.DokDistKanalRequest;
 import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentForAktoerIdFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import javax.inject.Inject;
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType.UTL_ORG;
 import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 
 @Slf4j
 @Component
@@ -32,8 +34,18 @@ public class HentBestemDokdistKanalService {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 	}
 
-	public DistribusjonsKanalCode bestemDistribusjonskanal(Journalpost journalpost) {
-		String personnummer = hentIdent(journalpost.getBruker());
+	public DistribusjonsKanalCode bestemDistribusjonskanal(Journalpost journalpost, boolean harAdresse) {
+		String personnummer;
+		try {
+			personnummer = hentIdent(journalpost.getBruker());
+		} catch (PdlHentFolkeregisteridentForAktoerIdFunctionalException e) {
+			if (harAdresse) {
+				log.info("Returnerer PRINT som distribusjonskanal etter at mapping fra aktørid til fnr feilet for person med oppgitt adresse.");
+				return PRINT;
+			} else {
+				throw e;
+			}
+		}
 
 		DokDistKanalRequest request = DokDistKanalRequest.builder()
 				.dokumentTypeId(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID)
@@ -52,15 +64,11 @@ public class HentBestemDokdistKanalService {
 	}
 
 	private String getMottakerType(Journalpost.AvsenderMottaker avsenderMottaker) {
-		switch (avsenderMottaker.getType()) {
-			case FNR:
-				return PERSON;
-			case ORGNR:
-				return ORGANISASJON;
-			case UKJENT:
-				return SAMHANDLER_UTL_ORG;
-			default:
-				return SAMHANDLER_PREFIX + "_" + avsenderMottaker.getType();
-		}
+		return switch (avsenderMottaker.getType()) {
+			case FNR -> PERSON;
+			case ORGNR -> ORGANISASJON;
+			case UKJENT -> SAMHANDLER_UTL_ORG;
+			default -> SAMHANDLER_PREFIX + "_" + avsenderMottaker.getType();
+		};
 	}
 }
