@@ -31,5 +31,7 @@
       "arkivDokumentInfoId": "1234",
       "dokumenttypeId": "1111111"
     }
-  ]
+  ],
+  "distribusjonstype" : null,
+  "distribusjonstidspunkt" : null
 }
