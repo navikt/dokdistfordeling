@@ -51,6 +51,13 @@ spec:
       value: {{ DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME }}
     - name: APPD_NAME
       value: {{ APPD_NAME }}
+    - name: AZURE_APP_SCOPE
+      value: {{AZURE_APP_SCOPE}}
+    - name: JOURNALPOST_API_BASE_URL
+      value: {{JOURNALPOST_API_BASE_URL}}
+    - name: PROXY_HOST
+      value: {{ PROXY_HOST }}
+
   image: {{ image }}
   ingresses:
     {{#each INGRESSES}}
@@ -90,3 +97,6 @@ spec:
         mountPath: /var/run/secrets/nais.io/vault
       - kvPath: {{ APPDYNAMICS }}
         mountPath: /var/run/secrets/nais.io/appdynamics
+  azure:
+    application:
+      enabled: true

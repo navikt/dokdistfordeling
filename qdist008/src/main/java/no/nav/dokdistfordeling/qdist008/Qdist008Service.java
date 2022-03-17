@@ -1,12 +1,13 @@
 package no.nav.dokdistfordeling.qdist008;
 
 import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanal;
+import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
+import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterDistribusjonsinfoTo;
 import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseResponseTo;
 import no.nav.dokdistfordeling.consumer.tjoark110.ArkiverDokumentproduksjon;
-import no.nav.dokdistfordeling.consumer.tjoark110.SettJournalpostAttributterRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
@@ -24,7 +25,6 @@ import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DIST
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
-import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
 import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist008Metrics;
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
 import static org.apache.cxf.common.util.StringUtils.isEmpty;
@@ -40,6 +40,7 @@ public class Qdist008Service {
 	private final DokumentkatalogAdmin dokumentkatalogAdmin;
 	private final AdministrerForsendelse administrerForsendelse;
 	private final PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper;
+	private final JournalpostApi journalpostApi;
 
 	@Inject
 	public Qdist008Service(PdlGraphQLConsumer pdlGraphQLConsumer,
@@ -47,12 +48,14 @@ public class Qdist008Service {
 						   DokumentkatalogAdmin dokumentkatalogAdmin,
 						   BestemDistribusjonskanal bestemDistribusjonskanal,
 						   AdministrerForsendelse administrerForsendelse,
-						   PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper) {
+						   PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper,
+						   JournalpostApi journalpostApi) {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.arkiverDokumentproduksjon = arkiverDokumentproduksjon;
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.administrerForsendelse = administrerForsendelse;
 		this.persisterForsendelseToRequestMapper = persisterForsendelseToRequestMapper;
+		this.journalpostApi = journalpostApi;
 	}
 
 	@Handler
@@ -103,11 +106,13 @@ public class Qdist008Service {
 	private void updateArkivIfArkivsystemIsJoark(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling, DistribusjonsKanalCode distribusjonsKanal) {
 		final DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon = distribusjonbestilling.getArkivInformasjon();
 		if (arkivInformasjon != null && arkivInformasjon.getArkivSystem().equals(ArkivSystemCode.JOARK)) {
-			arkiverDokumentproduksjon.settJournalpostAttributter(SettJournalpostAttributterRequestTo.builder()
-							.journalpostId(arkivInformasjon.getArkivId())
-							.utsendingskanal(distribusjonsKanal.getJoarkUtsendingsKanal())
-							.build(),
-					SERVICE_ID);
+
+			journalpostApi.oppdaterDistribusjonsinfo(
+					arkivInformasjon.getArkivId(),
+					OppdaterDistribusjonsinfoTo.builder()
+							.settStatusEkspedert(false)
+							.utsendingsKanal(distribusjonsKanal.getJoarkUtsendingsKanal())
+							.build());
 		}
 	}
 

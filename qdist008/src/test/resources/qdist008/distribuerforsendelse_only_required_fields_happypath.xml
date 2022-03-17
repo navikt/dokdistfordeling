@@ -1,8 +1,8 @@
 <dok:distribuerForsendelse xmlns:dok="http://nav.no/melding/virksomhet/dokdistfordeling">
 	<distribusjonbestilling>
 		<bestillingsId>7882d37e-34f7-11e9-b210-d663bd873d93</bestillingsId>
-		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
 		<distribusjonKanal>PRINT</distribusjonKanal>
+		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
 		<tema>DAG</tema>
 		<mottaker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
 			<aktoerId>1000075457001</aktoerId>
@@ -12,6 +12,15 @@
 			<aktoerId>1000075457001</aktoerId>
 			<navn>Bjarne Betjent</navn>
 		</bruker>
+		<!--Optional: - DistrbusjonKanal PRINT må ha adresse -->
+		<adresse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:NorskPostadresse">
+			<adresselinje1>Adresslinje 1</adresselinje1>
+			<adresselinje2>Adresslinje 2</adresselinje2>
+			<adresselinje3>Adresslinje 3</adresselinje3>
+			<postnummer>0654</postnummer>
+			<poststed>Oslo</poststed>
+			<land>NO</land>
+		</adresse>
 		<dokumentProdApp>token</dokumentProdApp>
 		<dokumenter>
 			<dokumentInformasjon>
