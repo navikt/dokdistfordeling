@@ -1,6 +1,10 @@
 package no.nav.dokdistfordeling.storage;
 
-import com.amazonaws.util.json.Jackson;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import no.nav.dokdistfordeling.exception.technical.CouldNotSerializeObjectTechnicalException;
 
 /**
@@ -8,15 +12,28 @@ import no.nav.dokdistfordeling.exception.technical.CouldNotSerializeObjectTechni
  */
 public class JsonSerializer {
 
+	private static final ObjectMapper objectMapper = new ObjectMapper();
+
+	static {
+		objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	}
+
+	private static final ObjectWriter writer = objectMapper.writer();
+
 	public static String serialize(Object object) {
 		try {
-			return Jackson.toJsonString(object);
-		} catch (IllegalStateException e) {
+			return writer.writeValueAsString(object);
+		} catch (Exception e) {
 			throw new CouldNotSerializeObjectTechnicalException(e.getMessage(), e);
 		}
 	}
 
 	public static <T> T deserialize(String jsonPayload, Class<T> tClass) {
-		return Jackson.fromJsonString(jsonPayload, tClass);
+		try {
+			return objectMapper.readValue(jsonPayload, tClass);
+		} catch (JsonProcessingException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 }

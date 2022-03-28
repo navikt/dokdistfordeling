@@ -29,6 +29,10 @@
   "APP_NAME": "dokdistfordeling",
   "APPD_NAME": "dokdistfordeling",
   "NAMESPACE": "teamdokumenthandtering",
+  "DOKDISTMELLOMLAGER_PROJECTID": "teamdokumenthandteri-prod-a63b",
+  "DOKDISTMELLOMLAGER_BUCKET": "dokdistmellomlager-prod",
+  "DOKDISTMELLOMLAGER_KEYRING": "dokdistmellomlager-keyring",
+  "DOKDISTMELLOMLAGER_KEYID": "dokdistmellomlager-symmetric",
   "MIN_REPLICAS": "2",
   "MAX_REPLICAS": "10",
   "INGRESSES": [

@@ -1,17 +1,18 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import static java.lang.String.format;
-import static no.nav.dokdistfordeling.util.Qdist008Util.countHoveddokument;
-
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.OjectNotFoundInBucketFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
-import no.nav.dokdistfordeling.storage.Storage;
+import no.nav.dokdistfordeling.storage.BucketStorage;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
+
+import static java.lang.String.format;
+import static no.nav.dokdistfordeling.util.Qdist008Util.countHoveddokument;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -20,10 +21,10 @@ import java.util.UUID;
 @Component
 public class ForsendelseValidator {
 
-	private final Storage storage;
+	private final BucketStorage storage;
 	private static final String BDOK001_PREFIX = "BDOK100";
 
-	public ForsendelseValidator(Storage storage) {
+	public ForsendelseValidator(BucketStorage storage) {
 		this.storage = storage;
 	}
 
@@ -34,7 +35,7 @@ public class ForsendelseValidator {
 		assertThatAdresseIsPresentIfMottakerIsSamhandler(distribusjonbestillingTo);
 		assertThatBestillingsIdIsAValidUuid(distribusjonbestillingTo.getBestillingsId());
 
-		assertThatDocumentsAreAvailableInS3(distribusjonbestillingTo);
+		assertThatDocumentsAreAvailableInBucket(distribusjonbestillingTo);
 	}
 
 	private void assertThatForsendelseContainsExactlyOneHoveddokument(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
@@ -61,10 +62,13 @@ public class ForsendelseValidator {
 		}
 	}
 
-	private void assertThatDocumentsAreAvailableInS3(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
+	private void assertThatDocumentsAreAvailableInBucket(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
 		distribusjonbestillingTo.getDokumenter()
 				.forEach(dokumentInformasjonTo -> {
-					storage.get(dokumentInformasjonTo.getDokumentObjektReferanse());
+					String dokumentObjektReferanse = dokumentInformasjonTo.getDokumentObjektReferanse();
+					if (!storage.exists(dokumentObjektReferanse)) {
+						throw new OjectNotFoundInBucketFunctionalException(format("Fant ikke objectName i Google Cloud Storage. objectName=%s", dokumentObjektReferanse));
+					}
 				});
 	}
 }

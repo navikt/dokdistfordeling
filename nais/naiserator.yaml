@@ -57,7 +57,14 @@ spec:
       value: {{JOURNALPOST_API_BASE_URL}}
     - name: PROXY_HOST
       value: {{ PROXY_HOST }}
-
+    - name: DOKDISTMELLOMLAGER_PROJECTID
+      value: {{ DOKDISTMELLOMLAGER_PROJECTID }}
+    - name: DOKDISTMELLOMLAGER_BUCKET
+      value: {{ DOKDISTMELLOMLAGER_BUCKET }}
+    - name: DOKDISTMELLOMLAGER_KEYRING
+      value: {{ DOKDISTMELLOMLAGER_KEYRING }}
+    - name: DOKDISTMELLOMLAGER_KEYID
+      value: {{ DOKDISTMELLOMLAGER_KEYID }}
   image: {{ image }}
   ingresses:
     {{#each INGRESSES}}
