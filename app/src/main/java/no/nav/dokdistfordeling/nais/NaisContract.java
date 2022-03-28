@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.reactivex.Flowable;
 import io.reactivex.schedulers.Schedulers;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.nais.selftest.AbstractDependencyCheck;
 import no.nav.dokdistfordeling.nais.selftest.DependencyCheckResult;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+@Hidden
 @Slf4j
 @RestController
 public class NaisContract {

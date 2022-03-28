@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,40 +8,40 @@ import lombok.Value;
 
 @Value
 @Builder(toBuilder = true)
-@ApiModel(value = "DistribuerJournalpostRequestTo model")
+@Schema
 public class DistribuerJournalpostRequestTo {
-	@ApiModelProperty(name = "journalpostId", value = "Journalpost som skal distribueres", example = "343752389")
+	@Schema(name = "journalpostId", description = "Journalpost som skal distribueres", example = "343752389")
 	private final String journalpostId;
-	@ApiModelProperty(name = "batchId", value = "Identifiserer batch som forsendelsen inngår i. Lar bestiller identifisere forsendelser som hører sammen. Fritekst, og konsument må selv vurdere hva som er hensiktsmessige verdier", example = "54321", position = 1)
+	@Schema(name = "batchId", description = "Identifiserer batch som forsendelsen inngår i. Lar bestiller identifisere forsendelser som hører sammen. Fritekst, og konsument må selv vurdere hva som er hensiktsmessige verdier", example = "54321")
 	private final String batchId;
-	@ApiModelProperty(name = "bestillendeFagsystem", value = "Fagsystemet som bestiller distribusjon", example = "SYM", position = 2)
+	@Schema(name = "bestillendeFagsystem", description = "Fagsystemet som bestiller distribusjon", example = "SYM")
 	private final String bestillendeFagsystem;
-	@ApiModelProperty(name = "adresse", value = "Struktur for å beskrive postadresse. Inneholder enten norsk postadresse eller utenlandsk postadresse. Påkrevd hvis mottaker er samhandler, ellers skal dokdistsentralprint hente adresse fra fellesregistre hvis ikke satt", position = 3)
+	@Schema(name = "adresse", description = "Struktur for å beskrive postadresse. Inneholder enten norsk postadresse eller utenlandsk postadresse. Påkrevd hvis mottaker er samhandler, ellers skal dokdistsentralprint hente adresse fra fellesregistre hvis ikke satt")
 	private final AdresseTo adresse;
-	@ApiModelProperty(name = "dokumentProdApp", value = "Applikasjon som har produsert hoveddokumentet (for sporing og feilsøking)", example = "ELIN_STANDARD", position = 4)
+	@Schema(name = "dokumentProdApp", description = "Applikasjon som har produsert hoveddokumentet (for sporing og feilsøking)", example = "ELIN_STANDARD")
 	private final String dokumentProdApp;
-	@ApiModelProperty(name = "distribusjonstype", value = "Forteller dokumentdistribusjon hva slags dokument som distribueres. \"VEDTAK\", \"VIKTIG\" eller \"ANNET\"", example = "VEDTAK", position = 5)
+	@Schema(name = "distribusjonstype", description = "Forteller dokumentdistribusjon hva slags dokument som distribueres. \"VEDTAK\", \"VIKTIG\" eller \"ANNET\"", example = "VEDTAK")
 	private final String distribusjonstype;
-	@ApiModelProperty(name = "distribusjonstidspunkt", value = "Forteller dokumentdistribusjon når dokumentet kan distribueres. \"UMIDDELBART\" eller \"KJERNETID\"", example = "UMIDDELBART", position = 6)
+	@Schema(name = "distribusjonstidspunkt", description = "Forteller dokumentdistribusjon når dokumentet kan distribueres. \"UMIDDELBART\" eller \"KJERNETID\"", example = "UMIDDELBART")
 	private final String distribusjonstidspunkt;
 
 	@Builder
 	@Getter
 	@AllArgsConstructor
 	public static class AdresseTo {
-		@ApiModelProperty(name = "adressetype", value = "\"norskPostadresse\" eller \"utenlandskPostadresse\"", example = "norskPostadresse", position = 7)
+		@Schema(name = "adressetype", description = "\"norskPostadresse\" eller \"utenlandskPostadresse\"", example = "norskPostadresse")
 		private final String adressetype;
-		@ApiModelProperty(name = "postnummer", value = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "0505", position = 8)
+		@Schema(name = "postnummer", description = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "0505")
 		private final String postnummer;
-		@ApiModelProperty(name = "postnummer", value = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "Oslo", position = 9)
+		@Schema(name = "postnummer", description = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "Oslo")
 		private final String poststed;
-		@ApiModelProperty(name = "adresselinje1", value = "Påkrevd hvis adressetype = \"utenlandskPostadresse\"", example = "\"Eksempelveien 11B\"", position = 10)
+		@Schema(name = "adresselinje1", description = "Påkrevd hvis adressetype = \"utenlandskPostadresse\"", example = "\"Eksempelveien 11B\"")
 		private final String adresselinje1;
-		@ApiModelProperty(name = "adresselinje2", value = "Alternativ postadresse 2", example = "\"Eksempelveien 12B\"", position = 11)
+		@Schema(name = "adresselinje2", description = "Alternativ postadresse 2", example = "\"Eksempelveien 12B\"")
 		private final String adresselinje2;
-		@ApiModelProperty(name = "adresselinje3", value = "Alternativ postadresse 3", example = "\"Eksempelveien 13B\"", position = 12)
+		@Schema(name = "adresselinje3", description = "Alternativ postadresse 3", example = "\"Eksempelveien 13B\"")
 		private final String adresselinje3;
-		@ApiModelProperty(name = "land", value = "To-bokstavers landkode ihht iso3166-1 alfa-2", example = "NO", position = 13)
+		@Schema(name = "land", description = "To-bokstavers landkode ihht iso3166-1 alfa-2", example = "NO")
 		private final String land;
 	}
 }

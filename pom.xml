@@ -36,7 +36,7 @@
         <melding-virksomhet-dokdistfordeling.version>2.1.2</melding-virksomhet-dokdistfordeling.version>
         <arkiverdokumentproduksjon-tjenestespesifikasjon.version>3.4.1
         </arkiverdokumentproduksjon-tjenestespesifikasjon.version>
-        <io.springfox.version>3.0.0</io.springfox.version>
+        <springdoc-openapi-ui.version>1.6.6</springdoc-openapi-ui.version>
         <lombok.version>1.18.22</lombok.version>
         <jaxb2-basics-runtime.version>0.12.0</jaxb2-basics-runtime.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
@@ -81,13 +81,10 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.camel</groupId>
-                <artifactId>camel-jms</artifactId>
+                <artifactId>camel-bom</artifactId>
                 <version>${camel.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.camel</groupId>
-                <artifactId>camel-jaxb</artifactId>
-                <version>${camel.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.ibm.mq</groupId>
@@ -156,9 +153,9 @@
                 <version>${logstash-logback-encoder.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-boot-starter</artifactId>
-                <version>${io.springfox.version}</version>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc-openapi-ui.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.resilience4j</groupId>
