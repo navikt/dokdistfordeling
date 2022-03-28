@@ -33,7 +33,7 @@ public class DistribuerJournalpostRequestTo {
 		private final String adressetype;
 		@Schema(name = "postnummer", description = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "0505")
 		private final String postnummer;
-		@Schema(name = "postnummer", description = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "Oslo")
+		@Schema(name = "poststed", description = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "Oslo")
 		private final String poststed;
 		@Schema(name = "adresselinje1", description = "Påkrevd hvis adressetype = \"utenlandskPostadresse\"", example = "Eksempelveien 11B")
 		private final String adresselinje1;

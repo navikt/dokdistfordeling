@@ -24,7 +24,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
 
 /**
@@ -37,7 +37,7 @@ public class HentDokumentConsumer implements HentDokument {
 	private final RestTemplate restTemplate;
 	private final StsRestConsumer stsRestConsumer;
 
-	@Inject
+	@Autowired
 	public HentDokumentConsumer(@Value("${hentdokument.url}") String hentDokumentUrl,
 								RestTemplateBuilder restTemplateBuilder,
 								StsRestConsumer stsRestConsumer) {

@@ -12,7 +12,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
 
 /**
@@ -23,7 +23,7 @@ public class Tkat020Check extends AbstractDependencyCheck {
 
 	private final RestTemplate restTemplate;
 
-	@Inject
+	@Autowired
 	public Tkat020Check(MeterRegistry meterRegistry,
 						@Value("${DokumenttypeInfo_v4_url}") String dokumenttypeInfoV4Url,
 						RestTemplateBuilder restTemplateBuilder,

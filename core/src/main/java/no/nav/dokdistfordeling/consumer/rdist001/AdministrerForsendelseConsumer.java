@@ -28,7 +28,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
 
 /**
@@ -40,7 +40,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	private final String administrerforsendelseV1Url;
 	private final RestTemplate restTemplate;
 
-	@Inject
+	@Autowired
 	public AdministrerForsendelseConsumer(@Value("${administrerforsendelse.v1.url}") String administrerforsendelseV1Url,
 										  RestTemplateBuilder restTemplateBuilder,
 										  final ServiceuserAlias serviceuserAlias) {

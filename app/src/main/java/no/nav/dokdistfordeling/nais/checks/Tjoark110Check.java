@@ -10,7 +10,7 @@ import no.nav.dokdistfordeling.nais.selftest.Importance;
 import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.ArkiverDokumentproduksjonV1;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -20,7 +20,7 @@ public class Tjoark110Check extends AbstractDependencyCheck {
 
 	private final ArkiverDokumentproduksjonV1 arkiverDokumentproduksjonV1;
 
-	@Inject
+	@Autowired
 	public Tjoark110Check(MeterRegistry meterRegistry, ArkiverDokumentproduksjonV1 arkiverDokumentproduksjonV1, ArkiverDokumentproduksjonV1Alias arkiverDokumentproduksjonV1Alias) {
 		super(DependencyType.SOAP, "tjoark110", arkiverDokumentproduksjonV1Alias.getEndpointurl(), Importance.WARNING, meterRegistry);
 		this.arkiverDokumentproduksjonV1 = arkiverDokumentproduksjonV1;

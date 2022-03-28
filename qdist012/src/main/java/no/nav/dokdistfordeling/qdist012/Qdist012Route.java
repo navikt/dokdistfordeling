@@ -15,7 +15,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
 import java.nio.charset.StandardCharsets;
@@ -40,7 +40,7 @@ public class Qdist012Route extends RouteBuilder {
 	private final HentDokumenterFraJoarkDecrypter hentDokumenterFraJoarkDecrypter;
 
 
-	@Inject
+	@Autowired
 	public Qdist012Route(Queue qdist012,
 						 Queue qdist012FunksjonellFeil,
 						 Queue qdist008,

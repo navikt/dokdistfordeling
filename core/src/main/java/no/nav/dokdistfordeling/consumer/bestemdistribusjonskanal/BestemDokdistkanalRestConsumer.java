@@ -28,7 +28,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
 
 @Component
@@ -38,7 +38,7 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 
 	private final String bestemDokdistKanalUrl;
 
-	@Inject
+	@Autowired
 	public BestemDokdistkanalRestConsumer(RestTemplateBuilder restTemplateBuilder,
 										  final ServiceuserAlias serviceuserAlias,
 										  @Value("${bestemdistribusjonkanal_url}") String bestemDistKanalUrl) {

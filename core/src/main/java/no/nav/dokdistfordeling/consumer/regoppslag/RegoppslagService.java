@@ -4,7 +4,7 @@ import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseReque
 import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseResponseTo;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Joakim Bjørnstad, Jbit AS
@@ -16,7 +16,7 @@ class RegoppslagService implements Regoppslag {
 
     private final RegoppslagRestConsumer regoppslagRestConsumer;
 
-    @Inject
+    @Autowired
     RegoppslagService(RegoppslagRestConsumer regoppslagRestConsumer) {
         this.regoppslagRestConsumer = regoppslagRestConsumer;
     }

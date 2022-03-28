@@ -9,7 +9,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Component
 public class MetricUpdater {
@@ -24,7 +24,7 @@ public class MetricUpdater {
 
 	private static MeterRegistry meterRegistry;
 
-	@Inject
+	@Autowired
 	public MetricUpdater(MeterRegistry meterRegistry) {
 		MetricUpdater.meterRegistry = meterRegistry;
 	}

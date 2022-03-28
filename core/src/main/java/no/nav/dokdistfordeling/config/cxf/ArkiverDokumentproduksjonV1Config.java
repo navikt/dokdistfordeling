@@ -11,7 +11,7 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +29,7 @@ public class ArkiverDokumentproduksjonV1Config extends AbstractCxfEndpointConfig
 
 	private static final String WSDL_URL = "wsdl/no/nav/tjeneste/domene/brevogarkiv/arkiverdokumentproduksjon/v1/arkiverdokumentproduksjon.wsdl";
 
-	@Inject
+	@Autowired
 	public ArkiverDokumentproduksjonV1Config(Bus bus) {
 		super(bus);
 	}
