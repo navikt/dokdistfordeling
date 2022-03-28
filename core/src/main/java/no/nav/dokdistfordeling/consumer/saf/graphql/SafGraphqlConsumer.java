@@ -31,7 +31,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
 
 @Component
@@ -42,7 +42,7 @@ public class SafGraphqlConsumer {
 	private final RestTemplate restTemplate;
 	private final String graphQLurl;
 
-	@Inject
+	@Autowired
 	public SafGraphqlConsumer(RestTemplateBuilder restTemplateBuilder,
 							  @Value("${saf.graphql.url}") String graphQLurl) {
 		this.restTemplate = restTemplateBuilder

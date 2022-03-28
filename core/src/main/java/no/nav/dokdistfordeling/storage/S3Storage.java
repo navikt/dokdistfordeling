@@ -13,14 +13,14 @@ import no.nav.dokdistfordeling.exception.technical.S3FailedToPutDocumentTechnica
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 public class S3Storage implements Storage {
 
 	private AmazonS3 s3WithStrictEncryption;
 
-	@Inject
+	@Autowired
 	public S3Storage(AmazonS3 s3Encryption) {
 		this.s3WithStrictEncryption = s3Encryption;
 	}

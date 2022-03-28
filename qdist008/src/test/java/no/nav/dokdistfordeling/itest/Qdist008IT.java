@@ -20,7 +20,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.jms.Queue;
 import javax.jms.TextMessage;
 import javax.xml.bind.JAXBElement;
@@ -76,34 +76,34 @@ public class Qdist008IT {
 	private static final String FORSENDELSE_ID = "33333";
 	private static final String DOKUMENTTYPE_ID = "1111111";
 
-	@Inject
+	@Autowired
 	private JmsTemplate jmsTemplate;
 
-	@Inject
+	@Autowired
 	private Queue qdist008;
 
-	@Inject
+	@Autowired
 	private Queue qdist008FunksjonellFeil;
 
-	@Inject
+	@Autowired
 	private Queue qdist009;
 
-	@Inject
+	@Autowired
 	private Queue qdist010;
 
-	@Inject
+	@Autowired
 	private Queue qdist011;
 
-	@Inject
+	@Autowired
 	private Queue qdist013;
 
-	@Inject
+	@Autowired
 	private Queue backoutQueue;
 
-	@Inject
+	@Autowired
 	private AmazonS3 amazonS3;
 
-	@Inject
+	@Autowired
 	public CacheManager cacheManager;
 
 

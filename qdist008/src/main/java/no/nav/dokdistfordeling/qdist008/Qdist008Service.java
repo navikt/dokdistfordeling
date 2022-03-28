@@ -19,7 +19,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DISTRIBUSJON;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
@@ -42,7 +42,7 @@ public class Qdist008Service {
 	private final PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper;
 	private final JournalpostApi journalpostApi;
 
-	@Inject
+	@Autowired
 	public Qdist008Service(PdlGraphQLConsumer pdlGraphQLConsumer,
 						   ArkiverDokumentproduksjon arkiverDokumentproduksjon,
 						   DokumentkatalogAdmin dokumentkatalogAdmin,

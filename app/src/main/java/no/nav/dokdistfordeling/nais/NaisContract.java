@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.reactivex.Flowable;
 import io.reactivex.schedulers.Schedulers;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.nais.selftest.AbstractDependencyCheck;
 import no.nav.dokdistfordeling.nais.selftest.DependencyCheckResult;
@@ -19,12 +20,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+@Hidden
 @Slf4j
 @RestController
 public class NaisContract {
@@ -39,7 +41,7 @@ public class NaisContract {
 
 	private AtomicInteger app_status = new AtomicInteger();
 
-	@Inject
+	@Autowired
 	public NaisContract(List<AbstractDependencyCheck> dependencyCheckList, MeterRegistry registry, @Value("${APP_NAME:dokdistfordeling}") String appName, @Value("${APP_VERSION:0}") String version) {
 		this.dependencyCheckList = new ArrayList<>(dependencyCheckList);
 		Gauge.builder("dok_app_is_ready", app_status, AtomicInteger::get).register(registry);

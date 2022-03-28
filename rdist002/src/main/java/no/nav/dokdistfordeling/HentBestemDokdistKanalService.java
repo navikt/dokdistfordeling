@@ -9,7 +9,7 @@ import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentFor
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType.UTL_ORG;
@@ -28,7 +28,7 @@ public class HentBestemDokdistKanalService {
 	private final BestemDokdistkanalRestConsumer bestemDokdistkanal;
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 
-	@Inject
+	@Autowired
 	public HentBestemDokdistKanalService(BestemDokdistkanalRestConsumer bestemDokdistkanalRestConsumer, PdlGraphQLConsumer pdlGraphQLConsumer) {
 		this.bestemDokdistkanal = bestemDokdistkanalRestConsumer;
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;

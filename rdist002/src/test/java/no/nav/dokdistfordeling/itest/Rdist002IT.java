@@ -34,7 +34,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Queue;
@@ -113,13 +113,13 @@ public class Rdist002IT {
 	private static final String MOTTAKER_ID = "09876543210";
 	private static final String MOTTAKER_NAVN = "Jan Neimansen";
 	private static final String BRUKER_ID = "12345678901";
-	@Inject
+	@Autowired
 	protected TestRestTemplate restTemplate;
 	private @Value("${hentdokumenter_fra_joark_crypto_password}")
 	String encryptionPassphrase;
-	@Inject
+	@Autowired
 	private JmsTemplate jmsTemplate;
-	@Inject
+	@Autowired
 	private Queue qdist012;
 
 	@BeforeEach

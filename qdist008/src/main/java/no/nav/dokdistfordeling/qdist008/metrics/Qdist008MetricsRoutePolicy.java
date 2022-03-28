@@ -16,7 +16,7 @@ import org.apache.camel.ValidationException;
 import org.apache.camel.support.RoutePolicySupport;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Ugur Alpay Cenar, Visma Consulting.
@@ -32,7 +32,7 @@ public class Qdist008MetricsRoutePolicy extends RoutePolicySupport {
 	private static final String QDIST008_PROCESS_TIMER_DESCRIPTION = "prosesseringstid for kall inn til qdist008";
 	private static final String QDIST008_START = "Qdist008_start";
 
-	@Inject
+	@Autowired
 	public Qdist008MetricsRoutePolicy(MeterRegistry registry) {
 		this.registry = registry;
 	}

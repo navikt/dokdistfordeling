@@ -8,7 +8,7 @@ import no.nav.dokdistfordeling.nais.selftest.Importance;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 
@@ -18,7 +18,7 @@ public class Qdist008QueueCheck extends AbstractDependencyCheck {
 	private final Queue qdist008;
 	private final JmsTemplate jmsTemplate;
 
-	@Inject
+	@Autowired
 	public Qdist008QueueCheck(MeterRegistry registry, Queue qdist008, JmsTemplate jmsTemplate) throws JMSException {
 		super(DependencyType.QUEUE, "Qdist008Queue", qdist008.getQueueName(), Importance.CRITICAL, registry);
 		this.qdist008 = qdist008;

@@ -27,7 +27,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.TextMessage;
@@ -83,22 +83,22 @@ public class Qdist012IT {
 	private static String JOURNALPOST_ID = "arkivId";
 	private static String JOURNALPOST_ID_ATTRIBUTE = "journalpostId";
 
-	@Inject
+	@Autowired
 	private JmsTemplate jmsTemplate;
 
-	@Inject
+	@Autowired
 	private Queue qdist008;
 
-	@Inject
+	@Autowired
 	private Queue qdist012FunksjonellFeil;
 
-	@Inject
+	@Autowired
 	private Queue qdist012;
 
-	@Inject
+	@Autowired
 	private Queue backoutQueue;
 
-	@Inject
+	@Autowired
 	private Storage awsStorage;
 
 	@Value("${hentdokumenter_fra_joark_crypto_password}")

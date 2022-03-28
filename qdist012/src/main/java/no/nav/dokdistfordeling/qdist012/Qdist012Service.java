@@ -12,9 +12,9 @@ import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.dokdistfordeling.storage.Storage;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import org.apache.camel.Handler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -38,7 +38,7 @@ public class Qdist012Service {
 	private final StsRestConsumer stsRestConsumer;
 
 
-	@Inject
+	@Autowired
 	public Qdist012Service(HentDokument hentDokument,
 						   Storage storage,
 						   Qdist008DistribuerForsendelseMapper qdist008DistribuerForsendelseMapper,

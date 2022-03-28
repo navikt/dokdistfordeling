@@ -1,10 +1,8 @@
 package no.nav.dokdistfordeling;
 
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.DokkatGetDokumenttypeInfoFunctionalException;
@@ -15,7 +13,7 @@ import no.nav.dokdistfordeling.exception.functional.UkjentAdresseException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostIkkeFunnetTechnicalException;
 import no.nav.dokdistfordeling.metrics.Monitor;
-import no.nav.dokdistfordeling.swagger.SwaggerRestDistribuerJournalpost;
+import no.nav.dokdistfordeling.springdoc.SwaggerRestDistribuerJournalpost;
 import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -33,24 +31,23 @@ import static org.springframework.http.HttpStatus.GONE;
 
 @RestController
 @RequestMapping("rest/v1/")
-@Api(tags = "distribuerJournalpost API", description = "Tilbyr distribusjon av journalposter")
+@Tag(name="distribuerJournalpost API", description = "Tilbyr distribusjon av journalposter")
 @Slf4j
 public class DistribuerJournalpostController {
 
-	private DistribuerJournalpostService distribuerJournalpostService;
+	private final DistribuerJournalpostService distribuerJournalpostService;
 
 	public DistribuerJournalpostController(DistribuerJournalpostService distribuerJournalpostService) {
 		this.distribuerJournalpostService = distribuerJournalpostService;
 	}
 
-	@ApiOperation(value = "Bestiller distribusjon av en journalpost.", authorizations = {@Authorization(value = "apiKey")})
 	@SwaggerRestDistribuerJournalpost
 	@PostMapping(value = "/distribuerjournalpost")
 	@Monitor(value = "dok_metric", process = "rdist002", extraTags = {"process", "rdist002"}, histogram = true)
 	public ResponseEntity<DistribuerJournalpostResponseTo> distribuerJournalpost(@RequestBody DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
-																				 @ApiParam(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader,
-																				 @ApiParam(value = "Nav-CallId - teknisk sporingsid") @RequestHeader(value = "Nav-CallId", required = false) String navCallId,
-																				 @ApiParam(value = "Nav-Consumer-Id - teknisk sporingsinfo om konsument") @RequestHeader(value = "Nav-Consumer-Id", required = false) String navConsumerId) {
+																				 @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader,
+																				 @Parameter(description = "Nav-CallId - teknisk sporingsid") @RequestHeader(value = "Nav-CallId", required = false) String navCallId,
+																				 @Parameter(description = "Nav-Consumer-Id - teknisk sporingsinfo om konsument") @RequestHeader(value = "Nav-Consumer-Id", required = false) String navConsumerId) {
 		addCallIdToMDC(navCallId);
 		addConsumerIdToMDC(navConsumerId);
 		log.info("rdist002 har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());

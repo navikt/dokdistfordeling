@@ -21,7 +21,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
 
 /**
@@ -34,7 +34,7 @@ class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 	private final String dokumenttypeInfoV4Url;
 	private final RestTemplate restTemplate;
 
-	@Inject
+	@Autowired
 	public DokumentkatalogAdminConsumer(@Value("${DokumenttypeInfo_v4_url}") String dokumenttypeInfoV4Url,
 										RestTemplateBuilder restTemplateBuilder,
 										final ServiceuserAlias serviceuserAlias) {

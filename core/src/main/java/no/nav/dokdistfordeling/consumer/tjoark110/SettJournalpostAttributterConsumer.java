@@ -13,7 +13,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -22,7 +22,7 @@ import javax.inject.Inject;
 public class SettJournalpostAttributterConsumer implements ArkiverDokumentproduksjon {
 	private final ArkiverDokumentproduksjonV1 arkiverDokumentproduksjonV1;
 
-	@Inject
+	@Autowired
 	public SettJournalpostAttributterConsumer(ArkiverDokumentproduksjonV1 arkiverDokumentproduksjonV1) {
 		this.arkiverDokumentproduksjonV1 = arkiverDokumentproduksjonV1;
 	}
