@@ -35,11 +35,11 @@ public class DistribuerJournalpostRequestTo {
 		private final String postnummer;
 		@Schema(name = "postnummer", description = "Påkrevd hvis adressetype = \"norskPostadresse\"", example = "Oslo")
 		private final String poststed;
-		@Schema(name = "adresselinje1", description = "Påkrevd hvis adressetype = \"utenlandskPostadresse\"", example = "\"Eksempelveien 11B\"")
+		@Schema(name = "adresselinje1", description = "Påkrevd hvis adressetype = \"utenlandskPostadresse\"", example = "Eksempelveien 11B")
 		private final String adresselinje1;
-		@Schema(name = "adresselinje2", description = "Alternativ postadresse 2", example = "\"Eksempelveien 12B\"")
+		@Schema(name = "adresselinje2", description = "Alternativ postadresse 2", example = "Bolignummer H0101")
 		private final String adresselinje2;
-		@Schema(name = "adresselinje3", description = "Alternativ postadresse 3", example = "\"Eksempelveien 13B\"")
+		@Schema(name = "adresselinje3", description = "Alternativ postadresse 3", example = "Adresselinje3")
 		private final String adresselinje3;
 		@Schema(name = "land", description = "To-bokstavers landkode ihht iso3166-1 alfa-2", example = "NO")
 		private final String land;
