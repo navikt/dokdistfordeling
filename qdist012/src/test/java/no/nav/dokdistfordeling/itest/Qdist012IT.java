@@ -378,7 +378,7 @@ public class Qdist012IT {
 	}
 
 	@Test
-	public void shouldThrowS3TechnicalException() throws Exception {
+	public void shouldThrowBucketTechnicalException() throws Exception {
 		doThrow(new FailedBucketUploadTechnicalException("Feilet ved persistering av dokument til S3")).when(bucketStorage)
 				.upload(any(), any(), eq(BESTILLINGS_ID));
 		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
@@ -400,7 +400,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
-		Mockito.verify(bucketStorage, times(1)).upload(any(), any(), eq(BESTILLINGS_ID));
+		Mockito.verify(bucketStorage, times(1)).upload(any(), any(), any());
 		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
@@ -421,7 +421,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(MAX_ATTEMPTS_SHORT), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), postRequestedFor(urlEqualTo("/safGraphQL")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
@@ -444,7 +444,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(MAX_ATTEMPTS_SHORT), postRequestedFor(urlEqualTo("/safGraphQL")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
@@ -467,7 +467,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
@@ -493,7 +493,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(MAX_ATTEMPTS_SHORT + 1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
 		verify(exactly(MAX_ATTEMPTS_SHORT), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
@@ -519,7 +519,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
@@ -527,7 +527,7 @@ public class Qdist012IT {
 	}
 
 	private void encryptAndSendStringMessageWithHeaders(Queue queue, final String message) {
-		encryptAndSendStringMessageWithHeaders(queue, message, eq(BESTILLINGS_ID));
+		encryptAndSendStringMessageWithHeaders(queue, message, null);
 	}
 
 	private void encryptAndSendStringMessageWithHeaders(Queue queue, final String message, final String callId) {
