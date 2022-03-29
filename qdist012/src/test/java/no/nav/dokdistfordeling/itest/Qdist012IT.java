@@ -58,6 +58,7 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -147,7 +148,7 @@ public class Qdist012IT {
 			//verifiser at riktige objekt lagres til bucket
 			DistribuerForsendelse unmarshaledResponse = unmarshalDistribuerForsendelseFromXmlString(response);
 			Mockito.verify(bucketStorage, times(2))
-					.upload(argCaptorDokumentObjektReferanse.capture(), argCaptorDokdistDokument.capture());
+					.upload(argCaptorDokumentObjektReferanse.capture(), argCaptorDokdistDokument.capture(), eq(BESTILLINGS_ID));
 
 			DokdistDokument dokdistDokument1 = JsonSerializer.deserialize(argCaptorDokdistDokument.getAllValues()
 					.get(0), DokdistDokument.class);
@@ -208,7 +209,7 @@ public class Qdist012IT {
 			//verifiser at riktige objekt lagres til bucket
 			DistribuerForsendelse unmarshaledResponse = unmarshalDistribuerForsendelseFromXmlString(response);
 			Mockito.verify(bucketStorage, times(3))
-					.upload(argCaptorDokumentObjektReferanse.capture(), argCaptorDokdistDokument.capture());
+					.upload(argCaptorDokumentObjektReferanse.capture(), argCaptorDokdistDokument.capture(), eq(BESTILLINGS_ID));
 
 			DokdistDokument dokdistDokument1 = JsonSerializer.deserialize(argCaptorDokdistDokument.getAllValues()
 					.get(0), DokdistDokument.class);
@@ -253,7 +254,7 @@ public class Qdist012IT {
 			assertEquals(message, decryptXml(responseTextMessage.getText()));
 			assertEquals(JOURNALPOST_ID, responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any());
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -278,7 +279,7 @@ public class Qdist012IT {
 			assertEquals("", responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE));
 			assertEquals(JOURNALPOST_ID, responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any());
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -300,7 +301,7 @@ public class Qdist012IT {
 			assertEquals(message, decryptXml(responseTextMessage.getText()));
 			assertEquals(BESTILLINGS_ID, responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any());
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -325,7 +326,7 @@ public class Qdist012IT {
 			assertEquals(BESTILLINGS_ID, responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE));
 			assertEquals("", responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any());
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -348,7 +349,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, new Crypto(encryptionPassphrase, "thisKeyShouldBeBestillingsId").decrypt(response));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any());
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -370,7 +371,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, response);
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any());
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -379,7 +380,7 @@ public class Qdist012IT {
 	@Test
 	public void shouldThrowS3TechnicalException() throws Exception {
 		doThrow(new FailedBucketUploadTechnicalException("Feilet ved persistering av dokument til S3")).when(bucketStorage)
-				.upload(any(), any());
+				.upload(any(), any(), eq(BESTILLINGS_ID));
 		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
@@ -399,7 +400,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
-		Mockito.verify(bucketStorage, times(1)).upload(any(), any());
+		Mockito.verify(bucketStorage, times(1)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
@@ -420,7 +421,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any());
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(MAX_ATTEMPTS_SHORT), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(0), postRequestedFor(urlEqualTo("/safGraphQL")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
@@ -443,7 +444,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any());
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(MAX_ATTEMPTS_SHORT), postRequestedFor(urlEqualTo("/safGraphQL")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
@@ -466,7 +467,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any());
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
@@ -492,7 +493,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any());
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(MAX_ATTEMPTS_SHORT + 1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
 		verify(exactly(MAX_ATTEMPTS_SHORT), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
@@ -518,7 +519,7 @@ public class Qdist012IT {
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
-		Mockito.verify(bucketStorage, times(0)).upload(any(), any());
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
@@ -526,7 +527,7 @@ public class Qdist012IT {
 	}
 
 	private void encryptAndSendStringMessageWithHeaders(Queue queue, final String message) {
-		encryptAndSendStringMessageWithHeaders(queue, message, null);
+		encryptAndSendStringMessageWithHeaders(queue, message, eq(BESTILLINGS_ID));
 	}
 
 	private void encryptAndSendStringMessageWithHeaders(Queue queue, final String message, final String callId) {

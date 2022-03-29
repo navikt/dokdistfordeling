@@ -34,7 +34,7 @@ public class Qdist012Service {
 	private final HentDokument hentDokument;
 	private final BucketStorage bucketStorage;
 	private final Qdist008DistribuerForsendelseMapper qdist008DistribuerForsendelseMapper;
-	private SafJournalpostQueryService safJournalpostQueryService;
+	private final SafJournalpostQueryService safJournalpostQueryService;
 	private final StsRestConsumer stsRestConsumer;
 
 
@@ -53,19 +53,18 @@ public class Qdist012Service {
 
 	@Handler
 	public DistribuerForsendelse copyDocumentsFromJoarkToDokdistmellomlagerBucketStorage(HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo) {
-		HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
+		final HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
 		final String arkivId = distribusjonbestilling.getArkivInformasjon().getArkivId();
 
 		// tilknyttVedlegg legger til vedlegg etter at dokprod forsendelse er opprettet, så legg på evt. manglende vedlegg her
 		addMissingVedlegg(arkivId, hentDokumenterFraJoarkTo);
-
 		distribusjonbestilling.getDokumenter()
 				.forEach(dokumentInformasjonTo -> {
 					HentDokumentResponseTo hentDokumentResponseTo = hentDokument.hentDokument(arkivId, dokumentInformasjonTo.getArkivDokumentInfoId(),
 							dokumentInformasjonTo.getVariantFormat());
 					final String dokumentObjektReferanse = UUID.randomUUID().toString();
 					dokumentInformasjonTo.setDokumentObjektReferanse(dokumentObjektReferanse);
-					bucketStorage.upload(dokumentObjektReferanse, buildAndSerializeDokdistDokument(hentDokumentResponseTo.getDokument()));
+					bucketStorage.upload(dokumentObjektReferanse, buildAndSerializeDokdistDokument(hentDokumentResponseTo.getDokument()), distribusjonbestilling.getBestillingsId());
 				});
 
 		return qdist008DistribuerForsendelseMapper.map(hentDokumenterFraJoarkTo);

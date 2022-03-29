@@ -22,7 +22,6 @@ import static java.lang.String.format;
 @Slf4j
 public class GoogleCloudBucketStorage implements BucketStorage {
 
-	private static final byte[] ASSOCIATED_DATA = "dokdistmellomlager".getBytes();
 	private final String bucket;
 	private final Storage storage;
 	private final Aead aead;
@@ -36,9 +35,9 @@ public class GoogleCloudBucketStorage implements BucketStorage {
 	}
 
 	@Override
-	public void upload(String objectName, String payload) {
+	public void upload(String objectName, String payload, String associatedData) {
 		try {
-			byte[] encryptedValue = aead.encrypt(payload.getBytes(), ASSOCIATED_DATA);
+			byte[] encryptedValue = aead.encrypt(payload.getBytes(), associatedData.getBytes());
 			BlobId blobId = BlobId.of(bucket, objectName);
 			BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
 			storage.createFrom(blobInfo, new ByteArrayInputStream(encryptedValue));
