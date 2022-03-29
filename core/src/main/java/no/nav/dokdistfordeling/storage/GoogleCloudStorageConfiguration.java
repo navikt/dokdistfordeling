@@ -12,6 +12,8 @@ import com.google.crypto.tink.aead.KmsEnvelopeAeadKeyManager;
 import com.google.crypto.tink.integration.gcpkms.GcpKmsClient;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistmellomlagerProperties;
+import org.apache.http.HttpHost;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -19,6 +21,7 @@ import org.springframework.context.annotation.Profile;
 
 import java.util.Optional;
 
+import static com.google.api.client.http.apache.v2.ApacheHttpTransport.newDefaultHttpClientBuilder;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
@@ -31,7 +34,8 @@ public class GoogleCloudStorageConfiguration {
 	@Bean
 	@Lazy
 	public BucketStorage storage(
-			DokdistmellomlagerProperties dokdistmellomlagerProperties
+			DokdistmellomlagerProperties dokdistmellomlagerProperties,
+			@Value("${proxy.host}") String proxyHost
 	) throws Exception {
 		final String kekUri = dokdistmellomlagerProperties.gcpKekUri();
 
@@ -46,7 +50,9 @@ public class GoogleCloudStorageConfiguration {
 				.setTransportOptions(StorageOptions.getDefaultHttpTransportOptions().toBuilder()
 						.setConnectTimeout((int) SECONDS.toMillis(5))
 						.setReadTimeout((int) SECONDS.toMillis(20))
-						.setHttpTransportFactory(ApacheHttpTransport::new)
+						.setHttpTransportFactory(() -> new ApacheHttpTransport(newDefaultHttpClientBuilder()
+								.setProxy(HttpHost.create(proxyHost))
+								.build()))
 						.build())
 				.build().getService();
 		return new GoogleCloudBucketStorage(dokdistmellomlagerProperties.getBucket(), storage, aead);
