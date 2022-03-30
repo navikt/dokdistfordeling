@@ -34,8 +34,7 @@ public class GoogleCloudStorageConfiguration {
 	@Bean
 	@Lazy
 	public BucketStorage storage(
-			DokdistmellomlagerProperties dokdistmellomlagerProperties,
-			@Value("${proxy.host}") String proxyHost
+			DokdistmellomlagerProperties dokdistmellomlagerProperties
 	) throws Exception {
 		final String kekUri = dokdistmellomlagerProperties.gcpKekUri();
 
@@ -51,7 +50,6 @@ public class GoogleCloudStorageConfiguration {
 						.setConnectTimeout((int) SECONDS.toMillis(5))
 						.setReadTimeout((int) SECONDS.toMillis(20))
 						.setHttpTransportFactory(() -> new ApacheHttpTransport(newDefaultHttpClientBuilder()
-								.setProxy(HttpHost.create(proxyHost))
 								.build()))
 						.build())
 				.build().getService();

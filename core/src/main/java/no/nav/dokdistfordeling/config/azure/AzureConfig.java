@@ -32,20 +32,8 @@ public class AzureConfig {
     private String appClientSecret;
 
     @Bean("azureClient")
-    public WebClient webClient(WebClient.Builder webClientBuilder,
-                               @Value("${proxy.host:#{null}}") String proxyHost) {
-
-        HttpClient httpClient = HttpClient.create();
-
-        if (!isBlank(proxyHost)) {
-            var proxyUri = URI.create(proxyHost);
-            httpClient = httpClient
-                    .proxy(proxy -> proxy
-                            .type(ProxyProvider.Proxy.HTTP)
-                            .host(proxyUri.getHost())
-                            .port(proxyUri.getPort()));
-        }
-
+    public WebClient webClient(WebClient.Builder webClientBuilder) {
+        HttpClient httpClient = HttpClient.create().proxyWithSystemProperties();
         return webClientBuilder
                 .clone()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
