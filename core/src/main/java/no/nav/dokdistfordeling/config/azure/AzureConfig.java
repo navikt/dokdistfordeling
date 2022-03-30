@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling.config.azure;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
@@ -10,12 +9,8 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
-import reactor.netty.transport.ProxyProvider;
 
 import javax.validation.constraints.NotEmpty;
-import java.net.URI;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Data
 @ConfigurationProperties("azure")

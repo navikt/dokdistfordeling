@@ -23,7 +23,6 @@
   "ARKIVERDOKUMENTPRODUKSJON_V1_ENDPOINTURL": "https://dokarkiv.intern.nav.no/services/arkiverdokumentproduksjon/v1",
   "JOURNALPOST_API_BASE_URL": "https://dokarkiv.intern.nav.no/rest/journalpostapi/v1/journalpost",
   "AZURE_APP_SCOPE": "api://prod-fss.teamdokumenthandtering.dokarkiv/.default",
-  "PROXY_HOST": "http://webproxy.nais:8088",
   "VAULT": "/kv/prod/fss/dokdistfordeling/default",
   "APPDYNAMICS": "/apikey/appdynamics/prod",
   "APP_NAME": "dokdistfordeling",
