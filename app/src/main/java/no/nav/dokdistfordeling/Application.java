@@ -5,6 +5,7 @@ import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
 import no.nav.dokdistfordeling.config.azure.AzureConfig;
 import no.nav.dokdistfordeling.config.dokarkiv.JournalpostApiConfig;
+import no.nav.dokdistfordeling.config.props.DokdistmellomlagerProperties;
 import no.nav.dokdistfordeling.config.props.PdlProperties;
 import no.nav.dokdistfordeling.config.props.SrvAppserverProperties;
 import no.nav.dokdistfordeling.security.AzureToken;
@@ -25,7 +26,8 @@ import org.springframework.retry.annotation.EnableRetry;
 		SrvAppserverProperties.class,
 		PdlProperties.class,
 		AzureConfig.class,
-		JournalpostApiConfig.class
+		JournalpostApiConfig.class,
+		DokdistmellomlagerProperties.class
 })
 @Import({
 		CoreConfig.class,

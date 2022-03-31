@@ -10,7 +10,7 @@ import no.nav.dokdistfordeling.config.props.PdlProperties;
 import no.nav.dokdistfordeling.config.props.SrvAppserverProperties;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.security.AzureToken;
-import no.nav.dokdistfordeling.storage.Storage;
+import no.nav.dokdistfordeling.storage.BucketStorage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,8 +44,8 @@ import static org.mockito.Mockito.mock;
 public class Qdist012TestConfig {
 
 	@Bean
-	public Storage awsStorage() {
-		return mock(Storage.class);
+	public BucketStorage bucketStorage() {
+		return mock(BucketStorage.class);
 	}
 }
 

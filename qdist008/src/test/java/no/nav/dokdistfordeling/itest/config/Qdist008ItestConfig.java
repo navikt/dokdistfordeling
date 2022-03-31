@@ -1,6 +1,5 @@
 package no.nav.dokdistfordeling.itest.config;
 
-import com.amazonaws.services.s3.AmazonS3;
 import no.nav.dokdistfordeling.CoreConfig;
 import no.nav.dokdistfordeling.config.alias.ArkiverDokumentproduksjonV1Alias;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
@@ -11,8 +10,7 @@ import no.nav.dokdistfordeling.config.props.PdlProperties;
 import no.nav.dokdistfordeling.config.props.SrvAppserverProperties;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.security.AzureToken;
-import no.nav.dokdistfordeling.storage.S3Storage;
-import no.nav.dokdistfordeling.storage.Storage;
+import no.nav.dokdistfordeling.storage.BucketStorage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,14 +43,8 @@ import static org.mockito.Mockito.mock;
 public class Qdist008ItestConfig {
 
 	@Bean
-	public AmazonS3 s3() {
-		return mock(AmazonS3.class);
+	public BucketStorage bucketStorage() {
+		return mock(BucketStorage.class);
 	}
-
-	@Bean
-	public Storage storage(AmazonS3 s3) {
-		return new S3Storage(s3);
-	}
-
 }
 
