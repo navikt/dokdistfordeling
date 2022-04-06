@@ -1,13 +1,11 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanal;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterDistribusjonsinfoTo;
 import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseResponseTo;
-import no.nav.dokdistfordeling.consumer.tjoark110.ArkiverDokumentproduksjon;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
@@ -17,9 +15,8 @@ import no.nav.dokdistfordeling.qdist008.domain.PersisterForsendelseToRequestMapp
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
-import org.springframework.stereotype.Service;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DISTRIBUSJON;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
@@ -27,7 +24,7 @@ import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJ
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist008Metrics;
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
-import static org.apache.cxf.common.util.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * @author Sigurd Midttun, Visma Consulting.
@@ -36,7 +33,6 @@ import static org.apache.cxf.common.util.StringUtils.isEmpty;
 public class Qdist008Service {
 
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
-	private final ArkiverDokumentproduksjon arkiverDokumentproduksjon;
 	private final DokumentkatalogAdmin dokumentkatalogAdmin;
 	private final AdministrerForsendelse administrerForsendelse;
 	private final PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper;
@@ -44,14 +40,11 @@ public class Qdist008Service {
 
 	@Autowired
 	public Qdist008Service(PdlGraphQLConsumer pdlGraphQLConsumer,
-						   ArkiverDokumentproduksjon arkiverDokumentproduksjon,
 						   DokumentkatalogAdmin dokumentkatalogAdmin,
-						   BestemDistribusjonskanal bestemDistribusjonskanal,
 						   AdministrerForsendelse administrerForsendelse,
 						   PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper,
 						   JournalpostApi journalpostApi) {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
-		this.arkiverDokumentproduksjon = arkiverDokumentproduksjon;
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.administrerForsendelse = administrerForsendelse;
 		this.persisterForsendelseToRequestMapper = persisterForsendelseToRequestMapper;
@@ -88,7 +81,7 @@ public class Qdist008Service {
 	}
 
 	private DokumenttypeInfoTo getTittelFromDokkkatIfNotProvided(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
-		if (isEmpty(distribusjonbestilling.getForsendelseTittel())) {
+		if (isBlank(distribusjonbestilling.getForsendelseTittel())) {
 			return dokumentkatalogAdmin.getDokumenttypeInfo(getDokumenttypeIdHoveddokument(distribusjonbestilling));
 		} else {
 			return null;
