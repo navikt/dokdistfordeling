@@ -1,6 +1,5 @@
 package no.nav.dokdistfordeling;
 
-import no.nav.dokdistfordeling.config.alias.ArkiverDokumentproduksjonV1Alias;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
 import no.nav.dokdistfordeling.config.azure.AzureConfig;
@@ -21,7 +20,6 @@ import org.springframework.retry.annotation.EnableRetry;
 @SpringBootApplication
 @EnableConfigurationProperties({
 		ServiceuserAlias.class,
-		ArkiverDokumentproduksjonV1Alias.class,
 		MqGatewayAlias.class,
 		SrvAppserverProperties.class,
 		PdlProperties.class,

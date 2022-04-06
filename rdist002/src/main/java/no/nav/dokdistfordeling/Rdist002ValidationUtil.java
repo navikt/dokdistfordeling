@@ -4,10 +4,10 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
+import no.nav.dokdistfordeling.kodeverk.Journalposttype;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
-import no.nav.tjeneste.domene.brevogarkiv.arkiverdokumentproduksjon.v1.informasjon.arkiverdokumentproduksjon.JournalpostType;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExp
 
 public class Rdist002ValidationUtil {
 
-	private static final String UTGAAENDE = JournalpostType.U.name();
+	private static final String UTGAAENDE = Journalposttype.U.name();
 
 	public void validateRequest(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
 		assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
@@ -60,7 +60,7 @@ public class Rdist002ValidationUtil {
 	}
 
 	public void validateJournalpostAndDokumenter(Journalpost journalpost) {
-		assertNotNull(JournalpostType.class, journalpost.getJournalposttype());
+		assertNotNull(Journalposttype.class, journalpost.getJournalposttype());
 		assertParameterIsAsExpected("journalposttype", journalpost.getJournalposttype().name(), UTGAAENDE);
 		assertParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus(), FERDIGSTILT);
 

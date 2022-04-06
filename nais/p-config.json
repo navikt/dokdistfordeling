@@ -20,7 +20,6 @@
   "SAF_GRAPHQL_URL": "https://saf.intern.nav.no/graphql",
   "HENTDOKUMENT_URL": "https://saf.intern.nav.no/rest/hentdokument",
   "BESTEMDISTRIBUSJONKANAL_URL": "https://dokdistkanal.intern.nav.no/rest/bestemKanal",
-  "ARKIVERDOKUMENTPRODUKSJON_V1_ENDPOINTURL": "https://dokarkiv.intern.nav.no/services/arkiverdokumentproduksjon/v1",
   "JOURNALPOST_API_BASE_URL": "https://dokarkiv.intern.nav.no/rest/journalpostapi/v1/journalpost",
   "AZURE_APP_SCOPE": "api://prod-fss.teamdokumenthandtering.dokarkiv/.default",
   "VAULT": "/kv/prod/fss/dokdistfordeling/default",

@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling.itest.config;
 
 import no.nav.dokdistfordeling.CoreConfig;
-import no.nav.dokdistfordeling.config.alias.ArkiverDokumentproduksjonV1Alias;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
 import no.nav.dokdistfordeling.config.azure.AzureConfig;
@@ -26,7 +25,6 @@ import static org.mockito.Mockito.mock;
 @Profile("itest")
 @EnableConfigurationProperties({
 		ServiceuserAlias.class,
-		ArkiverDokumentproduksjonV1Alias.class,
 		MqGatewayAlias.class,
 		SrvAppserverProperties.class,
 		PdlProperties.class,
