@@ -69,7 +69,7 @@ public class DistribuerJournalpostController {
 			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
 
 			if(!isTilleggsopplysningerNull(journalpost.getTilleggsopplysninger())) {
-				log.info("Journalpost med journalpostID={} og bestillingsId={} allerede er distribuert", distribuerJournalpostRequestTo.getJournalpostId(), journalpost.getTilleggsopplysninger().getVerdi());
+				log.info("Journalpost med journalpostId={} og bestillingsId={} allerede er distribuert", distribuerJournalpostRequestTo.getJournalpostId(), journalpost.getTilleggsopplysninger().getVerdi());
 				return ResponseEntity.status(HttpStatus.CONFLICT)
 						.build();
 			}
