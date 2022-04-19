@@ -49,6 +49,20 @@ public class JournalpostApi {
 				.block();
 	}
 
+	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "oppdaterJournalpost"}, histogram = true)
+	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	public OppdaterJournalpostResponse oppdaterJournalpost(String journalpostId, OppdaterJournalpostRequest oppdaterJournalpostRequest) {
+
+		return webClient.put()
+				.uri("/{journalpostId}", validateJournalpostId(journalpostId))
+				.header(NavHeaders.NAV_CALL_ID, MDC.get(Constants.CALL_ID))
+				.body(Mono.just(oppdaterJournalpostRequest), OppdaterJournalpostRequest.class)
+				.retrieve()
+				.bodyToMono(OppdaterJournalpostResponse.class)
+				.doOnError(this::handleError)
+				.block();
+	}
+
 	private void handleError(Throwable error) {
 		if(error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
 			throw new JournalpostApiFunctionalException(

@@ -13,11 +13,19 @@ public class SafJournalpostTo {
 	private final String tema;
 	private final String journalposttype;
 	private final String journalstatus;
+	private final List<Tilleggsopplysninger> tilleggsopplysninger;
 	private final Bruker bruker;
 	private final AvsenderMottaker avsenderMottaker;
 
 	@Builder.Default
 	private final List<DokumentInfo> dokumenter = new ArrayList<>();
+
+	@Value
+	@Builder
+	public static class Tilleggsopplysninger {
+		private final String nokkel;
+		private final String verdi;
+	}
 
 	@Value
 	@Builder
