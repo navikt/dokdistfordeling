@@ -17,6 +17,7 @@ import no.nav.dokdistfordeling.exception.technical.SafJournalpostIkkeFunnetTechn
 import no.nav.dokdistfordeling.metrics.Monitor;
 import no.nav.dokdistfordeling.springdoc.SwaggerRestDistribuerJournalpost;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,11 +43,14 @@ public class DistribuerJournalpostController {
 
 	private final DistribuerJournalpostService distribuerJournalpostService;
 	private final SafJournalpostQueryService safJournalpostQueryService;
+	private final Rdist002ValidationUtil rdist002ValidationUtil;
 
+	@Autowired
 	public DistribuerJournalpostController(DistribuerJournalpostService distribuerJournalpostService,
 										   SafJournalpostQueryService safJournalpostQueryService) {
 		this.distribuerJournalpostService = distribuerJournalpostService;
 		this.safJournalpostQueryService = safJournalpostQueryService;
+		this.rdist002ValidationUtil = new Rdist002ValidationUtil();
 	}
 
 	@SwaggerRestDistribuerJournalpost
@@ -61,6 +65,7 @@ public class DistribuerJournalpostController {
 		log.info("rdist002 har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());
 
 		try {
+			rdist002ValidationUtil.validateRequest(distribuerJournalpostRequestTo);
 			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
 
 			if(!isTilleggsopplysningerNull(journalpost.getTilleggsopplysninger())) {
