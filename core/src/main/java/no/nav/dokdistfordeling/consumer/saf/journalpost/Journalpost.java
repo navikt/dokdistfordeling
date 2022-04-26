@@ -17,12 +17,19 @@ public class Journalpost {
 	private final String tema;
 	private final Journalposttype journalposttype;
 	private final String journalstatus;
+	private final Tilleggsopplysninger tilleggsopplysninger;
 	private final Bruker bruker;
 	private final AvsenderMottaker avsenderMottaker;
 
 	@Builder.Default
 	private final List<DokumentInfo> dokumenter = new ArrayList<>();
 
+	@Value
+	@Builder
+	public static class Tilleggsopplysninger {
+		private final String nokkel;
+		private final String verdi;
+	}
 
 	@Value
 	@Builder

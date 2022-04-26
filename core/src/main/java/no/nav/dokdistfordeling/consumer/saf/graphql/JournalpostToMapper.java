@@ -1,7 +1,5 @@
 package no.nav.dokdistfordeling.consumer.saf.graphql;
 
-import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
-
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
 import no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType;
@@ -12,6 +10,10 @@ import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+import static no.nav.dokdistfordeling.constants.Constants.DOKDISTBESTILLINGS_ID;
+import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
+
 public class JournalpostToMapper {
 
 	public Journalpost map(SafJournalpostTo safJournalpostTo) {
@@ -19,11 +21,22 @@ public class JournalpostToMapper {
 				.tittel(safJournalpostTo.getTittel())
 				.journalposttype(stringToEnum(Journalposttype.class, safJournalpostTo.getJournalposttype()))
 				.journalstatus(safJournalpostTo.getJournalstatus())
+				.tilleggsopplysninger(mapTilleggsopplysninger(safJournalpostTo))
 				.tema(safJournalpostTo.getTema())
 				.bruker(mapBruker(safJournalpostTo.getBruker()))
 				.avsenderMottaker(mapAvsenderMottaker(safJournalpostTo.getAvsenderMottaker()))
 				.dokumenter(mapDokumenter(safJournalpostTo.getDokumenter()))
 				.build();
+	}
+
+	private Journalpost.Tilleggsopplysninger mapTilleggsopplysninger(SafJournalpostTo safJournalpostTo) {
+		return isNull(safJournalpostTo.getTilleggsopplysninger()) || safJournalpostTo.getTilleggsopplysninger().isEmpty() ? null : safJournalpostTo.getTilleggsopplysninger().stream()
+				.filter(tilleggsopplysninger -> DOKDISTBESTILLINGS_ID.equals(tilleggsopplysninger.getNokkel()))
+				.map(tilleggsopplysninger -> Journalpost.Tilleggsopplysninger.builder()
+						.nokkel(tilleggsopplysninger.getNokkel())
+						.verdi(tilleggsopplysninger.getVerdi())
+						.build())
+				.findAny().orElse(null);
 	}
 
 	private List<Journalpost.DokumentInfo> mapDokumenter(List<SafJournalpostTo.DokumentInfo> dokumenter) {

@@ -4,6 +4,8 @@ package no.nav.dokdistfordeling;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.DokkatGetDokumenttypeInfoFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.InvalidMappingToEnumFunctionalException;
@@ -15,7 +17,9 @@ import no.nav.dokdistfordeling.exception.technical.SafJournalpostIkkeFunnetTechn
 import no.nav.dokdistfordeling.metrics.Monitor;
 import no.nav.dokdistfordeling.springdoc.SwaggerRestDistribuerJournalpost;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,8 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.http.HttpStatus.GONE;
 
 @RestController
@@ -36,9 +42,15 @@ import static org.springframework.http.HttpStatus.GONE;
 public class DistribuerJournalpostController {
 
 	private final DistribuerJournalpostService distribuerJournalpostService;
+	private final SafJournalpostQueryService safJournalpostQueryService;
+	private final Rdist002ValidationUtil rdist002ValidationUtil;
 
-	public DistribuerJournalpostController(DistribuerJournalpostService distribuerJournalpostService) {
+	@Autowired
+	public DistribuerJournalpostController(DistribuerJournalpostService distribuerJournalpostService,
+										   SafJournalpostQueryService safJournalpostQueryService) {
 		this.distribuerJournalpostService = distribuerJournalpostService;
+		this.safJournalpostQueryService = safJournalpostQueryService;
+		this.rdist002ValidationUtil = new Rdist002ValidationUtil();
 	}
 
 	@SwaggerRestDistribuerJournalpost
@@ -53,7 +65,17 @@ public class DistribuerJournalpostController {
 		log.info("rdist002 har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());
 
 		try {
-			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(distribuerJournalpostService.distribuerForsendelse(distribuerJournalpostRequestTo, authorizationHeader));
+			rdist002ValidationUtil.validateRequest(distribuerJournalpostRequestTo);
+			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
+
+			if(!isTilleggsopplysningerNull(journalpost.getTilleggsopplysninger())) {
+				log.info("Journalpost med journalpostId={} og bestillingsId={} allerede er distribuert", distribuerJournalpostRequestTo.getJournalpostId(), journalpost.getTilleggsopplysninger().getVerdi());
+				return ResponseEntity.status(HttpStatus.CONFLICT)
+						.build();
+			}
+
+			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(
+					distribuerJournalpostService.distribuerForsendelse(distribuerJournalpostRequestTo, journalpost));
 			return ResponseEntity.ok().body(response);
 		} catch (ValidationException | UkjentAdresseException e) {
 			log.warn("rdist002 - validering av distribusjonsforespørsel for journalpostId={} feilet, feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage());
@@ -95,5 +117,9 @@ public class DistribuerJournalpostController {
 		if (consumerId != null && !consumerId.isEmpty()) {
 			MDC.put(CONSUMER_ID, consumerId);
 		}
+	}
+
+	private Boolean isTilleggsopplysningerNull(Journalpost.Tilleggsopplysninger tilleggsopplysninger) {
+		return  isNull(tilleggsopplysninger) || isBlank(tilleggsopplysninger.getNokkel());
 	}
 }

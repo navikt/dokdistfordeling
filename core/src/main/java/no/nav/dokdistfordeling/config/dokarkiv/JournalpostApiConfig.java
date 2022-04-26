@@ -4,6 +4,7 @@ import lombok.Data;
 import org.apache.http.HttpHeaders;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,6 +14,7 @@ import javax.validation.constraints.NotEmpty;
 @Data
 @ConfigurationProperties("journalpost.api")
 @Validated
+@Configuration
 public class JournalpostApiConfig {
 
 	@NotEmpty

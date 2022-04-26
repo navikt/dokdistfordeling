@@ -2,6 +2,9 @@ package no.nav.dokdistfordeling;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
+import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
+import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostRequest;
+import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostResponse;
 import no.nav.dokdistfordeling.consumer.regoppslag.Regoppslag;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
@@ -15,10 +18,12 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static no.nav.dokdistfordeling.constants.Constants.DOKDISTBESTILLINGS_ID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 
 @Component
@@ -32,11 +37,12 @@ public class DistribuerJournalpostService {
 	private final Regoppslag regoppslag;
 	private final RegoppslagAdresseMapper regoppslagAdresseMapper;
 	private final HentBestemDokdistKanalService hentBestemDokdistKanal;
+	private final JournalpostApi journalpostApi;
 
 	public DistribuerJournalpostService(SafJournalpostQueryService safJournalpostQueryService,
 										DistribuerForsendelseProducer distribuerForsendelseProducer,
 										Regoppslag regoppslag, RegoppslagAdresseMapper regoppslagAdresseMapper,
-										HentBestemDokdistKanalService hentBestemDokdistKanal) {
+										HentBestemDokdistKanalService hentBestemDokdistKanal, JournalpostApi journalpostApi) {
 		this.safJournalpostQueryService = safJournalpostQueryService;
 		this.distribuerForsendelseProducer = distribuerForsendelseProducer;
 		this.regoppslagAdresseMapper = regoppslagAdresseMapper;
@@ -44,15 +50,14 @@ public class DistribuerJournalpostService {
 		this.rdist002ValidationUtil = new Rdist002ValidationUtil();
 		this.regoppslag = regoppslag;
 		this.hentBestemDokdistKanal = hentBestemDokdistKanal;
+		this.journalpostApi = journalpostApi;
 	}
 
-	public String distribuerForsendelse(final DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
-										final String authorizationHeader) {
+	public String distribuerForsendelse(final DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost) {
 		final String bestillingsId = UUID.randomUUID().toString();
 		DistribuerJournalpostRequestTo trimmetDistribuerJournalpostRequestTo = trimAdresse(distribuerJournalpostRequestTo);
 		rdist002ValidationUtil.validateRequest(trimmetDistribuerJournalpostRequestTo);
 
-		Journalpost journalpost = safJournalpostQueryService.hentJournalpost(trimmetDistribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
 		rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost);
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
@@ -61,6 +66,14 @@ public class DistribuerJournalpostService {
 
 		DistribuerJournalpostRequestTo distribuerRequest = isNull(trimmetDistribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonsKanalCode) ?
 				hentDistribuerAdresseFraRegoppslag(trimmetDistribuerJournalpostRequestTo, journalpost) : trimmetDistribuerJournalpostRequestTo;
+
+		OppdaterJournalpostResponse oppdaterJournalpostResponse = journalpostApi.oppdaterJournalpost(trimmetDistribuerJournalpostRequestTo.getJournalpostId(), OppdaterJournalpostRequest.builder()
+				.tilleggsopplysninger(Arrays.asList(OppdaterJournalpostRequest.Tilleggsopplysning.builder()
+						.nokkel(DOKDISTBESTILLINGS_ID)
+						.verdi(bestillingsId)
+						.build()))
+				.build());
+		log.info("Oppdatert journalpost med journalpostId={} tilleggsopplysninger med nøkkel={} og verdi={}", oppdaterJournalpostResponse.getJournalpostId(), DOKDISTBESTILLINGS_ID, bestillingsId);
 
 		return doDistribuerForsendelse(distribuerRequest, bestillingsId, journalpost, mottaker, distribusjonsKanalCode);
 	}
@@ -161,4 +174,5 @@ public class DistribuerJournalpostService {
 		}
 		return output;
 	}
+
 }

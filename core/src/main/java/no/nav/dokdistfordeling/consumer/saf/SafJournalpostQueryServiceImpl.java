@@ -20,6 +20,10 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 					"    journalposttype\n" +
 					"    journalstatus\n" +
 					"    tema\n" +
+					"    tilleggsopplysninger {\n" +
+					"      nokkel\n" +
+					"      verdi\n" +
+					"    }\n" +
 					"    bruker {\n" +
 					"      id\n" +
 					"      type\n" +
