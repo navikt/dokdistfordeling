@@ -69,9 +69,10 @@ public class DistribuerJournalpostController {
 			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
 
 			if(!isTilleggsopplysningerNull(journalpost.getTilleggsopplysninger())) {
-				log.info("Journalpost med journalpostId={} og bestillingsId={} allerede er distribuert", distribuerJournalpostRequestTo.getJournalpostId(), journalpost.getTilleggsopplysninger().getVerdi());
+				final var bestillingsId = journalpost.getTilleggsopplysninger().getVerdi();
+				log.info("Journalpost med journalpostId={} og bestillingsId={} er allerede distribuert", distribuerJournalpostRequestTo.getJournalpostId(), bestillingsId);
 				return ResponseEntity.status(HttpStatus.CONFLICT)
-						.build();
+						.body(new DistribuerJournalpostResponseTo(bestillingsId));
 			}
 
 			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(
