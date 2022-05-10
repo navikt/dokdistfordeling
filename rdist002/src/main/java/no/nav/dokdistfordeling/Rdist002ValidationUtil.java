@@ -39,7 +39,7 @@ public class Rdist002ValidationUtil {
 
 	private void logMissingDistribusjonsinformasjon(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, String field, String value) {
 		if (isEmpty(value)) {
-			log.warn("%s er ikke satt for journalpost=%s, bestillende fagsystem=%s, dokprodapp=%s", field, distribuerJournalpostRequestTo.getJournalpostId(), distribuerJournalpostRequestTo.getBestillendeFagsystem(), distribuerJournalpostRequestTo.getDokumentProdApp());
+			log.warn("{} er ikke satt for journalpost={}, bestillende fagsystem={}, dokprodapp={}", field, distribuerJournalpostRequestTo.getJournalpostId(), distribuerJournalpostRequestTo.getBestillendeFagsystem(), distribuerJournalpostRequestTo.getDokumentProdApp());
 		}
 	}
 
