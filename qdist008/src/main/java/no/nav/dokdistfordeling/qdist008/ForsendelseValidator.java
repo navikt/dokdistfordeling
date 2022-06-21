@@ -1,7 +1,9 @@
 package no.nav.dokdistfordeling.qdist008;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException;
 import no.nav.dokdistfordeling.exception.functional.OjectNotFoundInBucketFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
@@ -23,9 +25,14 @@ public class ForsendelseValidator {
 
 	private final BucketStorage storage;
 	private static final String BDOK001_PREFIX = "BDOK100";
+	private final SafJournalpostQueryService safJournalpostQueryService;
 
-	public ForsendelseValidator(BucketStorage storage) {
+	private static final String FEILREGISTRERT = "FEILREGISTRERT";
+	private static final String FERDIGSTILT = "FERDIGSTILT";
+
+	public ForsendelseValidator(BucketStorage storage, SafJournalpostQueryService safJournalpostQueryService) {
 		this.storage = storage;
+		this.safJournalpostQueryService = safJournalpostQueryService;
 	}
 
 	@Handler
@@ -35,8 +42,23 @@ public class ForsendelseValidator {
 		assertThatAdresseIsPresentIfMottakerIsSamhandler(distribusjonbestillingTo);
 		assertThatBestillingsIdIsAValidUuid(distribusjonbestillingTo.getBestillingsId());
 
+		if(distribusjonbestillingTo.getArkivInformasjon() != null) {
+			assertJournalpostStatus(distribusjonbestillingTo.getArkivInformasjon().getArkivId(), distribusjonbestillingTo.getBestillingsId());
+		}
+
 		assertThatDocumentsAreAvailableInBucket(distribusjonbestillingTo);
 	}
+
+	private void assertJournalpostStatus(String journalpostid, String bestillingsId) {
+		String journalpostStatus = safJournalpostQueryService.hentJournalpostStatus(journalpostid);
+		if(FEILREGISTRERT.equals(journalpostStatus)){
+			JournalpostFeilregistrertException exception = new JournalpostFeilregistrertException(format("journalpostId=%s er feilregistrert og distribusjon av bestillingsId=%s avbrytes", journalpostid, bestillingsId));
+			throw exception;
+		} else if(!FERDIGSTILT.equals(journalpostStatus)){
+			throw new ValidationException(format("journalpostId=%s har ugyldig status=%s og distribusjon av bestillingsId=%s avbrytes", journalpostid, journalpostStatus, bestillingsId));
+		}
+	}
+
 
 	private void assertThatForsendelseContainsExactlyOneHoveddokument(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo) {
 		int numberOfHoveddokumenter = countHoveddokument(distribusjonbestillingTo);

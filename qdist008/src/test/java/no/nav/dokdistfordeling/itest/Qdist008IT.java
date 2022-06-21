@@ -1,7 +1,11 @@
 package no.nav.dokdistfordeling.itest;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import no.nav.dokdistfordeling.itest.config.Qdist008ItestConfig;
+import no.nav.dokdistfordeling.qdist008.Qdist008Route;
 import no.nav.dokdistfordeling.storage.BucketStorage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.io.IOUtils;
@@ -10,6 +14,7 @@ import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +22,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -30,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
@@ -54,6 +61,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
@@ -73,6 +81,7 @@ public class Qdist008IT {
 
 	private static final String FORSENDELSE_ID = "33333";
 	private static final String DOKUMENTTYPE_ID = "1111111";
+	private static final String STSSTRING = "/stsRest/token?grant_type=client_credentials&scope=openid";
 
 	@Autowired
 	private JmsTemplate jmsTemplate;
@@ -114,6 +123,10 @@ public class Qdist008IT {
 		WireMock.reset();
 		WireMock.resetAllRequests();
 		WireMock.removeAllMappings();
+
+		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+				.withBodyFile("saf/safGraphQlResponse-happy.json")));
 	}
 
 	@Test
@@ -125,7 +138,7 @@ public class Qdist008IT {
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -152,7 +165,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -170,7 +183,7 @@ public class Qdist008IT {
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -197,7 +210,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoNAV_NOHappy.json"))));
@@ -215,7 +228,7 @@ public class Qdist008IT {
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -244,7 +257,7 @@ public class Qdist008IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-			verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+			verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 			verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSDPHappy.json"))));
@@ -263,7 +276,7 @@ public class Qdist008IT {
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -290,7 +303,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoTRYGDERETTENHappy.json"))));
@@ -308,7 +321,7 @@ public class Qdist008IT {
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -325,7 +338,7 @@ public class Qdist008IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-			verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+			verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 			verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoLHappy.json"))));
@@ -344,7 +357,7 @@ public class Qdist008IT {
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -362,7 +375,7 @@ public class Qdist008IT {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-			verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+			verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 			verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 			verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoINGEN_DISTRIBUSJONHappy.json"))));
@@ -381,7 +394,7 @@ public class Qdist008IT {
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -419,7 +432,7 @@ public class Qdist008IT {
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -446,7 +459,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -475,6 +488,10 @@ public class Qdist008IT {
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
+						.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_avoid_pdl_happypath.xml"));
 
@@ -484,7 +501,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(0), postRequestedFor(urlEqualTo("/pdl")));
 		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -502,7 +519,7 @@ public class Qdist008IT {
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -561,7 +578,7 @@ public class Qdist008IT {
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -614,6 +631,10 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowNotAvailableInBucketValidationException() throws Exception {
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
+						.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
 		when(bucketStorage.exists(anyString())).thenReturn(false);
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -631,6 +652,11 @@ public class Qdist008IT {
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBody("")));
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
+						.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -639,6 +665,7 @@ public class Qdist008IT {
 			assertThat(resultOnQdist008BackoutQueue).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 		});
 
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
 	}
 
@@ -648,7 +675,7 @@ public class Qdist008IT {
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -666,8 +693,71 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
+	}
+
+	@Test
+	public void shouldThrowJournalpostFeilregistrertException() throws Exception {
+		WireMock.removeAllMappings();
+
+		Logger logger = (Logger) LoggerFactory.getLogger(Qdist008Route.class);
+		ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+		listAppender.start();
+		logger.addAppender(listAppender);
+
+		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+				.withBodyFile("saf/safGraphQlResponse-FEILREGISTRERT.json")));
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
+						.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
+
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			assertTrue(listAppender.list.stream().map(ILoggingEvent::getMessage).collect(Collectors.toList()).contains("no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException: journalpostId=1234 er feilregistrert og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes;"));
+		});
+
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
+	}
+
+	@Test
+	public void shouldThrowValidationExceptionForJournalpostUnderArbeid() throws Exception {
+		WireMock.removeAllMappings();
+
+		Logger logger = (Logger) LoggerFactory.getLogger(Qdist008Route.class);
+		ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+		listAppender.start();
+		logger.addAppender(listAppender);
+
+		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+				.withBodyFile("saf/safGraphQlResponse-UNDER_ARBEID.json")));
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
+						.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			String resultOnQdist008FunksjonellFeilQueue = receive(qdist008FunksjonellFeil);
+			assertThat(resultOnQdist008FunksjonellFeilQueue).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml").replaceAll("\r", ""));
+			assertTrue(listAppender.list.stream().map(ILoggingEvent::getMessage).collect(Collectors.toList()).contains("no.nav.dokdistfordeling.exception.functional.ValidationException: journalpostId=1234 har ugyldig status=UNDER_ARBEID og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes; bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 og forsendelseId="));
+		});
+
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
 	}
 
 	@Test
@@ -675,7 +765,7 @@ public class Qdist008IT {
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -692,17 +782,16 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 	}
 
 	@Test
 	public void shouldThrowBestemDokdistKanalFunctionalException() throws Exception {
-
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -719,17 +808,16 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 	}
 
 	@Test
 	public void shouldThrowBestemDokdistKanalTechnicalException() throws Exception {
-
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -751,7 +839,7 @@ public class Qdist008IT {
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -768,7 +856,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 	}
 
@@ -777,7 +865,7 @@ public class Qdist008IT {
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -796,7 +884,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
@@ -805,11 +893,10 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowPersisterForsendelseTechicalException() throws Exception {
-
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -828,7 +915,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
@@ -836,11 +923,10 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowJournalpostAPITechnicalException() throws Exception {
-
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -868,7 +954,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -881,7 +967,7 @@ public class Qdist008IT {
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -912,7 +998,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -923,11 +1009,10 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowOppdaterForsendelseTechnicalException() throws Exception {
-
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse_happy.json")));
@@ -957,7 +1042,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/pdl")));
 		verify(exactly(1), patchRequestedFor(urlPathMatching("/rest/journalpostapi/1234/oppdaterDistribusjonsinfo"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));

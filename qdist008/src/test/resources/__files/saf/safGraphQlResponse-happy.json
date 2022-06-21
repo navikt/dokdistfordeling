@@ -1,0 +1,49 @@
+{
+  "data": {
+    "journalpost": {
+      "journalposttype": "U",
+      "journalstatus": "FERDIGSTILT",
+      "tema": "PEN",
+      "bruker": {
+        "id": "22104248784",
+        "type": "FNR",
+        "navn": "Roy Roger Testersen"
+      },
+      "avsenderMottaker": {
+        "id": "12345678910",
+        "type": "FNR",
+        "navn": "Ola-Johnny"
+      },
+      "dokumenter": [
+        {
+          "dokumentInfoId": "arkivDokumentInfoIdHoveddok",
+          "tittel": "MASKERT_FELT",
+          "brevkode": "000001",
+          "dokumentstatus": "FERDIGSTILT",
+          "dokumentvarianter": [
+            {
+              "saksbehandlerHarTilgang": true,
+              "variantformat": "ARKIV"
+            }
+          ]
+        },
+        {
+          "dokumentInfoId": "arkivDokumentInfoIdVedlegg",
+          "tittel": "MASKERT_FELT",
+          "brevkode": "000001",
+          "dokumentstatus": "FERDIGSTILT",
+          "dokumentvarianter": [
+            {
+              "saksbehandlerHarTilgang": true,
+              "variantformat": "SLADDET"
+            },
+            {
+              "saksbehandlerHarTilgang": true,
+              "variantformat": "ARKIV"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
