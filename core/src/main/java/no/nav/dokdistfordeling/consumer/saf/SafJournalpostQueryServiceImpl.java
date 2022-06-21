@@ -26,10 +26,12 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 		this.stsRestConsumer = stsRestConsumer;
 	}
 
+	@Override
 	public Journalpost hentJournalpost(String journalpostid) {
 		return hentJournalpost(journalpostid, getAuthorizationHeader());
 	}
 
+	@Override
 	public Journalpost hentJournalpost(String journalpostid, String authorizationHeader) {
 		return journalpostMapper.map(
 				journalpostToValidator.validateAndReturn(
@@ -41,6 +43,7 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 		);
 	}
 
+	@Override
 	public String hentJournalpostStatus(String journalpostid) {
 		return safGraphqlConsumer.performQuery(GraphQLRequest.builder()
 				.query(JOURNALPOSTSTATUS_QUERY)
