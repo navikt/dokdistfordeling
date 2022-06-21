@@ -90,8 +90,8 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 					"}\n";
 
 	private static final String JOURNALPOSTSTATUS_QUERY =
-			"query {\n" +
-					"	journalpost(journalpostId: $queryJournalpostId) {\n" +
+			"query journalpost($queryJournalpostId: String!) {\n" +
+					"  journalpost(journalpostId: $queryJournalpostId) { "+
 					"		journalstatus\n" +
 					"	}\n" +
 					"}\n";
