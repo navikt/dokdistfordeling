@@ -94,6 +94,6 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 					"	journalpost(journalpostId: $queryJournalpostId) {\n" +
 					"		journalstatus\n" +
 					"	}\n" +
-					"};\n";
+					"}\n";
 
 }
