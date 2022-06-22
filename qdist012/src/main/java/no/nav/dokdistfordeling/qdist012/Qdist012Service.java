@@ -35,20 +35,17 @@ public class Qdist012Service {
 	private final BucketStorage bucketStorage;
 	private final Qdist008DistribuerForsendelseMapper qdist008DistribuerForsendelseMapper;
 	private final SafJournalpostQueryService safJournalpostQueryService;
-	private final StsRestConsumer stsRestConsumer;
 
 
 	@Autowired
 	public Qdist012Service(HentDokument hentDokument,
 						   BucketStorage bucketStorage,
 						   Qdist008DistribuerForsendelseMapper qdist008DistribuerForsendelseMapper,
-						   SafJournalpostQueryService safJournalpostQueryService,
-						   StsRestConsumer stsRestConsumer) {
+						   SafJournalpostQueryService safJournalpostQueryService) {
 		this.hentDokument = hentDokument;
 		this.bucketStorage = bucketStorage;
 		this.qdist008DistribuerForsendelseMapper = qdist008DistribuerForsendelseMapper;
 		this.safJournalpostQueryService = safJournalpostQueryService;
-		this.stsRestConsumer = stsRestConsumer;
 	}
 
 	@Handler
@@ -79,16 +76,12 @@ public class Qdist012Service {
 		Set<String> prosesserteDokumentIder = prosesserteDokumenter.stream()
 				.map(HentDokumenterFraJoarkTo.DokumentInformasjonTo::getArkivDokumentInfoId).collect(Collectors.toSet());
 
-		Journalpost journalpost = safJournalpostQueryService.hentJournalpost(journalpostId, getAuthorizationHeader());
+		Journalpost journalpost = safJournalpostQueryService.hentJournalpost(journalpostId);
 		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
 		dokumenter.stream()
 				.filter(dokument -> !prosesserteDokumentIder.contains(dokument.getDokumentInfoId()))
 				.filter(dokument -> isDokumentFerdigstilt(dokument.getDokumentstatus()))
 				.forEach(dokument -> prosesserteDokumenter.add(mapDokumentInformasjonTo(dokument, prosesserteDokumenter.size() + 1)));
-	}
-
-	private String getAuthorizationHeader() {
-		return BEARER_PREFIX + stsRestConsumer.getOidcToken();
 	}
 
 	private boolean isDokumentFerdigstilt(String dokumentStatus) {

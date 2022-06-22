@@ -8,8 +8,10 @@ import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.SDP;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.TRYGDERETTEN;
 import static org.apache.camel.ExchangePattern.InOnly;
 import static org.apache.camel.LoggingLevel.ERROR;
+import static org.apache.camel.LoggingLevel.WARN;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException;
 import no.nav.dokdistfordeling.qdist008.metrics.Qdist008MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
@@ -20,6 +22,7 @@ import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.stereotype.Component;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
 import java.nio.charset.StandardCharsets;
@@ -75,6 +78,7 @@ public class Qdist008Route extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
+		//@formatter:off
 		errorHandler(defaultErrorHandler()
 				.maximumRedeliveries(0)
 				.log(log)
@@ -85,8 +89,14 @@ public class Qdist008Route extends RouteBuilder {
 		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
 				.useOriginalMessage()
-				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
+				.log(WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
+
+		//Om journalposten er feilregistrert skal den forkastes og ikke forsøkes distribuert
+		onException(JournalpostFeilregistrertException.class)
+				.handled(true)
+				.log(WARN, log, "${exception};")
+				.end();
 
 		from("jms:" + qdist008.getQueueName() +
 				"?transacted=true")
@@ -129,6 +139,7 @@ public class Qdist008Route extends RouteBuilder {
 				.end()
 				.bean(dokdistStatusUpdater)
 				.log(LoggingLevel.INFO, log, String.format("qdist008 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med %s", getIdsForLogging()));
+		//@formatter:on
 	}
 
 	public static String getIdsForLogging() {
