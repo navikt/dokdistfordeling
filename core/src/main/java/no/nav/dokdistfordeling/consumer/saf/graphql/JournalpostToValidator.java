@@ -31,6 +31,10 @@ public class JournalpostToValidator {
 		return safJournalpostTo;
 	}
 
+	private void validateAvsenderMottaker(SafJournalpostTo.AvsenderMottaker avsenderMottaker) {
+		assertNotNullOrEmpty("mottakerId", avsenderMottaker.getId());
+	}
+
 	private void validateDokumenter(List<SafJournalpostTo.DokumentInfo> dokumenter) {
 		dokumenter.forEach(this::validateDokument);
 	}
@@ -53,7 +57,4 @@ public class JournalpostToValidator {
 		assertNotNullOrEmpty("brukerIdType", bruker.getType());
 	}
 
-	private void validateAvsenderMottaker(SafJournalpostTo.AvsenderMottaker avsenderMottaker) {
-		assertNotNullOrEmpty("mottakerId", avsenderMottaker.getId());
-	}
 }
