@@ -1,16 +1,15 @@
 package no.nav.dokdistfordeling.consumer.saf.graphql;
 
+import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
+
+import java.util.List;
+
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertDokumentFieldNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
 
-import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
-
-import java.util.List;
-
 public class JournalpostToValidator {
-
 	public SafJournalpostTo validateAndReturn(SafJournalpostTo safJournalpostTo) {
 		assertJournalpostFieldNotNullOrEmpty("journalposttype", safJournalpostTo.getJournalposttype());
 		assertJournalpostFieldNotNullOrEmpty("journalstatus", safJournalpostTo.getJournalstatus());
@@ -19,8 +18,12 @@ public class JournalpostToValidator {
 		assertJournalpostFieldNotNull(SafJournalpostTo.Bruker.class, safJournalpostTo.getBruker());
 		validateBruker(safJournalpostTo.getBruker());
 
+		/*
+		 * Tom mottakerId er OK i rdist002
+		 * Qdist012 henter også ut journalpost fra saf men det er kun for å hente vedlegg - dette kan vel da bare fjernes?
 		assertJournalpostFieldNotNull(SafJournalpostTo.AvsenderMottaker.class, safJournalpostTo.getAvsenderMottaker());
 		validateAvsenderMottaker(safJournalpostTo.getAvsenderMottaker());
+		*/
 
 		assertJournalpostFieldNotNull(SafJournalpostTo.DokumentInfo.class, safJournalpostTo.getDokumenter());
 		validateDokumenter(safJournalpostTo.getDokumenter());

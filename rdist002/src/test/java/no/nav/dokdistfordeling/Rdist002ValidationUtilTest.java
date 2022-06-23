@@ -203,7 +203,6 @@ public class Rdist002ValidationUtilTest {
 		assertEquals("For journalposter kan feltet no.nav.dokdistfordeling.kodeverk.BrukerIdType ikke være null eller tomt. Fikk no.nav.dokdistfordeling.kodeverk.BrukerIdType=null", thrownException.getMessage());
 	}
 
-
 	@Test
 	public void shouldThrowValidationExceptionFromMottakerIsNull() {
 		Journalpost journalpost = createJournalpostBuilder()
@@ -212,6 +211,16 @@ public class Rdist002ValidationUtilTest {
 		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("For journalposter kan feltet no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost.AvsenderMottaker ikke være null eller tomt. Fikk no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost.AvsenderMottaker=null", thrownException.getMessage());
 	}
+
+	@Test
+	public void shouldThrowValidationExceptionFromMottakerNavnIsNull() {
+		Journalpost journalpost = createJournalpostBuilder()
+				.avsenderMottaker(Journalpost.AvsenderMottaker.builder().navn(null).build())
+				.build();
+		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
+		assertEquals("For journalposter kan feltet mottakerNavn ikke være null eller tomt. Fikk mottakerNavn=null", thrownException.getMessage());
+	}
+
 
 	@Test
 	public void shouldThrowValidationExceptionFromNoTittelInHoveddokument() {
