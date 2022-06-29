@@ -32,6 +32,7 @@ import static no.nav.dokdistfordeling.UnitTestUtil.createPostadresseAdresstypeNu
 import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresse;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class Rdist002ValidationUtilTest {
 
@@ -58,7 +59,7 @@ public class Rdist002ValidationUtilTest {
 				.adresse(createNorskPostadresse())
 				.dokumentProdApp(DOKUMENTPRODAPP)
 				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateRequest(request));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateRequest(request));
 		assertEquals("Feltet journalpostId kan ikke være null eller tomt. Fikk journalpostId=null", thrownException.getMessage());
 	}
 
@@ -71,7 +72,7 @@ public class Rdist002ValidationUtilTest {
 				.dokumentProdApp(DOKUMENTPRODAPP)
 				.build();
 
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateRequest(request));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateRequest(request));
 		assertEquals("Feltet bestillendeFagsystem kan ikke være null eller tomt. Fikk bestillendeFagsystem=null", thrownException.getMessage());
 	}
 
@@ -104,7 +105,7 @@ public class Rdist002ValidationUtilTest {
 		Samhandler mottaker = new Samhandler()
 				.withNavn(MOTTAKER_NAVN)
 				.withSamhandleridentifikator(MOTTAKER_ID);
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(null, mottaker));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(null, mottaker));
 		assertEquals("For mottaker av type samhandler kan ikke adresse være null", thrownException.getMessage());
 	}
 
@@ -122,7 +123,7 @@ public class Rdist002ValidationUtilTest {
 				null,
 				null
 		);
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(adresseWithNullLand, mottaker));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(adresseWithNullLand, mottaker));
 		assertEquals("Feltet land kan ikke være null eller tomt. Fikk land=null", thrownException.getMessage());
 	}
 
@@ -134,7 +135,7 @@ public class Rdist002ValidationUtilTest {
 				.withPersonidentifikator(MOTTAKER_ID);
 
 		DistribuerJournalpostRequestTo.AdresseTo adresseWithNullAdressType = createPostadresseAdresstypeNull();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(adresseWithNullAdressType, mottaker));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(adresseWithNullAdressType, mottaker));
 		assertEquals("Feltet adressetype kan ikke være null eller tomt. Fikk adressetype=null", thrownException.getMessage());
 
 	}
@@ -163,7 +164,7 @@ public class Rdist002ValidationUtilTest {
 		Journalpost journalpost = createJournalpostBuilder()
 				.journalposttype(Journalposttype.I)
 				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("journalposttype er ikke som forventet, fikk: I, men forventet U", thrownException.getMessage());
 	}
 
@@ -172,7 +173,7 @@ public class Rdist002ValidationUtilTest {
 		Journalpost journalpost = createJournalpostBuilder()
 				.journalstatus(EKSPEDERT)
 				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("journalpoststatus er ikke som forventet, fikk: EKSPEDERT, men forventet FERDIGSTILT", thrownException.getMessage());
 	}
 
@@ -181,7 +182,7 @@ public class Rdist002ValidationUtilTest {
 		Journalpost journalpost = createJournalpostBuilder()
 				.bruker(null)
 				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("For journalposter kan feltet no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost.Bruker ikke være null eller tomt. Fikk no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost.Bruker=null", thrownException.getMessage());
 	}
 
@@ -190,7 +191,7 @@ public class Rdist002ValidationUtilTest {
 		Journalpost journalpost = createJournalpostBuilder()
 				.bruker(Journalpost.Bruker.builder().id(null).type(BrukerIdType.FNR).build())
 				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("For journalposter kan feltet brukerId ikke være null eller tomt. Fikk brukerId=null", thrownException.getMessage());
 	}
 
@@ -199,7 +200,7 @@ public class Rdist002ValidationUtilTest {
 		Journalpost journalpost = createJournalpostBuilder()
 				.bruker(Journalpost.Bruker.builder().id(BRUKER_ID).type(null).build())
 				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("For journalposter kan feltet no.nav.dokdistfordeling.kodeverk.BrukerIdType ikke være null eller tomt. Fikk no.nav.dokdistfordeling.kodeverk.BrukerIdType=null", thrownException.getMessage());
 	}
 
@@ -208,7 +209,7 @@ public class Rdist002ValidationUtilTest {
 		Journalpost journalpost = createJournalpostBuilder()
 				.avsenderMottaker(null)
 				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("For journalposter kan feltet no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost.AvsenderMottaker ikke være null eller tomt. Fikk no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost.AvsenderMottaker=null", thrownException.getMessage());
 	}
 
@@ -231,7 +232,7 @@ public class Rdist002ValidationUtilTest {
 								.build(),
 						createDokumentInfo2Builder().build()))
 				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("For hoveddokumentet kan feltet tittel ikke være null eller tomt. Fikk tittel=null, dokumentInfoId=666666666", thrownException.getMessage());
 	}
 
@@ -244,7 +245,7 @@ public class Rdist002ValidationUtilTest {
 								.build(),
 						createDokumentInfo2Builder().build()))
 				.build();
-		Exception thrownException = Assertions.assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("For hoveddokumentet kan feltet brevkode ikke være null eller tomt. Fikk brevkode=null, dokumentInfoId=666666666", thrownException.getMessage());
 	}
 
@@ -264,7 +265,7 @@ public class Rdist002ValidationUtilTest {
 								.build(),
 						createDokumentInfo2Builder().build()))
 				.build();
-		Exception thrownException = Assertions.assertThrows(BrukerManglerTilgangTilDokumentFunctionalException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
+		Exception thrownException = assertThrows(BrukerManglerTilgangTilDokumentFunctionalException.class, () -> rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost));
 		assertEquals("Saksbehandler har ikke tilgang til noen av dokumentets variantformater. dokumentInfoId=666666666", thrownException.getMessage());
 	}
 }

@@ -126,14 +126,11 @@ public class DistribuerJournalpostService {
 	}
 
 	private DistribuerJournalpostRequestTo.AdresseTo hentAdresse(Journalpost.AvsenderMottaker avsenderMottaker, String tema) {
-		switch (avsenderMottaker.getType()) {
-			case FNR:
-				return regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentPersonAdresse(avsenderMottaker.getId(), tema));
-			case ORGNR:
-				return regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentOrganisasjonAdresse(avsenderMottaker.getId()));
-			default:
-				throw new ValidationException("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis adresse ikke oppgis i request.");
-		}
+		return switch (avsenderMottaker.getType()) {
+			case FNR -> regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentPersonAdresse(avsenderMottaker.getId(), tema));
+			case ORGNR -> regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentOrganisasjonAdresse(avsenderMottaker.getId()));
+				default -> throw new ValidationException("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis adresse ikke oppgis i request.");
+		};
 	}
 
 	private Aktoer mapMottaker(Journalpost.AvsenderMottaker avsenderMottaker) {
