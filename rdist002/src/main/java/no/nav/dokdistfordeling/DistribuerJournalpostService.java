@@ -6,7 +6,6 @@ import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostRequest;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostResponse;
 import no.nav.dokdistfordeling.consumer.regoppslag.Regoppslag;
-import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
@@ -24,13 +23,14 @@ import java.util.UUID;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.nav.dokdistfordeling.constants.Constants.DOKDISTBESTILLINGS_ID;
+import static no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType.UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Component
 @Slf4j
 public class DistribuerJournalpostService {
 
-	private final SafJournalpostQueryService safJournalpostQueryService;
 	private final DistribuerForsendelseProducer distribuerForsendelseProducer;
 	private final HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper;
 	private final Rdist002ValidationUtil rdist002ValidationUtil;
@@ -39,11 +39,10 @@ public class DistribuerJournalpostService {
 	private final HentBestemDokdistKanalService hentBestemDokdistKanal;
 	private final JournalpostApi journalpostApi;
 
-	public DistribuerJournalpostService(SafJournalpostQueryService safJournalpostQueryService,
+	public DistribuerJournalpostService(
 										DistribuerForsendelseProducer distribuerForsendelseProducer,
 										Regoppslag regoppslag, RegoppslagAdresseMapper regoppslagAdresseMapper,
 										HentBestemDokdistKanalService hentBestemDokdistKanal, JournalpostApi journalpostApi) {
-		this.safJournalpostQueryService = safJournalpostQueryService;
 		this.distribuerForsendelseProducer = distribuerForsendelseProducer;
 		this.regoppslagAdresseMapper = regoppslagAdresseMapper;
 		this.hentDokumenterFraJoarkMapper = new HentDokumenterFraJoarkMapper();
@@ -127,52 +126,61 @@ public class DistribuerJournalpostService {
 	}
 
 	private DistribuerJournalpostRequestTo.AdresseTo hentAdresse(Journalpost.AvsenderMottaker avsenderMottaker, String tema) {
-		switch (avsenderMottaker.getType()) {
-			case FNR:
-				return regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentPersonAdresse(avsenderMottaker.getId(), tema));
-			case ORGNR:
-				return regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentOrganisasjonAdresse(avsenderMottaker.getId()));
-			default:
-				throw new ValidationException("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis adresse ikke oppgis i request.");
-		}
+		return switch (avsenderMottaker.getType()) {
+			case FNR -> regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentPersonAdresse(avsenderMottaker.getId(), tema));
+			case ORGNR -> regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentOrganisasjonAdresse(avsenderMottaker.getId()));
+				default -> throw new ValidationException("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis adresse ikke oppgis i request.");
+		};
 	}
 
 	private Aktoer mapMottaker(Journalpost.AvsenderMottaker avsenderMottaker) {
 		Aktoer output;
-		switch (avsenderMottaker.getType()) {
-			case FNR:
-				output = new Person()
-						.withNavn(avsenderMottaker.getNavn())
-						.withPersonidentifikator(avsenderMottaker.getId());
-				break;
-			case ORGNR:
-				output = new Organisasjon()
-						.withNavn(avsenderMottaker.getNavn())
-						.withOrgnummer(avsenderMottaker.getId());
-				break;
-			case HPRNR:
-				output = new Samhandler()
-						.withNavn(avsenderMottaker.getNavn())
-						.withSamhandleridentifikator(avsenderMottaker.getId())
-						.withSamhandlerkategori(SamhandlerKategoriCode.HPR.name());
-				break;
-			case UTL_ORG:
-				output = new Samhandler()
-						.withNavn(avsenderMottaker.getNavn())
-						.withSamhandleridentifikator(avsenderMottaker.getId())
-						.withSamhandlerkategori(SamhandlerKategoriCode.UTL_ORG.name());
-				break;
-			case UKJENT:
-				output = new Samhandler()
-						.withNavn(avsenderMottaker.getNavn())
-						.withSamhandleridentifikator(avsenderMottaker.getId())
-						.withSamhandlerkategori(SamhandlerKategoriCode.UKJENT.name());
-				break;
-			default:
-				output = null;
-				break;
+		if(avsenderMottaker.getType() == null || isEmpty(avsenderMottaker.getType().name())){
+			output = new Samhandler()
+					.withNavn(avsenderMottaker.getNavn())
+					.withSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()))
+					.withSamhandlerkategori(SamhandlerKategoriCode.UKJENT.name());
+		}
+		else {
+			switch (avsenderMottaker.getType()) {
+				case FNR:
+					output = new Person()
+							.withNavn(avsenderMottaker.getNavn())
+							.withPersonidentifikator(avsenderMottaker.getId());
+					break;
+				case ORGNR:
+					output = new Organisasjon()
+							.withNavn(avsenderMottaker.getNavn())
+							.withOrgnummer(avsenderMottaker.getId());
+					break;
+				case HPRNR:
+					output = new Samhandler()
+							.withNavn(avsenderMottaker.getNavn())
+							.withSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()))
+							.withSamhandlerkategori(SamhandlerKategoriCode.HPR.name());
+					break;
+				case UTL_ORG:
+					output = new Samhandler()
+							.withNavn(avsenderMottaker.getNavn())
+							.withSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()))
+							.withSamhandlerkategori(SamhandlerKategoriCode.UTL_ORG.name());
+					break;
+				case UKJENT:
+					output = new Samhandler()
+							.withNavn(avsenderMottaker.getNavn())
+							.withSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()))
+							.withSamhandlerkategori(SamhandlerKategoriCode.UKJENT.name());
+					break;
+				default:
+					output = null;
+					break;
+			}
 		}
 		return output;
+	}
+
+	private String determineAvsenderMottakerId(String mottakerId){
+		return isEmpty(mottakerId) ? UKJENT.name() : mottakerId;
 	}
 
 }

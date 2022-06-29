@@ -80,7 +80,7 @@ public class Rdist002ValidationUtil {
 		assertJournalpostFieldNotNull(BrukerIdType.class, journalpost.getBruker().getType());
 
 		assertJournalpostFieldNotNull(Journalpost.AvsenderMottaker.class, journalpost.getAvsenderMottaker());
-		assertJournalpostFieldNotNullOrEmpty("mottakerId", journalpost.getAvsenderMottaker().getId());
+		assertJournalpostFieldNotNullOrEmpty("mottakerNavn", journalpost.getAvsenderMottaker().getNavn());
 
 		validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
 
