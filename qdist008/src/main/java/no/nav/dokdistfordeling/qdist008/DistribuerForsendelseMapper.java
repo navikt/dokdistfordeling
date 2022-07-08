@@ -59,7 +59,7 @@ public class DistribuerForsendelseMapper {
 	private DistribuerForsendelseTo.DistribusjonbestillingTo mapDokumentbestillingsinformasjon(Distribusjonbestilling distribusjonbestilling) {
 		return DistribuerForsendelseTo.DistribusjonbestillingTo.builder()
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
-				.batchId(distribusjonbestilling.getBatchId())
+				.batchId(mapBatchId(distribusjonbestilling.getBatchId()))
 				.distribusjonKanal(mapKanalCode(distribusjonbestilling.getDistribusjonKanal()))
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
 				.tema(distribusjonbestilling.getTema())
@@ -82,6 +82,10 @@ public class DistribuerForsendelseMapper {
 								.build())
 						.collect(Collectors.toList()))
 				.build();
+	}
+
+	private String mapBatchId(String batchId) {
+		return isBlank(batchId) ? null : batchId;
 	}
 
 	private DistribuerForsendelseTo.ArkivInformasjonTo mapArkivInformasjon(ArkivInformasjon arkivInformasjon) {
