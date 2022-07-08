@@ -12,6 +12,8 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Samhandler;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.UtenlandskPostadresse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 
@@ -185,6 +187,19 @@ class Qdist008DistribuerForsendelseMapperTest {
 		DistribuerForsendelse distribuerForsendelse = qdist008DistribuerForsendelseMapper.map(HentDokumenterFraJoarkTo.builder()
 				.distribusjonbestilling(createDistribusjonbestillingToBuilder()
 						.batchId(null)
+						.build())
+				.build());
+
+		assertDistribuerForsendelse(distribuerForsendelse);
+		assertNull(distribuerForsendelse.getDistribusjonbestilling().getBatchId());
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {"", " "})
+	public void shouldMapBatchIdNullWhenBlank(String batchId) {
+		DistribuerForsendelse distribuerForsendelse = qdist008DistribuerForsendelseMapper.map(HentDokumenterFraJoarkTo.builder()
+				.distribusjonbestilling(createDistribusjonbestillingToBuilder()
+						.batchId(batchId)
 						.build())
 				.build());
 

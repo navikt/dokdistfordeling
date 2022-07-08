@@ -47,7 +47,7 @@ public class Qdist008DistribuerForsendelseMapper {
 	private Distribusjonbestilling mapDokumentbestillingsinformasjon(HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestillingTo) {
 		return new Distribusjonbestilling()
 				.withBestillingsId(distribusjonbestillingTo.getBestillingsId())
-				.withBatchId(distribusjonbestillingTo.getBatchId())
+				.withBatchId(mapBatchId(distribusjonbestillingTo.getBatchId()))
 				.withDistribusjonKanal(distribusjonbestillingTo.getDistribusjonKanal())
 				.withBestillendeFagsystem(distribusjonbestillingTo.getBestillendeFagsystem())
 				.withTema(distribusjonbestillingTo.getTema())
@@ -69,6 +69,10 @@ public class Qdist008DistribuerForsendelseMapper {
 								.withDokumentObjektReferanse(dokumentInformasjon.getDokumentObjektReferanse()))
 						.collect(Collectors.toList()));
 
+	}
+
+	private String mapBatchId(String batchId) {
+		return isBlank(batchId) ? null : batchId;
 	}
 
 	private ArkivInformasjon mapArkivInformasjon(HentDokumenterFraJoarkTo.ArkivInformasjonTo arkivInformasjonTo) {
