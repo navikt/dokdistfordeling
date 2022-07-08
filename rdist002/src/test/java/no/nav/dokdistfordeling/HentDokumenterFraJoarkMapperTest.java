@@ -11,6 +11,8 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.UtenlandskPostadresse;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 
@@ -187,6 +189,24 @@ public class HentDokumenterFraJoarkMapperTest {
 				BESTILLINGS_ID, PRINT));
 
 		assertEquals("Adresse kan ikke være null", e.getMessage());
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {"", " "})
+	public void shouldMapBatchIdToNullWhenBlank(String batchId) {
+		HentDokumenterFraJoark result = mapper.map(createDistribuerJournalpostRequestToBuilder()
+						.distribusjonstype(VEDTAK.name())
+						.distribusjonstidspunkt(UMIDDELBART.name())
+						.batchId(batchId)
+						.build(),
+				createJournalpostBuilder().build(),
+				createPersonMottaker(),
+				BESTILLINGS_ID, PRINT);
+
+		assertNotNull(result.getDistribusjonbestilling());
+		Distribusjonbestilling bestilling = result.getDistribusjonbestilling();
+
+		assertNull(bestilling.getBatchId());
 	}
 
 	private void assertDokumenter(List<DokumentInformasjon> dokumenter) {
