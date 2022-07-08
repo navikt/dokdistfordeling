@@ -47,7 +47,7 @@ public class HentDokumenterFraJoarkMapper {
 		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
 		Distribusjonbestilling distribusjonbestilling = new Distribusjonbestilling()
 				.withBestillingsId(bestillingsId)
-				.withBatchId(distribuerJournalpostRequestTo.getBatchId())
+				.withBatchId(mapBatchId(distribuerJournalpostRequestTo.getBatchId()))
 				.withDistribusjonKanal(distribusjonsKanal.name())
 				.withBestillendeFagsystem(distribuerJournalpostRequestTo.getBestillendeFagsystem())
 				.withTema(journalpost.getTema())
@@ -80,6 +80,10 @@ public class HentDokumenterFraJoarkMapper {
 
 		return new HentDokumenterFraJoark()
 				.withDistribusjonbestilling(distribusjonbestilling);
+	}
+
+	private String mapBatchId(String batchId) {
+		return isBlank(batchId) ? null : batchId;
 	}
 
 	private Adresse mapAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo) {
