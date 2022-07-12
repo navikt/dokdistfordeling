@@ -6,7 +6,6 @@ import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
 import no.nav.dokdistfordeling.config.azure.AzureConfig;
 import no.nav.dokdistfordeling.config.dokarkiv.JournalpostApiConfig;
 import no.nav.dokdistfordeling.config.props.PdlProperties;
-import no.nav.dokdistfordeling.config.props.SrvAppserverProperties;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.security.AzureToken;
 import no.nav.dokdistfordeling.storage.BucketStorage;
@@ -26,7 +25,6 @@ import static org.mockito.Mockito.mock;
 @EnableConfigurationProperties({
 		ServiceuserAlias.class,
 		MqGatewayAlias.class,
-		SrvAppserverProperties.class,
 		PdlProperties.class,
 		AzureConfig.class,
 		JournalpostApiConfig.class
