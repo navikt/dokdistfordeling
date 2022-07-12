@@ -89,13 +89,13 @@ public class JmsConfig {
 
 		UserCredentialsConnectionFactoryAdapter adapter = new UserCredentialsConnectionFactoryAdapter();
 		adapter.setTargetConnectionFactory(connectionFactory);
-        adapter.setUsername(serviceuserAlias.getUsername());
-        adapter.setPassword(serviceuserAlias.getPassword());
+		adapter.setUsername(serviceuserAlias.getUsername());
+		adapter.setPassword(serviceuserAlias.getPassword());
 
-        PooledConnectionFactory pooledFactory = new PooledConnectionFactory();
-        pooledFactory.setConnectionFactory(adapter);
-        pooledFactory.setMaxConnections(10);
-        pooledFactory.setMaximumActiveSessionPerConnection(10);
+		PooledConnectionFactory pooledFactory = new PooledConnectionFactory();
+		pooledFactory.setConnectionFactory(adapter);
+		pooledFactory.setMaxConnections(10);
+		pooledFactory.setMaximumActiveSessionPerConnection(10);
 		return pooledFactory;
 	}
 }
