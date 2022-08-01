@@ -9,6 +9,7 @@
         "type": "AKTOERID"
       },
       "avsenderMottaker": {
+        "type": "NULL",
         "navn": "Jan Neimansen"
       },
       "dokumenter": [

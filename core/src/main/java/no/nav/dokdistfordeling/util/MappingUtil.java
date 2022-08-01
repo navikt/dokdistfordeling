@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.util;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,12 +11,14 @@ import java.io.IOException;
 
 public final class MappingUtil {
 
+	private static final String NULL = "NULL";
+
 	private MappingUtil() {
 	}
 
 	public static <E extends Enum<E>> E stringToEnum(Class<E> enumClass, String enumName) {
 		try {
-			return enumName == null ? null : Enum.valueOf(enumClass, enumName);
+			return (NULL.equals(enumName) || isEmpty(enumName)) ? null : Enum.valueOf(enumClass, enumName);
 		} catch (IllegalArgumentException e) {
 			throw new InvalidMappingToEnumFunctionalException(format("%s er ikke en gyldig kodeverdi for %s", enumName, enumClass));
 		}
