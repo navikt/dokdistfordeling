@@ -25,7 +25,6 @@
         <java.version>17</java.version>
         <camel.version>3.17.0</camel.version>
         <logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
-        <resilience4j.version>1.7.1</resilience4j.version>
         <google-cloud.version>25.4.0</google-cloud.version>
         <google-tink.version>1.6.1</google-tink.version>
         <dokkat-api>10.4.0</dokkat-api>
@@ -34,7 +33,6 @@
         <melding-virksomhet-dokdistfordeling.version>2.1.3</melding-virksomhet-dokdistfordeling.version>
         <springdoc-openapi-ui.version>1.6.6</springdoc-openapi-ui.version>
         <jaxb2-basics-runtime.version>0.12.0</jaxb2-basics-runtime.version>
-        <rxjava.version>2.2.21</rxjava.version>
         <!-- test -->
         <junit5.mockito.version>4.0.0</junit5.mockito.version>
         <awaitility.version>4.1.0</awaitility.version>
@@ -131,36 +129,6 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-ui</artifactId>
                 <version>${springdoc-openapi-ui.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-spring-boot</artifactId>
-                <version>${resilience4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-metrics</artifactId>
-                <version>${resilience4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-prometheus</artifactId>
-                <version>${resilience4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-timelimiter</artifactId>
-                <version>${resilience4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-circuitbreaker</artifactId>
-                <version>${resilience4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.reactivex.rxjava2</groupId>
-                <artifactId>rxjava</artifactId>
-                <version>${rxjava.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>

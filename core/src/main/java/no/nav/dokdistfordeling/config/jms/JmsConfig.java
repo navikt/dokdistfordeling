@@ -17,10 +17,8 @@ import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapte
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Queue;
+import java.util.concurrent.TimeUnit;
 
-/**
- * @author Sigurd Midttun, Visma Consulting AS
- */
 @Profile({"nais", "local"})
 @Configuration
 public class JmsConfig {
@@ -96,6 +94,8 @@ public class JmsConfig {
 		pooledFactory.setConnectionFactory(adapter);
 		pooledFactory.setMaxConnections(10);
 		pooledFactory.setMaximumActiveSessionPerConnection(10);
+		pooledFactory.setReconnectOnException(true);
+		pooledFactory.setExpiryTimeout(TimeUnit.HOURS.toMillis(24));
 		return pooledFactory;
 	}
 }
