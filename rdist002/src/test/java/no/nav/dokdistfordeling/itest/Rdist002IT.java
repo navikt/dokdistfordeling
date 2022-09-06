@@ -794,6 +794,8 @@ public class Rdist002IT {
 						ADRESSELINJE3,
 						LAND_NO
 				))
+				.distribusjonstidspunkt(KJERNETID.name())
+				.distribusjonstype(VIKTIG.name())
 				.dokumentProdApp(DOKUMENTPRODAPP);
 
 	}

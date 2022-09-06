@@ -4,6 +4,7 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
@@ -31,6 +32,8 @@ import static no.nav.dokdistfordeling.UnitTestUtil.createNorskPostadresse;
 import static no.nav.dokdistfordeling.UnitTestUtil.createPostadresseAdresstypeNull;
 import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresse;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VIKTIG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -47,8 +50,38 @@ public class Rdist002ValidationUtilTest {
 				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
 				.adresse(createNorskPostadresse())
 				.dokumentProdApp(DOKUMENTPRODAPP)
+				.distribusjonstidspunkt(KJERNETID.name())
+				.distribusjonstype(VIKTIG.name())
 				.build();
 		rdist002ValidationUtil.validateRequest(request);
+	}
+
+	@Test
+	public void shouldThrowValidationExceptionFromMissingDistribusjonstidspunkt() {
+		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
+				.batchId(BATCH_ID)
+				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
+				.adresse(createNorskPostadresse())
+				.journalpostId(JOURNALPOST_ID)
+				.dokumentProdApp(DOKUMENTPRODAPP)
+				.distribusjonstype(VIKTIG.name())
+				.build();
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateRequest(request));
+		assertEquals("Feltet distribusjonstidspunkt kan ikke være null eller tomt. Fikk distribusjonstidspunkt=null", thrownException.getMessage());
+	}
+
+	@Test
+	public void shouldThrowValidationExceptionFromMissingDistribusjonstype() {
+		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
+				.batchId(BATCH_ID)
+				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
+				.adresse(createNorskPostadresse())
+				.journalpostId(JOURNALPOST_ID)
+				.dokumentProdApp(DOKUMENTPRODAPP)
+				.distribusjonstidspunkt(KJERNETID.name())
+				.build();
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateRequest(request));
+		assertEquals("Feltet distribusjonstype kan ikke være null eller tomt. Fikk distribusjonstype=null", thrownException.getMessage());
 	}
 
 	@Test

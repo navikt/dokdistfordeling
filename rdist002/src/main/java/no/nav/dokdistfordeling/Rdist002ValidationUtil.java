@@ -22,7 +22,6 @@ import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostField
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
-import static org.jvnet.jaxb2_commons.lang.StringUtils.isEmpty;
 
 @Slf4j
 public class Rdist002ValidationUtil {
@@ -33,14 +32,8 @@ public class Rdist002ValidationUtil {
 		assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
 		assertNotNullOrEmptyAndCorrectLength("bestillendeFagsystem", distribuerJournalpostRequestTo.getBestillendeFagsystem());
 		assertNotNullOrEmptyAndCorrectLength("dokumentProdapp", distribuerJournalpostRequestTo.getDokumentProdApp());
-		logMissingDistribusjonsinformasjon(distribuerJournalpostRequestTo, "distribusjonstype", distribuerJournalpostRequestTo.getDistribusjonstype());
-		logMissingDistribusjonsinformasjon(distribuerJournalpostRequestTo, "distribusjonstidspunkt", distribuerJournalpostRequestTo.getDistribusjonstidspunkt());
-	}
-
-	private void logMissingDistribusjonsinformasjon(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, String field, String value) {
-		if (isEmpty(value)) {
-			log.warn("{} er ikke satt for journalpost={}, bestillende fagsystem={}, dokprodapp={}", field, distribuerJournalpostRequestTo.getJournalpostId(), distribuerJournalpostRequestTo.getBestillendeFagsystem(), distribuerJournalpostRequestTo.getDokumentProdApp());
-		}
+		assertNotNullOrEmpty("distribusjonstype", distribuerJournalpostRequestTo.getDistribusjonstype());
+		assertNotNullOrEmpty("distribusjonstidspunkt", distribuerJournalpostRequestTo.getDistribusjonstidspunkt());
 	}
 
 	private void assertNotNullOrEmptyAndCorrectLength(String field, String value) {
