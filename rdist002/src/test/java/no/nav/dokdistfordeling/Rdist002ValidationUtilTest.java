@@ -11,6 +11,10 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 
@@ -34,6 +38,8 @@ import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresse;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VIKTIG;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -56,8 +62,12 @@ public class Rdist002ValidationUtilTest {
 		rdist002ValidationUtil.validateRequest(request);
 	}
 
-	@Test
-	public void shouldThrowValidationExceptionFromMissingDistribusjonstidspunkt() {
+	@ParameterizedTest
+	@CsvSource({
+			"null,hadde en ugyldig verdi. Fikk distribusjonstidspunkt=null. Gyldige verdier er ",
+			" ,kan ikke være null eller tomt. Fikk distribusjonstidspunkt=null",
+			"InVaLiD,hadde en ugyldig verdi. Fikk distribusjonstidspunkt=InVaLiD. Gyldige verdier er "})
+	public void shouldThrowValidationExceptionForVariousDistribusjonstidspunkt(String distribusjonstidspunkt, String errorMessage) {
 		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
 				.batchId(BATCH_ID)
 				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
@@ -65,13 +75,18 @@ public class Rdist002ValidationUtilTest {
 				.journalpostId(JOURNALPOST_ID)
 				.dokumentProdApp(DOKUMENTPRODAPP)
 				.distribusjonstype(VIKTIG.name())
+				.distribusjonstidspunkt(distribusjonstidspunkt)
 				.build();
 		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateRequest(request));
-		assertEquals("Feltet distribusjonstidspunkt kan ikke være null eller tomt. Fikk distribusjonstidspunkt=null", thrownException.getMessage());
+		assertThat(thrownException.getMessage(), containsString("Feltet distribusjonstidspunkt " + errorMessage));
 	}
 
-	@Test
-	public void shouldThrowValidationExceptionFromMissingDistribusjonstype() {
+	@ParameterizedTest
+	@CsvSource({
+			"null,hadde en ugyldig verdi. Fikk distribusjonstype=null. Gyldige verdier er ",
+			" ,kan ikke være null eller tomt. Fikk distribusjonstype=null",
+			"InVaLiD,hadde en ugyldig verdi. Fikk distribusjonstype=InVaLiD. Gyldige verdier er "})
+	public void shouldThrowValidationExceptionFromMissingDistribusjonstype(String distribusjonstype, String errorMessage) {
 		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
 				.batchId(BATCH_ID)
 				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
@@ -79,9 +94,10 @@ public class Rdist002ValidationUtilTest {
 				.journalpostId(JOURNALPOST_ID)
 				.dokumentProdApp(DOKUMENTPRODAPP)
 				.distribusjonstidspunkt(KJERNETID.name())
+				.distribusjonstype(distribusjonstype)
 				.build();
 		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateRequest(request));
-		assertEquals("Feltet distribusjonstype kan ikke være null eller tomt. Fikk distribusjonstype=null", thrownException.getMessage());
+		assertThat(thrownException.getMessage(), containsString("Feltet distribusjonstype " + errorMessage));
 	}
 
 	@Test

@@ -5,6 +5,8 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
@@ -16,6 +18,7 @@ import static java.lang.String.format;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullAndValidValueIgnoreCase;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertHovedokumentFieldNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNullOrEmpty;
@@ -32,8 +35,8 @@ public class Rdist002ValidationUtil {
 		assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
 		assertNotNullOrEmptyAndCorrectLength("bestillendeFagsystem", distribuerJournalpostRequestTo.getBestillendeFagsystem());
 		assertNotNullOrEmptyAndCorrectLength("dokumentProdapp", distribuerJournalpostRequestTo.getDokumentProdApp());
-		assertNotNullOrEmpty("distribusjonstype", distribuerJournalpostRequestTo.getDistribusjonstype());
-		assertNotNullOrEmpty("distribusjonstidspunkt", distribuerJournalpostRequestTo.getDistribusjonstidspunkt());
+		assertNotNullAndValidValueIgnoreCase("distribusjonstype", distribuerJournalpostRequestTo.getDistribusjonstype(), DistribusjonstypeCode.values());
+		assertNotNullAndValidValueIgnoreCase("distribusjonstidspunkt", distribuerJournalpostRequestTo.getDistribusjonstidspunkt(), DistribusjonstidspunktCode.values());
 	}
 
 	private void assertNotNullOrEmptyAndCorrectLength(String field, String value) {

@@ -1,10 +1,12 @@
 package no.nav.dokdistfordeling.util;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
-import org.apache.commons.lang3.StringUtils;
+
+import java.util.stream.Stream;
 
 public final class ValidationUtil {
 
@@ -52,5 +54,13 @@ public final class ValidationUtil {
 		if (isBlank(value)) {
 			throw new ValidationException(format("For hoveddokumentet kan feltet %s ikke være null eller tomt. Fikk %s=%s", field, field, value));
 		}
+	}
+
+	public static <T extends Enum<?>> void assertNotNullAndValidValueIgnoreCase(String field, String value, T... validValues) {
+		assertNotNullOrEmpty(field, value);
+		if (Stream.of(validValues).map(Enum::name).noneMatch(value::equalsIgnoreCase)) {
+			throw new ValidationException(format("Feltet %s hadde en ugyldig verdi. Fikk %s=%s. Gyldige verdier er [%s]", field, field, value, Stream.of(validValues).map(Enum::name).collect(joining(", "))));
+		}
+
 	}
 }
