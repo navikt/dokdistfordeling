@@ -5,6 +5,8 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
@@ -16,13 +18,13 @@ import static java.lang.String.format;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullAndValidValueIgnoreCase;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertHovedokumentFieldNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
-import static org.jvnet.jaxb2_commons.lang.StringUtils.isEmpty;
 
 @Slf4j
 public class Rdist002ValidationUtil {
@@ -33,14 +35,8 @@ public class Rdist002ValidationUtil {
 		assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
 		assertNotNullOrEmptyAndCorrectLength("bestillendeFagsystem", distribuerJournalpostRequestTo.getBestillendeFagsystem());
 		assertNotNullOrEmptyAndCorrectLength("dokumentProdapp", distribuerJournalpostRequestTo.getDokumentProdApp());
-		logMissingDistribusjonsinformasjon(distribuerJournalpostRequestTo, "distribusjonstype", distribuerJournalpostRequestTo.getDistribusjonstype());
-		logMissingDistribusjonsinformasjon(distribuerJournalpostRequestTo, "distribusjonstidspunkt", distribuerJournalpostRequestTo.getDistribusjonstidspunkt());
-	}
-
-	private void logMissingDistribusjonsinformasjon(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, String field, String value) {
-		if (isEmpty(value)) {
-			log.warn("{} er ikke satt for journalpost={}, bestillende fagsystem={}, dokprodapp={}", field, distribuerJournalpostRequestTo.getJournalpostId(), distribuerJournalpostRequestTo.getBestillendeFagsystem(), distribuerJournalpostRequestTo.getDokumentProdApp());
-		}
+		assertNotNullAndValidValueIgnoreCase("distribusjonstype", distribuerJournalpostRequestTo.getDistribusjonstype(), DistribusjonstypeCode.values());
+		assertNotNullAndValidValueIgnoreCase("distribusjonstidspunkt", distribuerJournalpostRequestTo.getDistribusjonstidspunkt(), DistribusjonstidspunktCode.values());
 	}
 
 	private void assertNotNullOrEmptyAndCorrectLength(String field, String value) {
