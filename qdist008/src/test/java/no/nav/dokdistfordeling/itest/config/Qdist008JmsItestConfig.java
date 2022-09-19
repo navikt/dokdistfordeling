@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.itest.config;
 
 
+import com.ibm.mq.jms.MQQueue;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.RedeliveryPolicy;
 import org.apache.activemq.broker.BrokerService;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
 import javax.jms.Queue;
 
 /**
@@ -59,6 +61,11 @@ public class Qdist008JmsItestConfig {
 	@Bean
 	public Queue qdist013(@Value("${dokdisteformidling_qdist013_dist_trygderetten.queuename}") String qdist013QueueName) {
 		return new ActiveMQQueue(qdist013QueueName);
+	}
+
+	@Bean
+	public Queue qdist016(@Value("${dokdistdpv_qdist016_dist_til_dpv.queuename}") String qdist016QueueName) throws JMSException {
+		return new MQQueue(qdist016QueueName);
 	}
 
 	@Bean

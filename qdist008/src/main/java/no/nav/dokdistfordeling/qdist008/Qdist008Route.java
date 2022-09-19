@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.qdist008;
 
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DPVT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DISTRIBUSJON;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
@@ -48,6 +49,7 @@ public class Qdist008Route extends RouteBuilder {
 	private final Queue qdist010;
 	private final Queue qdist011;
 	private final Queue qdist013;
+	private final Queue qdist016;
 	private final Queue qdist008FunksjonellFeil;
 	private final Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy;
 
@@ -57,6 +59,7 @@ public class Qdist008Route extends RouteBuilder {
 						 Queue qdist010,
 						 Queue qdist011,
 						 Queue qdist013,
+						 Queue qdist016,
 						 Queue qdist008FunksjonellFeil,
 						 Qdist008Service qdist008Service,
 						 Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy,
@@ -68,6 +71,7 @@ public class Qdist008Route extends RouteBuilder {
 		this.qdist010 = qdist010;
 		this.qdist011 = qdist011;
 		this.qdist013 = qdist013;
+		this.qdist016 = qdist016;
 		this.qdist008FunksjonellFeil = qdist008FunksjonellFeil;
 		this.qdist008Service = qdist008Service;
 		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
@@ -135,6 +139,10 @@ public class Qdist008Route extends RouteBuilder {
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(TRYGDERETTEN))
 					.to(InOnly,"jms:" + qdist013.getQueueName())
 					.log(LoggingLevel.INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist013 for distribusjon via Trygderetten", getIdsForLogging()))
+					.endChoice()
+				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DPVT))
+					.to(InOnly,"jms:" + qdist016.getQueueName())
+					.log(LoggingLevel.INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist016 for distribusjon via DPVT", getIdsForLogging()))
 					.endChoice()
 				.end()
 				.bean(dokdistStatusUpdater)

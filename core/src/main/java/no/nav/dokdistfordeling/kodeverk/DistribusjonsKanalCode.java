@@ -12,7 +12,8 @@ public enum DistribusjonsKanalCode {
 	DITTNAV("NAV_NO"),
 	LOKAL_PRINT("L"),
 	INGEN_DISTRIBUSJON("INGEN_DISTRIBUSJON"),
-	TRYGDERETTEN("TRYGDERETTEN");
+	TRYGDERETTEN("TRYGDERETTEN"),
+	DPVT("DPVT");
 
 	private final String joarkUtsendingsKanal;
 
