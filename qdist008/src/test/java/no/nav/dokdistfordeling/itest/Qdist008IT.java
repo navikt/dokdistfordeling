@@ -105,6 +105,9 @@ public class Qdist008IT {
 	private Queue qdist013;
 
 	@Autowired
+	private Queue qdist016;
+
+	@Autowired
 	private Queue backoutQueue;
 
 	@Autowired
@@ -310,6 +313,45 @@ public class Qdist008IT {
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilTrygderettenOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
+	}
+
+	@Test
+	public void shouldDistribuereForsendelseTilDPV() throws Exception {
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
+		stubFor(post("/pdl").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("pdl/pdl-happy.json")));
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
+						.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+		stubFor(post("/administrerforsendelse/v1")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())));
+
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_til_dpvt.xml"));
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			String response = receive(qdist016);
+			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
+		});
+
+		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelse_til_dpv_happy.json"))));
 	}
 
 	@Test

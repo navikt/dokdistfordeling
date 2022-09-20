@@ -1,0 +1,28 @@
+{
+  "bestillingsId" : "7882d37e-34f7-11e9-b210-d663bd873d93",
+  "distribusjonsKanal" : "DPVT",
+  "bestillendeFagsystem" : "bestillendeFagsystem",
+  "tema" : "DAG",
+  "forsendelseTittel" : "Innkalling til informasjonsmoete",
+  "batchId" : "batchId",
+  "dokumentProdApp" : "token",
+  "mottaker" : {
+    "mottakerId" : "20026900817",
+    "mottakerNavn" : "Bjarne Betjent",
+    "mottakerType" : "PERSON"
+  },
+  "arkivInformasjon" : {
+    "arkivSystem" : "JOARK",
+    "arkivId" : "1234"
+  },
+  "postadresse" : null,
+  "dokumenter" : [ {
+    "tilknyttetSom" : "HOVEDDOKUMENT",
+    "dokumentObjektReferanse" : "testKey",
+    "rekkefolge" : 1,
+    "arkivDokumentInfoId" : "1234",
+    "dokumenttypeId" : "1111111"
+  } ],
+  "distribusjonstype" : null,
+  "distribusjonstidspunkt" : null
+}

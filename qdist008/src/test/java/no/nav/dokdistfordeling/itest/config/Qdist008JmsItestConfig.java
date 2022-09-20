@@ -62,6 +62,11 @@ public class Qdist008JmsItestConfig {
 	}
 
 	@Bean
+	public Queue qdist016(@Value("${dokdistdpv_qdist016_dist_til_dpv.queuename}") String qdist016QueueName) {
+		return new ActiveMQQueue(qdist016QueueName);
+	}
+
+	@Bean
 	public Queue backoutQueue() {
 		return new ActiveMQQueue("ActiveMQ.DLQ");
 	}
