@@ -141,7 +141,7 @@ public class Qdist008Route extends RouteBuilder {
 					.log(LoggingLevel.INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist013 for distribusjon via Trygderetten", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DPVT))
-					.to(InOnly,"jms:" + qdist016.getQueueName())
+					.to(InOnly, "jms:" + qdist016.getQueueName())
 					.log(LoggingLevel.INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist016 for distribusjon via DPVT", getIdsForLogging()))
 					.endChoice()
 				.end()
