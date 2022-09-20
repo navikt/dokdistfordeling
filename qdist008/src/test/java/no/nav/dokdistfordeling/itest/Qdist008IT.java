@@ -316,7 +316,7 @@ public class Qdist008IT {
 	}
 
 	@Test
-	public void shouldProcessForsendelseAndWithUtsendingskanalDPV() throws Exception {
+	public void shouldDistribuereForsendelseTilDPV() throws Exception {
 		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
