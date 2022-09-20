@@ -25,8 +25,8 @@
         <java.version>17</java.version>
         <camel.version>3.18.1</camel.version>
         <logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
-        <google-cloud.version>26.1.1</google-cloud.version>
-        <google-tink.version>1.7.0</google-tink.version>
+        <google-cloud.version>25.4.0</google-cloud.version>
+        <google-tink.version>1.6.1</google-tink.version>
         <dokkat-api>10.4.0</dokkat-api>
         <wmq.version>9.3.0.0</wmq.version>
         <commons-io.version>2.11.0</commons-io.version>
