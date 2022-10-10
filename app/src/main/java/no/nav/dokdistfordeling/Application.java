@@ -14,6 +14,9 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Import;
 import org.springframework.retry.annotation.EnableRetry;
 
+import static java.lang.System.getenv;
+import static java.lang.System.setProperty;
+
 @EnableCaching
 @EnableRetry
 @SpringBootApplication
@@ -33,6 +36,7 @@ import org.springframework.retry.annotation.EnableRetry;
 public class Application {
 
 	public static void main(String[] args) {
+		setProperty("javax.net.ssl.keyStorePassword", getenv("DOKDISTFORDELING_CERT_KEYSTORE_PASSWORD"));
 		SpringApplication.run(Application.class, args);
 	}
 
