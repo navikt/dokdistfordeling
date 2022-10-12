@@ -19,7 +19,7 @@
   "DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME": "QA.P_DOKDISTEFORMIDLING.QDIST013_DIST_TRYGDE",
   "DOKDISTDPV_QDIST016_DIST_TIL_DPV_QUEUENAME": "QA.P_DOKDISTDPV.QDIST016_DIST_TIL_DPV",
   "SRVDOKDISTFORDELING": "/serviceuser/data/prod/srvdokdistfordeling",
-  "DOKDISTFORDELING_CERT": "/kv/preprod/fss/dokdistfordeling/certificate",
+  "DOKDISTFORDELING_CERT": "/kv/prod/fss/dokdistfordeling/certificate",
   "PDL_URL": "https://pdl-api.intern.nav.no/graphql",
   "SAF_GRAPHQL_URL": "https://saf.intern.nav.no/graphql",
   "HENTDOKUMENT_URL": "https://saf.intern.nav.no/rest/hentdokument",
