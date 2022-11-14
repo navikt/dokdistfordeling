@@ -6,6 +6,7 @@ import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
+import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
@@ -27,11 +28,10 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
-import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
-import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
 import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
 import static org.apache.commons.lang3.EnumUtils.isValidEnumIgnoreCase;
@@ -170,13 +170,12 @@ public class DistribuerForsendelseMapper {
 			throw new ValidationException("Ugyldig input: samhandlerkategori kan ikke være null");
 		}
 
-		if (HPR.name().equals(samhandlerKategori)) {
-			return SAMHANDLER_HPR;
-		} else if (UTL_ORG.name().equals(samhandlerKategori)) {
-			return SAMHANDLER_UTL_ORG;
-		} else {
-			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR og UTL_ORG støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
-		}
+		return switch (SamhandlerKategoriCode.valueOf(samhandlerKategori)) {
+			case HPR -> SAMHANDLER_HPR;
+			case UTL_ORG -> SAMHANDLER_UTL_ORG;
+			case UKJENT -> SAMHANDLER_UKJENT;
+			default -> throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR og UTL_ORG støttes støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
+		};
 	}
 
 	private String mapKanalCode(String distribusjonKanal) {

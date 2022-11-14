@@ -7,12 +7,10 @@ import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentForAktoerIdFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
-import static no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType.UTL_ORG;
 import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static org.apache.logging.log4j.util.Strings.isEmpty;

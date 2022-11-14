@@ -57,6 +57,7 @@ class DistribuerForsendelseMapperTest {
 	private static final String ORGNUMMER = "orgnr";
 	private static final String SAMHANDLER_IDENTIFIKATOR = "samhandlerId";
 	private static final String SAMHANDLER_KATEGORI_UTL_ORG = "UTL_ORG";
+	private static final String SAMHANDLER_KATEGORI_UKJENT = "UKJENT";
 	private static final String SAMHANDLER_KATEGORI_HPR = "HPR";
 	private static final String ADRESSELINJE_1 = "adresselinje1";
 	private static final String ADRESSELINJE_2 = "adresselinje2";
@@ -173,6 +174,21 @@ class DistribuerForsendelseMapperTest {
 	}
 
 	@Test
+	public void shouldMapSamhandlerUkjent() {
+		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
+		distribuerForsendelse.getDistribusjonbestilling().withMottaker(createAktoerSamhandlerOrgUkjent());
+		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
+
+		assertDistribuerForsendelseTo(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
+		final DistribuerForsendelseTo.AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
+		assertEquals(mottakerTo.getIdentifikator(), SAMHANDLER_IDENTIFIKATOR);
+		assertEquals(mottakerTo.getNavn(), SAMHANDLER_NAVN);
+		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.SAMHANDLER_UKJENT);
+		assertFalse(mottakerTo.isIdentifikatorAktoerId());
+	}
+
+	@Test
 	public void shouldMapOkWhenWithoutAkivinformasjon() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
 		distribuerForsendelse.getDistribusjonbestilling().withArkivInformasjon(null);
@@ -250,7 +266,7 @@ class DistribuerForsendelseMapperTest {
 		NorskPostadresse adresse = createNorskPostadresse();
 		adresse.setAdresselinje1("    ");
 		adresse.setAdresselinje2("           ");
-		adresse.setAdresselinje3("          "+adresse.getAdresselinje3());
+		adresse.setAdresselinje3("          " + adresse.getAdresselinje3());
 		distribuerForsendelse.getDistribusjonbestilling().withAdresse(adresse);
 		distribuerForsendelse.getDistribusjonbestilling().withDistribusjonKanal(DISTRIBUSJONKANAL_PRINT);
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
@@ -413,5 +429,12 @@ class DistribuerForsendelseMapperTest {
 				.withNavn(SAMHANDLER_NAVN)
 				.withSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR)
 				.withSamhandlerkategori(SAMHANDLER_KATEGORI_UTL_ORG);
+	}
+
+	private Aktoer createAktoerSamhandlerOrgUkjent() {
+		return new Samhandler()
+				.withNavn(SAMHANDLER_NAVN)
+				.withSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR)
+				.withSamhandlerkategori(SAMHANDLER_KATEGORI_UKJENT);
 	}
 }

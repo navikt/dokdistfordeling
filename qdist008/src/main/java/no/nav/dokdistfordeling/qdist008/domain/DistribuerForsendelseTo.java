@@ -51,7 +51,9 @@ public class DistribuerForsendelseTo {
 		private final AktoerTypeCode aktoerType;
 
 		public boolean isSamhandler() {
-			return this.getAktoerType().equals(AktoerTypeCode.SAMHANDLER_HPR) || this.aktoerType.equals(AktoerTypeCode.SAMHANDLER_UTL_ORG);
+			return this.getAktoerType().equals(AktoerTypeCode.SAMHANDLER_HPR)
+					|| this.aktoerType.equals(AktoerTypeCode.SAMHANDLER_UTL_ORG)
+					|| this.aktoerType.equals(AktoerTypeCode.SAMHANDLER_UKJENT);
 		}
 
 	}
