@@ -174,7 +174,7 @@ public class DistribuerForsendelseMapper {
 			case HPR -> SAMHANDLER_HPR;
 			case UTL_ORG -> SAMHANDLER_UTL_ORG;
 			case UKJENT -> SAMHANDLER_UKJENT;
-			default -> throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR og UTL_ORG støttes støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
+			default -> throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR, UTL_ORG og UKJENT støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
 		};
 	}
 
