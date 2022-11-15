@@ -13,6 +13,10 @@ import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 
 import java.util.List;
 
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UKJENT;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
+
 /**
  * @author Sigurd Midttun, Visma Consulting AS
  */
@@ -51,7 +55,9 @@ public class DistribuerForsendelseTo {
 		private final AktoerTypeCode aktoerType;
 
 		public boolean isSamhandler() {
-			return this.getAktoerType().equals(AktoerTypeCode.SAMHANDLER_HPR) || this.aktoerType.equals(AktoerTypeCode.SAMHANDLER_UTL_ORG);
+			return this.getAktoerType() == SAMHANDLER_HPR
+					|| this.aktoerType == SAMHANDLER_UTL_ORG
+					|| this.aktoerType == SAMHANDLER_UKJENT;
 		}
 
 	}

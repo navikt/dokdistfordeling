@@ -52,6 +52,7 @@ class HentDokumenterFraJoarkMapperTest {
 	private static final String ORGNUMMER = "orgnr";
 	private static final String SAMHANDLER_IDENTIFIKATOR = "samhandlerId";
 	private static final String SAMHANDLER_KATEGORI_HPR = "HPR";
+	private static final String SAMHANDLER_KATEGORI_UKJENT = "UKJENT";
 	private static final String ADRESSELINJE_1 = "adresselinje1";
 	private static final String ADRESSELINJE_2 = "adresselinje2";
 	private static final String ADRESSELINJE_3 = "adresselinje3";
@@ -154,6 +155,21 @@ class HentDokumenterFraJoarkMapperTest {
 		assertEquals(mottakerTo.getIdentifikator(), SAMHANDLER_IDENTIFIKATOR);
 		assertEquals(mottakerTo.getNavn(), SAMHANDLER_NAVN);
 		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.SAMHANDLER_HPR);
+		assertFalse(mottakerTo.isIdentifikatorAktoerId());
+	}
+
+	@Test
+	public void shouldMapSamhandlerUKJENT() {
+		HentDokumenterFraJoark hentDokumenterFraJoark = createHentDokumentFraJoark();
+		hentDokumenterFraJoark.getDistribusjonbestilling().withMottaker(createAktoerSamhandlerUkjent());
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
+
+		assertHentDokumentFraJoarkTo(hentDokumenterFraJoarkTo);
+		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker());
+		final HentDokumenterFraJoarkTo.AktoerTo mottakerTo = hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker();
+		assertEquals(mottakerTo.getIdentifikator(), SAMHANDLER_IDENTIFIKATOR);
+		assertEquals(mottakerTo.getNavn(), SAMHANDLER_NAVN);
+		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.SAMHANDLER_UKJENT);
 		assertFalse(mottakerTo.isIdentifikatorAktoerId());
 	}
 
@@ -367,6 +383,13 @@ class HentDokumenterFraJoarkMapperTest {
 				.withNavn(SAMHANDLER_NAVN)
 				.withSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR)
 				.withSamhandlerkategori(SAMHANDLER_KATEGORI_HPR);
+	}
+
+	private Aktoer createAktoerSamhandlerUkjent() {
+		return new Samhandler()
+				.withNavn(SAMHANDLER_NAVN)
+				.withSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR)
+				.withSamhandlerkategori(SAMHANDLER_KATEGORI_UKJENT);
 	}
 
 }

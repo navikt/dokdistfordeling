@@ -51,6 +51,7 @@ class Qdist008DistribuerForsendelseMapperTest {
 	private static final String SAMHANDLER_IDENTIFIKATOR = "samhandlerId";
 	private static final String SAMHANDLER_KATEGORI_HPR = "HPR";
 	private static final String SAMHANDLER_KATEGORI_UTL_ORG = "UTL_ORG";
+	private static final String SAMHANDLER_KATEGORI_UKJENT = "UKJENT";
 	private static final String ADRESSELINJE_1 = "adresselinje1";
 	private static final String ADRESSELINJE_2 = "adresselinje2";
 	private static final String ADRESSELINJE_3 = "adresselinje3";
@@ -168,6 +169,24 @@ class Qdist008DistribuerForsendelseMapperTest {
 		assertEquals(samhandler.getSamhandleridentifikator(), SAMHANDLER_IDENTIFIKATOR);
 		assertEquals(samhandler.getNavn(), SAMHANDLER_NAVN);
 		assertEquals(samhandler.getSamhandlerkategori(), SAMHANDLER_KATEGORI_UTL_ORG);
+	}
+
+	@Test
+	public void shouldMapSamhandlerUkjent() {
+		DistribuerForsendelse distribuerForsendelse = qdist008DistribuerForsendelseMapper.map(HentDokumenterFraJoarkTo.builder()
+				.distribusjonbestilling(createDistribusjonbestillingToBuilder()
+						.mottaker(createAktoerSamhandlerUkjent(SAMHANDLER_NAVN, SAMHANDLER_IDENTIFIKATOR))
+						.build())
+				.build());
+
+		assertDistribuerForsendelse(distribuerForsendelse);
+		assertNotNull(distribuerForsendelse.getDistribusjonbestilling().getMottaker());
+		assertTrue(distribuerForsendelse.getDistribusjonbestilling().getMottaker() instanceof Samhandler);
+
+		final Samhandler samhandler = (Samhandler) distribuerForsendelse.getDistribusjonbestilling().getMottaker();
+		assertEquals(samhandler.getSamhandleridentifikator(), SAMHANDLER_IDENTIFIKATOR);
+		assertEquals(samhandler.getNavn(), SAMHANDLER_NAVN);
+		assertEquals(samhandler.getSamhandlerkategori(), SAMHANDLER_KATEGORI_UKJENT);
 	}
 
 	@Test
@@ -350,5 +369,9 @@ class Qdist008DistribuerForsendelseMapperTest {
 
 	private HentDokumenterFraJoarkTo.AktoerTo createAktoerSamhandlerUtlOrg(String navn, String identifikasjon) {
 		return new HentDokumenterFraJoarkTo.AktoerTo(identifikasjon, navn, false, AktoerTypeCode.SAMHANDLER_UTL_ORG);
+	}
+
+	private HentDokumenterFraJoarkTo.AktoerTo createAktoerSamhandlerUkjent(String navn, String identifikasjon) {
+		return new HentDokumenterFraJoarkTo.AktoerTo(identifikasjon, navn, false, AktoerTypeCode.SAMHANDLER_UKJENT);
 	}
 }

@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
@@ -150,13 +152,13 @@ public class HentDokumenterFraJoarkMapper {
 	private AktoerTypeCode mapSamhandlerKategoriToSamhandlerType(String samhandlerKategori) {
 		if (samhandlerKategori == null) {
 			throw new ValidationException("Ugyldig input: samhandlerkategori kan ikke være null");
-		} else if (SamhandlerKategoriCode.HPR.name().equals(samhandlerKategori)) {
-			return AktoerTypeCode.SAMHANDLER_HPR;
-		} else if (SamhandlerKategoriCode.UTL_ORG.name().equals(samhandlerKategori)) {
-			return AktoerTypeCode.SAMHANDLER_UTL_ORG;
-		} else {
-			throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR og UTL_ORG støttes støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
 		}
+		return switch (SamhandlerKategoriCode.valueOf(samhandlerKategori)) {
+			case HPR -> SAMHANDLER_HPR;
+			case UTL_ORG -> SAMHANDLER_UTL_ORG;
+			case UKJENT -> AktoerTypeCode.SAMHANDLER_UKJENT;
+			default -> throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR, UTL_ORG og UKJENT støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
+		};
 	}
 
 	private String mapKanalCode(String distribusjonKanal) {

@@ -24,6 +24,7 @@ import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
+import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -111,6 +112,12 @@ public class Qdist008DistribuerForsendelseMapper {
 						.withSamhandleridentifikator(aktoer.getIdentifikator())
 						.withNavn(aktoer.getNavn())
 						.withSamhandlerkategori(UTL_ORG.name());
+				break;
+			case SAMHANDLER_UKJENT:
+				output = new Samhandler()
+						.withSamhandleridentifikator(aktoer.getIdentifikator())
+						.withNavn(aktoer.getNavn())
+						.withSamhandlerkategori(UKJENT.name());
 				break;
 			default:
 				output = null;
