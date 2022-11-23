@@ -146,10 +146,10 @@ public class UnitTestUtil {
 	}
 
 	public static DistribuerJournalpostRequestTo.AdresseTo createUtenlandskPostadresse() {
-		return createUtenlandskPostadresse(ADRESSELINJE1);
+		return createUtenlandskPostadresseWithAdresselinje1(ADRESSELINJE1);
 	}
 
-	public static DistribuerJournalpostRequestTo.AdresseTo createUtenlandskPostadresse(String adresselinje1) {
+	public static DistribuerJournalpostRequestTo.AdresseTo createUtenlandskPostadresseWithAdresselinje1(String adresselinje1) {
 		return new DistribuerJournalpostRequestTo.AdresseTo(
 				ADRESSETYPE_UTENLANDSK,
 				null,

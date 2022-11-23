@@ -15,8 +15,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Arrays;
 
-import static no.nav.dokdistfordeling.UnitTestUtil.ADRESSELINJE1;
-import static no.nav.dokdistfordeling.UnitTestUtil.ADRESSETYPE_NORSK;
 import static no.nav.dokdistfordeling.UnitTestUtil.BATCH_ID;
 import static no.nav.dokdistfordeling.UnitTestUtil.BESTILLENDEFAGSYSTEM;
 import static no.nav.dokdistfordeling.UnitTestUtil.BRUKER_ID;
@@ -24,8 +22,6 @@ import static no.nav.dokdistfordeling.UnitTestUtil.DOKUMENTPRODAPP;
 import static no.nav.dokdistfordeling.UnitTestUtil.JOURNALPOST_ID;
 import static no.nav.dokdistfordeling.UnitTestUtil.MOTTAKER_ID;
 import static no.nav.dokdistfordeling.UnitTestUtil.MOTTAKER_NAVN;
-import static no.nav.dokdistfordeling.UnitTestUtil.POSTNUMMER;
-import static no.nav.dokdistfordeling.UnitTestUtil.POSTSTED;
 import static no.nav.dokdistfordeling.UnitTestUtil.createDokumentInfo1Builder;
 import static no.nav.dokdistfordeling.UnitTestUtil.createDokumentInfo2Builder;
 import static no.nav.dokdistfordeling.UnitTestUtil.createJournalpostBuilder;
@@ -33,6 +29,7 @@ import static no.nav.dokdistfordeling.UnitTestUtil.createMottaker;
 import static no.nav.dokdistfordeling.UnitTestUtil.createNorskPostadresse;
 import static no.nav.dokdistfordeling.UnitTestUtil.createPostadresseAdresstypeNull;
 import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresse;
+import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresseWithAdresselinje1;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VIKTIG;
@@ -136,7 +133,7 @@ public class Rdist002ValidationUtilTest {
 			"'',Feltet adresselinje1 kan ikke være null eller tomt. Fikk adresselinje1= "
 	})
 	public void ShouldThrowValidationExceptionForMissingAdresselinje1(String adresselinje1, String expectedMessage) {
-		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(createUtenlandskPostadresse(adresselinje1), createMottaker()));
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(createUtenlandskPostadresseWithAdresselinje1(adresselinje1), createMottaker()));
 		assertEquals(expectedMessage, thrownException.getMessage());
 	}
 

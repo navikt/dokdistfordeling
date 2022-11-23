@@ -15,6 +15,7 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -34,10 +35,10 @@ import static no.nav.dokdistfordeling.util.ValidationUtil.asssertStringIsNumberO
 public class Rdist002ValidationUtil {
 
 	private static final String UTGAAENDE = Journalposttype.U.name();
-	private final List<String> ISO3166_TWO_LETTER_CODES;
+	private final Set<String> ISO3166_TWO_LETTER_CODES;
 
 	public Rdist002ValidationUtil() {
-		ISO3166_TWO_LETTER_CODES = Arrays.stream(Locale.getISOCountries()).collect(Collectors.toList());
+		ISO3166_TWO_LETTER_CODES = Arrays.stream(Locale.getISOCountries()).collect(Collectors.toSet());
 	}
 
 	public void validateRequest(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
