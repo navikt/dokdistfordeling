@@ -143,7 +143,8 @@ public class Rdist002ValidationUtilTest {
 	@ParameterizedTest
 	@CsvSource({
 			"NOR,Land må være en gyldig iso3166-2 landkode på 2 bokstaver. Fikk=NOR",
-			"'',Land må være en gyldig iso3166-2 landkode på 2 bokstaver. Fikk="
+			"'',Land må være en gyldig iso3166-2 landkode på 2 bokstaver. Fikk=",
+			",Land må være en gyldig iso3166-2 landkode på 2 bokstaver. Fikk=null"
 	})
 	public void shouldThrowValidationExceptionForBadLandkode(String landkode, String expectedMessage) {
 		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(UnitTestUtil.createPostadresseWithLandkode(landkode), createMottaker()));
@@ -193,25 +194,6 @@ public class Rdist002ValidationUtilTest {
 		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(null, mottaker));
 		assertEquals("For mottaker av type samhandler kan ikke adresse være null", thrownException.getMessage());
 	}
-
-	@Test
-	public void shouldThrowValidationExceptionFromMissingLand() {
-		Person mottaker = new Person()
-				.withNavn(MOTTAKER_NAVN)
-				.withPersonidentifikator(MOTTAKER_ID);
-		DistribuerJournalpostRequestTo.AdresseTo adresseWithNullLand = new DistribuerJournalpostRequestTo.AdresseTo(
-				ADRESSETYPE_NORSK,
-				POSTNUMMER,
-				POSTSTED,
-				ADRESSELINJE1,
-				null,
-				null,
-				null
-		);
-		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(adresseWithNullLand, mottaker));
-		assertEquals("Feltet land kan ikke være null eller tomt. Fikk land=null", thrownException.getMessage());
-	}
-
 
 	@Test
 	public void shouldThrowValidationExceptionForMissingAdresseType() {
