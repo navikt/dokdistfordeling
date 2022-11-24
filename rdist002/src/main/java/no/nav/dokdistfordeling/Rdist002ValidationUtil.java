@@ -12,24 +12,34 @@ import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
-import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullAndValidValueIgnoreCase;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertHovedokumentFieldNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullAndValidValueIgnoreCase;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertStringIsNumberOfExactLength;
 
 @Slf4j
 public class Rdist002ValidationUtil {
 
 	private static final String UTGAAENDE = Journalposttype.U.name();
+	private final Set<String> ISO3166_TWO_LETTER_CODES;
+
+	public Rdist002ValidationUtil() {
+		ISO3166_TWO_LETTER_CODES = Arrays.stream(Locale.getISOCountries()).collect(Collectors.toSet());
+	}
 
 	public void validateRequest(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
 		assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
@@ -52,17 +62,23 @@ public class Rdist002ValidationUtil {
 		}
 
 		if (adresseTo != null) {
-			assertNotNullOrEmpty("land", adresseTo.getLand());
-			assertNotNullOrEmpty("adressetype", adresseTo.getAdressetype());
+			validateLandKode(adresseTo.getLand());
 
-			if (adresseTo.getAdressetype().equals(NORSK_POSTADRESSE)) {
+			if (NORSK_POSTADRESSE.equals(adresseTo.getAdressetype())) {
 				assertNotNullOrEmpty("poststed", adresseTo.getPoststed());
-				assertNotNullOrEmpty("postnummer", adresseTo.getPostnummer());
-			} else if (adresseTo.getAdressetype().equals(UTENLANDSK_POSTADRESSE)) {
+				assertStringIsNumberOfExactLength("postnummer", adresseTo.getPostnummer(), 4);
+
+			} else if (UTENLANDSK_POSTADRESSE.equals(adresseTo.getAdressetype())) {
 				assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
 			} else {
 				throw new ValidationException(format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, adresseType= %s", adresseTo.getAdressetype()));
 			}
+		}
+	}
+
+	private void validateLandKode(String land) {
+		if (!ISO3166_TWO_LETTER_CODES.contains(land)) {
+			throw new ValidationException(format("Land må være en gyldig iso3166-2 landkode på 2 bokstaver. Fikk=%s", land));
 		}
 	}
 

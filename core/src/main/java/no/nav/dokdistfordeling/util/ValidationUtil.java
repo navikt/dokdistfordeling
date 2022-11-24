@@ -1,12 +1,13 @@
 package no.nav.dokdistfordeling.util;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 
 import java.util.stream.Stream;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 public final class ValidationUtil {
 
@@ -16,6 +17,12 @@ public final class ValidationUtil {
 	public static void assertNotNullOrEmpty(String field, String value) {
 		if (isBlank(value)) {
 			throw new ValidationException(format("Feltet %s kan ikke være null eller tomt. Fikk %s=%s", field, field, value));
+		}
+	}
+
+	public static void assertStringIsNumberOfExactLength(String field, String value, int expectedLength) {
+		if (!isNumeric(value) || value.length() != expectedLength) {
+			throw new ValidationException(format("Feltet %s må være et gyldig tall med %s siffer. Fikk %s=%s", field, expectedLength, field, value));
 		}
 	}
 

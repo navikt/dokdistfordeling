@@ -1,15 +1,15 @@
 package no.nav.dokdistfordeling;
 
-import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
-
-import no.nav.dokdistfordeling.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
+import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
 
 public class UnitTestUtil {
 
@@ -111,24 +111,50 @@ public class UnitTestUtil {
 						.variantformat(Variantformat.ARKIV).build()));
 	}
 
+	public static DistribuerJournalpostRequestTo.AdresseTo createNorskPostadresseWithPostSted(String poststed) {
+		return createBaseNorskPostadresse(POSTNUMMER, LAND_NO, poststed);
+	}
+	
+	public static DistribuerJournalpostRequestTo.AdresseTo createNorskPostadresseWithPostnummer(String postnummer) {
+		return createBaseNorskPostadresse(postnummer, LAND_NO, POSTSTED);
+	}
+
+	public static DistribuerJournalpostRequestTo.AdresseTo createPostadresseWithLandkode(String landkode) {
+		return createBaseNorskPostadresse(POSTNUMMER, landkode, POSTSTED);
+	}
+
 	public static DistribuerJournalpostRequestTo.AdresseTo createNorskPostadresse() {
+		return createBaseNorskPostadresse(POSTNUMMER, LAND_NO, POSTSTED);
+	}
+
+	private static DistribuerJournalpostRequestTo.AdresseTo createBaseNorskPostadresse(String postnummer, String landkode, String poststed){
 		return new DistribuerJournalpostRequestTo.AdresseTo(
 				ADRESSETYPE_NORSK,
-				POSTNUMMER,
-				POSTSTED,
+				postnummer,
+				poststed,
 				ADRESSELINJE1,
 				ADRESSELINJE2,
 				ADRESSELINJE3,
-				LAND_NO
+				landkode
 		);
 	}
 
+	public static Person createMottaker(){
+		return new Person()
+				.withNavn(MOTTAKER_NAVN)
+				.withPersonidentifikator(MOTTAKER_ID);
+	}
+
 	public static DistribuerJournalpostRequestTo.AdresseTo createUtenlandskPostadresse() {
+		return createUtenlandskPostadresseWithAdresselinje1(ADRESSELINJE1);
+	}
+
+	public static DistribuerJournalpostRequestTo.AdresseTo createUtenlandskPostadresseWithAdresselinje1(String adresselinje1) {
 		return new DistribuerJournalpostRequestTo.AdresseTo(
 				ADRESSETYPE_UTENLANDSK,
 				null,
 				null,
-				ADRESSELINJE1,
+				adresselinje1,
 				ADRESSELINJE2,
 				ADRESSELINJE3,
 				LAND_US

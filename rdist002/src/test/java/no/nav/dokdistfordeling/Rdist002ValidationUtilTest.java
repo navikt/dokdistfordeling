@@ -4,7 +4,6 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
@@ -13,13 +12,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 
-import static no.nav.dokdistfordeling.UnitTestUtil.ADRESSELINJE1;
-import static no.nav.dokdistfordeling.UnitTestUtil.ADRESSETYPE_NORSK;
 import static no.nav.dokdistfordeling.UnitTestUtil.BATCH_ID;
 import static no.nav.dokdistfordeling.UnitTestUtil.BESTILLENDEFAGSYSTEM;
 import static no.nav.dokdistfordeling.UnitTestUtil.BRUKER_ID;
@@ -27,14 +22,14 @@ import static no.nav.dokdistfordeling.UnitTestUtil.DOKUMENTPRODAPP;
 import static no.nav.dokdistfordeling.UnitTestUtil.JOURNALPOST_ID;
 import static no.nav.dokdistfordeling.UnitTestUtil.MOTTAKER_ID;
 import static no.nav.dokdistfordeling.UnitTestUtil.MOTTAKER_NAVN;
-import static no.nav.dokdistfordeling.UnitTestUtil.POSTNUMMER;
-import static no.nav.dokdistfordeling.UnitTestUtil.POSTSTED;
 import static no.nav.dokdistfordeling.UnitTestUtil.createDokumentInfo1Builder;
 import static no.nav.dokdistfordeling.UnitTestUtil.createDokumentInfo2Builder;
 import static no.nav.dokdistfordeling.UnitTestUtil.createJournalpostBuilder;
+import static no.nav.dokdistfordeling.UnitTestUtil.createMottaker;
 import static no.nav.dokdistfordeling.UnitTestUtil.createNorskPostadresse;
 import static no.nav.dokdistfordeling.UnitTestUtil.createPostadresseAdresstypeNull;
 import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresse;
+import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresseWithAdresselinje1;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VIKTIG;
@@ -47,7 +42,6 @@ public class Rdist002ValidationUtilTest {
 
 	private Rdist002ValidationUtil rdist002ValidationUtil = new Rdist002ValidationUtil();
 
-	// validate request
 	@Test
 	public void shouldValidateRequest() {
 		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
@@ -112,6 +106,55 @@ public class Rdist002ValidationUtilTest {
 		assertEquals("Feltet journalpostId kan ikke være null eller tomt. Fikk journalpostId=null", thrownException.getMessage());
 	}
 
+	@ParameterizedTest
+	@CsvSource({
+			"ikke_et_postnummer,Feltet postnummer må være et gyldig tall med 4 siffer. Fikk postnummer=ikke_et_postnummer",
+			"12345,Feltet postnummer må være et gyldig tall med 4 siffer. Fikk postnummer=12345",
+			",Feltet postnummer må være et gyldig tall med 4 siffer. Fikk postnummer=null"
+	})
+	public void ShouldThrowValidationExceptionWhenBadNorskPostnummer(String postnummer, String expectedMessage) {
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(UnitTestUtil.createNorskPostadresseWithPostnummer(postnummer), createMottaker()));
+		assertEquals(expectedMessage, thrownException.getMessage());
+	}
+
+	@ParameterizedTest
+	@CsvSource({
+			",Feltet poststed kan ikke være null eller tomt. Fikk poststed=null",
+			"'', Feltet poststed kan ikke være null eller tomt. Fikk poststed= "
+	})
+	public void shouldThrowValdationExceptionWhenNoPostnummerOrPoststedForNorskPostadresse(String poststed, String expectedMessage) {
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(UnitTestUtil.createNorskPostadresseWithPostSted(poststed), createMottaker()));
+		assertEquals(expectedMessage, thrownException.getMessage());
+	}
+
+	@ParameterizedTest
+	@CsvSource({
+			",Feltet adresselinje1 kan ikke være null eller tomt. Fikk adresselinje1=null",
+			"'',Feltet adresselinje1 kan ikke være null eller tomt. Fikk adresselinje1= "
+	})
+	public void shouldThrowValidationExceptionForMissingAdresselinje1WhenUtenlandskAdresse(String adresselinje1, String expectedMessage) {
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(createUtenlandskPostadresseWithAdresselinje1(adresselinje1), createMottaker()));
+		assertEquals(expectedMessage, thrownException.getMessage());
+	}
+
+	@ParameterizedTest
+	@CsvSource({
+			"NOR,Land må være en gyldig iso3166-2 landkode på 2 bokstaver. Fikk=NOR",
+			"'',Land må være en gyldig iso3166-2 landkode på 2 bokstaver. Fikk=",
+			",Land må være en gyldig iso3166-2 landkode på 2 bokstaver. Fikk=null"
+	})
+	public void shouldThrowValidationExceptionForBadLandkode(String landkode, String expectedMessage) {
+		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(UnitTestUtil.createPostadresseWithLandkode(landkode), createMottaker()));
+		assertEquals(expectedMessage, thrownException.getMessage());
+	}
+
+	@ParameterizedTest
+	@CsvSource({"BV", "EE", "KG", "NO", "SE", "DK"})
+	public void shouldValidateGoodLandkode(String landkode) {
+		rdist002ValidationUtil.validateAdresse(UnitTestUtil.createPostadresseWithLandkode(landkode), createMottaker());
+	}
+
+
 	@Test
 	public void shouldThrowValidationExceptionFromMissingBestillendeFagsystemId() {
 		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
@@ -127,26 +170,17 @@ public class Rdist002ValidationUtilTest {
 
 	@Test
 	public void shouldValidateNorskPostadresse() {
-		Person mottaker = new Person()
-				.withNavn(MOTTAKER_NAVN)
-				.withPersonidentifikator(MOTTAKER_ID);
-		rdist002ValidationUtil.validateAdresse(createNorskPostadresse(), mottaker);
+		rdist002ValidationUtil.validateAdresse(createNorskPostadresse(), createMottaker());
 	}
 
 	@Test
 	public void shouldValidateAdresseWithoutAdresse() {
-		Person mottaker = new Person()
-				.withNavn(MOTTAKER_NAVN)
-				.withPersonidentifikator(MOTTAKER_ID);
-		rdist002ValidationUtil.validateAdresse(null, mottaker);
+		rdist002ValidationUtil.validateAdresse(null, createMottaker());
 	}
 
 	@Test
 	public void shouldValidateAdresseWithUtenlandskPostadresse() {
-		Person mottaker = new Person()
-				.withNavn(MOTTAKER_NAVN)
-				.withPersonidentifikator(MOTTAKER_ID);
-		rdist002ValidationUtil.validateAdresse(createUtenlandskPostadresse(), mottaker);
+		rdist002ValidationUtil.validateAdresse(createUtenlandskPostadresse(), createMottaker());
 	}
 
 	@Test
@@ -159,33 +193,14 @@ public class Rdist002ValidationUtilTest {
 	}
 
 	@Test
-	public void shouldThrowValidationExceptionFromMissingLand() {
-		Person mottaker = new Person()
-				.withNavn(MOTTAKER_NAVN)
-				.withPersonidentifikator(MOTTAKER_ID);
-		DistribuerJournalpostRequestTo.AdresseTo adresseWithNullLand = new DistribuerJournalpostRequestTo.AdresseTo(
-				ADRESSETYPE_NORSK,
-				POSTNUMMER,
-				POSTSTED,
-				ADRESSELINJE1,
-				null,
-				null,
-				null
-		);
-		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(adresseWithNullLand, mottaker));
-		assertEquals("Feltet land kan ikke være null eller tomt. Fikk land=null", thrownException.getMessage());
-	}
-
-
-	@Test
-	public void shouldThrowValidationExceptionForMissingAdresseType(){
+	public void shouldThrowValidationExceptionForMissingAdresseType() {
 		Person mottaker = new Person()
 				.withNavn(MOTTAKER_NAVN)
 				.withPersonidentifikator(MOTTAKER_ID);
 
 		DistribuerJournalpostRequestTo.AdresseTo adresseWithNullAdressType = createPostadresseAdresstypeNull();
 		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(adresseWithNullAdressType, mottaker));
-		assertEquals("Feltet adressetype kan ikke være null eller tomt. Fikk adressetype=null", thrownException.getMessage());
+		assertEquals("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, adresseType= null", thrownException.getMessage());
 
 	}
 
