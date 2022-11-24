@@ -132,7 +132,7 @@ public class Rdist002ValidationUtilTest {
 			",Feltet adresselinje1 kan ikke være null eller tomt. Fikk adresselinje1=null",
 			"'',Feltet adresselinje1 kan ikke være null eller tomt. Fikk adresselinje1= "
 	})
-	public void ShouldThrowValidationExceptionForMissingAdresselinje1(String adresselinje1, String expectedMessage) {
+	public void shouldThrowValidationExceptionForMissingAdresselinje1WhenUtenlandskAdresse(String adresselinje1, String expectedMessage) {
 		Exception thrownException = assertThrows(ValidationException.class, () -> rdist002ValidationUtil.validateAdresse(createUtenlandskPostadresseWithAdresselinje1(adresselinje1), createMottaker()));
 		assertEquals(expectedMessage, thrownException.getMessage());
 	}

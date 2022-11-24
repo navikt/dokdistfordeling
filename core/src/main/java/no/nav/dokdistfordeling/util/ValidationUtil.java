@@ -20,7 +20,7 @@ public final class ValidationUtil {
 		}
 	}
 
-	public static void asssertStringIsNumberOfExactLength(String field, String value, int expectedLength) {
+	public static void assertStringIsNumberOfExactLength(String field, String value, int expectedLength) {
 		if (!isNumeric(value) || value.length() != expectedLength) {
 			throw new ValidationException(format("Feltet %s må være et gyldig tall med %s siffer. Fikk %s=%s", field, expectedLength, field, value));
 		}

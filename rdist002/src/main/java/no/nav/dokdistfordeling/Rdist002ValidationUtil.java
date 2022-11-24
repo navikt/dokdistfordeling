@@ -29,7 +29,7 @@ import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullAndValidValueIgnoreCase;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
-import static no.nav.dokdistfordeling.util.ValidationUtil.asssertStringIsNumberOfExactLength;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertStringIsNumberOfExactLength;
 
 @Slf4j
 public class Rdist002ValidationUtil {
@@ -66,7 +66,7 @@ public class Rdist002ValidationUtil {
 
 			if (NORSK_POSTADRESSE.equals(adresseTo.getAdressetype())) {
 				assertNotNullOrEmpty("poststed", adresseTo.getPoststed());
-				asssertStringIsNumberOfExactLength("postnummer", adresseTo.getPostnummer(), 4);
+				assertStringIsNumberOfExactLength("postnummer", adresseTo.getPostnummer(), 4);
 
 			} else if (UTENLANDSK_POSTADRESSE.equals(adresseTo.getAdressetype())) {
 				assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
