@@ -41,8 +41,6 @@ import java.util.function.Function;
 /**
  * AspectJ aspect for intercepting types or method annotated with @Timed.
  * Changes: Counter for exceptions
- *
- * @author Joakim Bjørnstad, Jbit AS
  */
 @Aspect
 @Incubating(since = "1.0.0")

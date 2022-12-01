@@ -1,8 +1,5 @@
 package no.nav.dokdistfordeling.exception.functional;
 
-/**
- * @author Sigurd Midttun, Visma Consulting
- */
 public class ForsendelseManglerPaakrevdHeaderFunctionalException extends AbstractDokdistfordelingFunctionalException {
 
 	public ForsendelseManglerPaakrevdHeaderFunctionalException(String message) {

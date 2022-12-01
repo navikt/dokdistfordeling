@@ -7,7 +7,6 @@ import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentForAktoerIdFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
@@ -27,7 +26,6 @@ public class HentBestemDokdistKanalService {
 	private final BestemDokdistkanalRestConsumer bestemDokdistkanal;
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 
-	@Autowired
 	public HentBestemDokdistKanalService(BestemDokdistkanalRestConsumer bestemDokdistkanalRestConsumer, PdlGraphQLConsumer pdlGraphQLConsumer) {
 		this.bestemDokdistkanal = bestemDokdistkanalRestConsumer;
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;

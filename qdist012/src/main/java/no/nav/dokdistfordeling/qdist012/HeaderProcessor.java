@@ -9,9 +9,6 @@ import no.nav.dokdistfordeling.exception.functional.ForsendelseManglerPaakrevdHe
 import no.nav.dokdistfordeling.support.MDCHeaderProcessor;
 import org.apache.camel.Exchange;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 public class HeaderProcessor extends MDCHeaderProcessor {
 
 	@Override

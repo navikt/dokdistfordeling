@@ -16,9 +16,6 @@ import java.util.UUID;
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.util.Qdist008Util.countHoveddokument;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Slf4j
 @Component
 public class ForsendelseValidator {

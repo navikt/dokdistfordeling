@@ -6,7 +6,7 @@ import lombok.Value;
 @Value
 @Builder
 public class HentMottakerOgAdresseRequestTo {
-	private final String identifikator;
-	private final String type;
-	private final String tema;
+	String identifikator;
+	String type;
+	String tema;
 }

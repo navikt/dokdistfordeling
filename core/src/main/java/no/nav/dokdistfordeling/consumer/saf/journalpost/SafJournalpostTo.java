@@ -9,55 +9,55 @@ import java.util.List;
 @Value
 @Builder
 public class SafJournalpostTo {
-	private final String tittel;
-	private final String tema;
-	private final String journalposttype;
-	private final String journalstatus;
-	private final List<Tilleggsopplysninger> tilleggsopplysninger;
-	private final Bruker bruker;
-	private final AvsenderMottaker avsenderMottaker;
+	String tittel;
+	String tema;
+	String journalposttype;
+	String journalstatus;
+	List<Tilleggsopplysninger> tilleggsopplysninger;
+	Bruker bruker;
+	AvsenderMottaker avsenderMottaker;
 
 	@Builder.Default
-	private final List<DokumentInfo> dokumenter = new ArrayList<>();
+	List<DokumentInfo> dokumenter = new ArrayList<>();
 
 	@Value
 	@Builder
 	public static class Tilleggsopplysninger {
-		private final String nokkel;
-		private final String verdi;
+		String nokkel;
+		String verdi;
 	}
 
 	@Value
 	@Builder
 	public static class Bruker {
-		private final String id;
-		private final String type;
+		String id;
+		String type;
 	}
 
 	@Value
 	@Builder
 	public static class AvsenderMottaker {
-		private final String id;
-		private final String navn;
-		private final String type;
+		String id;
+		String navn;
+		String type;
 	}
 
 	@Value
 	@Builder
 	public static class DokumentInfo {
-		private final String dokumentInfoId;
-		private final String tittel;
-		private final String brevkode;
-		private final String dokumentstatus;
+		String dokumentInfoId;
+		String tittel;
+		String brevkode;
+		String dokumentstatus;
 
 		@Builder.Default
-		private final List<Dokumentvariant> dokumentvarianter = new ArrayList<>();
+		List<Dokumentvariant> dokumentvarianter = new ArrayList<>();
 	}
 
 	@Value
 	@Builder
 	public static class Dokumentvariant {
-		private final String variantformat;
-		private final boolean saksbehandlerHarTilgang;
+		String variantformat;
+		boolean saksbehandlerHarTilgang;
 	}
 }

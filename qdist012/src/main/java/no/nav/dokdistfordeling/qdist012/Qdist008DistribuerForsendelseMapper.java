@@ -29,9 +29,6 @@ import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class Qdist008DistribuerForsendelseMapper {
 

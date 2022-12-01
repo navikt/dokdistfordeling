@@ -14,7 +14,6 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.jms.JMSException;
 import javax.jms.Queue;
@@ -64,10 +62,6 @@ import static org.mockito.Mockito.times;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
-@ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @SpringBootTest(classes = {Qdist012TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

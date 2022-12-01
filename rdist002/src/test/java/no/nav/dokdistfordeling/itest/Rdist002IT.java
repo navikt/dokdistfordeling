@@ -9,7 +9,6 @@ import no.nav.dokdistfordeling.util.MappingUtil;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -25,7 +24,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -69,7 +67,6 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpStatus.GONE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
-@ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @SpringBootTest(classes = {Rdist002TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

@@ -1,9 +1,5 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import static org.apache.camel.ExchangePattern.InOnly;
-import static org.apache.camel.LoggingLevel.ERROR;
-import static org.apache.camel.LoggingLevel.INFO;
-
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseException;
 import no.nav.dokdistfordeling.metrics.Qdist012MetricsRoutePolicy;
@@ -15,15 +11,15 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.stereotype.Component;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
 import java.nio.charset.StandardCharsets;
 
+import static org.apache.camel.ExchangePattern.InOnly;
+import static org.apache.camel.LoggingLevel.ERROR;
+import static org.apache.camel.LoggingLevel.INFO;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
+
 @Component
 public class Qdist012Route extends RouteBuilder {
 
@@ -39,8 +35,6 @@ public class Qdist012Route extends RouteBuilder {
 	private final HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper;
 	private final HentDokumenterFraJoarkDecrypter hentDokumenterFraJoarkDecrypter;
 
-
-	@Autowired
 	public Qdist012Route(Queue qdist012,
 						 Queue qdist012FunksjonellFeil,
 						 Queue qdist008,

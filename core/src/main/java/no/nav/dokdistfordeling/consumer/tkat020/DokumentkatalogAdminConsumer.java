@@ -1,9 +1,5 @@
 package no.nav.dokdistfordeling.consumer.tkat020;
 
-import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACHE;
-import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
-
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
 import no.nav.dokdistfordeling.exception.functional.DokkatGetDokumenttypeInfoFunctionalException;
@@ -21,12 +17,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
 
-/**
- * @author Sigurd Midttun, Visma Consulting AS
- */
+import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACHE;
+import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
+import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
+
 @Slf4j
 @Component
 class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
@@ -34,7 +30,6 @@ class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 	private final String dokumenttypeInfoV4Url;
 	private final RestTemplate restTemplate;
 
-	@Autowired
 	public DokumentkatalogAdminConsumer(@Value("${DokumenttypeInfo_v4_url}") String dokumenttypeInfoV4Url,
 										RestTemplateBuilder restTemplateBuilder,
 										final ServiceuserAlias serviceuserAlias) {

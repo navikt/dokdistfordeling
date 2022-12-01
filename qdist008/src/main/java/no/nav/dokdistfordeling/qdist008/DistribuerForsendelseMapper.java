@@ -38,9 +38,6 @@ import static org.apache.commons.lang3.EnumUtils.isValidEnumIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class DistribuerForsendelseMapper {
 

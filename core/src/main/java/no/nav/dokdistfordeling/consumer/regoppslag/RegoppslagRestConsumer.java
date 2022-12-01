@@ -30,9 +30,6 @@ import static java.lang.String.format;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
-/**
- * @author Ugur Alpay Cenar, Visma Consulting.
- */
 @Slf4j
 @Component
 class RegoppslagRestConsumer {

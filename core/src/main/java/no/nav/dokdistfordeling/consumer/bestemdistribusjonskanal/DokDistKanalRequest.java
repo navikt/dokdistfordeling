@@ -4,9 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Data
 @Builder
 @AllArgsConstructor

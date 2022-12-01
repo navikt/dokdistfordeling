@@ -10,9 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Configuration
 public class SpringdocConfig {
 

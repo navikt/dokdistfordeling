@@ -13,22 +13,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
 
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class StsRestConsumer {
 
 	private final RestTemplate restTemplate;
 	private final String stsUrl;
 
-	@Autowired
 	public StsRestConsumer(@Value("${security-token-service-token.url}") String stsUrl,
 						   RestTemplateBuilder restTemplateBuilder,
 						   final ServiceuserAlias serviceuserAlias) {

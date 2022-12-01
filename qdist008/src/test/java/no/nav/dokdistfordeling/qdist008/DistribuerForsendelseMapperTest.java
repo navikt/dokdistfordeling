@@ -31,9 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 class DistribuerForsendelseMapperTest {
 
 	private static final String BESTILLINGS_ID = "bestillingsId";

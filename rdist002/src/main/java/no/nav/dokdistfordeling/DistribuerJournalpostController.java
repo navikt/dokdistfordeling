@@ -17,7 +17,6 @@ import no.nav.dokdistfordeling.exception.technical.SafJournalpostIkkeFunnetTechn
 import no.nav.dokdistfordeling.metrics.Monitor;
 import no.nav.dokdistfordeling.springdoc.SwaggerRestDistribuerJournalpost;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +44,6 @@ public class DistribuerJournalpostController {
 	private final SafJournalpostQueryService safJournalpostQueryService;
 	private final Rdist002ValidationUtil rdist002ValidationUtil;
 
-	@Autowired
 	public DistribuerJournalpostController(DistribuerJournalpostService distribuerJournalpostService,
 										   SafJournalpostQueryService safJournalpostQueryService) {
 		this.distribuerJournalpostService = distribuerJournalpostService;

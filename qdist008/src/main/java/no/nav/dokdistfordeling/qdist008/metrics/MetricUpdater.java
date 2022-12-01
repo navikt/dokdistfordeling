@@ -1,15 +1,13 @@
 package no.nav.dokdistfordeling.qdist008.metrics;
 
-import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_PROCESS;
-import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
-import static no.nav.dokdistfordeling.util.Qdist008Util.countVedlegg;
-import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
-
 import io.micrometer.core.instrument.MeterRegistry;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import org.springframework.stereotype.Component;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_PROCESS;
+import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
+import static no.nav.dokdistfordeling.util.Qdist008Util.countVedlegg;
+import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
 
 @Component
 public class MetricUpdater {
@@ -24,7 +22,6 @@ public class MetricUpdater {
 
 	private static MeterRegistry meterRegistry;
 
-	@Autowired
 	public MetricUpdater(MeterRegistry meterRegistry) {
 		MetricUpdater.meterRegistry = meterRegistry;
 	}

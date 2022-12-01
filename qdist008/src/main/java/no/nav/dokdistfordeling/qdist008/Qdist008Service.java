@@ -15,7 +15,6 @@ import no.nav.dokdistfordeling.qdist008.domain.PersisterForsendelseToRequestMapp
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DISTRIBUSJON;
@@ -26,9 +25,6 @@ import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Service
 public class Qdist008Service {
 
@@ -38,7 +34,6 @@ public class Qdist008Service {
 	private final PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper;
 	private final JournalpostApi journalpostApi;
 
-	@Autowired
 	public Qdist008Service(PdlGraphQLConsumer pdlGraphQLConsumer,
 						   DokumentkatalogAdmin dokumentkatalogAdmin,
 						   AdministrerForsendelse administrerForsendelse,

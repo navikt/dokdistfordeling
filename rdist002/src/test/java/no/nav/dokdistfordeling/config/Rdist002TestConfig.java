@@ -15,9 +15,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.retry.annotation.EnableRetry;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Configuration
 @Profile("itest")
 @EnableConfigurationProperties({

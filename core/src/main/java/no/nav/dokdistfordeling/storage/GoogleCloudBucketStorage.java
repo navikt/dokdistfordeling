@@ -14,11 +14,6 @@ import java.security.GeneralSecurityException;
 
 import static java.lang.String.format;
 
-/**
- * Google Cloud Storage implementasjon av {@link BucketStorage}
- *
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Slf4j
 public class GoogleCloudBucketStorage implements BucketStorage {
 

@@ -11,9 +11,6 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class PersisterForsendelseToRequestMapper {
 

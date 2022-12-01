@@ -1,12 +1,6 @@
 package no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal;
 
 
-import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
-import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
-
 import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
 import no.nav.dokdistfordeling.constants.Constants;
 import no.nav.dokdistfordeling.consumer.NavHeaders;
@@ -28,17 +22,20 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
+
+import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
+import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
+import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Component
 public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal {
 
 	private final RestTemplate restTemplate;
-
 	private final String bestemDokdistKanalUrl;
 
-	@Autowired
 	public BestemDokdistkanalRestConsumer(RestTemplateBuilder restTemplateBuilder,
 										  final ServiceuserAlias serviceuserAlias,
 										  @Value("${bestemdistribusjonkanal_url}") String bestemDistKanalUrl) {
@@ -84,7 +81,7 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 		final String callId = MDC.get(Constants.CALL_ID);
 		httpHeaders.set(Constants.CALL_ID, callId);
 		httpHeaders.set(NavHeaders.NAV_CALL_ID, callId);
-		httpHeaders.setContentType(APPLICATION_JSON_UTF8);
+		httpHeaders.setContentType(APPLICATION_JSON);
 		return httpHeaders;
 	}
 }
