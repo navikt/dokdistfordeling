@@ -21,34 +21,34 @@ import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG
 @Builder
 public class DistribuerForsendelseTo {
 
-	private final DistribusjonbestillingTo distribusjonbestilling;
+	DistribusjonbestillingTo distribusjonbestilling;
 
 	@Value
 	@Builder
 	public static class DistribusjonbestillingTo {
-		private final String bestillingsId;
-		private final String batchId;
-		private final String distribusjonKanal;
-		private final String bestillendeFagsystem;
-		private final String tema;
-		private final String forsendelseTittel;
-		private final DistribusjonstypeCode distribusjonstype;
-		private final DistribusjonstidspunktCode distribusjonstidspunkt;
-		private final ArkivInformasjonTo arkivInformasjon;
-		private final AktoerTo mottaker;
-		private final AktoerTo bruker;
-		private final AdresseTo adresse;
-		private final String dokumentProdApp;
-		private final List<DokumentInformasjonTo> dokumenter;
+		String bestillingsId;
+		String batchId;
+		String distribusjonKanal;
+		String bestillendeFagsystem;
+		String tema;
+		String forsendelseTittel;
+		DistribusjonstypeCode distribusjonstype;
+		DistribusjonstidspunktCode distribusjonstidspunkt;
+		ArkivInformasjonTo arkivInformasjon;
+		AktoerTo mottaker;
+		AktoerTo bruker;
+		AdresseTo adresse;
+		String dokumentProdApp;
+		List<DokumentInformasjonTo> dokumenter;
 	}
 
 	@Value
 	@Builder
 	public static class AktoerTo {
-		private final String identifikator;
-		private final String navn;
-		private final boolean identifikatorAktoerId;
-		private final AktoerTypeCode aktoerType;
+		String identifikator;
+		String navn;
+		boolean identifikatorAktoerId;
+		AktoerTypeCode aktoerType;
 
 		public boolean isSamhandler() {
 			return this.getAktoerType() == SAMHANDLER_HPR
@@ -70,8 +70,8 @@ public class DistribuerForsendelseTo {
 	@EqualsAndHashCode(callSuper = true)
 	@Value
 	public static class NorskPostadresseTo extends AdresseTo {
-		private final String postnummer;
-		private final String poststed;
+		String postnummer;
+		String poststed;
 
 		@Builder
 		public NorskPostadresseTo(String adresselinje1, String adresselinje2, String adresselinje3, String land, String postnummer, String poststed) {
@@ -93,18 +93,18 @@ public class DistribuerForsendelseTo {
 	@Value
 	@Builder
 	public static class ArkivInformasjonTo {
-		private final ArkivSystemCode arkivSystem;
-		private final String arkivId;
+		ArkivSystemCode arkivSystem;
+		String arkivId;
 	}
 
 	@Value
 	@Builder
 	public static class DokumentInformasjonTo {
-		private final String dokumenttypeId;
-		private final String dokumentObjektReferanse;
-		private final TilknyttetSomCode tilknyttetSom;
-		private final String arkivDokumentInfoId;
-		private final int rekkefolge;
+		String dokumenttypeId;
+		String dokumentObjektReferanse;
+		TilknyttetSomCode tilknyttetSom;
+		String arkivDokumentInfoId;
+		int rekkefolge;
 	}
 
 }

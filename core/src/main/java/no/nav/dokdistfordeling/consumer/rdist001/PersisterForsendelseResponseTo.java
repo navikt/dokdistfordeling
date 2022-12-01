@@ -7,5 +7,5 @@ import lombok.Value;
 @Value
 @Builder
 public class PersisterForsendelseResponseTo {
-	private final String forsendelseId;
+	String forsendelseId;
 }

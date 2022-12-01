@@ -1,9 +1,10 @@
 package no.nav.dokdistfordeling.exception.functional;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+
+@ResponseStatus(value = UNAUTHORIZED)
 public class SafJournalpostQueryUnauthorizedException extends AbstractDokdistfordelingFunctionalException {
 
 	public SafJournalpostQueryUnauthorizedException(String message) {

@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling.kodeverk;
 
 public enum AktoerTypeCode {
-
 	PERSON,
 	ORGANISASJON,
 	SAMHANDLER_HPR,

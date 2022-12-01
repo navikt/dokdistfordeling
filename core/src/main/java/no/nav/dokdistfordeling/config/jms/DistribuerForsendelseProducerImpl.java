@@ -26,8 +26,8 @@ import java.io.StringWriter;
 public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseProducer {
 
 	private final String encryptionPassphrase;
-	private JmsTemplate jmsTemplate;
-	private Queue qdist012;
+	private final JmsTemplate jmsTemplate;
+	private final Queue qdist012;
 
 	public DistribuerForsendelseProducerImpl(JmsTemplate jmsTemplate,
 											 Queue qdist012,

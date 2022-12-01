@@ -57,43 +57,46 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 	}
 
 	private static final String JOURNALPOST_QUERY =
-			"query journalpost($queryJournalpostId: String!) {\n" +
-					"  journalpost(journalpostId: $queryJournalpostId) {\n" +
-					"    tittel\n" +
-					"    journalposttype\n" +
-					"    journalstatus\n" +
-					"    tema\n" +
-					"    tilleggsopplysninger {\n" +
-					"      nokkel\n" +
-					"      verdi\n" +
-					"    }\n" +
-					"    bruker {\n" +
-					"      id\n" +
-					"      type\n" +
-					"    }\n" +
-					"    avsenderMottaker {\n" +
-					"      id\n" +
-					"      type\n" +
-					"      navn\n" +
-					"    }\n" +
-					"    dokumenter {\n" +
-					"      dokumentInfoId\n" +
-					"      tittel\n" +
-					"      brevkode\n" +
-					"      dokumentstatus\n" +
-					"      dokumentvarianter {\n" +
-					"        saksbehandlerHarTilgang\n" +
-					"        variantformat\n" +
-					"      }\n" +
-					"    }\n" +
-					"  }\n" +
-					"}\n";
+			"""
+					query journalpost($queryJournalpostId: String!) {
+					  journalpost(journalpostId: $queryJournalpostId) {
+					    tittel
+					    journalposttype
+					    journalstatus
+					    tema
+					    tilleggsopplysninger {
+					      nokkel
+					      verdi
+					    }
+					    bruker {
+					      id
+					      type
+					    }
+					    avsenderMottaker {
+					      id
+					      type
+					      navn
+					    }
+					    dokumenter {
+					      dokumentInfoId
+					      tittel
+					      brevkode
+					      dokumentstatus
+					      dokumentvarianter {
+					        saksbehandlerHarTilgang
+					        variantformat
+					      }
+					    }
+					  }
+					}
+					""";
 
 	private static final String JOURNALPOSTSTATUS_QUERY =
-			"query journalpost($queryJournalpostId: String!) {\n" +
-					"  journalpost(journalpostId: $queryJournalpostId) { "+
-					"		journalstatus\n" +
-					"	}\n" +
-					"}\n";
+			"""
+					query journalpost($queryJournalpostId: String!) {
+					  journalpost(journalpostId: $queryJournalpostId) { journalstatus
+						}
+					}
+					""";
 
 }

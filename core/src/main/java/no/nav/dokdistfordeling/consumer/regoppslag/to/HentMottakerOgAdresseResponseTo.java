@@ -6,16 +6,16 @@ import lombok.Value;
 @Value
 @Builder
 public class HentMottakerOgAdresseResponseTo {
-	private final AdresseTo adresse;
+	AdresseTo adresse;
 
 	@Value
 	@Builder
 	public static class AdresseTo {
-		private final String adresselinje1;
-		private final String adresselinje2;
-		private final String adresselinje3;
-		private final String postnummer;
-		private final String poststed;
-		private final String landkode;
+		String adresselinje1;
+		String adresselinje2;
+		String adresselinje3;
+		String postnummer;
+		String poststed;
+		String landkode;
 	}
 }

@@ -6,5 +6,5 @@ import lombok.Value;
 @Value
 @Builder
 public class DokumenttypeInfoTo {
-	private final String dokumentTittel;
+	String dokumentTittel;
 }

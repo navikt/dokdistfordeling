@@ -11,19 +11,19 @@ import lombok.Value;
 @Schema
 public class DistribuerJournalpostRequestTo {
 	@Schema(name = "journalpostId", description = "Journalpost som skal distribueres", example = "343752389")
-	private final String journalpostId;
+	String journalpostId;
 	@Schema(name = "batchId", description = "Identifiserer batch som forsendelsen inngår i. Lar bestiller identifisere forsendelser som hører sammen. Fritekst, og konsument må selv vurdere hva som er hensiktsmessige verdier", example = "54321")
-	private final String batchId;
+	String batchId;
 	@Schema(name = "bestillendeFagsystem", description = "Fagsystemet som bestiller distribusjon", example = "SYM")
-	private final String bestillendeFagsystem;
+	String bestillendeFagsystem;
 	@Schema(name = "adresse", description = "Struktur for å beskrive postadresse. Inneholder enten norsk postadresse eller utenlandsk postadresse. Påkrevd hvis mottaker er samhandler, ellers skal dokdistsentralprint hente adresse fra fellesregistre hvis ikke satt")
-	private final AdresseTo adresse;
+	AdresseTo adresse;
 	@Schema(name = "dokumentProdApp", description = "Applikasjon som har produsert hoveddokumentet (for sporing og feilsøking)", example = "ELIN_STANDARD")
-	private final String dokumentProdApp;
+	String dokumentProdApp;
 	@Schema(name = "distribusjonstype", description = "Forteller dokumentdistribusjon hva slags dokument som distribueres. \"VEDTAK\", \"VIKTIG\" eller \"ANNET\"", example = "VEDTAK", required = true)
-	private final String distribusjonstype;
+	String distribusjonstype;
 	@Schema(name = "distribusjonstidspunkt", description = "Forteller dokumentdistribusjon når dokumentet kan distribueres. \"UMIDDELBART\" eller \"KJERNETID\"", example = "UMIDDELBART", required = true)
-	private final String distribusjonstidspunkt;
+	String distribusjonstidspunkt;
 
 	@Builder
 	@Getter

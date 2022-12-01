@@ -12,54 +12,54 @@ import java.util.List;
 @Value
 @Builder
 public class PersisterForsendelseRequestTo {
-	private final String bestillingsId;
-	private final DistribusjonsKanalCode distribusjonsKanal;
-	private final String bestillendeFagsystem;
-	private final String tema;
-	private final String forsendelseTittel;
-	private final String batchId;
-	private final String dokumentProdApp;
-	private final MottakerTo mottaker;
-	private final ArkivInformasjonTo arkivInformasjon;
-	private final PostadresseTo postadresse;
-	private final List<DokumentTo> dokumenter;
-	private final String distribusjonstype;
-	private final String distribusjonstidspunkt;
+	String bestillingsId;
+	DistribusjonsKanalCode distribusjonsKanal;
+	String bestillendeFagsystem;
+	String tema;
+	String forsendelseTittel;
+	String batchId;
+	String dokumentProdApp;
+	MottakerTo mottaker;
+	ArkivInformasjonTo arkivInformasjon;
+	PostadresseTo postadresse;
+	List<DokumentTo> dokumenter;
+	String distribusjonstype;
+	String distribusjonstidspunkt;
 
 
 	@Value
 	@Builder
 	public static class MottakerTo {
-		private final String mottakerId;
-		private final String mottakerNavn;
-		private final AktoerTypeCode mottakerType;
+		String mottakerId;
+		String mottakerNavn;
+		AktoerTypeCode mottakerType;
 	}
 
 	@Value
 	@Builder
 	public static class ArkivInformasjonTo {
-		private final ArkivSystemCode arkivSystem;
-		private final String arkivId;
+		ArkivSystemCode arkivSystem;
+		String arkivId;
 	}
 
 	@Value
 	@Builder
 	public static class PostadresseTo {
-		private final String adresselinje1;
-		private final String adresselinje2;
-		private final String adresselinje3;
-		private final String postnummer;
-		private final String poststed;
-		private final String landkode;
+		String adresselinje1;
+		String adresselinje2;
+		String adresselinje3;
+		String postnummer;
+		String poststed;
+		String landkode;
 	}
 
 	@Value
 	@Builder
 	public static class DokumentTo {
-		private final TilknyttetSomCode tilknyttetSom;
-		private final String dokumentObjektReferanse;
-		private final int rekkefolge;
-		private final String arkivDokumentInfoId;
-		private final String dokumenttypeId;
+		TilknyttetSomCode tilknyttetSom;
+		String dokumentObjektReferanse;
+		int rekkefolge;
+		String arkivDokumentInfoId;
+		String dokumenttypeId;
 	}
 }
