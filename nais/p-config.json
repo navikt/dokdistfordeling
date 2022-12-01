@@ -30,7 +30,6 @@
   "APPDYNAMICS": "/apikey/appdynamics/prod",
   "APP_NAME": "dokdistfordeling",
   "APPD_NAME": "dokdistfordeling",
-  "NAMESPACE": "teamdokumenthandtering",
   "DOKDISTMELLOMLAGER_PROJECTID": "teamdokumenthandteri-prod-a63b",
   "DOKDISTMELLOMLAGER_BUCKET": "dokdistmellomlager-prod",
   "DOKDISTMELLOMLAGER_KEYRING": "dokdistmellomlager-keyring",
