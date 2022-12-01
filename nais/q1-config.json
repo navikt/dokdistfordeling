@@ -26,7 +26,6 @@
   "BESTEMDISTRIBUSJONKANAL_URL": "https://dokdistkanal-q1.dev.intern.nav.no/rest/bestemKanal",
   "JOURNALPOST_API_BASE_URL": "https://dokarkiv-q1.dev.intern.nav.no/rest/journalpostapi/v1/journalpost",
   "AZURE_APP_SCOPE": "api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default",
-  "VAULT": "/kv/preprod/fss/dokdistfordeling-q1/q1",
   "APPDYNAMICS": "/apikey/appdynamics/dev",
   "APP_NAME": "dokdistfordeling-q1",
   "APPD_NAME": "dokdistfordeling-q1",

@@ -102,8 +102,6 @@ spec:
     paths:
       - kvPath: {{ SRVDOKDISTFORDELING }}
         mountPath: /var/run/secrets/nais.io/srvdokdistfordeling
-      - kvPath: {{ VAULT }}
-        mountPath: /var/run/secrets/nais.io/vault
       - kvPath: {{ APPDYNAMICS }}
         mountPath: /var/run/secrets/nais.io/appdynamics
       - kvPath: {{ DOKDISTFORDELING_CERT }}
