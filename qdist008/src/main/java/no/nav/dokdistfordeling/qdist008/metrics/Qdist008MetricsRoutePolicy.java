@@ -1,12 +1,5 @@
 package no.nav.dokdistfordeling.qdist008.metrics;
 
-import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_ERROR_TYPE;
-import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_EXCEPTION_NAME;
-import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_PROCESS;
-import static no.nav.dokdistfordeling.metrics.MetricLabels.TYPE_FUNCTIONAL_EXCEPTION;
-import static no.nav.dokdistfordeling.metrics.MetricLabels.TYPE_TECHNICAL_EXCEPTION;
-import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
-
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
@@ -16,7 +9,12 @@ import org.apache.camel.ValidationException;
 import org.apache.camel.support.RoutePolicySupport;
 import org.springframework.stereotype.Component;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_ERROR_TYPE;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_EXCEPTION_NAME;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.LABEL_PROCESS;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.TYPE_FUNCTIONAL_EXCEPTION;
+import static no.nav.dokdistfordeling.metrics.MetricLabels.TYPE_TECHNICAL_EXCEPTION;
+import static no.nav.dokdistfordeling.qdist008.Qdist008Route.SERVICE_ID;
 
 @Component
 public class Qdist008MetricsRoutePolicy extends RoutePolicySupport {
@@ -29,7 +27,6 @@ public class Qdist008MetricsRoutePolicy extends RoutePolicySupport {
 	private static final String QDIST008_PROCESS_TIMER_DESCRIPTION = "prosesseringstid for kall inn til qdist008";
 	private static final String QDIST008_START = "Qdist008_start";
 
-	@Autowired
 	public Qdist008MetricsRoutePolicy(MeterRegistry registry) {
 		this.registry = registry;
 	}

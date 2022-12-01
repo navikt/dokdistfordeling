@@ -1,16 +1,5 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DPVT;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DISTRIBUSJON;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.SDP;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.TRYGDERETTEN;
-import static org.apache.camel.ExchangePattern.InOnly;
-import static org.apache.camel.LoggingLevel.ERROR;
-import static org.apache.camel.LoggingLevel.WARN;
-
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException;
 import no.nav.dokdistfordeling.qdist008.metrics.Qdist008MetricsRoutePolicy;
@@ -22,11 +11,20 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.stereotype.Component;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
 import java.nio.charset.StandardCharsets;
+
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DPVT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DISTRIBUSJON;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.SDP;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.TRYGDERETTEN;
+import static org.apache.camel.ExchangePattern.InOnly;
+import static org.apache.camel.LoggingLevel.ERROR;
+import static org.apache.camel.LoggingLevel.WARN;
 
 
 @Component
@@ -50,7 +48,6 @@ public class Qdist008Route extends RouteBuilder {
 	private final Queue qdist008FunksjonellFeil;
 	private final Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy;
 
-	@Autowired
 	public Qdist008Route(Queue qdist008,
 						 Queue qdist009,
 						 Queue qdist010,

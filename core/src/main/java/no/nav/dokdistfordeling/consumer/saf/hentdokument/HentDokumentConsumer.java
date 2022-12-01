@@ -1,8 +1,5 @@
 package no.nav.dokdistfordeling.consumer.saf.hentdokument;
 
-import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
-
 import no.nav.dokdistfordeling.constants.Constants;
 import no.nav.dokdistfordeling.consumer.NavHeaders;
 import no.nav.dokdistfordeling.consumer.sts.StsRestConsumer;
@@ -24,8 +21,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
+
+import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
+import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
 @Component
 public class HentDokumentConsumer implements HentDokument {
@@ -34,7 +33,6 @@ public class HentDokumentConsumer implements HentDokument {
 	private final RestTemplate restTemplate;
 	private final StsRestConsumer stsRestConsumer;
 
-	@Autowired
 	public HentDokumentConsumer(@Value("${hentdokument.url}") String hentDokumentUrl,
 								RestTemplateBuilder restTemplateBuilder,
 								StsRestConsumer stsRestConsumer) {

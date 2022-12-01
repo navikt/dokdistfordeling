@@ -4,8 +4,6 @@ import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseReque
 import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseResponseTo;
 import org.springframework.stereotype.Component;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 @Component
 class RegoppslagService implements Regoppslag {
     private static final String ORGANISASJON_TYPE = "ORGANISASJON";
@@ -13,7 +11,6 @@ class RegoppslagService implements Regoppslag {
 
     private final RegoppslagRestConsumer regoppslagRestConsumer;
 
-    @Autowired
     RegoppslagService(RegoppslagRestConsumer regoppslagRestConsumer) {
         this.regoppslagRestConsumer = regoppslagRestConsumer;
     }
