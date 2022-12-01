@@ -26,7 +26,7 @@
     <properties>
         <java.version>17</java.version>
 
-        <camel.version>3.18.1</camel.version>
+        <camel.version>3.19.0</camel.version>
         <logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
         <wmq.version>9.3.1.0</wmq.version>
         <commons-io.version>2.11.0</commons-io.version>
@@ -74,18 +74,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>org.apache.camel</groupId>
-                <artifactId>camel-bom</artifactId>
-                <version>${camel.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.ibm.mq</groupId>
-                <artifactId>com.ibm.mq.allclient</artifactId>
-                <version>${wmq.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
@@ -105,17 +94,6 @@
             </dependency>
 
             <dependency>
-                <groupId>no.nav.meldinger.virksomhet</groupId>
-                <artifactId>melding-virksomhet-dokdistfordeling</artifactId>
-                <version>${melding-virksomhet-dokdistfordeling.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.dokkat</groupId>
-                <artifactId>dokkat-api</artifactId>
-                <version>${dokkat-api.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash-logback-encoder.version}</version>
@@ -124,6 +102,22 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-ui</artifactId>
                 <version>${springdoc-openapi-ui.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ibm.mq</groupId>
+                <artifactId>com.ibm.mq.allclient</artifactId>
+                <version>${wmq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>no.nav.meldinger.virksomhet</groupId>
+                <artifactId>melding-virksomhet-dokdistfordeling</artifactId>
+                <version>${melding-virksomhet-dokdistfordeling.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.dokkat</groupId>
+                <artifactId>dokkat-api</artifactId>
+                <version>${dokkat-api.version}</version>
             </dependency>
 
             <dependency>
