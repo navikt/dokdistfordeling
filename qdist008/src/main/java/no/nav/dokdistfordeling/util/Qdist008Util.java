@@ -29,8 +29,7 @@ public class Qdist008Util {
 		return distribusjonbestilling.getDokumenter().stream()
 				.filter(dokumentInformasjonTo -> dokumentInformasjonTo.getTilknyttetSom()
 						.equals(TilknyttetSomCode.HOVEDDOKUMENT))
-				.map(DistribuerForsendelseTo.DokumentInformasjonTo::getDokumenttypeId)
-				.collect(Collectors.toList())
+				.map(DistribuerForsendelseTo.DokumentInformasjonTo::getDokumenttypeId).toList()
 				.get(0);
 	}
 }

@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
+import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
+import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
@@ -92,8 +94,8 @@ public class Qdist012Service {
 
 	private String getVariantFormat(List<Journalpost.Dokumentvariant> dokumentvarianter) {
 		return dokumentvarianter.stream()
-				.anyMatch(dokumentvariant -> Variantformat.SLADDET.equals(dokumentvariant.getVariantformat())) ?
-				Variantformat.SLADDET.name() : Variantformat.ARKIV.name();
+				.anyMatch(dokumentvariant -> SLADDET.equals(dokumentvariant.getVariantformat())) ?
+				SLADDET.name() : ARKIV.name();
 	}
 
 	private String buildAndSerializeDokdistDokument(byte[] document) {

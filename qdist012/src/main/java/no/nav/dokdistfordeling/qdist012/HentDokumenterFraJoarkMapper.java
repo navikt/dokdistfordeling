@@ -83,32 +83,28 @@ public class HentDokumenterFraJoarkMapper {
 	}
 
 	private HentDokumenterFraJoarkTo.AktoerTo mapAktoer(Aktoer aktoer) {
-		if (aktoer instanceof Person) {
-			Person person = (Person) aktoer;
+		if (aktoer instanceof Person person) {
 			return HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(person.getNavn())
 					.identifikator(person.getPersonidentifikator())
 					.aktoerType(AktoerTypeCode.PERSON)
 					.identifikatorAktoerId(false)
 					.build();
-		} else if (aktoer instanceof Organisasjon) {
-			Organisasjon organisasjon = (Organisasjon) aktoer;
+		} else if (aktoer instanceof Organisasjon organisasjon) {
 			return HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(organisasjon.getNavn())
 					.identifikator(organisasjon.getOrgnummer())
 					.aktoerType(AktoerTypeCode.ORGANISASJON)
 					.identifikatorAktoerId(false)
 					.build();
-		} else if (aktoer instanceof AktoerId) {
-			AktoerId aktoerId = (AktoerId) aktoer;
+		} else if (aktoer instanceof AktoerId aktoerId) {
 			return HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(aktoerId.getNavn())
 					.identifikator(aktoerId.getAktoerId())
 					.aktoerType(AktoerTypeCode.PERSON)
 					.identifikatorAktoerId(true)
 					.build();
-		} else if (aktoer instanceof Samhandler) {
-			Samhandler samhandler = (Samhandler) aktoer;
+		} else if (aktoer instanceof Samhandler samhandler) {
 			return HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(samhandler.getNavn())
 					.identifikator(samhandler.getSamhandleridentifikator())
@@ -123,8 +119,7 @@ public class HentDokumenterFraJoarkMapper {
 	private HentDokumenterFraJoarkTo.AdresseTo mapAdresse(Adresse adresse) {
 		if (adresse == null) {
 			throw new ValidationException("Adresse kan ikke være null");
-		} else if (adresse instanceof NorskPostadresse) {
-			NorskPostadresse norskPostadresse = (NorskPostadresse) adresse;
+		} else if (adresse instanceof NorskPostadresse norskPostadresse) {
 			return HentDokumenterFraJoarkTo.NorskPostadresseTo.builder()
 					.adresselinje1(norskPostadresse.getAdresselinje1())
 					.adresselinje2(norskPostadresse.getAdresselinje2())
@@ -133,8 +128,7 @@ public class HentDokumenterFraJoarkMapper {
 					.poststed(norskPostadresse.getPoststed())
 					.land(norskPostadresse.getLand())
 					.build();
-		} else if (adresse instanceof UtenlandskPostadresse) {
-			UtenlandskPostadresse utenlandskPostadresse = (UtenlandskPostadresse) adresse;
+		} else if (adresse instanceof UtenlandskPostadresse utenlandskPostadresse) {
 			return HentDokumenterFraJoarkTo.UtenlandskPostadresseTo.builder()
 					.adresselinje1(utenlandskPostadresse.getAdresselinje1())
 					.adresselinje2(utenlandskPostadresse.getAdresselinje2())

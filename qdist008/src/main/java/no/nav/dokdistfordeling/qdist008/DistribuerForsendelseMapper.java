@@ -93,32 +93,28 @@ public class DistribuerForsendelseMapper {
 	}
 
 	private DistribuerForsendelseTo.AktoerTo mapAktoer(Aktoer aktoer) {
-		if (aktoer instanceof Person) {
-			Person person = (Person) aktoer;
+		if (aktoer instanceof Person person) {
 			return DistribuerForsendelseTo.AktoerTo.builder()
 					.navn(person.getNavn())
 					.identifikator(person.getPersonidentifikator())
 					.aktoerType(AktoerTypeCode.PERSON)
 					.identifikatorAktoerId(false)
 					.build();
-		} else if (aktoer instanceof Organisasjon) {
-			Organisasjon organisasjon = (Organisasjon) aktoer;
+		} else if (aktoer instanceof Organisasjon organisasjon) {
 			return DistribuerForsendelseTo.AktoerTo.builder()
 					.navn(organisasjon.getNavn())
 					.identifikator(organisasjon.getOrgnummer())
 					.aktoerType(AktoerTypeCode.ORGANISASJON)
 					.identifikatorAktoerId(false)
 					.build();
-		} else if (aktoer instanceof AktoerId) {
-			AktoerId aktoerId = (AktoerId) aktoer;
+		} else if (aktoer instanceof AktoerId aktoerId) {
 			return DistribuerForsendelseTo.AktoerTo.builder()
 					.navn(aktoerId.getNavn())
 					.identifikator(aktoerId.getAktoerId())
 					.aktoerType(AktoerTypeCode.PERSON)
 					.identifikatorAktoerId(true)
 					.build();
-		} else if (aktoer instanceof Samhandler) {
-			Samhandler samhandler = (Samhandler) aktoer;
+		} else if (aktoer instanceof Samhandler samhandler) {
 			return DistribuerForsendelseTo.AktoerTo.builder()
 					.navn(samhandler.getNavn())
 					.identifikator(samhandler.getSamhandleridentifikator())
@@ -135,8 +131,7 @@ public class DistribuerForsendelseMapper {
 			throw new ValidationException("Adresse kan ikke være null");
 		}
 
-		if (adresse instanceof NorskPostadresse) {
-			NorskPostadresse norskPostadresse = (NorskPostadresse) adresse;
+		if (adresse instanceof NorskPostadresse norskPostadresse) {
 			return DistribuerForsendelseTo.NorskPostadresseTo.builder()
 					.adresselinje1(trimAdresse(norskPostadresse.getAdresselinje1()))
 					.adresselinje2(trimAdresse(norskPostadresse.getAdresselinje2()))
@@ -145,8 +140,7 @@ public class DistribuerForsendelseMapper {
 					.poststed(norskPostadresse.getPoststed())
 					.land(norskPostadresse.getLand())
 					.build();
-		} else if (adresse instanceof UtenlandskPostadresse) {
-			UtenlandskPostadresse utenlandskPostadresse = (UtenlandskPostadresse) adresse;
+		} else if (adresse instanceof UtenlandskPostadresse utenlandskPostadresse) {
 			return DistribuerForsendelseTo.UtenlandskPostadresseTo.builder()
 					.adresselinje1(trimAdresse(utenlandskPostadresse.getAdresselinje1()))
 					.adresselinje2(trimAdresse(utenlandskPostadresse.getAdresselinje2()))

@@ -126,8 +126,7 @@ public class Qdist008DistribuerForsendelseMapper {
 	private Adresse mapAdresse(HentDokumenterFraJoarkTo.AdresseTo adresse) {
 		if (adresse == null) {
 			throw new ValidationException("Adresse kan ikke være null");
-		} else if (adresse instanceof HentDokumenterFraJoarkTo.NorskPostadresseTo) {
-			HentDokumenterFraJoarkTo.NorskPostadresseTo norskPostadresse = (HentDokumenterFraJoarkTo.NorskPostadresseTo) adresse;
+		} else if (adresse instanceof HentDokumenterFraJoarkTo.NorskPostadresseTo norskPostadresse) {
 			return new NorskPostadresse()
 					.withAdresselinje1(trimAdresselinje(norskPostadresse.getAdresselinje1()))
 					.withAdresselinje2(trimAdresselinje(norskPostadresse.getAdresselinje2()))
@@ -135,8 +134,7 @@ public class Qdist008DistribuerForsendelseMapper {
 					.withPostnummer(norskPostadresse.getPostnummer())
 					.withPoststed(norskPostadresse.getPoststed())
 					.withLand(norskPostadresse.getLand());
-		} else if (adresse instanceof HentDokumenterFraJoarkTo.UtenlandskPostadresseTo) {
-			HentDokumenterFraJoarkTo.UtenlandskPostadresseTo utenlandskPostadresse = (HentDokumenterFraJoarkTo.UtenlandskPostadresseTo) adresse;
+		} else if (adresse instanceof HentDokumenterFraJoarkTo.UtenlandskPostadresseTo utenlandskPostadresse) {
 			return new UtenlandskPostadresse()
 					.withAdresselinje1(trimAdresselinje(utenlandskPostadresse.getAdresselinje1()))
 					.withAdresselinje2(trimAdresselinje(utenlandskPostadresse.getAdresselinje2()))
