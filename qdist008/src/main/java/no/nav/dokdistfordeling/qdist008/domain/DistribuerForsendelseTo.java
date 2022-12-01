@@ -17,10 +17,6 @@ import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
 
-/**
- * @author Sigurd Midttun, Visma Consulting AS
- */
-
 @Value
 @Builder
 public class DistribuerForsendelseTo {

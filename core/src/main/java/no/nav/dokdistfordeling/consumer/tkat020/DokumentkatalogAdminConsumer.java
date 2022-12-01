@@ -24,9 +24,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
 
-/**
- * @author Sigurd Midttun, Visma Consulting AS
- */
 @Slf4j
 @Component
 class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {

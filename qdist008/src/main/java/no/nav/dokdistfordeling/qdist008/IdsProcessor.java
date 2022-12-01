@@ -7,9 +7,6 @@ import no.nav.dokdistfordeling.support.MDCHeaderProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.language.xpath.XPathBuilder;
 
-/**
- * @author Erik Bråten, Visma Consulting.
- */
 public class IdsProcessor extends MDCHeaderProcessor {
 
 	@Override

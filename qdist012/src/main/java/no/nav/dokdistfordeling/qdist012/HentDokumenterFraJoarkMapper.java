@@ -32,9 +32,6 @@ import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class HentDokumenterFraJoarkMapper {
 

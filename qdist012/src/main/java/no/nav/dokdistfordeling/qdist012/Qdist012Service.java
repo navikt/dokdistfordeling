@@ -25,9 +25,6 @@ import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKU
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Service
 public class Qdist012Service {
 

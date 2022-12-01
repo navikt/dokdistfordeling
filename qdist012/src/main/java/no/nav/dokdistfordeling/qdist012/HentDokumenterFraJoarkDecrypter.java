@@ -8,9 +8,6 @@ import org.apache.camel.Handler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class HentDokumenterFraJoarkDecrypter {
 

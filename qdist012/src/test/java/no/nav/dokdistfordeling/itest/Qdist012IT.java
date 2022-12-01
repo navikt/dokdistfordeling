@@ -64,9 +64,6 @@ import static org.mockito.Mockito.times;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @SpringBootTest(classes = {Qdist012TestConfig.class},

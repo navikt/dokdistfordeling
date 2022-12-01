@@ -18,9 +18,6 @@ import org.springframework.retry.annotation.EnableRetry;
 
 import static org.mockito.Mockito.mock;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Configuration
 @Profile("itest")
 @EnableRetry

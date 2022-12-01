@@ -5,9 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Data
 @Builder
 @NoArgsConstructor

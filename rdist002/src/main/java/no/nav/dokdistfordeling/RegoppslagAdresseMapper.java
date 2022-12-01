@@ -7,9 +7,6 @@ import org.springframework.stereotype.Component;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Component
 public class RegoppslagAdresseMapper {
     private static final String ISO_3166_ALPHA_2_NORGE = "NO";

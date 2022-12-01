@@ -21,9 +21,6 @@ import javax.xml.bind.JAXBContext;
 import java.nio.charset.StandardCharsets;
 
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class Qdist012Route extends RouteBuilder {
 

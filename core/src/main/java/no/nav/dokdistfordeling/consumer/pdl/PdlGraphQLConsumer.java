@@ -26,12 +26,6 @@ import java.util.Optional;
 import static java.util.Objects.requireNonNull;
 import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
 
-/**
- * https://navikt.github.io/pdl
- *
- * @author Joakim Bjørnstad, Jbit AS
- * @author Erlend Axelsson, NAV IT
- */
 @Slf4j
 @Component
 public class PdlGraphQLConsumer {

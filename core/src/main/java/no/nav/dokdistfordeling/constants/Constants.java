@@ -1,8 +1,5 @@
 package no.nav.dokdistfordeling.constants;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 public final class Constants {
 
 	public static final String CALL_ID = "callId";

@@ -8,9 +8,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotEmpty;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Getter
 @Setter
 @ToString(exclude = "password")

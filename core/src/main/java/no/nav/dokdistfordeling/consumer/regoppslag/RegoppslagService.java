@@ -6,9 +6,6 @@ import org.springframework.stereotype.Component;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 @Component
 class RegoppslagService implements Regoppslag {
     private static final String ORGANISASJON_TYPE = "ORGANISASJON";

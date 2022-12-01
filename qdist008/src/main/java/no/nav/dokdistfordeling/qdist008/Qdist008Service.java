@@ -26,9 +26,6 @@ import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Service
 public class Qdist008Service {
 

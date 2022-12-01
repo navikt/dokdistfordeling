@@ -1,8 +1,5 @@
 package no.nav.dokdistfordeling.exception.functional;
 
-/**
- * @author Jarl Øystein Samseth, Visma Consulting
- */
 public abstract class AbstractDokdistfordelingFunctionalException extends RuntimeException {
 
 	public AbstractDokdistfordelingFunctionalException(String message) {

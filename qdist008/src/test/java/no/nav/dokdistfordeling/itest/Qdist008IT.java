@@ -67,10 +67,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
-
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @SpringBootTest(classes = {Qdist008ItestConfig.class},

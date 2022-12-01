@@ -27,9 +27,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Component
 public class HentDokumentConsumer implements HentDokument {
 

@@ -14,9 +14,6 @@ import static no.nav.dokdistfordeling.UnitTestUtil.POSTNUMMER;
 import static no.nav.dokdistfordeling.UnitTestUtil.POSTSTED;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * @author Joakim Bjørnstad, Jbit AS
- */
 class RegoppslagAdresseMapperTest {
     private final RegoppslagAdresseMapper regoppslagAdresseMapper = new RegoppslagAdresseMapper();
 

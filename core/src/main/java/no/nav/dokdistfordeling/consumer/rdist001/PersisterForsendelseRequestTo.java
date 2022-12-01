@@ -9,9 +9,6 @@ import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 
 import java.util.List;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- */
 @Value
 @Builder
 public class PersisterForsendelseRequestTo {

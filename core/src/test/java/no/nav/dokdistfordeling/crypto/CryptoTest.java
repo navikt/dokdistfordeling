@@ -9,9 +9,6 @@ import no.nav.dokdistfordeling.storage.DokdistDokument;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Ugur Alpay Cenar, Visma Consulting.
- */
 public class CryptoTest {
 
 	@Test

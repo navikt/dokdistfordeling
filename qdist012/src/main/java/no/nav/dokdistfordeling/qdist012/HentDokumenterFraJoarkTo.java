@@ -12,10 +12,6 @@ import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 
 import java.util.List;
 
-/**
- * @author Sigurd Midttun, Visma Consulting AS
- */
-
 @Value
 @Builder
 public class HentDokumenterFraJoarkTo {

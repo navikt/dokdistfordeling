@@ -1,8 +1,5 @@
 package no.nav.dokdistfordeling.metrics;
 
-/**
- * @author Jakob A. Libak, NAV.
- */
 public final class MetricLabels {
 
 	public static final String TYPE_TECHNICAL_EXCEPTION = "technical";

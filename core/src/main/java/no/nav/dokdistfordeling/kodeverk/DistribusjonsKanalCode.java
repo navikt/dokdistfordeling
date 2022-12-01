@@ -1,10 +1,5 @@
 package no.nav.dokdistfordeling.kodeverk;
 
-/**
- * @author Sigurd Midttun, Visma Consulting.
- * <p>
- * Distribusjonskanaler støttet av dokdistfordeling
- */
 public enum DistribusjonsKanalCode {
 
 	PRINT("S"),

@@ -18,9 +18,6 @@ import org.springframework.stereotype.Component;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * @author Ugur Alpay Cenar, Visma Consulting.
- */
 @Component
 public class Qdist012MetricsRoutePolicy extends RoutePolicySupport {
 

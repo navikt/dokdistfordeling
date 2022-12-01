@@ -26,10 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Heidi Elisabeth Sando, Visma Consulting.
- */
-
 class Qdist008DistribuerForsendelseMapperTest {
 
 	private static final String BESTILLINGS_ID = "bestillingsId";
