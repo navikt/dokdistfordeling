@@ -3,7 +3,7 @@ WORKDIR build
 COPY app/target/app.jar app.jar
 RUN java -Djarmode=layertools -jar app.jar extract
 
-FROM navikt/java:17-appdynamics
+FROM ghcr.io/navikt/baseimages/temurin:17-appdynamics
 WORKDIR app
 COPY --from=builder build/dependencies/ ./
 COPY --from=builder build/snapshot-dependencies/ ./
