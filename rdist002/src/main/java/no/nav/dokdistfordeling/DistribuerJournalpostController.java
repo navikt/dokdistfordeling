@@ -17,7 +17,6 @@ import no.nav.dokdistfordeling.exception.technical.SafJournalpostIkkeFunnetTechn
 import no.nav.dokdistfordeling.metrics.Monitor;
 import no.nav.dokdistfordeling.springdoc.SwaggerRestDistribuerJournalpost;
 import org.slf4j.MDC;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +31,7 @@ import static java.util.Objects.isNull;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.GONE;
 
 @RestController
@@ -55,7 +55,7 @@ public class DistribuerJournalpostController {
 	@PostMapping(value = "/distribuerjournalpost")
 	@Monitor(value = "dok_metric", process = "rdist002", extraTags = {"process", "rdist002"}, histogram = true)
 	public ResponseEntity<DistribuerJournalpostResponseTo> distribuerJournalpost(@RequestBody DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
-																				 @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorizationHeader,
+																				 @Parameter(hidden = true) @RequestHeader(value = AUTHORIZATION) String authorizationHeader,
 																				 @Parameter(description = "Nav-CallId - teknisk sporingsid") @RequestHeader(value = "Nav-CallId", required = false) String navCallId,
 																				 @Parameter(description = "Nav-Consumer-Id - teknisk sporingsinfo om konsument") @RequestHeader(value = "Nav-Consumer-Id", required = false) String navConsumerId) {
 		addCallIdToMDC(navCallId);

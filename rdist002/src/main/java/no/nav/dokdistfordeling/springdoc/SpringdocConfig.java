@@ -8,7 +8,10 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
+
+import static io.swagger.v3.oas.models.security.SecurityScheme.In.HEADER;
+import static io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Configuration
 public class SpringdocConfig {
@@ -19,21 +22,21 @@ public class SpringdocConfig {
 				.info(new Info()
 						.title("DistribuerJournalpost API")
 						.description("""
-								Her dokumenteres tjenestegrensesnittet til distribuerJournalpost. Til autentisering brukes OIDC-token (JWT via OAuth2.0).\s
-								Følgende format må brukes i Authorize sitt input-felt "Value": <strong> Bearer {token} </strong>.\s
-								Eksempel på verdi i input-feltet: <strong> Bearer eYdmifml0ejugm </strong>. Et gyldig token kommer til å ha mange flere karakterer enn i eksempelet.
+								Her dokumenteres tjenestegrensesnittet til distribuerJournalpost. Til autentisering brukes OIDC-token (JWT via OAuth2.0).
+
+								Har du spørsmål? Kontakt oss på Slack-kanalen #team_dokumentløsninger.
 								""")
 						.version(version))
 				.components(
 						new Components()
 								.addSecuritySchemes("Authorization",
 										new SecurityScheme()
-												.type(SecurityScheme.Type.HTTP)
+												.type(HTTP)
 												.scheme("Bearer")
 												.bearerFormat("JWT")
-												.in(SecurityScheme.In.HEADER)
+												.in(HEADER)
 												.description("Eksempel på verdi som skal inn i Value-feltet (Bearer trengs altså ikke å oppgis): 'eyAidH...'")
-												.name(HttpHeaders.AUTHORIZATION)
+												.name(AUTHORIZATION)
 								)
 				)
 				.addSecurityItem(
