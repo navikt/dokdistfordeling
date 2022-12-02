@@ -1,14 +1,15 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_BESTILLINGS_ID;
-import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
-import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
-
 import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
+
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DISTRIBUSJON;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
+import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_BESTILLINGS_ID;
+import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
+import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 
 @Component
 public class DokdistStatusUpdater {
@@ -31,8 +32,8 @@ public class DokdistStatusUpdater {
 	}
 
 	private boolean shouldUpdate(Exchange exchange){
-		if(exchange.getProperty(PROPERTY_DISTRIBUSJONSKANAL).equals(DistribusjonsKanalCode.LOKAL_PRINT)||
-				exchange.getProperty(PROPERTY_DISTRIBUSJONSKANAL).equals(DistribusjonsKanalCode.INGEN_DISTRIBUSJON)) {
+		if(exchange.getProperty(PROPERTY_DISTRIBUSJONSKANAL).equals(LOKAL_PRINT)||
+				exchange.getProperty(PROPERTY_DISTRIBUSJONSKANAL).equals(INGEN_DISTRIBUSJON)) {
 			return false;
 		}else{
 			return true;

@@ -373,7 +373,7 @@ public class Qdist012IT {
 
 	@Test
 	public void shouldThrowBucketTechnicalException() throws Exception {
-		doThrow(new FailedBucketUploadTechnicalException("Feilet ved persistering av dokument til S3")).when(bucketStorage)
+		doThrow(new FailedBucketUploadTechnicalException("Feilet å laste opp dokument til Google Cloud Storage.")).when(bucketStorage)
 				.upload(any(), any(), eq(BESTILLINGS_ID));
 		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())

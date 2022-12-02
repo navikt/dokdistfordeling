@@ -2,7 +2,7 @@ kind: Application
 apiVersion: nais.io/v1alpha1
 metadata:
   name: {{ APP_NAME }}
-  namespace: {{ NAMESPACE }}
+  namespace: teamdokumenthandtering
   labels:
     team: teamdokumenthandtering
 spec:
@@ -102,8 +102,6 @@ spec:
     paths:
       - kvPath: {{ SRVDOKDISTFORDELING }}
         mountPath: /var/run/secrets/nais.io/srvdokdistfordeling
-      - kvPath: {{ VAULT }}
-        mountPath: /var/run/secrets/nais.io/vault
       - kvPath: {{ APPDYNAMICS }}
         mountPath: /var/run/secrets/nais.io/appdynamics
       - kvPath: {{ DOKDISTFORDELING_CERT }}

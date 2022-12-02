@@ -10,7 +10,6 @@ import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_PO
 @Component
 public class RegoppslagAdresseMapper {
     private static final String ISO_3166_ALPHA_2_NORGE = "NO";
-    private static final String TEST_VALUE = "";
 
     DistribuerJournalpostRequestTo.AdresseTo mapAdresseTo(final HentMottakerOgAdresseResponseTo.AdresseTo regoppslagAdresseTo) {
         if (ISO_3166_ALPHA_2_NORGE.equals(regoppslagAdresseTo.getLandkode())) {
