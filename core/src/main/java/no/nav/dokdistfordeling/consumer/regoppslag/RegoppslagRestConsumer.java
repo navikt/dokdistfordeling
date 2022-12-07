@@ -63,9 +63,9 @@ class RegoppslagRestConsumer {
 				throw new RegoppslagHentAdresseSecurityException(format("Kall mot TREG002 feilet. Ingen tilgang. feilmelding=%s", e
 						.getMessage()), e);
 			} else if (HttpStatus.NOT_FOUND == e.getStatusCode()) {
-				throw new UkjentAdresseException("Mottaker har ukjent adresse.", e);
+				throw new UkjentAdresseException("Fant ikke adresseinformasjon for mottaker i PDL. Mottaker har ukjent adresse.", e);
 			} else if (HttpStatus.GONE == e.getStatusCode()) {
-				throw new PersonErDoedUkjentAdresseException(format("Mottaker er død og har ukjent adresse. Status=%s", e.getStatusCode()), e);
+				throw new PersonErDoedUkjentAdresseException("Mottaker er død og har ukjent adresse.", e);
 			} else {
 				throw new RegoppslagHentAdresseFunctionalException(format("Kunne ikke hente adresse for bruker. status=%s, feilmelding=%s", e
 						.getStatusCode(), e.getMessage()), e);

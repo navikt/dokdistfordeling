@@ -22,6 +22,9 @@ import java.util.UUID;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateAdresse;
+import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateJournalpostAndDokumenter;
+import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateDistribuerJournalpostRequest;
 import static no.nav.dokdistfordeling.constants.Constants.DOKDISTBESTILLINGS_ID;
 import static no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType.UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
@@ -33,7 +36,6 @@ public class DistribuerJournalpostService {
 
 	private final DistribuerForsendelseProducer distribuerForsendelseProducer;
 	private final HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper;
-	private final Rdist002ValidationUtil rdist002ValidationUtil;
 	private final Regoppslag regoppslag;
 	private final RegoppslagAdresseMapper regoppslagAdresseMapper;
 	private final HentBestemDokdistKanalService hentBestemDokdistKanal;
@@ -46,7 +48,6 @@ public class DistribuerJournalpostService {
 		this.distribuerForsendelseProducer = distribuerForsendelseProducer;
 		this.regoppslagAdresseMapper = regoppslagAdresseMapper;
 		this.hentDokumenterFraJoarkMapper = new HentDokumenterFraJoarkMapper();
-		this.rdist002ValidationUtil = new Rdist002ValidationUtil();
 		this.regoppslag = regoppslag;
 		this.hentBestemDokdistKanal = hentBestemDokdistKanal;
 		this.journalpostApi = journalpostApi;
@@ -55,9 +56,9 @@ public class DistribuerJournalpostService {
 	public String distribuerForsendelse(final DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost) {
 		final String bestillingsId = UUID.randomUUID().toString();
 		DistribuerJournalpostRequestTo trimmetDistribuerJournalpostRequestTo = trimAdresse(distribuerJournalpostRequestTo);
-		rdist002ValidationUtil.validateRequest(trimmetDistribuerJournalpostRequestTo);
+		validateDistribuerJournalpostRequest(trimmetDistribuerJournalpostRequestTo);
 
-		rdist002ValidationUtil.validateJournalpostAndDokumenter(journalpost);
+		validateJournalpostAndDokumenter(journalpost);
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
 		boolean harAdresse = nonNull(trimmetDistribuerJournalpostRequestTo.getAdresse());
@@ -114,7 +115,7 @@ public class DistribuerJournalpostService {
 										   final Aktoer mottaker, DistribusjonsKanalCode distribusjonsKanalCode) {
 
 		if (PRINT.name().equals(distribusjonsKanalCode.name())) {
-			rdist002ValidationUtil.validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
+			validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
 		}
 
 		final HentDokumenterFraJoark hentDokumenterFraJoark = hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, bestillingsId, distribusjonsKanalCode);
@@ -127,12 +128,9 @@ public class DistribuerJournalpostService {
 
 	private DistribuerJournalpostRequestTo.AdresseTo hentAdresse(Journalpost.AvsenderMottaker avsenderMottaker, String tema) {
 		return switch (avsenderMottaker.getType()) {
-			case FNR ->
-					regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentPersonAdresse(avsenderMottaker.getId(), tema));
-			case ORGNR ->
-					regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentOrganisasjonAdresse(avsenderMottaker.getId()));
-			default ->
-					throw new ValidationException("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis adresse ikke oppgis i request.");
+			case FNR -> regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentPersonAdresse(avsenderMottaker.getId(), tema));
+			case ORGNR -> regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentOrganisasjonAdresse(avsenderMottaker.getId()));
+			default -> throw new ValidationException("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis adresse ikke oppgis i request.");
 		};
 	}
 

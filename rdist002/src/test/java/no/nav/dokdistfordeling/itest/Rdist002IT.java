@@ -676,7 +676,7 @@ public class Rdist002IT {
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 		assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-		assertThat(responseEntity.getBody()).contains("Mottaker har ukjent adresse");
+		assertThat(responseEntity.getBody()).contains("Fant ikke adresseinformasjon for mottaker i PDL. Mottaker har ukjent adresse.");
 	}
 
 	@Test
@@ -710,7 +710,7 @@ public class Rdist002IT {
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 		assertThat(responseEntity.getStatusCode()).isEqualTo(GONE);
-		assertThat(responseEntity.getBody()).contains("Mottaker er død og har ukjent adresse");
+		assertThat(responseEntity.getBody()).contains("Mottaker er død og har ukjent adresse.");
 	}
 
 	@Test

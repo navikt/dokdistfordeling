@@ -61,7 +61,7 @@ public class SafGraphqlConsumer {
 
 			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null || responseEntity.getBody()
 					.getData().getJournalpost() == null) {
-				throw new SafJournalpostIkkeFunnetTechnicalException("Ingen journalpost ble funnet");
+				throw new SafJournalpostIkkeFunnetTechnicalException("Fant ikke journalposten i fagarkivet");
 			}
 
 			return responseEntity.getBody().getJournalpost();
