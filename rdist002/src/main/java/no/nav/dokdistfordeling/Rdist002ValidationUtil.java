@@ -48,7 +48,7 @@ public class Rdist002ValidationUtil {
 	private static void assertNotNullOrEmptyAndCorrectLength(String field, String value) {
 		assertNotNullOrEmpty(field, value);
 		if (value.length() > 20) {
-			throw new ValidationException((format("%s kan ikke være mer enn 20 tegn", field)));
+			throw new ValidationException(format("%s kan ikke være mer enn 20 tegn", field));
 		}
 	}
 
