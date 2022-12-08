@@ -106,7 +106,11 @@ public class Rdist002ValidationUtil {
 
 	private static void validateDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
 		if (checkIfNoDokumentvariantWithTilgang(dokumentInfo.getDokumentvarianter())) {
-			throw new BrukerManglerTilgangTilDokumentFunctionalException(format("Saksbehandler har ikke tilgang til å se dokumentet med dokumentInfoId=%s og kan derfor ikke bestille distribusjon.", dokumentInfo.getDokumentInfoId()));
+			throw new BrukerManglerTilgangTilDokumentFunctionalException(format("" +
+					"Systembruker eller saksbehandler har ikke tilgang til dokumentInfoId=%s og kan derfor ikke bestille distribusjon. " +
+					"For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. " +
+					"For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
+					"Kontakt oss på #team_dokumentløsninger for bistand.", dokumentInfo.getDokumentInfoId()));
 		}
 	}
 
