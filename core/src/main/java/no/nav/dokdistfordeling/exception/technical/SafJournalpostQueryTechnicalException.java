@@ -5,4 +5,8 @@ public class SafJournalpostQueryTechnicalException extends AbstractDokdistfordel
 	public SafJournalpostQueryTechnicalException(String message, Throwable cause) {
 		super(message, cause);
 	}
+
+	public SafJournalpostQueryTechnicalException(String message) {
+		super(message);
+	}
 }

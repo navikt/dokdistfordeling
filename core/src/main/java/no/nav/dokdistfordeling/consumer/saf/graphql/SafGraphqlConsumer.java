@@ -6,7 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.constants.Constants;
 import no.nav.dokdistfordeling.consumer.NavHeaders;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonJournalpost;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonResponse;
+import no.nav.dokdistfordeling.exception.functional.SafBadRequestException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.exception.technical.MarshalGraphqlRequestToJsonTechnicalException;
@@ -20,7 +21,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -38,6 +38,10 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHOR
 public class SafGraphqlConsumer {
 
 	private static final String OIDC_TOKEN_PREFIX = "Bearer";
+	private static final String NOT_FOUND = "not_found";
+	private static final String FORBIDDEN = "forbidden";
+	private static final String SERVER_ERROR = "server_error";
+	private static final String BAD_REQUEST = "bad_request";
 	private final RestTemplate restTemplate;
 	private final String graphQLurl;
 
@@ -57,14 +61,26 @@ public class SafGraphqlConsumer {
 		try {
 			HttpHeaders httpHeaders = createAuthHeaderFromToken(authorizationHeader);
 
-			ResponseEntity<SafJsonJournalpost> responseEntity = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(requestToJson(graphQLRequest), httpHeaders), SafJsonJournalpost.class);
+			SafJsonResponse result = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(requestToJson(graphQLRequest), httpHeaders), SafJsonResponse.class).getBody();
 
-			if (responseEntity.getBody() == null || responseEntity.getBody().getData() == null || responseEntity.getBody()
-					.getData().getJournalpost() == null) {
-				throw new SafJournalpostIkkeFunnetTechnicalException("Fant ikke journalposten i fagarkivet");
+			if (result.getErrors() != null && result.getErrors().size() > 0) {
+				no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonResponse.Error safError = result.getErrors().get(0);
+				String safErrorCode = safError.getExtensions().getCode();
+
+				switch (safErrorCode) {
+					case NOT_FOUND -> throw new SafJournalpostIkkeFunnetTechnicalException("Fant ikke journalposten i fagarkivet");
+					case FORBIDDEN -> throw new SafJournalpostQueryUnauthorizedException(
+							"Saksbehandler har ikke tilgang til journalposten. Feilmelding fra SAF: " + safError.getMessage());
+					case SERVER_ERROR -> {
+						log.warn("Teknisk feil mot SAF. Feilmelding: " + safError.getMessage());
+						throw new SafJournalpostQueryTechnicalException(safError.getMessage());
+					}
+					case BAD_REQUEST -> throw new SafBadRequestException("Bad request mot SAF: " + safError.getMessage());
+					default -> throw new SafBadRequestException("Ukjent funksjonell feil mot SAF: " + safError.getMessage());
+				}
 			}
 
-			return responseEntity.getBody().getJournalpost();
+			return result.getData().getJournalpost();
 
 		} catch (HttpClientErrorException e) {
 			throw new SafJournalpostQueryUnauthorizedException(String.format("Henting av journalpost feilet med status: %s, feilmelding: %s", e

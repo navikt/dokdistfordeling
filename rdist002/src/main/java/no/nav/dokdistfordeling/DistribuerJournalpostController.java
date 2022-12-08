@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
-import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.metrics.Monitor;
 import no.nav.dokdistfordeling.springdoc.SwaggerRestDistribuerJournalpost;
@@ -36,7 +35,7 @@ public class DistribuerJournalpostController {
 	private final SafJournalpostQueryService safJournalpostQueryService;
 	private final DistribuerJournalpostService distribuerJournalpostService;
 
-	private static final String RDIST002_PREFIX = "rdist002 - Distribusjon feilet for journalpostId= ";
+	private static final String RDIST002_PREFIX = "rdist002 - Distribusjon feilet for journalpostId=";
 	private static final String FEILMELDING_SUFFIX = ". Feilmelding: ";
 
 
@@ -73,12 +72,9 @@ public class DistribuerJournalpostController {
 			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(
 					distribuerJournalpostService.distribuerForsendelse(distribuerJournalpostRequestTo, journalpost));
 			return ResponseEntity.ok().body(response);
-		} catch (SafJournalpostQueryUnauthorizedException e) {
-			log.warn(RDIST002_PREFIX + distribuerJournalpostRequestTo.getJournalpostId() + FEILMELDING_SUFFIX + e.getMessage());
-			throw new SafJournalpostQueryUnauthorizedException("Saksbehandler har ikke tilgang til journalpost= " + distribuerJournalpostRequestTo.getJournalpostId() + " og kan derfor ikke bestille distribusjon. Feilmelding: " + e.getMessage(), e);
 		} catch (ValidationException e) {
 			log.warn(RDIST002_PREFIX + distribuerJournalpostRequestTo.getJournalpostId() + FEILMELDING_SUFFIX + e.getMessage());
-			throw new ValidationException("Validering av distribusjonsforespørsel feilet med feilmelding: " + e.getMessage(), e);
+			throw new ValidationException("Validering av distribusjonsforespørsel feilet med feilmelding: " + e.getMessage());
 		} catch (Exception e) {
 			log.warn(RDIST002_PREFIX + distribuerJournalpostRequestTo.getJournalpostId() + FEILMELDING_SUFFIX + e.getMessage());
 			throw e;
