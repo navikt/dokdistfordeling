@@ -83,7 +83,8 @@ public class SafGraphqlConsumer {
 			return result.getData().getJournalpost();
 
 		} catch (HttpClientErrorException e) {
-			throw new SafJournalpostQueryUnauthorizedException(String.format("Henting av journalpost feilet med status: %s, feilmelding: %s", e
+			throw new SafJournalpostQueryUnauthorizedException(String.format("Henting av journalpost feilet med status: %s. Skyldes sannsynligvis at appen som gjorde kallet ikke har tilgang til SAF. " +
+					"For å få tilgang må appen som kaller dokdistfordeling legges til i SAF sin <env-config.json>. Feilmelding: %s", e
 					.getStatusCode(), e.getMessage()), e);
 		} catch (HttpServerErrorException e) {
 			throw new SafJournalpostQueryTechnicalException(String.format("Tjenesten SAF (graphQL) feilet med status: %s, feilmelding: %s", e
