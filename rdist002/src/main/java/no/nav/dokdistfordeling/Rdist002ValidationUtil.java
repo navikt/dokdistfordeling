@@ -35,13 +35,9 @@ import static no.nav.dokdistfordeling.util.ValidationUtil.assertStringIsNumberOf
 public class Rdist002ValidationUtil {
 
 	private static final String UTGAAENDE = Journalposttype.U.name();
-	private final Set<String> ISO3166_TWO_LETTER_CODES;
+	private static final Set<String> ISO3166_TWO_LETTER_CODES = Arrays.stream(Locale.getISOCountries()).collect(Collectors.toSet());
 
-	public Rdist002ValidationUtil() {
-		ISO3166_TWO_LETTER_CODES = Arrays.stream(Locale.getISOCountries()).collect(Collectors.toSet());
-	}
-
-	public void validateRequest(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
+	public static void validateDistribuerJournalpostRequest(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
 		assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
 		assertNotNullOrEmptyAndCorrectLength("bestillendeFagsystem", distribuerJournalpostRequestTo.getBestillendeFagsystem());
 		assertNotNullOrEmptyAndCorrectLength("dokumentProdapp", distribuerJournalpostRequestTo.getDokumentProdApp());
@@ -49,14 +45,14 @@ public class Rdist002ValidationUtil {
 		assertNotNullAndValidValueIgnoreCase("distribusjonstidspunkt", distribuerJournalpostRequestTo.getDistribusjonstidspunkt(), DistribusjonstidspunktCode.values());
 	}
 
-	private void assertNotNullOrEmptyAndCorrectLength(String field, String value) {
+	private static void assertNotNullOrEmptyAndCorrectLength(String field, String value) {
 		assertNotNullOrEmpty(field, value);
 		if (value.length() > 20) {
-			throw new ValidationException(String.format("%s kan ikke være mer enn 20 tegn", field));
+			throw new ValidationException(format("%s kan ikke være mer enn 20 tegn", field));
 		}
 	}
 
-	public void validateAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo, Aktoer mottaker) {
+	public static void validateAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo, Aktoer mottaker) {
 		if (mottaker instanceof Samhandler && adresseTo == null) {
 			throw new ValidationException("For mottaker av type samhandler kan ikke adresse være null");
 		}
@@ -76,13 +72,13 @@ public class Rdist002ValidationUtil {
 		}
 	}
 
-	private void validateLandKode(String land) {
+	private static void validateLandKode(String land) {
 		if (!ISO3166_TWO_LETTER_CODES.contains(land)) {
 			throw new ValidationException(format("Land må være en gyldig iso3166-2 landkode på 2 bokstaver. Fikk=%s", land));
 		}
 	}
 
-	public void validateJournalpostAndDokumenter(Journalpost journalpost) {
+	public static void validateJournalpostAndDokumenter(Journalpost journalpost) {
 		assertNotNull(Journalposttype.class, journalpost.getJournalposttype());
 		assertParameterIsAsExpected("journalposttype", journalpost.getJournalposttype().name(), UTGAAENDE);
 		assertParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus(), FERDIGSTILT);
@@ -96,10 +92,10 @@ public class Rdist002ValidationUtil {
 
 		validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
 
-		journalpost.getDokumenter().forEach(this::validateDokumentInfo);
+		journalpost.getDokumenter().forEach(Rdist002ValidationUtil::validateDokumentInfo);
 	}
 
-	private void validateHovedDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
+	private static void validateHovedDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
 		try {
 			assertHovedokumentFieldNotNullOrEmpty("tittel", dokumentInfo.getTittel());
 			assertHovedokumentFieldNotNullOrEmpty("brevkode", dokumentInfo.getBrevkode());
@@ -108,13 +104,18 @@ public class Rdist002ValidationUtil {
 		}
 	}
 
-	private void validateDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
+	private static void validateDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
 		if (checkIfNoDokumentvariantWithTilgang(dokumentInfo.getDokumentvarianter())) {
-			throw new BrukerManglerTilgangTilDokumentFunctionalException(format("Saksbehandler har ikke tilgang til noen av dokumentets variantformater. dokumentInfoId=%s", dokumentInfo.getDokumentInfoId()));
+			throw new BrukerManglerTilgangTilDokumentFunctionalException(format("" +
+					"Systembruker eller saksbehandler har ikke tilgang til dokumentInfoId=%s og kan derfor ikke bestille distribusjon. " +
+					"For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. " +
+					"For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
+					"Kontakt oss på #team_dokumentløsninger for bistand.", dokumentInfo.getDokumentInfoId()));
 		}
 	}
 
-	private boolean checkIfNoDokumentvariantWithTilgang(List<Journalpost.Dokumentvariant> dokumentvarianter) {
+
+	private static boolean checkIfNoDokumentvariantWithTilgang(List<Journalpost.Dokumentvariant> dokumentvarianter) {
 		return dokumentvarianter.stream().noneMatch(dokumentvariant -> dokumentvariant.isSaksbehandlerHarTilgang() && (Variantformat.ARKIV.equals(dokumentvariant.getVariantformat()) || Variantformat.SLADDET.equals(dokumentvariant.getVariantformat())));
 	}
 }

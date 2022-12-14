@@ -1,0 +1,23 @@
+{
+  "errors": [
+    {
+      "message": "Bad request",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": [
+        "journalpost"
+      ],
+      "extensions": {
+        "code": "bad_request",
+        "classification": "ExecutionAborted"
+      }
+    }
+  ],
+  "data": {
+    "journalpost": null
+  }
+}

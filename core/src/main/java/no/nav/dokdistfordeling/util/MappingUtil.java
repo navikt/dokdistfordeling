@@ -20,7 +20,7 @@ public final class MappingUtil {
 		try {
 			return (NULL.equals(enumName) || isEmpty(enumName)) ? null : Enum.valueOf(enumClass, enumName);
 		} catch (IllegalArgumentException e) {
-			throw new InvalidMappingToEnumFunctionalException(format("%s er ikke en gyldig kodeverdi for %s", enumName, enumClass));
+			throw new InvalidMappingToEnumFunctionalException(format("Ulovlig verdi ble forsøkt mappet til enum: %s er ikke en gyldig kodeverdi for %s", enumName, enumClass));
 		}
 	}
 

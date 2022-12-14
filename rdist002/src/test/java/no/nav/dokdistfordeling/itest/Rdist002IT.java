@@ -9,6 +9,8 @@ import no.nav.dokdistfordeling.util.MappingUtil;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -589,6 +591,9 @@ public class Rdist002IT {
 		assertNull(restResponse.getBestillingsId());
 	}
 
+	/*
+	// Før gjorde man en sjekk i safQueryConsumer på om svaret inneholdt en journalpost. Hvvis ikke ble det kasta en journalpostIkkeFunnetException
+	// Dette skal nå kunne fjernes siden vi nå sjekker om saf returnerer en NOT_FOUND i errors i svaret
 	@Test
 	public void distribuerJournalpostThrowsSafJournalpostIkkeFunnetFunctionalException() {
 		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
@@ -602,7 +607,7 @@ public class Rdist002IT {
 		assertNull(restResponse.getBestillingsId());
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
-	}
+	}*/
 
 	@Test
 	public void distribuerJournalpostThrowsSafJournalpostQueryUnauthorizedException() {
@@ -629,6 +634,24 @@ public class Rdist002IT {
 		assertNull(restResponse.getBestillingsId());
 		verify(exactly(3), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
+	}
+
+	@ParameterizedTest
+	@CsvSource({
+			"safgraphql-bad_request.json,Bad request,400",
+			"safgraphql-not_found.json,Fant ikke journalpost,404",
+			"safgraphql-unauthorized.json,Bruker er unauthorized,401"
+
+	})
+	void shouldReturnCorrecteErrorTypeWhenSafRequestFails(String filename, String errorMessage, int httpErrorCode) {
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
+				.withBodyFile("saf/" + filename)));
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
+		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
+		assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.valueOf(httpErrorCode));
+		assertThat(responseEntity.getBody()).contains(errorMessage);
 	}
 
 	@Test
@@ -676,7 +699,7 @@ public class Rdist002IT {
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 		assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-		assertThat(responseEntity.getBody()).contains("Mottaker har ukjent adresse");
+		assertThat(responseEntity.getBody()).contains("Fant ikke adresseinformasjon for mottaker i PDL. Mottaker har ukjent adresse.");
 	}
 
 	@Test
@@ -710,7 +733,7 @@ public class Rdist002IT {
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 		assertThat(responseEntity.getStatusCode()).isEqualTo(GONE);
-		assertThat(responseEntity.getBody()).contains("Mottaker er død og har ukjent adresse");
+		assertThat(responseEntity.getBody()).contains("Mottaker er død og har ukjent adresse.");
 	}
 
 	@Test

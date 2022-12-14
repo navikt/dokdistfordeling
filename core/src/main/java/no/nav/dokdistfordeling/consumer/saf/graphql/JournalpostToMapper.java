@@ -2,6 +2,7 @@ package no.nav.dokdistfordeling.consumer.saf.graphql;
 
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo.DokumentInfo;
 import no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
@@ -39,7 +40,7 @@ public class JournalpostToMapper {
 				.findAny().orElse(null);
 	}
 
-	private List<Journalpost.DokumentInfo> mapDokumenter(List<SafJournalpostTo.DokumentInfo> dokumenter) {
+	private List<Journalpost.DokumentInfo> mapDokumenter(List<DokumentInfo> dokumenter) {
 		return dokumenter
 				.stream()
 				.map(this::mapDokument)

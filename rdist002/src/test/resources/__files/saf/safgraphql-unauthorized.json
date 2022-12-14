@@ -1,0 +1,23 @@
+{
+  "errors": [
+    {
+      "message": "Bruker er unauthorized",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": [
+        "journalpost"
+      ],
+      "extensions": {
+        "code": "forbidden",
+        "classification": "ExecutionAborted"
+      }
+    }
+  ],
+  "data": {
+    "journalpost": null
+  }
+}
