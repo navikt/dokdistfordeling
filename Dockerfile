@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk as builder
+FROM eclipse-temurin:17-jre as builder
 WORKDIR build
 COPY app/target/app.jar app.jar
 RUN java -Djarmode=layertools -jar app.jar extract
