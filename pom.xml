@@ -26,7 +26,7 @@
     <properties>
         <java.version>17</java.version>
 
-        <camel.version>3.20.1</camel.version>
+        <camel.version>3.20.2</camel.version>
         <logstash-logback-encoder.version>7.2</logstash-logback-encoder.version>
         <ibm.mq.version>9.3.1.0</ibm.mq.version>
         <commons-io.version>2.11.0</commons-io.version>
@@ -119,6 +119,8 @@
                 <artifactId>dokkat-api</artifactId>
                 <version>${dokkat-api.version}</version>
             </dependency>
+
+            <!-- Test -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-contract-wiremock</artifactId>
