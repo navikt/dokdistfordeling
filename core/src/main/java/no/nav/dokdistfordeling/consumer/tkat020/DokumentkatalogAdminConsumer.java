@@ -1,43 +1,40 @@
 package no.nav.dokdistfordeling.consumer.tkat020;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
-import no.nav.dokdistfordeling.exception.functional.DokkatGetDokumenttypeInfoFunctionalException;
+import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
+import no.nav.dokdistfordeling.exception.functional.DokMetDokumenttypeInfoFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
-import no.nav.dokdistfordeling.exception.technical.DokkatGetDokumenttypeInfoTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.DokMetDokumenttypeInfoTechnicalException;
 import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
+import no.nav.dokdistfordeling.security.AzureToken;
+import no.nav.dokdistfordeling.security.WebClientAzureAuthentication;
 import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.time.Duration;
-
+import static java.util.Objects.isNull;
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACHE;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @Component
 class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 
-	private final String dokumenttypeInfoV4Url;
-	private final RestTemplate restTemplate;
+	private final WebClient webclient;
 
-	public DokumentkatalogAdminConsumer(@Value("${DokumenttypeInfo_v4_url}") String dokumenttypeInfoV4Url,
-										RestTemplateBuilder restTemplateBuilder,
-										final ServiceuserAlias serviceuserAlias) {
-		this.dokumenttypeInfoV4Url = dokumenttypeInfoV4Url;
-		this.restTemplate = restTemplateBuilder
-				.setReadTimeout(Duration.ofSeconds(20))
-				.setConnectTimeout(Duration.ofSeconds(5))
-				.basicAuthentication(serviceuserAlias.getUsername(), serviceuserAlias.getPassword())
+	public DokumentkatalogAdminConsumer(DokdistfordelingProperties dokdistfordelingProperties,
+										WebClient webclient, AzureToken azureToken) {
+		this.webclient = webclient.mutate()
+				.baseUrl(dokdistfordelingProperties.getEndpoints().getDokmet().getUrl())
+				.defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.filter(new WebClientAzureAuthentication(azureToken, dokdistfordelingProperties.getEndpoints().getDokmet().getScope()))
 				.build();
 	}
 
@@ -45,16 +42,13 @@ class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "getDokumenttypeInfo"}, histogram = true)
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public DokumenttypeInfoTo getDokumenttypeInfo(final String dokumenttypeId) {
-		try {
-			DokumentTypeInfoToV4 response = restTemplate.getForObject(this.dokumenttypeInfoV4Url + "/" + dokumenttypeId, DokumentTypeInfoToV4.class);
-			return mapResponse(response);
-		} catch (HttpClientErrorException e) {
-			throw new DokkatGetDokumenttypeInfoFunctionalException(String.format("TKAT020 feilet med statusKode=%s. Fant ingen dokumenttypeInfo med dokumenttypeId=%s. Feilmelding=%s", e.getStatusCode(), dokumenttypeId, e.getResponseBodyAsString()), e);
-		} catch (HttpServerErrorException e) {
-			throw new DokkatGetDokumenttypeInfoTechnicalException(String.format("TKAT020 feilet teknisk med statusKode=%s, feilmelding=%s", e
-					.getStatusCode(), e
-					.getResponseBodyAsString()), e);
-		}
+		DokumentTypeInfoToV4 dokumentTypeInfoToV4 = webclient.get()
+				.uri("/" + dokumenttypeId)
+				.retrieve()
+				.bodyToMono(DokumentTypeInfoToV4.class)
+				.doOnError(this::handleError)
+				.block();
+		return isNull(dokumentTypeInfoToV4) ? null : mapResponse(dokumentTypeInfoToV4);
 	}
 
 	private DokumenttypeInfoTo mapResponse(final DokumentTypeInfoToV4 response) {
@@ -63,4 +57,17 @@ class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 				.build();
 	}
 
+	private void handleError(Throwable error) {
+		if (error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
+			throw new DokMetDokumenttypeInfoFunctionalException(
+					String.format("Kall mot tkat020 feilet funksjonelt med statuskode=%s Feilmelding=%s",
+							response.getRawStatusCode(),
+							response.getMessage()),
+					error);
+		} else {
+			throw new DokMetDokumenttypeInfoTechnicalException(
+					String.format("Kall mot tkat020 feilet teknisk med feilmelding=%s", error.getMessage()),
+					error);
+		}
+	}
 }

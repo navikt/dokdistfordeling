@@ -127,28 +127,14 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalPrint() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/administrerforsendelse/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubSTSToken();
+		stubPostPdl();
+		stubAzure();
+		stubGetDokumenttypeInfo();
+		stubPostRdist001();
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -172,28 +158,14 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalDittNav() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/administrerforsendelse/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubGetDokumenttypeInfo();
+		stubPostPdl();
+		stubSTSToken();
+		stubAzure();
+		stubPostRdist001();
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -217,28 +189,14 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalSDP() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/administrerforsendelse/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubGetDokumenttypeInfo();
+		stubPostPdl();
+		stubSTSToken();
+		stubAzure();
+		stubPostRdist001();
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -265,28 +223,14 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalTrygderetten() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/administrerforsendelse/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubGetDokumenttypeInfo();
+		stubPostPdl();
+		stubSTSToken();
+		stubAzure();
+		stubPostRdist001();
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -310,28 +254,14 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldDistribuereForsendelseTilDPV() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/administrerforsendelse/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubGetDokumenttypeInfo();
+		stubPostPdl();
+		stubSTSToken();
+		stubAzure();
+		stubPostRdist001();
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -349,22 +279,11 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalLokalPrint() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+		stubGetDokumenttypeInfo();
+		stubPostPdl();
+		stubSTSToken();
+		stubAzure();
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -385,22 +304,11 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalIngenDistribusjon() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+		stubGetDokumenttypeInfo();
+		stubPostPdl();
+		stubSTSToken();
+		stubAzure();
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -422,28 +330,14 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseOnlyRequiredInputFieds() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/administrerforsendelse/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubGetDokumenttypeInfo();
+		stubPostPdl();
+		stubSTSToken();
+		stubAzure();
+		stubPostRdist001();
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -459,29 +353,14 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessWithoutContactingDokkat() throws Exception {
-
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/administrerforsendelse/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubGetDokumenttypeInfo();
+		stubPostPdl();
+		stubSTSToken();
+		stubAzure();
+		stubPostRdist001();
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -505,28 +384,16 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseWithoutContactingPdl() throws Exception {
-
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/administrerforsendelse/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubGetDokumenttypeInfo();
+		stubPostRdist001();
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
+		stubSTSToken();
+		stubAzure();
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_avoid_pdl_happypath.xml"));
 
@@ -547,28 +414,14 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldPassOnCallId() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/administrerforsendelse/v1")
-				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubGetDokumenttypeInfo();
+		stubPostPdl();
+		stubSTSToken();
+		stubAzure();
+		stubPostRdist001();
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -609,23 +462,14 @@ public class Qdist008IT {
 
 	@Test
 	public void shoulThrwoExceptionIfTemaErNullorEmpty() throws Exception {
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
+		stubPostPdl();
+		stubSTSToken();
+		stubAzure();
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("rjoark001/administrerForsendelseEmptyTema.json")));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -666,10 +510,8 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowNotAvailableInBucketValidationException() throws Exception {
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
+		stubSTSToken();
+		stubAzure();
 		when(bucketStorage.exists(anyString())).thenReturn(false);
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -687,11 +529,8 @@ public class Qdist008IT {
 						.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBody("")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-
+		stubSTSToken();
+		stubAzure();
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -706,14 +545,9 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowPdlFunctionalException() throws Exception {
-
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
+		stubGetDokumenttypeInfo();
+		stubSTSToken();
+		stubAzure();
 		stubFor(post("/pdl").willReturn(aResponse()
 				.withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
@@ -744,13 +578,9 @@ public class Qdist008IT {
 		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-FEILREGISTRERT.json")));
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
+		stubGetDokumenttypeInfo();
+		stubSTSToken();
+		stubAzure();
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -775,13 +605,9 @@ public class Qdist008IT {
 		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-UNDER_ARBEID.json")));
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
+		stubGetDokumenttypeInfo();
+		stubSTSToken();
+		stubAzure();
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -797,13 +623,9 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowPdlTechicalException() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
+		stubGetDokumenttypeInfo();
+		stubSTSToken();
+		stubAzure();
 		stubFor(post("/pdl").willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR
 						.value())
 				.withBody("")));
@@ -823,17 +645,10 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowBestemDokdistKanalFunctionalException() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
+		stubGetDokumenttypeInfo();
+		stubSTSToken();
+		stubAzure();
+		stubPostPdl();
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -849,17 +664,10 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowBestemDokdistKanalTechnicalException() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
+		stubGetDokumenttypeInfo();
+		stubSTSToken();
+		stubAzure();
+		stubPostPdl();
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_magleradresse_happypath.xml"));
 
@@ -871,17 +679,10 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowBestemDokdistKanalMappingException() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
+		stubGetDokumenttypeInfo();
+		stubSTSToken();
+		stubAzure();
+		stubPostPdl();
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -897,17 +698,10 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowPersisterForsendelseFunctionalException() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
+		stubGetDokumenttypeInfo();
+		stubSTSToken();
+		stubAzure();
+		stubPostPdl();
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.BAD_REQUEST.value())));
 
@@ -928,17 +722,11 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowPersisterForsendelseTechicalException() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
+		stubGetDokumenttypeInfo();
+		stubSTSToken();
+		stubAzure();
+		stubPostPdl();
+
 		stubFor(post("/administrerforsendelse/v1")
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
@@ -958,25 +746,12 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowJournalpostAPITechnicalException() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(post("/administrerforsendelse/v1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+		stubGetDokumenttypeInfo();
+		stubSTSToken();
+		stubAzure();
+		stubPostPdl();
+		stubPostRdist001();
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
@@ -999,27 +774,13 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowOppdaterForsendelseFunctionalException() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(post("/administrerforsendelse/v1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubGetDokumenttypeInfo();
+		stubSTSToken();
+		stubAzure();
+		stubPostPdl();
+		stubPostRdist001();
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.BAD_REQUEST.value())));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -1044,27 +805,14 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowOppdaterForsendelseTechnicalException() throws Exception {
-		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
-		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
-						.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("sts/stsResponse_happy.json")));
-		stubFor(post("/pdl").willReturn(aResponse()
-				.withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-				.withBodyFile("pdl/pdl-happy.json")));
-		stubFor(post("/administrerforsendelse/v1").willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+		stubGetDokumenttypeInfo();
+		stubSTSToken();
+		stubAzure();
+		stubPostPdl();
+		stubPostRdist001();
 		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
-		stubFor(post("/azure_token")
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())
-						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("azure/token_response.json")));
+
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
@@ -1084,6 +832,41 @@ public class Qdist008IT {
 		verify(exactly(1), postRequestedFor(urlEqualTo("/administrerforsendelse/v1"))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo(("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST"))));
+	}
+
+	private void stubPostRdist001() {
+		stubFor(post("/administrerforsendelse/v1")
+				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+	}
+
+	private void stubPostPdl() {
+		stubFor(post("/pdl").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("pdl/pdl-happy.json")));
+	}
+
+	private void stubSTSToken() {
+		stubFor(get(STSSTRING).willReturn(aResponse().withStatus(HttpStatus.OK
+						.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse_happy.json")));
+	}
+
+	void stubAzure() {
+		stubFor(post("/azure_token")
+				.willReturn(aResponse()
+						.withStatus(HttpStatus.OK.value())
+						.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("azure/token_response.json")));
+	}
+
+	private void stubGetDokumenttypeInfo() {
+		stubFor(get("/dokkat-tkat020/" + DOKUMENTTYPE_ID).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokumentinfov4/tkat020-happy.json")));
 	}
 
 	private void sendStringMessage(Queue queue, final String message) {

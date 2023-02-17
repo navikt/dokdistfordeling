@@ -6,16 +6,11 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import reactor.core.publisher.Mono;
 
-public class WebClientAzureAuthentication implements ExchangeFilterFunction {
-    final private AzureToken azureToken;
-
-    public WebClientAzureAuthentication(AzureToken azureToken) {
-        this.azureToken = azureToken;
-    }
+public record WebClientAzureAuthentication(AzureToken azureToken, String scope) implements ExchangeFilterFunction {
     @Override
     public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
-        return next.exchange(ClientRequest.from(request).headers((headers) -> {
-            headers.setBearerAuth(azureToken.accessToken());
-        }).build());
+        return next.exchange(ClientRequest.from(request).headers((headers) ->
+            headers.setBearerAuth(azureToken.accessToken(scope))
+        ).build());
     }
 }

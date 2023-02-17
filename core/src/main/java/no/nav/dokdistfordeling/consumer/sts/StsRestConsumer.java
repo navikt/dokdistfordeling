@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.consumer.sts;
 
-import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
+import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.cache.LokalCacheConfig;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.StsTechnicalException;
@@ -26,12 +26,12 @@ public class StsRestConsumer {
 
 	public StsRestConsumer(@Value("${security-token-service-token.url}") String stsUrl,
 						   RestTemplateBuilder restTemplateBuilder,
-						   final ServiceuserAlias serviceuserAlias) {
+						   final DokdistfordelingProperties dokdistfordelingProperties) {
 		this.stsUrl = stsUrl;
 		this.restTemplate = restTemplateBuilder
 				.setReadTimeout(Duration.ofSeconds(20))
 				.setConnectTimeout(Duration.ofSeconds(5))
-				.basicAuthentication(serviceuserAlias.getUsername(), serviceuserAlias.getPassword())
+				.basicAuthentication(dokdistfordelingProperties.getServiceuser().getUsername(), dokdistfordelingProperties.getServiceuser().getPassword())
 				.build();
 	}
 

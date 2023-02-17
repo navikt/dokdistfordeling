@@ -1,11 +1,6 @@
 package no.nav.dokdistfordeling.consumer.rdist001;
 
-import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
-
-import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
-import no.nav.dokdistfordeling.constants.Constants;
+import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.consumer.NavHeaders;
 import no.nav.dokdistfordeling.exception.functional.OppdaterForsendelseFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.PersisterForsendelseFunctionalException;
@@ -28,8 +23,11 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Duration;
+
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
+import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
 @Component
 public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
@@ -39,12 +37,12 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 
 	public AdministrerForsendelseConsumer(@Value("${administrerforsendelse.v1.url}") String administrerforsendelseV1Url,
 										  RestTemplateBuilder restTemplateBuilder,
-										  final ServiceuserAlias serviceuserAlias) {
+										  final DokdistfordelingProperties dokdistfordelingProperties) {
 		this.administrerforsendelseV1Url = administrerforsendelseV1Url;
 		this.restTemplate = restTemplateBuilder
 				.setReadTimeout(Duration.ofSeconds(20))
 				.setConnectTimeout(Duration.ofSeconds(5))
-				.basicAuthentication(serviceuserAlias.getUsername(), serviceuserAlias.getPassword())
+				.basicAuthentication(dokdistfordelingProperties.getServiceuser().getUsername(), dokdistfordelingProperties.getServiceuser().getPassword())
 				.build();
 	}
 

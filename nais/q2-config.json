@@ -1,5 +1,4 @@
 {
-  "DOKUMENTTYPEINFO_V4_URL": "https://app-q2.adeo.no/dokkat/rest/dokumenttypeinfo/v4",
   "ADMINISTRERFORSENDELSE_V1_URL": "https://app-q2.adeo.no/dokdist/rest/v1/administrerforsendelse",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.dev.adeo.no/rest/v1/sts",
   "REGOPPSLAG_URL": "https://regoppslag.dev.intern.nav.no/rest",
@@ -24,8 +23,10 @@
   "SAF_GRAPHQL_URL": "https://saf.dev.intern.nav.no/graphql",
   "HENTDOKUMENT_URL": "https://saf.dev.intern.nav.no/rest/hentdokument",
   "BESTEMDISTRIBUSJONKANAL_URL": "https://dokdistkanal.dev.intern.nav.no/rest/bestemKanal",
-  "JOURNALPOST_API_BASE_URL": "https://dokarkiv.dev.intern.nav.no/rest/journalpostapi/v1/journalpost",
-  "AZURE_APP_SCOPE": "api://dev-fss.teamdokumenthandtering.dokarkiv/.default",
+  "DOKDISTFORDELING_ENDPOINTS_DOKARKIV_URL": "https://dokarkiv.dev.intern.nav.no/rest/journalpostapi/v1/journalpost",
+  "DOKDISTFORDELING_ENDPOINTS_DOKARKIV_SCOPE": "api://dev-fss.teamdokumenthandtering.dokarkiv/.default",
+  "DOKDISTFORDELING_ENDPOINTS_DOKMET_URL": "https://dokmet.dev.intern.nav.no/rest/dokumenttypeinfo",
+  "DOKDISTFORDELING_ENDPOINTS_DOKMET_SCOPE": "api://dev-fss.teamdokumenthandtering.dokmet/.default",
   "APPDYNAMICS": "/apikey/appdynamics/dev",
   "APP_NAME": "dokdistfordeling",
   "APPD_NAME": "dokdistfordeling-q2",

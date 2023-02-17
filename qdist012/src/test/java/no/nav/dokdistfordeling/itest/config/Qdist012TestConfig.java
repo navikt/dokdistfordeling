@@ -1,10 +1,9 @@
 package no.nav.dokdistfordeling.itest.config;
 
 import no.nav.dokdistfordeling.CoreConfig;
+import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
-import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
 import no.nav.dokdistfordeling.config.azure.AzureConfig;
-import no.nav.dokdistfordeling.config.dokarkiv.JournalpostApiConfig;
 import no.nav.dokdistfordeling.config.props.PdlProperties;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.security.AzureToken;
@@ -22,11 +21,10 @@ import static org.mockito.Mockito.mock;
 @Profile("itest")
 @EnableRetry
 @EnableConfigurationProperties({
-		ServiceuserAlias.class,
+		DokdistfordelingProperties.class,
 		MqGatewayAlias.class,
 		PdlProperties.class,
-		AzureConfig.class,
-		JournalpostApiConfig.class
+		AzureConfig.class
 })
 @Import({
 		Qdist012JmsItestConfig.class,
