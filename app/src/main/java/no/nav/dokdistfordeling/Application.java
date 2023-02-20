@@ -2,7 +2,7 @@ package no.nav.dokdistfordeling;
 
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
-import no.nav.dokdistfordeling.config.azure.AzureConfig;
+import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.DokdistmellomlagerProperties;
 import no.nav.dokdistfordeling.config.props.PdlProperties;
 import no.nav.dokdistfordeling.security.AzureToken;
@@ -22,7 +22,7 @@ import static java.lang.System.setProperty;
 @EnableConfigurationProperties({
 		MqGatewayAlias.class,
 		PdlProperties.class,
-		AzureConfig.class,
+		AzureProperties.class,
 		DokdistmellomlagerProperties.class,
 		DokdistfordelingProperties.class
 })

@@ -3,7 +3,7 @@ package no.nav.dokdistfordeling.security;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.config.azure.AzureConfig;
+import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.exception.functional.AzureTokenException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,11 +28,11 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VAL
 @Component
 public class AzureToken {
 
-	private final AzureConfig azureConfig;
+	private final AzureProperties azureConfig;
 	private final ObjectMapper objectMapper;
 	private final WebClient webClient;
 
-	public AzureToken(AzureConfig azureConfig,
+	public AzureToken(AzureProperties azureConfig,
 					  ObjectMapper objectMapper,
 					  WebClient webClient) {
 		this.azureConfig = azureConfig;

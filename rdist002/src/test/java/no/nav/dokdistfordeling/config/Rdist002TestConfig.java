@@ -4,7 +4,7 @@ import no.nav.dokdistfordeling.CoreConfig;
 import no.nav.dokdistfordeling.DistribuerJournalpostConfig;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
-import no.nav.dokdistfordeling.config.azure.AzureConfig;
+import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.PdlProperties;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.security.AzureToken;
@@ -20,7 +20,7 @@ import org.springframework.retry.annotation.EnableRetry;
 		DokdistfordelingProperties.class,
 		MqGatewayAlias.class,
 		PdlProperties.class,
-		AzureConfig.class
+		AzureProperties.class
 })
 @EnableRetry
 @Import({

@@ -9,7 +9,7 @@ import javax.validation.constraints.NotEmpty;
 @Data
 @ConfigurationProperties("azure")
 @Validated
-public class AzureConfig {
+public class AzureProperties {
 	@NotEmpty
 	private String openidConfigTokenEndpoint;
 	@NotEmpty

@@ -5,8 +5,8 @@ import com.ibm.mq.constants.MQConstants;
 import com.ibm.mq.jms.MQConnectionFactory;
 import com.ibm.mq.jms.MQQueue;
 import com.ibm.msg.client.wmq.WMQConstants;
-import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
+import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import org.apache.activemq.jms.pool.PooledConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -75,11 +75,11 @@ public class JmsConfig {
 	@Bean
 	public ConnectionFactory wmqConnectionFactory(final MqGatewayAlias mqGatewayAlias,
 												  final DokdistfordelingProperties dokdistfordelingProperties) throws JMSException {
-		return createConnectionFactory(mqGatewayAlias, dokdistfordelingProperties);
+		return createConnectionFactory(mqGatewayAlias, dokdistfordelingProperties.getServiceuser());
 	}
 
 	private PooledConnectionFactory createConnectionFactory(final MqGatewayAlias mqGatewayAlias,
-															final DokdistfordelingProperties dokdistfordelingProperties) throws JMSException {
+															final DokdistfordelingProperties.Serviceuser serviceuser) throws JMSException {
 		MQConnectionFactory connectionFactory = new MQConnectionFactory();
 		connectionFactory.setHostName(mqGatewayAlias.getHostname());
 		connectionFactory.setPort(mqGatewayAlias.getPort());
@@ -100,8 +100,8 @@ public class JmsConfig {
 
 		UserCredentialsConnectionFactoryAdapter adapter = new UserCredentialsConnectionFactoryAdapter();
 		adapter.setTargetConnectionFactory(connectionFactory);
-		adapter.setUsername(dokdistfordelingProperties.getServiceuser().getUsername());
-		adapter.setPassword(dokdistfordelingProperties.getServiceuser().getPassword());
+		adapter.setUsername(serviceuser.getUsername());
+		adapter.setPassword(serviceuser.getPassword());
 
 		PooledConnectionFactory pooledFactory = new PooledConnectionFactory();
 		pooledFactory.setConnectionFactory(adapter);
