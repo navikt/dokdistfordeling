@@ -7,14 +7,14 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
-import java.time.Duration;
+import static java.time.Duration.ofSeconds;
 
 @ComponentScan
 @Configuration
 public class CoreConfig {
 	@Bean
 	public WebClient webClient(WebClient.Builder webClientBuilder) {
-		HttpClient httpClient = HttpClient.create().responseTimeout(Duration.ofSeconds(60))
+		HttpClient httpClient = HttpClient.create().responseTimeout(ofSeconds(20))
 				.proxyWithSystemProperties();
 		return webClientBuilder
 				.clone()
