@@ -1,7 +1,7 @@
 package no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal;
 
 
-import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
+import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.constants.Constants;
 import no.nav.dokdistfordeling.consumer.NavHeaders;
 import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalFunctionalException;
@@ -37,13 +37,13 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 	private final String bestemDokdistKanalUrl;
 
 	public BestemDokdistkanalRestConsumer(RestTemplateBuilder restTemplateBuilder,
-										  final ServiceuserAlias serviceuserAlias,
+										  final DokdistfordelingProperties dokdistfordelingProperties,
 										  @Value("${bestemdistribusjonkanal_url}") String bestemDistKanalUrl) {
 		this.bestemDokdistKanalUrl = bestemDistKanalUrl;
 		this.restTemplate = restTemplateBuilder
 				.setReadTimeout(Duration.ofSeconds(20))
 				.setConnectTimeout(Duration.ofSeconds(5))
-				.basicAuthentication(serviceuserAlias.getUsername(), serviceuserAlias.getPassword())
+				.basicAuthentication(dokdistfordelingProperties.getServiceuser().getUsername(), dokdistfordelingProperties.getServiceuser().getPassword())
 				.build();
 	}
 

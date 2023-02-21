@@ -1,7 +1,7 @@
 package no.nav.dokdistfordeling.consumer.regoppslag;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
+import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.constants.Constants;
 import no.nav.dokdistfordeling.consumer.NavHeaders;
 import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseRequestTo;
@@ -40,13 +40,13 @@ class RegoppslagRestConsumer {
 
 	public RegoppslagRestConsumer(RestTemplateBuilder restTemplateBuilder,
 								  @Value("${regoppslag.url}") String regoppslagUrl,
-								  final ServiceuserAlias serviceuserAlias,
+								  final DokdistfordelingProperties dokdistfordelingProperties,
 								  StsRestConsumer stsRestConsumer) {
 		this.regoppslagUrl = regoppslagUrl;
 		this.restTemplate = restTemplateBuilder
 				.setReadTimeout(Duration.ofSeconds(20))
 				.setConnectTimeout(Duration.ofSeconds(5))
-				.basicAuthentication(serviceuserAlias.getUsername(), serviceuserAlias.getPassword())
+				.basicAuthentication(dokdistfordelingProperties.getServiceuser().getUsername(), dokdistfordelingProperties.getServiceuser().getPassword())
 				.build();
 		this.stsRestConsumer = stsRestConsumer;
 	}

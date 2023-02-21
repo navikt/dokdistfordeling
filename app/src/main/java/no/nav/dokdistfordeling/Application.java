@@ -1,9 +1,8 @@
 package no.nav.dokdistfordeling;
 
+import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
-import no.nav.dokdistfordeling.config.alias.ServiceuserAlias;
-import no.nav.dokdistfordeling.config.azure.AzureConfig;
-import no.nav.dokdistfordeling.config.dokarkiv.JournalpostApiConfig;
+import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.DokdistmellomlagerProperties;
 import no.nav.dokdistfordeling.config.props.PdlProperties;
 import no.nav.dokdistfordeling.security.AzureToken;
@@ -21,12 +20,11 @@ import static java.lang.System.setProperty;
 @EnableRetry
 @SpringBootApplication
 @EnableConfigurationProperties({
-		ServiceuserAlias.class,
 		MqGatewayAlias.class,
 		PdlProperties.class,
-		AzureConfig.class,
-		JournalpostApiConfig.class,
-		DokdistmellomlagerProperties.class
+		AzureProperties.class,
+		DokdistmellomlagerProperties.class,
+		DokdistfordelingProperties.class
 })
 @Import({
 		CoreConfig.class,
