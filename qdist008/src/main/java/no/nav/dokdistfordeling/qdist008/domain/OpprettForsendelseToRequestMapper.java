@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.qdist008.domain;
 
-import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
+import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import org.springframework.stereotype.Component;
@@ -12,18 +12,18 @@ import static java.util.Objects.isNull;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 
 @Component
-public class PersisterForsendelseToRequestMapper {
+public class OpprettForsendelseToRequestMapper {
 
-	public PersisterForsendelseRequestTo map(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling,
-											 DokumenttypeInfoTo dokumenttypeInfoTo,
-											 String fnrMottaker,
-											 DistribusjonsKanalCode distribusjonsKanal) {
+	public OpprettForsendelseRequestTo map(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling,
+										   DokumenttypeInfoTo dokumenttypeInfoTo,
+										   String fnrMottaker,
+										   DistribusjonsKanalCode distribusjonsKanal) {
 		final DistribuerForsendelseTo.AktoerTo mottaker = distribusjonbestilling.getMottaker();
 		final DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon = distribusjonbestilling.getArkivInformasjon();
 		final DistribuerForsendelseTo.AdresseTo adresse = distribusjonbestilling.getAdresse();
 		final List<DistribuerForsendelseTo.DokumentInformasjonTo> dokumentInformasjonToList = distribusjonbestilling.getDokumenter();
 
-		return PersisterForsendelseRequestTo.builder()
+		return OpprettForsendelseRequestTo.builder()
 				.bestillingsId(distribusjonbestilling.getBestillingsId())
 				.distribusjonsKanal(distribusjonsKanal)
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
@@ -47,8 +47,8 @@ public class PersisterForsendelseToRequestMapper {
 				.getForsendelseTittel();
 	}
 
-	private PersisterForsendelseRequestTo.DokumentTo mapDokument(DistribuerForsendelseTo.DokumentInformasjonTo dokumentInformasjon) {
-		return PersisterForsendelseRequestTo.DokumentTo.builder()
+	private OpprettForsendelseRequestTo.DokumentTo mapDokument(DistribuerForsendelseTo.DokumentInformasjonTo dokumentInformasjon) {
+		return OpprettForsendelseRequestTo.DokumentTo.builder()
 				.tilknyttetSom(dokumentInformasjon.getTilknyttetSom())
 				.dokumentObjektReferanse(dokumentInformasjon.getDokumentObjektReferanse())
 				.rekkefolge(dokumentInformasjon.getRekkefolge())
@@ -57,23 +57,23 @@ public class PersisterForsendelseToRequestMapper {
 				.build();
 	}
 
-	private PersisterForsendelseRequestTo.MottakerTo mapMottaker(DistribuerForsendelseTo.AktoerTo mottaker, String fnrMottaker) {
-		return PersisterForsendelseRequestTo.MottakerTo.builder()
+	private OpprettForsendelseRequestTo.MottakerTo mapMottaker(DistribuerForsendelseTo.AktoerTo mottaker, String fnrMottaker) {
+		return OpprettForsendelseRequestTo.MottakerTo.builder()
 				.mottakerId(getMottakerId(mottaker, fnrMottaker))
 				.mottakerNavn(mottaker.getNavn())
 				.mottakerType(mottaker.getAktoerType())
 				.build();
 	}
 
-	private PersisterForsendelseRequestTo.ArkivInformasjonTo mapArkivInformasjon(DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon) {
-		return arkivInformasjon == null ? null : PersisterForsendelseRequestTo.ArkivInformasjonTo.builder()
+	private OpprettForsendelseRequestTo.ArkivInformasjonTo mapArkivInformasjon(DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon) {
+		return arkivInformasjon == null ? null : OpprettForsendelseRequestTo.ArkivInformasjonTo.builder()
 				.arkivSystem(arkivInformasjon.getArkivSystem())
 				.arkivId(arkivInformasjon.getArkivId())
 				.build();
 	}
 
-	private PersisterForsendelseRequestTo.PostadresseTo mapPostadresse(DistribuerForsendelseTo.AdresseTo adresse) {
-		return adresse == null ? null : PersisterForsendelseRequestTo.PostadresseTo.builder()
+	private OpprettForsendelseRequestTo.PostadresseTo mapPostadresse(DistribuerForsendelseTo.AdresseTo adresse) {
+		return adresse == null ? null : OpprettForsendelseRequestTo.PostadresseTo.builder()
 				.adresselinje1(adresse.getAdresselinje1())
 				.adresselinje2(adresse.getAdresselinje2())
 				.adresselinje3(adresse.getAdresselinje3())

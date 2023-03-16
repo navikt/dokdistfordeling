@@ -4,14 +4,13 @@ import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterDistribusjonsinfoTo;
 import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
-import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
-import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseResponseTo;
+import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
-import no.nav.dokdistfordeling.qdist008.domain.PersisterForsendelseToRequestMapper;
+import no.nav.dokdistfordeling.qdist008.domain.OpprettForsendelseToRequestMapper;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
@@ -31,18 +30,18 @@ public class Qdist008Service {
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final DokumentkatalogAdmin dokumentkatalogAdmin;
 	private final AdministrerForsendelse administrerForsendelse;
-	private final PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper;
+	private final OpprettForsendelseToRequestMapper opprettForsendelseToRequestMapper;
 	private final JournalpostApi journalpostApi;
 
 	public Qdist008Service(PdlGraphQLConsumer pdlGraphQLConsumer,
 						   DokumentkatalogAdmin dokumentkatalogAdmin,
 						   AdministrerForsendelse administrerForsendelse,
-						   PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper,
+						   OpprettForsendelseToRequestMapper opprettForsendelseToRequestMapper,
 						   JournalpostApi journalpostApi) {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
 		this.administrerForsendelse = administrerForsendelse;
-		this.persisterForsendelseToRequestMapper = persisterForsendelseToRequestMapper;
+		this.opprettForsendelseToRequestMapper = opprettForsendelseToRequestMapper;
 		this.journalpostApi = journalpostApi;
 	}
 
@@ -60,13 +59,13 @@ public class Qdist008Service {
 
 		if (!(INGEN_DISTRIBUSJON.equals(distribusjonsKanal) || LOKAL_PRINT.equals(distribusjonsKanal))) {
 
-			final PersisterForsendelseRequestTo persisterForsendelseRequestTo = persisterForsendelseToRequestMapper
+			final OpprettForsendelseRequestTo opprettForsendelseRequestTo = opprettForsendelseToRequestMapper
 					.map(distribusjonbestilling, dokumenttypeInfoTo, mottakerFnr, distribusjonsKanal);
 
-			PersisterForsendelseResponseTo persisterForsendelseResponseTo = administrerForsendelse.persisterForsendelse(persisterForsendelseRequestTo);
-			exchange.setProperty(PROPERTY_FORSENDELSE_ID, persisterForsendelseResponseTo.getForsendelseId());
+			String forsendelseId = administrerForsendelse.opprettForsendelse(opprettForsendelseRequestTo);
+			exchange.setProperty(PROPERTY_FORSENDELSE_ID, forsendelseId);
 
-			distribuerTilKanal.setForsendelseId(persisterForsendelseResponseTo.getForsendelseId());
+			distribuerTilKanal.setForsendelseId(forsendelseId);
 		}
 
 		updateArkivIfArkivsystemIsJoark(distribusjonbestilling, distribusjonsKanal);

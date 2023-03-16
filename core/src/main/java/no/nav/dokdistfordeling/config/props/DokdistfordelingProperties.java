@@ -39,6 +39,12 @@ public class DokdistfordelingProperties {
 		@NotNull
 		private AzureEndpoint dokarkiv;
 
+		/**
+		 * URL til dokdistadmin administrerforsendelse api.
+		 */
+		@NotNull
+		private AzureEndpoint dokdistadmin;
+
 	}
 
 	@Data
