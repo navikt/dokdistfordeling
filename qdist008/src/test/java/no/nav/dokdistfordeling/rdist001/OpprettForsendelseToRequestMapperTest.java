@@ -1,13 +1,13 @@
 package no.nav.dokdistfordeling.rdist001;
 
-import no.nav.dokdistfordeling.consumer.rdist001.PersisterForsendelseRequestTo;
+import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
-import no.nav.dokdistfordeling.qdist008.domain.PersisterForsendelseToRequestMapper;
+import no.nav.dokdistfordeling.qdist008.domain.OpprettForsendelseToRequestMapper;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -16,7 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class PersisterForsendelseToRequestMapperTest {
+class OpprettForsendelseToRequestMapperTest {
 
 	private static final String FORSENDELSE_TITTEL = "forsendelseTittel";
 	private static final String BESTILLINGS_ID = "bestillingsId";
@@ -58,153 +58,153 @@ class PersisterForsendelseToRequestMapperTest {
 
 	private static final DistribusjonsKanalCode DISTRIBUSJONS_KANAL_CODE = DistribusjonsKanalCode.PRINT;
 
-	private PersisterForsendelseToRequestMapper persisterForsendelseToRequestMapper = new PersisterForsendelseToRequestMapper();
+	private OpprettForsendelseToRequestMapper opprettForsendelseToRequestMapper = new OpprettForsendelseToRequestMapper();
 
 	// Happy path: Person with norsk postaddresse
 	@Test
 	public void shouldMapHappyPath() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.distribusjonKanal(DISTRIBUSJONKANAL_PRINT).build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(), null);
 
-		assertCommon(persisterForsendelseRequestTo);
-		assertMottakerIsPerson(persisterForsendelseRequestTo.getMottaker());
-		assertDokumentInformasjon(persisterForsendelseRequestTo.getDokumenter());
-		assertNorskPostaddresseTo(persisterForsendelseRequestTo.getPostadresse());
+		assertCommon(opprettForsendelseRequestTo);
+		assertMottakerIsPerson(opprettForsendelseRequestTo.getMottaker());
+		assertDokumentInformasjon(opprettForsendelseRequestTo.getDokumenter());
+		assertNorskPostaddresseTo(opprettForsendelseRequestTo.getPostadresse());
 	}
 
 	@Test
 	public void shouldMapWithAktoerId() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.mottaker(createMottakerToWithAktoerId())
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				AKTOER_IDENTIFIKATOR);
 
-		assertMottakerIsAktoerId(persisterForsendelseRequestTo.getMottaker());
+		assertMottakerIsAktoerId(opprettForsendelseRequestTo.getMottaker());
 	}
 
 
 	@Test
 	public void shouldMapWithOrganisasjonsNr() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.mottaker(createMottakerToWithOrganisasjonsNr())
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 
-		assertMottakerIsOrganisasjonNr(persisterForsendelseRequestTo.getMottaker());
+		assertMottakerIsOrganisasjonNr(opprettForsendelseRequestTo.getMottaker());
 	}
 
 	@Test
 	public void shouldMapWithSamhandlerHpr() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.mottaker(createMottakerToWithSamhandlerHpr())
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 
-		assertMottakerWithSamhandlerHpr(persisterForsendelseRequestTo.getMottaker());
+		assertMottakerWithSamhandlerHpr(opprettForsendelseRequestTo.getMottaker());
 	}
 
 	@Test
 	public void shouldMapWithSamhandlerUtlOrg() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.mottaker(createMottakerToWithSamhandlerUtlOrg())
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 
-		assertMottakerWithSamhandlerUtlOrg(persisterForsendelseRequestTo.getMottaker());
+		assertMottakerWithSamhandlerUtlOrg(opprettForsendelseRequestTo.getMottaker());
 	}
 
 	@Test
 	public void shouldMapWithUtenlandsPostaddresse() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.distribusjonKanal(DISTRIBUSJONKANAL_PRINT)
 						.adresse(createUtenlandsPostadresseTo())
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 
-		assertResponseIsPostaddresseUtenlands(persisterForsendelseRequestTo.getPostadresse());
+		assertResponseIsPostaddresseUtenlands(opprettForsendelseRequestTo.getPostadresse());
 	}
 
 	@Test
 	public void shouldMapWithNullAddresse() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.adresse(null)
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 
-		assertNull(persisterForsendelseRequestTo.getPostadresse());
+		assertNull(opprettForsendelseRequestTo.getPostadresse());
 	}
 
 	@Test
 	public void shouldMapWithTomTittel() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.forsendelseTittel(null)
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
-		assertResponseWithTomTittel(persisterForsendelseRequestTo);
+		assertResponseWithTomTittel(opprettForsendelseRequestTo);
 	}
 
 	@Test
 	public void shouldMapWithNullArkivinformasjon() {
-		PersisterForsendelseRequestTo persisterForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.arkivInformasjon(null)
 						.build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 
-		assertNull(persisterForsendelseRequestTo.getArkivInformasjon());
+		assertNull(opprettForsendelseRequestTo.getArkivInformasjon());
 	}
 
 
-	private void assertCommon(PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
-		assertEquals(BATCH_ID, persisterForsendelseRequestTo.getBatchId());
-		assertEquals(BESTILLENDE_FAGSYSTEM, persisterForsendelseRequestTo.getBestillendeFagsystem());
-		assertEquals(BESTILLINGS_ID, persisterForsendelseRequestTo.getBestillingsId());
-		assertEquals(DOKUMENT_PROD_APP, persisterForsendelseRequestTo.getDokumentProdApp());
-		assertEquals(TEMA, persisterForsendelseRequestTo.getTema());
+	private void assertCommon(OpprettForsendelseRequestTo opprettForsendelseRequestTo) {
+		assertEquals(BATCH_ID, opprettForsendelseRequestTo.getBatchId());
+		assertEquals(BESTILLENDE_FAGSYSTEM, opprettForsendelseRequestTo.getBestillendeFagsystem());
+		assertEquals(BESTILLINGS_ID, opprettForsendelseRequestTo.getBestillingsId());
+		assertEquals(DOKUMENT_PROD_APP, opprettForsendelseRequestTo.getDokumentProdApp());
+		assertEquals(TEMA, opprettForsendelseRequestTo.getTema());
 
-		assertEquals(ARKIV_ID, persisterForsendelseRequestTo.getArkivInformasjon().getArkivId());
-		assertEquals(ARKIV_SYSTEM_CODE, persisterForsendelseRequestTo.getArkivInformasjon().getArkivSystem());
+		assertEquals(ARKIV_ID, opprettForsendelseRequestTo.getArkivInformasjon().getArkivId());
+		assertEquals(ARKIV_SYSTEM_CODE, opprettForsendelseRequestTo.getArkivInformasjon().getArkivSystem());
 	}
 
-	private void assertMottakerIsPerson(PersisterForsendelseRequestTo.MottakerTo mottaker) {
+	private void assertMottakerIsPerson(OpprettForsendelseRequestTo.MottakerTo mottaker) {
 		assertEquals(PERSON_TYPE_CODE, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
 		assertEquals(PERSON_IDENTIFIKATOR, mottaker.getMottakerId());
 	}
 
-	private void assertMottakerIsAktoerId(PersisterForsendelseRequestTo.MottakerTo mottaker) {
+	private void assertMottakerIsAktoerId(OpprettForsendelseRequestTo.MottakerTo mottaker) {
 		assertEquals(PERSON_TYPE_CODE, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
 		assertEquals(AKTOER_IDENTIFIKATOR, mottaker.getMottakerId());
 	}
 
-	private void assertMottakerIsOrganisasjonNr(PersisterForsendelseRequestTo.MottakerTo mottaker) {
+	private void assertMottakerIsOrganisasjonNr(OpprettForsendelseRequestTo.MottakerTo mottaker) {
 		assertEquals(ORGANISASJON_TYPE_CODE, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
 		assertEquals(ORGNUMMER, mottaker.getMottakerId());
 	}
 
-	private void assertMottakerWithSamhandlerHpr(PersisterForsendelseRequestTo.MottakerTo mottaker) {
+	private void assertMottakerWithSamhandlerHpr(OpprettForsendelseRequestTo.MottakerTo mottaker) {
 		assertEquals(SAMHANDLER_TYPE_CODE_HPR, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
 		assertEquals(SAMHANDLER_IDENTIFIKATOR, mottaker.getMottakerId());
 	}
 
-	private void assertMottakerWithSamhandlerUtlOrg(PersisterForsendelseRequestTo.MottakerTo mottaker) {
+	private void assertMottakerWithSamhandlerUtlOrg(OpprettForsendelseRequestTo.MottakerTo mottaker) {
 		assertEquals(SAMHANDLER_TYPE_CODE_UTL_ORG, mottaker.getMottakerType());
 		assertEquals(MOTTAKERNAVN, mottaker.getMottakerNavn());
 		assertEquals(SAMHANDLER_IDENTIFIKATOR, mottaker.getMottakerId());
 	}
 
-	private void assertNorskPostaddresseTo(PersisterForsendelseRequestTo.PostadresseTo postadresseTo) {
+	private void assertNorskPostaddresseTo(OpprettForsendelseRequestTo.PostadresseTo postadresseTo) {
 		assertEquals(ADRESSELINJE_1, postadresseTo.getAdresselinje1());
 		assertEquals(ADRESSELINJE_2, postadresseTo.getAdresselinje2());
 		assertEquals(ADRESSELINJE_3, postadresseTo.getAdresselinje3());
@@ -213,19 +213,19 @@ class PersisterForsendelseToRequestMapperTest {
 		assertEquals(LAND_NORGE, postadresseTo.getLandkode());
 	}
 
-	private void assertResponseIsPostaddresseUtenlands(PersisterForsendelseRequestTo.PostadresseTo postadresseTo) {
+	private void assertResponseIsPostaddresseUtenlands(OpprettForsendelseRequestTo.PostadresseTo postadresseTo) {
 		assertEquals(ADRESSELINJE_1, postadresseTo.getAdresselinje1());
 		assertEquals(ADRESSELINJE_2, postadresseTo.getAdresselinje2());
 		assertEquals(ADRESSELINJE_3, postadresseTo.getAdresselinje3());
 		assertEquals(UTLAND, postadresseTo.getLandkode());
 	}
 
-	private void assertResponseWithTomTittel(PersisterForsendelseRequestTo persisterForsendelseRequestTo) {
-		assertDokumentInformasjon(persisterForsendelseRequestTo.getDokumenter());
-		assertEquals(DOKUMENTTITTEL, persisterForsendelseRequestTo.getForsendelseTittel());
+	private void assertResponseWithTomTittel(OpprettForsendelseRequestTo opprettForsendelseRequestTo) {
+		assertDokumentInformasjon(opprettForsendelseRequestTo.getDokumenter());
+		assertEquals(DOKUMENTTITTEL, opprettForsendelseRequestTo.getForsendelseTittel());
 	}
 
-	private void assertDokumentInformasjon(List<PersisterForsendelseRequestTo.DokumentTo> dokumenter) {
+	private void assertDokumentInformasjon(List<OpprettForsendelseRequestTo.DokumentTo> dokumenter) {
 
 		assertEquals(DOKUMENTTYPE_ID_1, dokumenter.get(0).getDokumenttypeId());
 		assertEquals(ARKIV_DOKUMENTINFO_ID_1, dokumenter.get(0).getArkivDokumentInfoId());
@@ -245,10 +245,10 @@ class PersisterForsendelseToRequestMapperTest {
 				createSecondDistribuerForsendelseToBuilder().build());
 	}
 
-	private PersisterForsendelseRequestTo performMapping(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo,
-														 DokumenttypeInfoTo dokumenttypeInfoTo,
-														 String hentIdentForAktoerIdResponseTo) {
-		return persisterForsendelseToRequestMapper.map(
+	private OpprettForsendelseRequestTo performMapping(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo,
+													   DokumenttypeInfoTo dokumenttypeInfoTo,
+													   String hentIdentForAktoerIdResponseTo) {
+		return opprettForsendelseToRequestMapper.map(
 				distribusjonbestillingTo,
 				dokumenttypeInfoTo,
 				hentIdentForAktoerIdResponseTo,

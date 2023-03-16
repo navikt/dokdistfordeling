@@ -11,7 +11,7 @@ import java.util.List;
 
 @Value
 @Builder
-public class PersisterForsendelseRequestTo {
+public class OpprettForsendelseRequestTo {
 	String bestillingsId;
 	DistribusjonsKanalCode distribusjonsKanal;
 	String bestillendeFagsystem;

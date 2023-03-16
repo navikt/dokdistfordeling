@@ -27,6 +27,8 @@
   "DOKDISTFORDELING_ENDPOINTS_DOKARKIV_SCOPE": "api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default",
   "DOKDISTFORDELING_ENDPOINTS_DOKMET_URL": "https://dokmet-q1.dev.intern.nav.no/rest/dokumenttypeinfo",
   "DOKDISTFORDELING_ENDPOINTS_DOKMET_SCOPE": "api://dev-fss.teamdokumenthandtering.dokmet-q1/.default",
+  "DOKDISTFORDELING_ENDPOINTS_DOKDISTADMIN_URL": "https://dokdistadmin-q1.dev.intern.nav.no/rest/v1/administrerforsendelse",
+  "DOKDISTFORDELING_ENDPOINTS_DOKDISTADMIN_SCOPE": "api://dev-fss.teamdokumenthandtering.dokdistadmin-q1/.default",
   "APPDYNAMICS": "/apikey/appdynamics/dev",
   "APP_NAME": "dokdistfordeling-q1",
   "APPD_NAME": "dokdistfordeling-q1",
