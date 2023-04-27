@@ -155,7 +155,7 @@ public class Qdist008IT {
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
-		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
+		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/v1/administrerforsendelse/oppdaterforsendelse")));
 	}
 
 	@Test
@@ -186,7 +186,7 @@ public class Qdist008IT {
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoNAV_NOHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilDittNavOutputHappy.json"))));
-		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
+		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/v1/administrerforsendelse/oppdaterforsendelse")));
 	}
 
 	@Test
@@ -219,7 +219,7 @@ public class Qdist008IT {
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSDPHappy.json"))));
 			verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilSDPOutputHappy.json"))));
-			verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
+			verify(exactly(1), putRequestedFor(urlEqualTo("/rest/v1/administrerforsendelse/oppdaterforsendelse")));
 		});
 	}
 
@@ -251,7 +251,7 @@ public class Qdist008IT {
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoTRYGDERETTENHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilTrygderettenOutputHappy.json"))));
-		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
+		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/v1/administrerforsendelse/oppdaterforsendelse")));
 	}
 
 	@Test
@@ -300,7 +300,7 @@ public class Qdist008IT {
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoLHappy.json"))));
 			verify(exactly(0), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilLokalPrintOutputHappy.json"))));
-			verify(exactly(0), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
+			verify(exactly(0), putRequestedFor(urlEqualTo("/administrerforsendelse/oppdaterforsendelse")));
 		});
 	}
 
@@ -326,7 +326,7 @@ public class Qdist008IT {
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoINGEN_DISTRIBUSJONHappy.json"))));
 			verify(exactly(0), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilIngenDistribusjonOutputHappy.json"))));
-			verify(exactly(0), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
+			verify(exactly(0), putRequestedFor(urlEqualTo("/administrerforsendelse//oppdaterforsendelse")));
 		});
 	}
 
@@ -337,7 +337,7 @@ public class Qdist008IT {
 		stubSTSToken();
 		stubAzure();
 		stubPostRdist001();
-		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
+		stubFor(put("/administrerforsendelse/oppdaterforsendelse")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
@@ -360,7 +360,7 @@ public class Qdist008IT {
 		stubSTSToken();
 		stubAzure();
 		stubPostRdist001();
-		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
+		stubFor(put("/administrerforsendelse/oppdaterforsendelse")
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
@@ -381,7 +381,7 @@ public class Qdist008IT {
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseWithTittelAvoidDokkatHappy.json"))));
-		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
+		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/v1/administrerforsendelse/oppdaterforsendelse")));
 	}
 
 	@Test
@@ -411,7 +411,7 @@ public class Qdist008IT {
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseWithOrganisasjonOutputHappy.json"))));
-		verify(exactly(1), putRequestedFor(urlEqualTo("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")));
+		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/v1/administrerforsendelse/oppdaterforsendelse")));
 	}
 
 	@Test
@@ -781,7 +781,7 @@ public class Qdist008IT {
 		stubAzure();
 		stubPostPdl();
 		stubPostRdist001();
-		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
+		stubFor(put("/administrerforsendelse/oppdaterforsendelse")
 				.willReturn(aResponse().withStatus(HttpStatus.BAD_REQUEST.value())));
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
@@ -802,7 +802,7 @@ public class Qdist008IT {
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
-		verify(exactly(1), putRequestedFor(urlEqualTo(("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST"))));
+		verify(exactly(1), putRequestedFor(urlEqualTo(("/rest/v1/administrerforsendelse/oppdaterforsendelse"))));
 	}
 
 	@Test
@@ -812,7 +812,7 @@ public class Qdist008IT {
 		stubAzure();
 		stubPostPdl();
 		stubPostRdist001();
-		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
+		stubFor(put("/rest/v1/administrerforsendelse/oppdaterforsendelse")
 				.willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
@@ -833,7 +833,7 @@ public class Qdist008IT {
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
-		verify(exactly(1), putRequestedFor(urlEqualTo(("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST"))));
+		verify(exactly(1), putRequestedFor(urlEqualTo(("/rest/v1/administrerforsendelse/oppdaterforsendelse"))));
 	}
 
 	private void stubPostRdist001() {
