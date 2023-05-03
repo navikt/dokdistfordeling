@@ -1,13 +1,13 @@
 package no.nav.dokdistfordeling.qdist008;
 
 import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
+import no.nav.dokdistfordeling.consumer.rdist001.domain.OppdaterForsendelseRequest;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DISTRIBUSJON;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
-import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 
@@ -24,19 +24,15 @@ public class DokdistStatusUpdater {
 	@Handler
 	public void doUpdate(Exchange exchange) {
 		final String forsendelseId = exchange.getProperty(PROPERTY_FORSENDELSE_ID, String.class);
-		final String bestillingsId = exchange.getProperty(PROPERTY_BESTILLINGS_ID, String.class);
 
-		if(shouldUpdate(exchange)){
-			administrerForsendelse.oppdaterForsendelseStatus(forsendelseId, FORSENDELSE_STATUS_KLAR_FOR_DIST, bestillingsId);
+		if (!isDistribusjonKanalLokalPrintOrIngenDistribusjon(exchange)) {
+			administrerForsendelse.oppdaterForsendelse(new OppdaterForsendelseRequest(Long.valueOf(forsendelseId),
+					FORSENDELSE_STATUS_KLAR_FOR_DIST));
 		}
 	}
 
-	private boolean shouldUpdate(Exchange exchange){
-		if(exchange.getProperty(PROPERTY_DISTRIBUSJONSKANAL).equals(LOKAL_PRINT)||
-				exchange.getProperty(PROPERTY_DISTRIBUSJONSKANAL).equals(INGEN_DISTRIBUSJON)) {
-			return false;
-		}else{
-			return true;
-		}
+	private boolean isDistribusjonKanalLokalPrintOrIngenDistribusjon(Exchange exchange) {
+		return LOKAL_PRINT.equals(exchange.getProperty(PROPERTY_DISTRIBUSJONSKANAL)) ||
+				INGEN_DISTRIBUSJON.equals(exchange.getProperty(PROPERTY_DISTRIBUSJONSKANAL));
 	}
 }
