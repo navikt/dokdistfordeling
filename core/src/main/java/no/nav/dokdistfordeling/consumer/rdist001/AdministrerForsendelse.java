@@ -6,5 +6,5 @@ public interface AdministrerForsendelse {
 
 	String opprettForsendelse(final OpprettForsendelseRequestTo opprettForsendelseRequestTo);
 
-	void oppdaterForsendelseStatus(OppdaterForsendelseRequest oppdaterForsendelseRequest);
+	void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelseRequest);
 }

@@ -60,17 +60,22 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 		return forsendelseId;
 	}
 
-	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "oppdaterForsendelseStatus"}, histogram = true)
+	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "oppdaterForsendelse"}, histogram = true)
 	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	public void oppdaterForsendelseStatus(OppdaterForsendelseRequest oppdaterForsendelseRequest) {
+	public void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelse) {
+		log.info("oppdaterForsendelse oppdaterer forsendelse med forsendelseId={}", oppdaterForsendelse.forsendelseId());
 
 		webClient.put()
 				.uri("/oppdaterforsendelse")
-				.bodyValue(oppdaterForsendelseRequest)
+				.bodyValue(oppdaterForsendelse)
 				.retrieve()
 				.toBodilessEntity()
 				.doOnError(this::handleError)
 				.block();
+
+		log.info("oppdaterForsendelse oppdatert forsendelse med forsendelseId={} til forsendelseStatus={}",
+				oppdaterForsendelse.forsendelseId(), oppdaterForsendelse.forsendelseStatus());
+
 	}
 
 	private void handleError(Throwable error) {
