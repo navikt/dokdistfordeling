@@ -73,7 +73,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.doOnError(this::handleError)
 				.block();
 
-		log.info("oppdaterForsendelse oppdatert forsendelse med forsendelseId={} til forsendelseStatus={}",
+		log.info("oppdaterForsendelse har oppdatert forsendelse med forsendelseId={} til forsendelseStatus={}",
 				oppdaterForsendelse.forsendelseId(), oppdaterForsendelse.forsendelseStatus());
 
 	}
