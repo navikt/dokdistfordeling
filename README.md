@@ -1,5 +1,6 @@
 # Dokdistfordeling
-Dokdistfordeling gjør det mulig å distribuere journalposter. 
+Dokdistfordeling distribuere journalposter til brukers prefererte kanal.
+
 For detaljert informasjon om hvordan du kan distribuere dokument til bruker kan du sjekke ut [Distribuere dokument til bruker](https://confluence.adeo.no/display/BOA/Distribuere+dokument+til+bruker),
 eller teste ut [distribuerJournalpost-endepunktet på Swagger](https://dokdistfordeling.dev.intern.nav.no/swagger-ui/index.html).
 
