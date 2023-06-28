@@ -39,7 +39,7 @@ public class ForsendelseValidator {
 		assertThatAdresseIsPresentIfMottakerIsSamhandler(distribusjonbestillingTo);
 		assertThatBestillingsIdIsAValidUuid(distribusjonbestillingTo.getBestillingsId());
 
-		if(distribusjonbestillingTo.getArkivInformasjon() != null) {
+		if (distribusjonbestillingTo.getArkivInformasjon() != null) {
 			assertJournalpostStatus(distribusjonbestillingTo.getArkivInformasjon().getArkivId(), distribusjonbestillingTo.getBestillingsId());
 		}
 
@@ -48,10 +48,10 @@ public class ForsendelseValidator {
 
 	private void assertJournalpostStatus(String journalpostid, String bestillingsId) {
 		String journalpostStatus = safJournalpostQueryService.hentJournalpostStatus(journalpostid);
-		if(FEILREGISTRERT.equals(journalpostStatus)){
+		if (FEILREGISTRERT.equals(journalpostStatus)) {
 			JournalpostFeilregistrertException exception = new JournalpostFeilregistrertException(format("journalpostId=%s er feilregistrert og distribusjon av bestillingsId=%s avbrytes", journalpostid, bestillingsId));
 			throw exception;
-		} else if(!FERDIGSTILT.equals(journalpostStatus)){
+		} else if (!FERDIGSTILT.equals(journalpostStatus)) {
 			throw new ValidationException(format("journalpostId=%s har ugyldig status=%s og distribusjon av bestillingsId=%s avbrytes", journalpostid, journalpostStatus, bestillingsId));
 		}
 	}

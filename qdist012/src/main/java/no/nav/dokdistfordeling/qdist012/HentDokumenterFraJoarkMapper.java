@@ -24,7 +24,10 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.ORGANISASJON;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.PERSON;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
@@ -87,21 +90,21 @@ public class HentDokumenterFraJoarkMapper {
 			return HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(person.getNavn())
 					.identifikator(person.getPersonidentifikator())
-					.aktoerType(AktoerTypeCode.PERSON)
+					.aktoerType(PERSON)
 					.identifikatorAktoerId(false)
 					.build();
 		} else if (aktoer instanceof Organisasjon organisasjon) {
 			return HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(organisasjon.getNavn())
 					.identifikator(organisasjon.getOrgnummer())
-					.aktoerType(AktoerTypeCode.ORGANISASJON)
+					.aktoerType(ORGANISASJON)
 					.identifikatorAktoerId(false)
 					.build();
 		} else if (aktoer instanceof AktoerId aktoerId) {
 			return HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(aktoerId.getNavn())
 					.identifikator(aktoerId.getAktoerId())
-					.aktoerType(AktoerTypeCode.PERSON)
+					.aktoerType(PERSON)
 					.identifikatorAktoerId(true)
 					.build();
 		} else if (aktoer instanceof Samhandler samhandler) {
@@ -147,8 +150,7 @@ public class HentDokumenterFraJoarkMapper {
 		return switch (SamhandlerKategoriCode.valueOf(samhandlerKategori)) {
 			case HPR -> SAMHANDLER_HPR;
 			case UTL_ORG -> SAMHANDLER_UTL_ORG;
-			case UKJENT -> AktoerTypeCode.SAMHANDLER_UKJENT;
-			default -> throw new IllegalArgumentException(format("Ugyldig input: Kun samhandlerkategori=HPR, UTL_ORG og UKJENT støttes. Fikk samhandlerkategori=%s", samhandlerKategori));
+			case UKJENT -> SAMHANDLER_UKJENT;
 		};
 	}
 
