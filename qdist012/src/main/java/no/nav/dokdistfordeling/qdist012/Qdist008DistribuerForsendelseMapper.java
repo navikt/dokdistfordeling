@@ -82,7 +82,7 @@ public class Qdist008DistribuerForsendelseMapper {
 	private Aktoer mapAktoerTo(HentDokumenterFraJoarkTo.AktoerTo aktoer) {
 		Aktoer output;
 		switch (aktoer.getAktoerType()) {
-			case PERSON:
+			case PERSON -> {
 				if (aktoer.isIdentifikatorAktoerId()) {
 					output = new AktoerId()
 							.withAktoerId(aktoer.getIdentifikator())
@@ -92,33 +92,23 @@ public class Qdist008DistribuerForsendelseMapper {
 							.withPersonidentifikator(aktoer.getIdentifikator())
 							.withNavn(aktoer.getNavn());
 				}
-				break;
-			case ORGANISASJON:
-				output = new Organisasjon()
-						.withOrgnummer(aktoer.getIdentifikator())
-						.withNavn(aktoer.getNavn());
-				break;
-			case SAMHANDLER_HPR:
-				output = new Samhandler()
-						.withSamhandleridentifikator(aktoer.getIdentifikator())
-						.withNavn(aktoer.getNavn())
-						.withSamhandlerkategori(HPR.name());
-				break;
-			case SAMHANDLER_UTL_ORG:
-				output = new Samhandler()
-						.withSamhandleridentifikator(aktoer.getIdentifikator())
-						.withNavn(aktoer.getNavn())
-						.withSamhandlerkategori(UTL_ORG.name());
-				break;
-			case SAMHANDLER_UKJENT:
-				output = new Samhandler()
-						.withSamhandleridentifikator(aktoer.getIdentifikator())
-						.withNavn(aktoer.getNavn())
-						.withSamhandlerkategori(UKJENT.name());
-				break;
-			default:
-				output = null;
-				break;
+			}
+			case ORGANISASJON -> output = new Organisasjon()
+					.withOrgnummer(aktoer.getIdentifikator())
+					.withNavn(aktoer.getNavn());
+			case SAMHANDLER_HPR -> output = new Samhandler()
+					.withSamhandleridentifikator(aktoer.getIdentifikator())
+					.withNavn(aktoer.getNavn())
+					.withSamhandlerkategori(HPR.name());
+			case SAMHANDLER_UTL_ORG -> output = new Samhandler()
+					.withSamhandleridentifikator(aktoer.getIdentifikator())
+					.withNavn(aktoer.getNavn())
+					.withSamhandlerkategori(UTL_ORG.name());
+			case SAMHANDLER_UKJENT -> output = new Samhandler()
+					.withSamhandleridentifikator(aktoer.getIdentifikator())
+					.withNavn(aktoer.getNavn())
+					.withSamhandlerkategori(UKJENT.name());
+			default -> output = null;
 		}
 		return output;
 	}
@@ -158,6 +148,5 @@ public class Qdist008DistribuerForsendelseMapper {
 		return (nonNull(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.name())) ?
 				distribusjonstype.name() : null;
 	}
-
 
 }

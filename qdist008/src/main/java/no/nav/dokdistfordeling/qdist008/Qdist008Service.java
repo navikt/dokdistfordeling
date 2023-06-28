@@ -7,15 +7,17 @@ import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
-import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.AktoerTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.DistribusjonbestillingTo;
 import no.nav.dokdistfordeling.qdist008.domain.OpprettForsendelseToRequestMapper;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Service;
 
+import static no.nav.dokdistfordeling.kodeverk.ArkivSystemCode.JOARK;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DISTRIBUSJON;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
@@ -47,9 +49,9 @@ public class Qdist008Service {
 
 	@Handler
 	public DistribuerTilKanal distribuerForsendelseService(DistribuerForsendelseTo distribuerForsendelseTo, Exchange exchange) {
-		DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling = distribuerForsendelseTo.getDistribusjonbestilling();
+		DistribusjonbestillingTo distribusjonbestilling = distribuerForsendelseTo.getDistribusjonbestilling();
 
-		final DokumenttypeInfoTo dokumenttypeInfoTo = getTittelFromDokkkatIfNotProvided(distribusjonbestilling);
+		final DokumenttypeInfoTo dokumenttypeInfoTo = getTittelFromDokkatIfNotProvided(distribusjonbestilling);
 		final String mottakerFnr = getFnr(distribusjonbestilling.getMottaker());
 
 		final DistribusjonsKanalCode distribusjonsKanal = DistribusjonsKanalCode.valueOf(distribusjonbestilling.getDistribusjonKanal());
@@ -74,7 +76,7 @@ public class Qdist008Service {
 		return distribuerTilKanal;
 	}
 
-	private DokumenttypeInfoTo getTittelFromDokkkatIfNotProvided(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
+	private DokumenttypeInfoTo getTittelFromDokkatIfNotProvided(DistribusjonbestillingTo distribusjonbestilling) {
 		if (isBlank(distribusjonbestilling.getForsendelseTittel())) {
 			return dokumentkatalogAdmin.getDokumenttypeInfo(getDokumenttypeIdHoveddokument(distribusjonbestilling));
 		} else {
@@ -82,7 +84,7 @@ public class Qdist008Service {
 		}
 	}
 
-	private String getFnr(DistribuerForsendelseTo.AktoerTo aktoer) {
+	private String getFnr(AktoerTo aktoer) {
 		if (aktoer.isIdentifikatorAktoerId()) {
 			return pdlGraphQLConsumer.hentFolkeregisteridentForAktoerId(aktoer.getIdentifikator());
 		} else {
@@ -90,9 +92,9 @@ public class Qdist008Service {
 		}
 	}
 
-	private void updateArkivIfArkivsystemIsJoark(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling, DistribusjonsKanalCode distribusjonsKanal) {
+	private void updateArkivIfArkivsystemIsJoark(DistribusjonbestillingTo distribusjonbestilling, DistribusjonsKanalCode distribusjonsKanal) {
 		final DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon = distribusjonbestilling.getArkivInformasjon();
-		if (arkivInformasjon != null && arkivInformasjon.getArkivSystem().equals(ArkivSystemCode.JOARK)) {
+		if (arkivInformasjon != null && arkivInformasjon.getArkivSystem().equals(JOARK)) {
 
 			journalpostApi.oppdaterDistribusjonsinfo(
 					arkivInformasjon.getArkivId(),

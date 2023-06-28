@@ -5,7 +5,6 @@ import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseExc
 import no.nav.dokdistfordeling.metrics.Qdist012MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
-import org.apache.camel.LoggingLevel;
 import org.apache.camel.ValidationException;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
@@ -13,11 +12,12 @@ import org.springframework.stereotype.Component;
 
 import javax.jms.Queue;
 import javax.xml.bind.JAXBContext;
-import java.nio.charset.StandardCharsets;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.camel.ExchangePattern.InOnly;
 import static org.apache.camel.LoggingLevel.ERROR;
 import static org.apache.camel.LoggingLevel.INFO;
+import static org.apache.camel.LoggingLevel.WARN;
 
 
 @Component
@@ -62,12 +62,12 @@ public class Qdist012Route extends RouteBuilder {
 		onException(PersonErDoedUkjentAdresseException.class)
 				.handled(true)
 				.useOriginalMessage()
-				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging());
+				.log(WARN, log, "${exception}; " + getIdsForLogging());
 
 		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
 				.useOriginalMessage()
-				.log(LoggingLevel.WARN, log, "${exception}; " + getIdsForLogging())
+				.log(WARN, log, "${exception}; " + getIdsForLogging())
 				.to("jms:" + qdist012FunksjonellFeil.getQueueName());
 
 		from("jms:" + qdist012.getQueueName() +
@@ -83,7 +83,7 @@ public class Qdist012Route extends RouteBuilder {
 				.bean(hentDokumenterFraJoarkMapper)
 				.bean(qdist012Service)
 				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
-				.convertBodyTo(String.class, StandardCharsets.UTF_8.toString())
+				.convertBodyTo(String.class, UTF_8.toString())
 				.to(InOnly, "jms:" + qdist008.getQueueName())
 				.log(INFO, log, "qdist012 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist008 for distribusjon av forsendelse");
 	}

@@ -4,8 +4,6 @@ import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.hentdokument.HentDokument;
 import no.nav.dokdistfordeling.consumer.saf.hentdokument.HentDokumentResponseTo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
-import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
-import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.dokdistfordeling.storage.BucketStorage;
 import no.nav.dokdistfordeling.storage.DokdistDokument;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
@@ -20,6 +18,7 @@ import java.util.stream.Collectors;
 
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
+import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -87,7 +86,7 @@ public class Qdist012Service {
 				.arkivDokumentInfoId(dokumentInfo.getDokumentInfoId())
 				.dokumenttypeId(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID)
 				.rekkefolge(rekkefolge)
-				.tilknyttetSom(TilknyttetSomCode.VEDLEGG.name())
+				.tilknyttetSom(VEDLEGG.name())
 				.variantFormat(getVariantFormat(dokumentInfo.getDokumentvarianter()))
 				.build();
 	}
