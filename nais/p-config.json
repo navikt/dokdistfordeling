@@ -1,5 +1,4 @@
 {
-  "ADMINISTRERFORSENDELSE_V1_URL": "https://app.adeo.no/dokdist/rest/v1/administrerforsendelse",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.adeo.no/rest/v1/sts",
   "REGOPPSLAG_URL": "https://regoppslag.intern.nav.no/rest",
   "MQGATEWAY01_CHANNEL_NAME": "P_DOKDISTFORDELING",
