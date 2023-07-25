@@ -27,11 +27,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Queue;
-import javax.jms.TextMessage;
-import javax.xml.bind.JAXBException;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Queue;
+import jakarta.jms.TextMessage;
+import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -783,7 +783,7 @@ public class Rdist002IT {
 
 	private HttpHeaders createHappyPathHeaders(String callId, String consumerId) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + OIDC_TOKEN);
 		if (callId != null) {
 			headers.add("Nav-CallId", callId);
@@ -796,7 +796,7 @@ public class Rdist002IT {
 
 	private HttpHeaders createHeaderWithoutAuth() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+		headers.setContentType(MediaType.APPLICATION_JSON);
 		return headers;
 	}
 

@@ -101,8 +101,8 @@ class DistribuerForsendelseMapperTest {
 	@Test
 	public void shouldMapUtenlandskAdresse() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().withAdresse(createUtenlandskPostadresse());
-		distribuerForsendelse.getDistribusjonbestilling().withDistribusjonKanal(DISTRIBUSJONKANAL_PRINT);
+		distribuerForsendelse.getDistribusjonbestilling().setAdresse(createUtenlandskPostadresse());
+		distribuerForsendelse.getDistribusjonbestilling().setDistribusjonKanal(DISTRIBUSJONKANAL_PRINT);
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
@@ -112,7 +112,7 @@ class DistribuerForsendelseMapperTest {
 	@Test
 	public void shouldMapAktoerId() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().withMottaker(createMottakerAktoerId());
+		distribuerForsendelse.getDistribusjonbestilling().setMottaker(createMottakerAktoerId());
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
@@ -127,7 +127,7 @@ class DistribuerForsendelseMapperTest {
 	@Test
 	public void shouldMapOrganisasjon() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().withMottaker(createAktoerOrganisasjon());
+		distribuerForsendelse.getDistribusjonbestilling().setMottaker(createAktoerOrganisasjon());
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
@@ -143,7 +143,7 @@ class DistribuerForsendelseMapperTest {
 	@Test
 	public void shouldMapSamhandlerHpr() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().withMottaker(createAktoerSamhandlerHpr());
+		distribuerForsendelse.getDistribusjonbestilling().setMottaker(createAktoerSamhandlerHpr());
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
@@ -158,7 +158,7 @@ class DistribuerForsendelseMapperTest {
 	@Test
 	public void shouldMapSamhandlerUtlOrg() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().withMottaker(createAktoerSamhandlerOrgUtl());
+		distribuerForsendelse.getDistribusjonbestilling().setMottaker(createAktoerSamhandlerOrgUtl());
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
@@ -173,7 +173,7 @@ class DistribuerForsendelseMapperTest {
 	@Test
 	public void shouldMapSamhandlerUkjent() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().withMottaker(createAktoerSamhandlerOrgUkjent());
+		distribuerForsendelse.getDistribusjonbestilling().setMottaker(createAktoerSamhandlerOrgUkjent());
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
@@ -188,7 +188,7 @@ class DistribuerForsendelseMapperTest {
 	@Test
 	public void shouldMapOkWhenWithoutAkivinformasjon() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().withArkivInformasjon(null);
+		distribuerForsendelse.getDistribusjonbestilling().setArkivInformasjon(null);
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
@@ -229,8 +229,10 @@ class DistribuerForsendelseMapperTest {
 	@Test
 	public void shouldFailUgyldigSamhandlerKategori() {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
+		Samhandler aktoerSamhandlerHpr = (Samhandler) createAktoerSamhandlerHpr();
+		aktoerSamhandlerHpr.setSamhandlerkategori("NO_SUCH_KATEGORI");
 		distribuerForsendelse.getDistribusjonbestilling()
-				.withMottaker(((Samhandler) createAktoerSamhandlerHpr()).withSamhandlerkategori("NO_SUCH_KATEGORI"));
+				.setMottaker(aktoerSamhandlerHpr);
 
 		assertThrows(AbstractDokdistfordelingFunctionalException.class,
 				() -> distribuerForsendelseMapper.map(distribuerForsendelse),
@@ -264,8 +266,8 @@ class DistribuerForsendelseMapperTest {
 		adresse.setAdresselinje1("    ");
 		adresse.setAdresselinje2("           ");
 		adresse.setAdresselinje3("          " + adresse.getAdresselinje3());
-		distribuerForsendelse.getDistribusjonbestilling().withAdresse(adresse);
-		distribuerForsendelse.getDistribusjonbestilling().withDistribusjonKanal(DISTRIBUSJONKANAL_PRINT);
+		distribuerForsendelse.getDistribusjonbestilling().setAdresse(adresse);
+		distribuerForsendelse.getDistribusjonbestilling().setDistribusjonKanal(DISTRIBUSJONKANAL_PRINT);
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
 		assertDistribuerForsendelseTo(distribuerForsendelseTo);
@@ -347,91 +349,107 @@ class DistribuerForsendelseMapperTest {
 	}
 
 	private DistribuerForsendelse createDistribuerForsendelse() {
-		return new DistribuerForsendelse()
-				.withDistribusjonbestilling(new Distribusjonbestilling()
-						.withBestillingsId(BESTILLINGS_ID)
-						.withBatchId(BATCH_ID)
-						.withDistribusjonKanal(DISTRIBUSJONKANAL_PRINT)
-						.withBestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
-						.withTema(TEMA)
-						.withForsendelseTittel(FORSENDELSE_TITTEL)
-						.withArkivInformasjon(new ArkivInformasjon()
-								.withArkivId(ARKIV_ID)
-								.withArkivSystem(ARKIV_SYSTEM))
-						.withMottaker(createAktoerPerson(PERSON_NAVN_MOTTAKER, PERSON_IDENTIFIKATOR_MOTTAKER))
-						.withBruker(createAktoerPerson(PERSON_NAVN_BRUKER, PERSON_IDENTIFIKATOR_BRUKER))
-						.withAdresse(createNorskPostadresse())
-						.withDokumentProdApp(DOKUMENT_PROD_APP)
-						.withDokumenter(Arrays.asList(new DokumentInformasjon()
-										.withDokumenttypeId(DOKUMENTTYPE_ID_1)
-										.withDokumentObjektReferanse(OBJEKT_REFERANSE_1)
-										.withTilknyttetSom(TILKNYTTET_SOM_HOVEDDOK)
-										.withArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_1)
-										.withRekkefolge(REKKEFOLGE_1),
-								new DokumentInformasjon()
-										.withDokumenttypeId(DOKUMENTTYPE_ID_2)
-										.withDokumentObjektReferanse(OBJEKT_REFERANSE_2)
-										.withTilknyttetSom(TILKNYTTET_SOM_VEDLEGG)
-										.withArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_2)
-										.withRekkefolge(REKKEFOLGE_2)
-						))
-				);
+		Distribusjonbestilling distribusjonbestilling = new Distribusjonbestilling();
+		distribusjonbestilling.setBestillingsId(BESTILLINGS_ID);
+		distribusjonbestilling.setBatchId(BATCH_ID);
+		distribusjonbestilling.setDistribusjonKanal(DISTRIBUSJONKANAL_PRINT);
+		distribusjonbestilling.setBestillendeFagsystem(BESTILLENDE_FAGSYSTEM);
+		distribusjonbestilling.setTema(TEMA);
+		distribusjonbestilling.setForsendelseTittel(FORSENDELSE_TITTEL);
+		distribusjonbestilling.setMottaker(createAktoerPerson(PERSON_NAVN_MOTTAKER, PERSON_IDENTIFIKATOR_MOTTAKER));
+		distribusjonbestilling.setBruker(createAktoerPerson(PERSON_NAVN_BRUKER, PERSON_IDENTIFIKATOR_BRUKER));
+		distribusjonbestilling.setAdresse(createNorskPostadresse());
+		distribusjonbestilling.setDokumentProdApp(DOKUMENT_PROD_APP);
+
+		ArkivInformasjon arkivInformasjon = new ArkivInformasjon();
+		arkivInformasjon.setArkivId(ARKIV_ID);
+		arkivInformasjon.setArkivSystem(ARKIV_SYSTEM);
+		distribusjonbestilling.setArkivInformasjon(arkivInformasjon);
+
+		DokumentInformasjon dokumentInformasjon1 = new DokumentInformasjon();
+		dokumentInformasjon1.setDokumenttypeId(DOKUMENTTYPE_ID_1);
+		dokumentInformasjon1.setDokumentObjektReferanse(OBJEKT_REFERANSE_1);
+		dokumentInformasjon1.setTilknyttetSom(TILKNYTTET_SOM_HOVEDDOK);
+		dokumentInformasjon1.setArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_1);
+		dokumentInformasjon1.setRekkefolge(REKKEFOLGE_1);
+
+		DokumentInformasjon dokumentInformasjon2 = new DokumentInformasjon();
+		dokumentInformasjon2.setDokumenttypeId(DOKUMENTTYPE_ID_2);
+		dokumentInformasjon2.setDokumentObjektReferanse(OBJEKT_REFERANSE_2);
+		dokumentInformasjon2.setTilknyttetSom(TILKNYTTET_SOM_VEDLEGG);
+		dokumentInformasjon2.setArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_2);
+		dokumentInformasjon2.setRekkefolge(REKKEFOLGE_2);
+
+		distribusjonbestilling.setDokumenter(Arrays.asList(dokumentInformasjon1, dokumentInformasjon2));
+
+		DistribuerForsendelse distribuerForsendelse = new DistribuerForsendelse();
+		distribuerForsendelse.setDistribusjonbestilling(distribusjonbestilling);
+		return distribuerForsendelse;
 	}
 
 	private NorskPostadresse createNorskPostadresse() {
-		return new NorskPostadresse()
-				.withAdresselinje1(ADRESSELINJE_1)
-				.withAdresselinje2(ADRESSELINJE_2)
-				.withAdresselinje3(ADRESSELINJE_3)
-				.withPostnummer(POSTNUMMER)
-				.withPoststed(POSTSTED)
-				.withLand(LAND);
+		NorskPostadresse norskPostadresse = new NorskPostadresse();
+		norskPostadresse.setAdresselinje1(ADRESSELINJE_1);
+		norskPostadresse.setAdresselinje2(ADRESSELINJE_2);
+		norskPostadresse.setAdresselinje3(ADRESSELINJE_3);
+		norskPostadresse.setPostnummer(POSTNUMMER);
+		norskPostadresse.setPoststed(POSTSTED);
+		norskPostadresse.setLand(LAND);
+		return norskPostadresse;
 	}
 
 	private UtenlandskPostadresse createUtenlandskPostadresse() {
-		return new UtenlandskPostadresse()
-				.withAdresselinje1(ADRESSELINJE_1)
-				.withAdresselinje2(ADRESSELINJE_2)
-				.withAdresselinje3(ADRESSELINJE_3)
-				.withLand(LAND);
+		UtenlandskPostadresse utenlandskPostadresse = new UtenlandskPostadresse();
+		utenlandskPostadresse.setAdresselinje1(ADRESSELINJE_1);
+		utenlandskPostadresse.setAdresselinje2(ADRESSELINJE_2);
+		utenlandskPostadresse.setAdresselinje3(ADRESSELINJE_3);
+		utenlandskPostadresse.setLand(LAND);
+		return utenlandskPostadresse;
 	}
 
+
 	private Aktoer createAktoerPerson(String navn, String identifikator) {
-		return new Person()
-				.withNavn(navn)
-				.withPersonidentifikator(identifikator);
+		Person person = new Person();
+		person.setNavn(navn);
+		person.setPersonidentifikator(identifikator);
+		return person;
 	}
 
 	private Aktoer createMottakerAktoerId() {
-		return new AktoerId()
-				.withNavn(MOTTAKER_ID_NAVN)
-				.withAktoerId(MOTTAKER_ID);
+		AktoerId aktoerId = new AktoerId();
+		aktoerId.setNavn(MOTTAKER_ID_NAVN);
+		aktoerId.setAktoerId(MOTTAKER_ID);
+		return aktoerId;
 	}
 
 	private Aktoer createAktoerOrganisasjon() {
-		return new Organisasjon()
-				.withNavn(ORGANISASJON_NAVN)
-				.withOrgnummer(ORGNUMMER);
+		Organisasjon organisasjon = new Organisasjon();
+		organisasjon.setNavn(ORGANISASJON_NAVN);
+		organisasjon.setOrgnummer(ORGNUMMER);
+		return organisasjon;
 	}
 
 	private Aktoer createAktoerSamhandlerHpr() {
-		return new Samhandler()
-				.withNavn(SAMHANDLER_NAVN)
-				.withSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR)
-				.withSamhandlerkategori(SAMHANDLER_KATEGORI_HPR);
+		Samhandler samhandler = new Samhandler();
+		samhandler.setNavn(SAMHANDLER_NAVN);
+		samhandler.setSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR);
+		samhandler.setSamhandlerkategori(SAMHANDLER_KATEGORI_HPR);
+		return samhandler;
 	}
 
 	private Aktoer createAktoerSamhandlerOrgUtl() {
-		return new Samhandler()
-				.withNavn(SAMHANDLER_NAVN)
-				.withSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR)
-				.withSamhandlerkategori(SAMHANDLER_KATEGORI_UTL_ORG);
+		Samhandler samhandler = new Samhandler();
+		samhandler.setNavn(SAMHANDLER_NAVN);
+		samhandler.setSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR);
+		samhandler.setSamhandlerkategori(SAMHANDLER_KATEGORI_UTL_ORG);
+		return samhandler;
 	}
 
 	private Aktoer createAktoerSamhandlerOrgUkjent() {
-		return new Samhandler()
-				.withNavn(SAMHANDLER_NAVN)
-				.withSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR)
-				.withSamhandlerkategori(SAMHANDLER_KATEGORI_UKJENT);
+		Samhandler samhandler = new Samhandler();
+		samhandler.setNavn(SAMHANDLER_NAVN);
+		samhandler.setSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR);
+		samhandler.setSamhandlerkategori(SAMHANDLER_KATEGORI_UKJENT);
+		return samhandler;
 	}
 }

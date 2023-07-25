@@ -298,29 +298,33 @@ public class HentDokumenterFraJoarkMapperTest {
 
 
 	private Person createPersonMottaker() {
-		return new Person()
-				.withPersonidentifikator(MOTTAKER_ID)
-				.withNavn(MOTTAKER_NAVN);
+		Person person = new Person();
+		person.setPersonidentifikator(MOTTAKER_ID);
+		person.setNavn(MOTTAKER_NAVN);
+		return person;
 	}
 
 	private Organisasjon createOrganisasjonMottaker() {
-		return new Organisasjon()
-				.withOrgnummer(ORGNR)
-				.withNavn(ORG_NAVN);
+		Organisasjon organisasjon = new Organisasjon();
+		organisasjon.setOrgnummer(ORGNR);
+		organisasjon.setNavn(ORG_NAVN);
+		return organisasjon;
 	}
 
 	private Samhandler createSamhandlerMottaker() {
-		return new Samhandler()
-				.withSamhandleridentifikator(SAMHANDLER_ID)
-				.withSamhandlerkategori(SAMHANDLER_KATOGORI)
-				.withNavn(SAMHANDLER_NAVN);
+		Samhandler samhandler = new Samhandler();
+		samhandler.setSamhandleridentifikator(SAMHANDLER_ID);
+		samhandler.setSamhandlerkategori(SAMHANDLER_KATOGORI);
+		samhandler.setNavn(SAMHANDLER_NAVN);
+		return samhandler;
 	}
 
 	private Samhandler createTSSMottaker() {
-		return new Samhandler()
-				.withSamhandleridentifikator(TSS_ID)
-				.withSamhandlerkategori(TSS_KATEGORI)
-				.withNavn(TSS_NAVN);
+		Samhandler samhandler = new Samhandler();
+		samhandler.setSamhandleridentifikator(TSS_ID);
+		samhandler.setSamhandlerkategori(TSS_KATEGORI);
+		samhandler.setNavn(TSS_NAVN);
+		return samhandler;
 	}
 
 }

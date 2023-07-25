@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.UMIDDELBART;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VEDTAK;
@@ -101,7 +102,7 @@ class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapUtenlandskAdresse() {
 		HentDokumenterFraJoark hentDokumenterFraJoark = createHentDokumentFraJoark();
-		hentDokumenterFraJoark.getDistribusjonbestilling().withAdresse(createUtenlandskPostadresse());
+		hentDokumenterFraJoark.getDistribusjonbestilling().setAdresse(createUtenlandskPostadresse());
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
 		assertHentDokumentFraJoarkTo(hentDokumenterFraJoarkTo);
@@ -111,7 +112,7 @@ class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapAktoerId() {
 		HentDokumenterFraJoark hentDokumenterFraJoark = createHentDokumentFraJoark();
-		hentDokumenterFraJoark.getDistribusjonbestilling().withMottaker(createMottakerAktoerId());
+		hentDokumenterFraJoark.getDistribusjonbestilling().setMottaker(createMottakerAktoerId());
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
 		assertHentDokumentFraJoarkTo(hentDokumenterFraJoarkTo);
@@ -126,7 +127,7 @@ class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapOrganisasjon() {
 		HentDokumenterFraJoark hentDokumenterFraJoark = createHentDokumentFraJoark();
-		hentDokumenterFraJoark.getDistribusjonbestilling().withMottaker(createAktoerOrganisasjon());
+		hentDokumenterFraJoark.getDistribusjonbestilling().setMottaker(createAktoerOrganisasjon());
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
 		assertHentDokumentFraJoarkTo(hentDokumenterFraJoarkTo);
@@ -142,7 +143,7 @@ class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapSamhandlerHpr() {
 		HentDokumenterFraJoark hentDokumenterFraJoark = createHentDokumentFraJoark();
-		hentDokumenterFraJoark.getDistribusjonbestilling().withMottaker(createAktoerSamhandlerHpr());
+		hentDokumenterFraJoark.getDistribusjonbestilling().setMottaker(createAktoerSamhandlerHpr());
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
 		assertHentDokumentFraJoarkTo(hentDokumenterFraJoarkTo);
@@ -157,7 +158,7 @@ class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapSamhandlerUKJENT() {
 		HentDokumenterFraJoark hentDokumenterFraJoark = createHentDokumentFraJoark();
-		hentDokumenterFraJoark.getDistribusjonbestilling().withMottaker(createAktoerSamhandlerUkjent());
+		hentDokumenterFraJoark.getDistribusjonbestilling().setMottaker(createAktoerSamhandlerUkjent());
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
 		assertHentDokumentFraJoarkTo(hentDokumenterFraJoarkTo);
@@ -172,7 +173,7 @@ class HentDokumenterFraJoarkMapperTest {
 	@Test
 	public void shouldMapOkWhenWithoutAkivinformasjon() {
 		HentDokumenterFraJoark hentDokumenterFraJoark = createHentDokumentFraJoark();
-		hentDokumenterFraJoark.getDistribusjonbestilling().withArkivInformasjon(null);
+		hentDokumenterFraJoark.getDistribusjonbestilling().setArkivInformasjon(null);
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
 		assertHentDokumentFraJoarkTo(hentDokumenterFraJoarkTo);
@@ -275,117 +276,108 @@ class HentDokumenterFraJoarkMapperTest {
 	}
 
 	private HentDokumenterFraJoark createHentDokumentFraJoark() {
-		return new HentDokumenterFraJoark()
-				.withDistribusjonbestilling(new Distribusjonbestilling()
-						.withBestillingsId(BESTILLINGS_ID)
-						.withBatchId(BATCH_ID)
-						.withDistribusjonKanal(PRINT.name())
-						.withBestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
-						.withTema(TEMA)
-						.withForsendelseTittel(FORSENDELSE_TITTEL)
-						.withArkivInformasjon(new ArkivInformasjon()
-								.withArkivId(ARKIV_ID)
-								.withArkivSystem(ARKIV_SYSTEM))
-						.withMottaker(createAktoerPerson(PERSON_NAVN_MOTTAKER, PERSON_IDENTIFIKATOR_MOTTAKER))
-						.withBruker(createAktoerPerson(PERSON_NAVN_BRUKER, PERSON_IDENTIFIKATOR_BRUKER))
-						.withAdresse(createNorskPostadresse())
-						.withDokumentProdApp(DOKUMENT_PROD_APP)
-						.withDokumenter(Arrays.asList(new DokumentInformasjon()
-										.withDokumenttypeId(DOKUMENTTYPE_ID_1)
-										.withVariantFormat(VARIANTFORMAT_1)
-										.withTilknyttetSom(TILKNYTTET_SOM_HOVEDDOK)
-										.withArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_1)
-										.withRekkefolge(REKKEFOLGE_1),
-								new DokumentInformasjon()
-										.withDokumenttypeId(DOKUMENTTYPE_ID_2)
-										.withVariantFormat(VARIANTFORMAT_2)
-										.withTilknyttetSom(TILKNYTTET_SOM_VEDLEGG)
-										.withArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_2)
-										.withRekkefolge(REKKEFOLGE_2)
-						))
-				);
+		return createHentDokumentFraJoark(PRINT.name());
 	}
 
 	private HentDokumenterFraJoark createHentDokumentFraJoarkDittNav() {
-		return new HentDokumenterFraJoark()
-				.withDistribusjonbestilling(new Distribusjonbestilling()
-						.withBestillingsId(BESTILLINGS_ID)
-						.withBatchId(BATCH_ID)
-						.withDistribusjonKanal("DITT_NAV")
-						.withBestillendeFagsystem(BESTILLENDE_FAGSYSTEM)
-						.withTema(TEMA)
-						.withForsendelseTittel(FORSENDELSE_TITTEL)
-						.withArkivInformasjon(new ArkivInformasjon()
-								.withArkivId(ARKIV_ID)
-								.withArkivSystem(ARKIV_SYSTEM))
-						.withMottaker(createAktoerPerson(PERSON_NAVN_MOTTAKER, PERSON_IDENTIFIKATOR_MOTTAKER))
-						.withBruker(createAktoerPerson(PERSON_NAVN_BRUKER, PERSON_IDENTIFIKATOR_BRUKER))
-						.withAdresse(createNorskPostadresse())
-						.withDokumentProdApp(DOKUMENT_PROD_APP)
-						.withDokumenter(Arrays.asList(new DokumentInformasjon()
-										.withDokumenttypeId(DOKUMENTTYPE_ID_1)
-										.withVariantFormat(VARIANTFORMAT_1)
-										.withTilknyttetSom(TILKNYTTET_SOM_HOVEDDOK)
-										.withArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_1)
-										.withRekkefolge(REKKEFOLGE_1),
-								new DokumentInformasjon()
-										.withDokumenttypeId(DOKUMENTTYPE_ID_2)
-										.withVariantFormat(VARIANTFORMAT_2)
-										.withTilknyttetSom(TILKNYTTET_SOM_VEDLEGG)
-										.withArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_2)
-										.withRekkefolge(REKKEFOLGE_2)
-						))
-				);
+		return createHentDokumentFraJoark(DITT_NAV);
+	}
+
+	private HentDokumenterFraJoark createHentDokumentFraJoark(String distribusjonKanal) {
+		Distribusjonbestilling distribusjonbestilling = new Distribusjonbestilling();
+		distribusjonbestilling.setBestillingsId(BESTILLINGS_ID);
+		distribusjonbestilling.setBatchId(BATCH_ID);
+		distribusjonbestilling.setDistribusjonKanal(distribusjonKanal);
+		distribusjonbestilling.setBestillendeFagsystem(BESTILLENDE_FAGSYSTEM);
+		distribusjonbestilling.setTema(TEMA);
+		distribusjonbestilling.setForsendelseTittel(FORSENDELSE_TITTEL);
+
+		ArkivInformasjon arkivInformasjon = new ArkivInformasjon();
+		arkivInformasjon.setArkivId(ARKIV_ID);
+		arkivInformasjon.setArkivSystem(ARKIV_SYSTEM);
+		distribusjonbestilling.setArkivInformasjon(arkivInformasjon);
+
+		distribusjonbestilling.setMottaker(createAktoerPerson(PERSON_NAVN_MOTTAKER, PERSON_IDENTIFIKATOR_MOTTAKER));
+		distribusjonbestilling.setBruker(createAktoerPerson(PERSON_NAVN_BRUKER, PERSON_IDENTIFIKATOR_BRUKER));
+		distribusjonbestilling.setAdresse(createNorskPostadresse());
+		distribusjonbestilling.setDokumentProdApp(DOKUMENT_PROD_APP);
+
+		DokumentInformasjon dokumentInformasjon1 = new DokumentInformasjon();
+		dokumentInformasjon1.setDokumenttypeId(DOKUMENTTYPE_ID_1);
+		dokumentInformasjon1.setVariantFormat(VARIANTFORMAT_1);
+		dokumentInformasjon1.setTilknyttetSom(TILKNYTTET_SOM_HOVEDDOK);
+		dokumentInformasjon1.setArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_1);
+		dokumentInformasjon1.setRekkefolge(REKKEFOLGE_1);
+
+		DokumentInformasjon dokumentInformasjon2 = new DokumentInformasjon();
+		dokumentInformasjon2.setDokumenttypeId(DOKUMENTTYPE_ID_2);
+		dokumentInformasjon2.setVariantFormat(VARIANTFORMAT_2);
+		dokumentInformasjon2.setTilknyttetSom(TILKNYTTET_SOM_VEDLEGG);
+		dokumentInformasjon2.setArkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_2);
+		dokumentInformasjon2.setRekkefolge(REKKEFOLGE_2);
+
+
+		distribusjonbestilling.setDokumenter(Arrays.asList(dokumentInformasjon1, dokumentInformasjon2));
+
+		HentDokumenterFraJoark hentDokumenterFraJoark = new HentDokumenterFraJoark();
+		hentDokumenterFraJoark.setDistribusjonbestilling(distribusjonbestilling);
+		return hentDokumenterFraJoark;
 	}
 
 	private NorskPostadresse createNorskPostadresse() {
-		return new NorskPostadresse()
-				.withAdresselinje1(ADRESSELINJE_1)
-				.withAdresselinje2(ADRESSELINJE_2)
-				.withAdresselinje3(ADRESSELINJE_3)
-				.withPostnummer(POSTNUMMER)
-				.withPoststed(POSTSTED)
-				.withLand(LAND);
+		NorskPostadresse norskPostadresse = new NorskPostadresse();
+		norskPostadresse.setAdresselinje1(ADRESSELINJE_1);
+		norskPostadresse.setAdresselinje2(ADRESSELINJE_2);
+		norskPostadresse.setAdresselinje3(ADRESSELINJE_3);
+		norskPostadresse.setPostnummer(POSTNUMMER);
+		norskPostadresse.setPoststed(POSTSTED);
+		norskPostadresse.setLand(LAND);
+		return norskPostadresse;
 	}
 
 	private UtenlandskPostadresse createUtenlandskPostadresse() {
-		return new UtenlandskPostadresse()
-				.withAdresselinje1(ADRESSELINJE_1)
-				.withAdresselinje2(ADRESSELINJE_2)
-				.withAdresselinje3(ADRESSELINJE_3)
-				.withLand(LAND);
+		UtenlandskPostadresse utenlandskPostadresse = new UtenlandskPostadresse();
+		utenlandskPostadresse.setAdresselinje1(ADRESSELINJE_1);
+		utenlandskPostadresse.setAdresselinje2(ADRESSELINJE_2);
+		utenlandskPostadresse.setAdresselinje3(ADRESSELINJE_3);
+		utenlandskPostadresse.setLand(LAND);
+		return utenlandskPostadresse;
 	}
 
 	private Aktoer createAktoerPerson(String navn, String identifikator) {
-		return new Person()
-				.withNavn(navn)
-				.withPersonidentifikator(identifikator);
+		Person person = new Person();
+		person.setNavn(navn);
+		person.setPersonidentifikator(identifikator);
+		return person;
 	}
 
 	private Aktoer createMottakerAktoerId() {
-		return new AktoerId()
-				.withNavn(MOTTAKER_ID_NAVN)
-				.withAktoerId(MOTTAKER_ID);
+		AktoerId aktoerId = new AktoerId();
+		aktoerId.setNavn(MOTTAKER_ID_NAVN);
+		aktoerId.setAktoerId(MOTTAKER_ID);
+		return aktoerId;
 	}
 
 	private Aktoer createAktoerOrganisasjon() {
-		return new Organisasjon()
-				.withNavn(ORGANISASJON_NAVN)
-				.withOrgnummer(ORGNUMMER);
+		Organisasjon organisasjon = new Organisasjon();
+		organisasjon.setNavn(ORGANISASJON_NAVN);
+		organisasjon.setOrgnummer(ORGNUMMER);
+		return organisasjon;
 	}
 
 	private Aktoer createAktoerSamhandlerHpr() {
-		return new Samhandler()
-				.withNavn(SAMHANDLER_NAVN)
-				.withSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR)
-				.withSamhandlerkategori(SAMHANDLER_KATEGORI_HPR);
+		Samhandler samhandler = new Samhandler();
+		samhandler.setNavn(SAMHANDLER_NAVN);
+		samhandler.setSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR);
+		samhandler.setSamhandlerkategori(SAMHANDLER_KATEGORI_HPR);
+		return samhandler;
 	}
 
 	private Aktoer createAktoerSamhandlerUkjent() {
-		return new Samhandler()
-				.withNavn(SAMHANDLER_NAVN)
-				.withSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR)
-				.withSamhandlerkategori(SAMHANDLER_KATEGORI_UKJENT);
+		Samhandler samhandler = new Samhandler();
+		samhandler.setNavn(SAMHANDLER_NAVN);
+		samhandler.setSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR);
+		samhandler.setSamhandlerkategori(SAMHANDLER_KATEGORI_UKJENT);
+		return samhandler;
 	}
-
 }

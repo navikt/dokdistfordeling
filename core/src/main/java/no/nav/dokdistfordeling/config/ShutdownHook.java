@@ -1,11 +1,11 @@
 package no.nav.dokdistfordeling.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.jms.pool.PooledConnectionFactory;
+import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
-import javax.jms.ConnectionFactory;
+import jakarta.jms.ConnectionFactory;
 
 /**
  * Rydder opp ressurser som Spring ikke gjør selv.
@@ -14,15 +14,15 @@ import javax.jms.ConnectionFactory;
 @Component
 public class ShutdownHook {
 
-	private final ConnectionFactory wmqConnectionFactory;
+	private final ConnectionFactory connectionFactory;
 
-	public ShutdownHook(ConnectionFactory wmqConnectionFactory) {
-		this.wmqConnectionFactory = wmqConnectionFactory;
+	public ShutdownHook(ConnectionFactory connectionFactory) {
+		this.connectionFactory = connectionFactory;
 	}
 
 	@PreDestroy
 	public void destroy() {
 		log.info("Graceful shutdown - Lukker koblinger til ConnectionFactory pool");
-		((PooledConnectionFactory) wmqConnectionFactory).clear();
+		((JmsPoolConnectionFactory) connectionFactory).clear();
 	}
 }

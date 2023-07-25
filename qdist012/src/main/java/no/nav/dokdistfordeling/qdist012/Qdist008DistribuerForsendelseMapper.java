@@ -34,8 +34,9 @@ public class Qdist008DistribuerForsendelseMapper {
 
 	public DistribuerForsendelse map(HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo) {
 		try {
-			return new DistribuerForsendelse()
-					.withDistribusjonbestilling(mapDokumentbestillingsinformasjon(hentDokumenterFraJoarkTo.getDistribusjonbestilling()));
+			DistribuerForsendelse distribuerForsendelse = new DistribuerForsendelse();
+			distribuerForsendelse.setDistribusjonbestilling(mapDokumentbestillingsinformasjon(hentDokumenterFraJoarkTo.getDistribusjonbestilling()));
+			return distribuerForsendelse;
 		} catch (Exception e) {
 			throw new DistrubuerForsendelseMapFunctionalException(format("Kunne ikke mappe qdist012 output. Feilmelding=%s",
 					e.getMessage()), e);
@@ -43,30 +44,33 @@ public class Qdist008DistribuerForsendelseMapper {
 	}
 
 	private Distribusjonbestilling mapDokumentbestillingsinformasjon(HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestillingTo) {
-		return new Distribusjonbestilling()
-				.withBestillingsId(distribusjonbestillingTo.getBestillingsId())
-				.withBatchId(mapBatchId(distribusjonbestillingTo.getBatchId()))
-				.withDistribusjonKanal(distribusjonbestillingTo.getDistribusjonKanal())
-				.withBestillendeFagsystem(distribusjonbestillingTo.getBestillendeFagsystem())
-				.withTema(distribusjonbestillingTo.getTema())
-				.withForsendelseTittel(distribusjonbestillingTo.getForsendelseTittel())
-				.withDistribusjonstype(mapDistribusjonstype(distribusjonbestillingTo.getDistribusjonstype()))
-				.withDistribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestillingTo.getDistribusjonstidspunkt()))
-				.withArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon() == null ? null :
-						mapArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon()))
-				.withMottaker(mapAktoerTo(distribusjonbestillingTo.getMottaker()))
-				.withBruker(mapAktoerTo(distribusjonbestillingTo.getBruker()))
-				.withAdresse(PRINT.name().equals(distribusjonbestillingTo.getDistribusjonKanal()) ? mapAdresse(distribusjonbestillingTo.getAdresse()) : null)
-				.withDokumentProdApp(distribusjonbestillingTo.getDokumentProdApp())
-				.withDokumenter(distribusjonbestillingTo.getDokumenter().stream()
-						.map(dokumentInformasjon -> new DokumentInformasjon()
-								.withDokumenttypeId(dokumentInformasjon.getDokumenttypeId())
-								.withTilknyttetSom(dokumentInformasjon.getTilknyttetSom())
-								.withArkivDokumentInfoId(dokumentInformasjon.getArkivDokumentInfoId())
-								.withRekkefolge(dokumentInformasjon.getRekkefolge())
-								.withDokumentObjektReferanse(dokumentInformasjon.getDokumentObjektReferanse()))
-						.collect(Collectors.toList()));
-
+		Distribusjonbestilling distribusjonbestilling = new Distribusjonbestilling();
+		distribusjonbestilling.setBestillingsId(distribusjonbestillingTo.getBestillingsId());
+		distribusjonbestilling.setBatchId(mapBatchId(distribusjonbestillingTo.getBatchId()));
+		distribusjonbestilling.setDistribusjonKanal(distribusjonbestillingTo.getDistribusjonKanal());
+		distribusjonbestilling.setBestillendeFagsystem(distribusjonbestillingTo.getBestillendeFagsystem());
+		distribusjonbestilling.setTema(distribusjonbestillingTo.getTema());
+		distribusjonbestilling.setForsendelseTittel(distribusjonbestillingTo.getForsendelseTittel());
+		distribusjonbestilling.setDistribusjonstype(mapDistribusjonstype(distribusjonbestillingTo.getDistribusjonstype()));
+		distribusjonbestilling.setDistribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestillingTo.getDistribusjonstidspunkt()));
+		distribusjonbestilling.setArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon() == null ? null :
+				mapArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon()));
+		distribusjonbestilling.setMottaker(mapAktoerTo(distribusjonbestillingTo.getMottaker()));
+		distribusjonbestilling.setBruker(mapAktoerTo(distribusjonbestillingTo.getBruker()));
+		distribusjonbestilling.setAdresse(PRINT.name().equals(distribusjonbestillingTo.getDistribusjonKanal()) ? mapAdresse(distribusjonbestillingTo.getAdresse()) : null);
+		distribusjonbestilling.setDokumentProdApp(distribusjonbestillingTo.getDokumentProdApp());
+		distribusjonbestilling.setDokumenter(distribusjonbestillingTo.getDokumenter().stream()
+				.map(dokumentInformasjonTo -> {
+					DokumentInformasjon dokumentInformasjon = new DokumentInformasjon();
+					dokumentInformasjon.setDokumenttypeId(dokumentInformasjonTo.getDokumenttypeId());
+					dokumentInformasjon.setTilknyttetSom(dokumentInformasjonTo.getTilknyttetSom());
+					dokumentInformasjon.setArkivDokumentInfoId(dokumentInformasjonTo.getArkivDokumentInfoId());
+					dokumentInformasjon.setRekkefolge(dokumentInformasjonTo.getRekkefolge());
+					dokumentInformasjon.setDokumentObjektReferanse(dokumentInformasjonTo.getDokumentObjektReferanse());
+					return dokumentInformasjon;
+				})
+				.collect(Collectors.toList()));
+		return distribusjonbestilling;
 	}
 
 	private String mapBatchId(String batchId) {
@@ -74,9 +78,10 @@ public class Qdist008DistribuerForsendelseMapper {
 	}
 
 	private ArkivInformasjon mapArkivInformasjon(HentDokumenterFraJoarkTo.ArkivInformasjonTo arkivInformasjonTo) {
-		return new ArkivInformasjon()
-				.withArkivSystem(arkivInformasjonTo.getArkivSystem())
-				.withArkivId(arkivInformasjonTo.getArkivId());
+		ArkivInformasjon arkivInformasjon = new ArkivInformasjon();
+		arkivInformasjon.setArkivSystem(arkivInformasjonTo.getArkivSystem());
+		arkivInformasjon.setArkivId(arkivInformasjonTo.getArkivId());
+		return arkivInformasjon;
 	}
 
 	private Aktoer mapAktoerTo(HentDokumenterFraJoarkTo.AktoerTo aktoer) {
@@ -84,30 +89,44 @@ public class Qdist008DistribuerForsendelseMapper {
 		switch (aktoer.getAktoerType()) {
 			case PERSON -> {
 				if (aktoer.isIdentifikatorAktoerId()) {
-					output = new AktoerId()
-							.withAktoerId(aktoer.getIdentifikator())
-							.withNavn(aktoer.getNavn());
+					AktoerId aktoerId = new AktoerId();
+					aktoerId.setAktoerId(aktoer.getIdentifikator());
+					aktoerId.setNavn(aktoer.getNavn());
+					output = aktoerId;
 				} else {
-					output = new Person()
-							.withPersonidentifikator(aktoer.getIdentifikator())
-							.withNavn(aktoer.getNavn());
+					Person person = new Person();
+					person.setPersonidentifikator(aktoer.getIdentifikator());
+					person.setNavn(aktoer.getNavn());
+					output = person;
 				}
 			}
-			case ORGANISASJON -> output = new Organisasjon()
-					.withOrgnummer(aktoer.getIdentifikator())
-					.withNavn(aktoer.getNavn());
-			case SAMHANDLER_HPR -> output = new Samhandler()
-					.withSamhandleridentifikator(aktoer.getIdentifikator())
-					.withNavn(aktoer.getNavn())
-					.withSamhandlerkategori(HPR.name());
-			case SAMHANDLER_UTL_ORG -> output = new Samhandler()
-					.withSamhandleridentifikator(aktoer.getIdentifikator())
-					.withNavn(aktoer.getNavn())
-					.withSamhandlerkategori(UTL_ORG.name());
-			case SAMHANDLER_UKJENT -> output = new Samhandler()
-					.withSamhandleridentifikator(aktoer.getIdentifikator())
-					.withNavn(aktoer.getNavn())
-					.withSamhandlerkategori(UKJENT.name());
+			case ORGANISASJON -> {
+				Organisasjon organisasjon = new Organisasjon();
+				organisasjon.setOrgnummer(aktoer.getIdentifikator());
+				organisasjon.setNavn(aktoer.getNavn());
+				output = organisasjon;
+			}
+			case SAMHANDLER_HPR -> {
+				Samhandler samhandler = new Samhandler();
+				samhandler.setSamhandleridentifikator(aktoer.getIdentifikator());
+				samhandler.setNavn(aktoer.getNavn());
+				samhandler.setSamhandlerkategori(HPR.name());
+				output = samhandler;
+			}
+			case SAMHANDLER_UTL_ORG -> {
+				Samhandler samhandler = new Samhandler();
+				samhandler.setSamhandleridentifikator(aktoer.getIdentifikator());
+				samhandler.setNavn(aktoer.getNavn());
+				samhandler.setSamhandlerkategori(UTL_ORG.name());
+				output = samhandler;
+			}
+			case SAMHANDLER_UKJENT -> {
+				Samhandler samhandler = new Samhandler();
+				samhandler.setSamhandleridentifikator(aktoer.getIdentifikator());
+				samhandler.setNavn(aktoer.getNavn());
+				samhandler.setSamhandlerkategori(UKJENT.name());
+				output = samhandler;
+			}
 			default -> output = null;
 		}
 		return output;
@@ -116,20 +135,22 @@ public class Qdist008DistribuerForsendelseMapper {
 	private Adresse mapAdresse(HentDokumenterFraJoarkTo.AdresseTo adresse) {
 		if (adresse == null) {
 			throw new ValidationException("Adresse kan ikke være null");
-		} else if (adresse instanceof HentDokumenterFraJoarkTo.NorskPostadresseTo norskPostadresse) {
-			return new NorskPostadresse()
-					.withAdresselinje1(trimAdresselinje(norskPostadresse.getAdresselinje1()))
-					.withAdresselinje2(trimAdresselinje(norskPostadresse.getAdresselinje2()))
-					.withAdresselinje3(trimAdresselinje(norskPostadresse.getAdresselinje3()))
-					.withPostnummer(norskPostadresse.getPostnummer())
-					.withPoststed(norskPostadresse.getPoststed())
-					.withLand(norskPostadresse.getLand());
-		} else if (adresse instanceof HentDokumenterFraJoarkTo.UtenlandskPostadresseTo utenlandskPostadresse) {
-			return new UtenlandskPostadresse()
-					.withAdresselinje1(trimAdresselinje(utenlandskPostadresse.getAdresselinje1()))
-					.withAdresselinje2(trimAdresselinje(utenlandskPostadresse.getAdresselinje2()))
-					.withAdresselinje3(utenlandskPostadresse.getAdresselinje3())
-					.withLand(utenlandskPostadresse.getLand());
+		} else if (adresse instanceof HentDokumenterFraJoarkTo.NorskPostadresseTo norskPostadresseTo) {
+			NorskPostadresse norskPostadresse = new NorskPostadresse();
+			norskPostadresse.setAdresselinje1(trimAdresselinje(norskPostadresseTo.getAdresselinje1()));
+			norskPostadresse.setAdresselinje2(trimAdresselinje(norskPostadresseTo.getAdresselinje2()));
+			norskPostadresse.setAdresselinje3(trimAdresselinje(norskPostadresseTo.getAdresselinje3()));
+			norskPostadresse.setPostnummer(norskPostadresseTo.getPostnummer());
+			norskPostadresse.setPoststed(norskPostadresseTo.getPoststed());
+			norskPostadresse.setLand(norskPostadresseTo.getLand());
+			return norskPostadresse;
+		} else if (adresse instanceof HentDokumenterFraJoarkTo.UtenlandskPostadresseTo utenlandskPostadresseTo) {
+			UtenlandskPostadresse utenlandskPostadresse = new UtenlandskPostadresse();
+			utenlandskPostadresse.setAdresselinje1(trimAdresselinje(utenlandskPostadresseTo.getAdresselinje1()));
+			utenlandskPostadresse.setAdresselinje2(trimAdresselinje(utenlandskPostadresseTo.getAdresselinje2()));
+			utenlandskPostadresse.setAdresselinje3(utenlandskPostadresseTo.getAdresselinje3());
+			utenlandskPostadresse.setLand(utenlandskPostadresseTo.getLand());
+			return utenlandskPostadresse;
 		} else {
 			return null;
 		}
