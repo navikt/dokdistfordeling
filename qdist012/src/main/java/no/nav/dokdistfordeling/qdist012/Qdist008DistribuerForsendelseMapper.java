@@ -53,11 +53,10 @@ public class Qdist008DistribuerForsendelseMapper {
 		distribusjonbestilling.setForsendelseTittel(distribusjonbestillingTo.getForsendelseTittel());
 		distribusjonbestilling.setDistribusjonstype(mapDistribusjonstype(distribusjonbestillingTo.getDistribusjonstype()));
 		distribusjonbestilling.setDistribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestillingTo.getDistribusjonstidspunkt()));
-		distribusjonbestilling.setArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon() == null ? null :
-				mapArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon()));
+		distribusjonbestilling.setArkivInformasjon(mapArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon()));
 		distribusjonbestilling.setMottaker(mapAktoerTo(distribusjonbestillingTo.getMottaker()));
 		distribusjonbestilling.setBruker(mapAktoerTo(distribusjonbestillingTo.getBruker()));
-		distribusjonbestilling.setAdresse(PRINT.name().equals(distribusjonbestillingTo.getDistribusjonKanal()) ? mapAdresse(distribusjonbestillingTo.getAdresse()) : null);
+		distribusjonbestilling.setAdresse(mapPrintAdresse(distribusjonbestillingTo));
 		distribusjonbestilling.setDokumentProdApp(distribusjonbestillingTo.getDokumentProdApp());
 		distribusjonbestilling.setDokumenter(distribusjonbestillingTo.getDokumenter().stream()
 				.map(dokumentInformasjonTo -> {
@@ -78,10 +77,17 @@ public class Qdist008DistribuerForsendelseMapper {
 	}
 
 	private ArkivInformasjon mapArkivInformasjon(HentDokumenterFraJoarkTo.ArkivInformasjonTo arkivInformasjonTo) {
+		if(arkivInformasjonTo == null) {
+			return null;
+		}
 		ArkivInformasjon arkivInformasjon = new ArkivInformasjon();
 		arkivInformasjon.setArkivSystem(arkivInformasjonTo.getArkivSystem());
 		arkivInformasjon.setArkivId(arkivInformasjonTo.getArkivId());
 		return arkivInformasjon;
+	}
+
+	private Adresse mapPrintAdresse(HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestillingTo) {
+		return PRINT.name().equals(distribusjonbestillingTo.getDistribusjonKanal()) ? mapAdresse(distribusjonbestillingTo.getAdresse()) : null;
 	}
 
 	private Aktoer mapAktoerTo(HentDokumenterFraJoarkTo.AktoerTo aktoer) {

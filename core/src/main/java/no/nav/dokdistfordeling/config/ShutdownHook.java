@@ -1,11 +1,10 @@
 package no.nav.dokdistfordeling.config;
 
+import jakarta.annotation.PreDestroy;
+import jakarta.jms.ConnectionFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PreDestroy;
-import jakarta.jms.ConnectionFactory;
 
 /**
  * Rydder opp ressurser som Spring ikke gjør selv.

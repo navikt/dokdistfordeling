@@ -3,7 +3,6 @@ package no.nav.dokdistfordeling;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
-import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
@@ -28,6 +27,9 @@ import static java.util.Objects.isNull;
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
+import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
+import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.FNR;
+import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.ORGNR;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
@@ -118,21 +120,23 @@ public class HentDokumenterFraJoarkMapper {
 	}
 
 	private Aktoer mapBruker(Journalpost.Bruker bruker) {
-		if (BrukerIdType.FNR.equals(bruker.getType())) {
-			Person person = new Person();
-			person.setPersonidentifikator(bruker.getId());
-			return person;
-		} else if (BrukerIdType.AKTOERID.equals(bruker.getType())) {
-			AktoerId aktoerId = new AktoerId();
-			aktoerId.setAktoerId(bruker.getId());
-			return aktoerId;
-		} else if (BrukerIdType.ORGNR.equals(bruker.getType())) {
-			Organisasjon organisasjon = new Organisasjon();
-			organisasjon.setOrgnummer(bruker.getId());
-			return organisasjon;
-		} else {
-			throw new ValidationException(String.format("BrukerIdType var ikke som forventet, fikk brukerIdType=%s, men forventet FNR, AKTOERID eller ORGNR", bruker.getType().name()));
-		}
+		return switch (bruker.getType()) {
+			case AKTOERID -> {
+				AktoerId aktoerId = new AktoerId();
+				aktoerId.setAktoerId(bruker.getId());
+				yield aktoerId;
+			}
+			case FNR -> {
+				Person person = new Person();
+				person.setPersonidentifikator(bruker.getId());
+				yield person;
+			}
+			case ORGNR -> {
+				Organisasjon organisasjon = new Organisasjon();
+				organisasjon.setOrgnummer(bruker.getId());
+				yield organisasjon;
+			}
+		};
 	}
 
 	private String mapDistribusjonstidspunkt(String distribusjonstidspunkt) {

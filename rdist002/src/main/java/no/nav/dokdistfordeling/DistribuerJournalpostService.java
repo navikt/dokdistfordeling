@@ -138,15 +138,14 @@ public class DistribuerJournalpostService {
 	}
 
 	private Aktoer mapMottaker(Journalpost.AvsenderMottaker avsenderMottaker) {
-		Aktoer output;
-		if (avsenderMottaker.getType() == null || isEmpty(avsenderMottaker.getType().name())) {
+		if (avsenderMottaker.getType() == null) {
 			Samhandler samhandler = new Samhandler();
 			samhandler.setNavn(avsenderMottaker.getNavn());
 			samhandler.setSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()));
 			samhandler.setSamhandlerkategori(SamhandlerKategoriCode.UKJENT.name());
-			output = samhandler;
+			return samhandler;
 		} else {
-			output = switch (avsenderMottaker.getType()) {
+			return switch (avsenderMottaker.getType()) {
 				case FNR -> {
 					Person person = new Person();
 					person.setNavn(avsenderMottaker.getNavn());
@@ -182,7 +181,6 @@ public class DistribuerJournalpostService {
 				}
 			};
 		}
-		return output;
 	}
 
 	private String determineAvsenderMottakerId(String mottakerId) {
