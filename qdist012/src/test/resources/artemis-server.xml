@@ -1,0 +1,40 @@
+<configuration xmlns="urn:activemq" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			   xsi:schemaLocation="urn:activemq /schema/artemis-configuration.xsd">
+	<core xmlns="urn:activemq:core">
+		<acceptors>
+			<acceptor name="invm">vm://0</acceptor>
+		</acceptors>
+		<security-enabled>false</security-enabled>
+		<persistence-enabled>false</persistence-enabled>
+		<address-settings>
+			<address-setting match="qdist012">
+				<dead-letter-address>qdist012Bq</dead-letter-address>
+				<expiry-address>qdist012Bq</expiry-address>
+				<max-delivery-attempts>1</max-delivery-attempts>
+			</address-setting>
+		</address-settings>
+
+		<addresses>
+			<address name="qdist008">
+				<anycast>
+					<queue name="qdist008"/>
+				</anycast>
+			</address>
+			<address name="qdist012">
+				<anycast>
+					<queue name="qdist012"/>
+				</anycast>
+			</address>
+			<address name="qdist012FunkFeil">
+				<anycast>
+					<queue name="qdist012FunkFeil"/>
+				</anycast>
+			</address>
+			<address name="qdist012Bq">
+				<anycast>
+					<queue name="qdist012Bq"/>
+				</anycast>
+			</address>
+		</addresses>
+	</core>
+</configuration>

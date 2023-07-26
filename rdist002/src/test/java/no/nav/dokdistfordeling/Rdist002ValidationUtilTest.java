@@ -16,8 +16,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.util.Arrays;
 
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateAdresse;
-import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateJournalpostAndDokumenter;
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateDistribuerJournalpostRequest;
+import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateJournalpostAndDokumenter;
 import static no.nav.dokdistfordeling.UnitTestUtil.BATCH_ID;
 import static no.nav.dokdistfordeling.UnitTestUtil.BESTILLENDEFAGSYSTEM;
 import static no.nav.dokdistfordeling.UnitTestUtil.BRUKER_ID;
@@ -186,21 +186,22 @@ public class Rdist002ValidationUtilTest {
 
 	@Test
 	public void shouldThrowValidationExceptionFromSamhandlerWithoutAdresse() {
-		Samhandler mottaker = new Samhandler()
-				.withNavn(MOTTAKER_NAVN)
-				.withSamhandleridentifikator(MOTTAKER_ID);
-		Exception thrownException = assertThrows(ValidationException.class, () -> validateAdresse(null, mottaker));
+		Samhandler samhandler = new Samhandler();
+		samhandler.setNavn(MOTTAKER_NAVN);
+		samhandler.setSamhandleridentifikator(MOTTAKER_ID);
+
+		Exception thrownException = assertThrows(ValidationException.class, () -> validateAdresse(null, samhandler));
 		assertEquals("For mottaker av type samhandler kan ikke adresse være null", thrownException.getMessage());
 	}
 
 	@Test
 	public void shouldThrowValidationExceptionForMissingAdresseType() {
-		Person mottaker = new Person()
-				.withNavn(MOTTAKER_NAVN)
-				.withPersonidentifikator(MOTTAKER_ID);
+		Person person = new Person();
+		person.setNavn(MOTTAKER_NAVN);
+		person.setPersonidentifikator(MOTTAKER_ID);
 
 		DistribuerJournalpostRequestTo.AdresseTo adresseWithNullAdressType = createPostadresseAdresstypeNull();
-		Exception thrownException = assertThrows(ValidationException.class, () -> validateAdresse(adresseWithNullAdressType, mottaker));
+		Exception thrownException = assertThrows(ValidationException.class, () -> validateAdresse(adresseWithNullAdressType, person));
 		assertEquals("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, adresseType= null", thrownException.getMessage());
 
 	}
@@ -331,9 +332,9 @@ public class Rdist002ValidationUtilTest {
 						createDokumentInfo2Builder().build()))
 				.build();
 		Exception thrownException = assertThrows(BrukerManglerTilgangTilDokumentFunctionalException.class, () -> validateJournalpostAndDokumenter(journalpost));
-		assertEquals("Systembruker eller saksbehandler har ikke tilgang til dokumentInfoId=666666666 og kan derfor ikke bestille distribusjon. "+
-				"For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. "+
-				"For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
-				"Kontakt oss på #team_dokumentløsninger for bistand.", thrownException.getMessage());
+		assertEquals("Systembruker eller saksbehandler har ikke tilgang til dokumentInfoId=666666666 og kan derfor ikke bestille distribusjon. " +
+					 "For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. " +
+					 "For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
+					 "Kontakt oss på #team_dokumentløsninger for bistand.", thrownException.getMessage());
 	}
 }

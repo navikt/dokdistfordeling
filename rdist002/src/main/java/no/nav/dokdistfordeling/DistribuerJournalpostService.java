@@ -23,8 +23,8 @@ import java.util.UUID;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateAdresse;
-import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateJournalpostAndDokumenter;
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateDistribuerJournalpostRequest;
+import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateJournalpostAndDokumenter;
 import static no.nav.dokdistfordeling.constants.Constants.DOKDISTBESTILLINGS_ID;
 import static no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType.UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
@@ -128,42 +128,59 @@ public class DistribuerJournalpostService {
 
 	private DistribuerJournalpostRequestTo.AdresseTo hentAdresse(Journalpost.AvsenderMottaker avsenderMottaker, String tema) {
 		return switch (avsenderMottaker.getType()) {
-			case FNR -> regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentPersonAdresse(avsenderMottaker.getId(), tema));
-			case ORGNR -> regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentOrganisasjonAdresse(avsenderMottaker.getId()));
-			default -> throw new ValidationException("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis adresse ikke oppgis i request.");
+			case FNR ->
+					regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentPersonAdresse(avsenderMottaker.getId(), tema));
+			case ORGNR ->
+					regoppslagAdresseMapper.mapAdresseTo(regoppslag.hentOrganisasjonAdresse(avsenderMottaker.getId()));
+			default ->
+					throw new ValidationException("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis adresse ikke oppgis i request.");
 		};
 	}
 
 	private Aktoer mapMottaker(Journalpost.AvsenderMottaker avsenderMottaker) {
-		Aktoer output;
-		if (avsenderMottaker.getType() == null || isEmpty(avsenderMottaker.getType().name())) {
-			output = new Samhandler()
-					.withNavn(avsenderMottaker.getNavn())
-					.withSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()))
-					.withSamhandlerkategori(SamhandlerKategoriCode.UKJENT.name());
+		if (avsenderMottaker.getType() == null) {
+			Samhandler samhandler = new Samhandler();
+			samhandler.setNavn(avsenderMottaker.getNavn());
+			samhandler.setSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()));
+			samhandler.setSamhandlerkategori(SamhandlerKategoriCode.UKJENT.name());
+			return samhandler;
 		} else {
-			output = switch (avsenderMottaker.getType()) {
-				case FNR -> new Person()
-						.withNavn(avsenderMottaker.getNavn())
-						.withPersonidentifikator(avsenderMottaker.getId());
-				case ORGNR -> new Organisasjon()
-						.withNavn(avsenderMottaker.getNavn())
-						.withOrgnummer(avsenderMottaker.getId());
-				case HPRNR -> new Samhandler()
-						.withNavn(avsenderMottaker.getNavn())
-						.withSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()))
-						.withSamhandlerkategori(SamhandlerKategoriCode.HPR.name());
-				case UTL_ORG -> new Samhandler()
-						.withNavn(avsenderMottaker.getNavn())
-						.withSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()))
-						.withSamhandlerkategori(SamhandlerKategoriCode.UTL_ORG.name());
-				case UKJENT -> new Samhandler()
-						.withNavn(avsenderMottaker.getNavn())
-						.withSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()))
-						.withSamhandlerkategori(SamhandlerKategoriCode.UKJENT.name());
+			return switch (avsenderMottaker.getType()) {
+				case FNR -> {
+					Person person = new Person();
+					person.setNavn(avsenderMottaker.getNavn());
+					person.setPersonidentifikator(avsenderMottaker.getId());
+					yield person;
+				}
+				case ORGNR -> {
+					Organisasjon organisasjon = new Organisasjon();
+					organisasjon.setNavn(avsenderMottaker.getNavn());
+					organisasjon.setOrgnummer(avsenderMottaker.getId());
+					yield organisasjon;
+				}
+				case HPRNR -> {
+					Samhandler samhandler = new Samhandler();
+					samhandler.setNavn(avsenderMottaker.getNavn());
+					samhandler.setSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()));
+					samhandler.setSamhandlerkategori(SamhandlerKategoriCode.HPR.name());
+					yield samhandler;
+				}
+				case UTL_ORG -> {
+					Samhandler samhandler = new Samhandler();
+					samhandler.setNavn(avsenderMottaker.getNavn());
+					samhandler.setSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()));
+					samhandler.setSamhandlerkategori(SamhandlerKategoriCode.UTL_ORG.name());
+					yield samhandler;
+				}
+				case UKJENT -> {
+					Samhandler samhandler = new Samhandler();
+					samhandler.setNavn(avsenderMottaker.getNavn());
+					samhandler.setSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()));
+					samhandler.setSamhandlerkategori(SamhandlerKategoriCode.UKJENT.name());
+					yield samhandler;
+				}
 			};
 		}
-		return output;
 	}
 
 	private String determineAvsenderMottakerId(String mottakerId) {

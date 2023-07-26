@@ -8,7 +8,6 @@ import no.nav.dokdistfordeling.storage.BucketStorage;
 import no.nav.dokdistfordeling.storage.DokdistDokument;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
-import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
@@ -26,12 +25,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.TextMessage;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.jms.JMSException;
+import jakarta.jms.Queue;
+import jakarta.jms.TextMessage;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -90,7 +89,7 @@ public class Qdist012IT {
 	private Queue qdist012;
 
 	@Autowired
-	private Queue backoutQueue;
+	private Queue qdist012Bq;
 
 	@Autowired
 	private BucketStorage bucketStorage;
@@ -235,7 +234,7 @@ public class Qdist012IT {
 	public void shouldThrowFunctionalExceptionMissingBestillingsId() throws Exception {
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		jmsTemplate.send(qdist012, session -> {
-			TextMessage msg = new ActiveMQTextMessage();
+			TextMessage msg = session.createTextMessage();
 			final String encryptedMessage = new Crypto(encryptionPassphrase, BESTILLINGS_ID).encrypt(message);
 			msg.setText(encryptedMessage);
 			msg.setStringProperty(JOURNALPOST_ID_ATTRIBUTE, JOURNALPOST_ID);
@@ -258,7 +257,7 @@ public class Qdist012IT {
 	public void shouldThrowFunctionalExceptionEmptyBestillingsId() throws Exception {
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		jmsTemplate.send(qdist012, session -> {
-			TextMessage msg = new ActiveMQTextMessage();
+			TextMessage msg = session.createTextMessage();
 			final String encryptedMessage = new Crypto(encryptionPassphrase, BESTILLINGS_ID).encrypt(message);
 			msg.setText(encryptedMessage);
 			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, "");
@@ -283,7 +282,7 @@ public class Qdist012IT {
 	public void shouldThrowFunctionalExceptionMissingJournalpostIdHeader() throws Exception {
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		jmsTemplate.send(qdist012, session -> {
-			TextMessage msg = new ActiveMQTextMessage();
+			TextMessage msg = session.createTextMessage();
 			final String encryptedMessage = new Crypto(encryptionPassphrase, BESTILLINGS_ID).encrypt(message);
 			msg.setText(encryptedMessage);
 			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, BESTILLINGS_ID);
@@ -305,7 +304,7 @@ public class Qdist012IT {
 	public void shouldThrowFunctionalExceptionEmptyJournalpostIdheader() throws Exception {
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		jmsTemplate.send(qdist012, session -> {
-			TextMessage msg = new ActiveMQTextMessage();
+			TextMessage msg = session.createTextMessage();
 			final String encryptedMessage = new Crypto(encryptionPassphrase, BESTILLINGS_ID).encrypt(message);
 			msg.setText(encryptedMessage);
 			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, BESTILLINGS_ID);
@@ -330,7 +329,7 @@ public class Qdist012IT {
 	public void shouldThrowFunctionalCryptoExceptionWrongSalt() throws Exception {
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		jmsTemplate.send(qdist012, session -> {
-			TextMessage msg = new ActiveMQTextMessage();
+			TextMessage msg = session.createTextMessage();
 			final String encryptedMessage = new Crypto(encryptionPassphrase, "thisKeyShouldBeBestillingsId").encrypt(message);
 			msg.setText(encryptedMessage);
 			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, BESTILLINGS_ID);
@@ -353,7 +352,7 @@ public class Qdist012IT {
 	public void shouldThrowFunctionalCryptoExceptionMessageNotEncrypted() throws Exception {
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		jmsTemplate.send(qdist012, session -> {
-			TextMessage msg = new ActiveMQTextMessage();
+			TextMessage msg = session.createTextMessage();
 			msg.setText(message);
 			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, BESTILLINGS_ID);
 			msg.setStringProperty(JOURNALPOST_ID_ATTRIBUTE, JOURNALPOST_ID);
@@ -390,7 +389,7 @@ public class Qdist012IT {
 		encryptAndSendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(backoutQueue);
+			String response = receiveFromBoqAndAssertHeaders(qdist012Bq);
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
@@ -411,7 +410,7 @@ public class Qdist012IT {
 		encryptAndSendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(backoutQueue);
+			String response = receiveFromBoqAndAssertHeaders(qdist012Bq);
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
@@ -434,7 +433,7 @@ public class Qdist012IT {
 		encryptAndSendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(backoutQueue);
+			String response = receiveFromBoqAndAssertHeaders(qdist012Bq);
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
@@ -483,7 +482,7 @@ public class Qdist012IT {
 		encryptAndSendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(15, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(backoutQueue);
+			String response = receiveFromBoqAndAssertHeaders(qdist012Bq);
 			assertNotNull(response);
 			assertEquals(message, decryptXml(response));
 		});
@@ -526,7 +525,7 @@ public class Qdist012IT {
 
 	private void encryptAndSendStringMessageWithHeaders(Queue queue, final String message, final String callId) {
 		jmsTemplate.send(queue, session -> {
-			TextMessage msg = new ActiveMQTextMessage();
+			TextMessage msg = session.createTextMessage();
 			final String encryptedMessage = new Crypto(encryptionPassphrase, BESTILLINGS_ID).encrypt(message);
 			msg.setText(encryptedMessage);
 			if (callId != null) {

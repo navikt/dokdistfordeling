@@ -4,10 +4,12 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import jakarta.jms.Queue;
+import jakarta.jms.TextMessage;
+import jakarta.xml.bind.JAXBElement;
 import no.nav.dokdistfordeling.itest.config.Qdist008ItestConfig;
 import no.nav.dokdistfordeling.qdist008.Qdist008Route;
 import no.nav.dokdistfordeling.storage.BucketStorage;
-import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
@@ -25,9 +27,6 @@ import org.springframework.http.MediaType;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.jms.Queue;
-import javax.jms.TextMessage;
-import javax.xml.bind.JAXBElement;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -89,6 +88,9 @@ public class Qdist008IT {
 	private Queue qdist008FunksjonellFeil;
 
 	@Autowired
+	private Queue qdist008Bq;
+
+	@Autowired
 	private Queue qdist009;
 
 	@Autowired
@@ -102,9 +104,6 @@ public class Qdist008IT {
 
 	@Autowired
 	private Queue qdist016;
-
-	@Autowired
-	private Queue backoutQueue;
 
 	@Autowired
 	private BucketStorage bucketStorage;
@@ -140,7 +139,7 @@ public class Qdist008IT {
 
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
-						.withStatus(HttpStatus.OK.value())));
+						 .withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -538,7 +537,7 @@ public class Qdist008IT {
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String resultOnQdist008BackoutQueue = receive(backoutQueue);
+			String resultOnQdist008BackoutQueue = receive(qdist008Bq);
 			assertThat(resultOnQdist008BackoutQueue).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 		});
 
@@ -636,7 +635,7 @@ public class Qdist008IT {
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String resultOnQdist008BackoutQueue = receive(backoutQueue);
+			String resultOnQdist008BackoutQueue = receive(qdist008Bq);
 			assertNotNull(resultOnQdist008BackoutQueue);
 			assertEquals(resultOnQdist008BackoutQueue, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 		});
@@ -736,7 +735,7 @@ public class Qdist008IT {
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String resultOnQdist008BackoutQueue = receive(backoutQueue);
+			String resultOnQdist008BackoutQueue = receive(qdist008Bq);
 			assertThat(resultOnQdist008BackoutQueue).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 		});
 
@@ -762,7 +761,7 @@ public class Qdist008IT {
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
 		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
-			String resultOnQdist008BackoutQueue = receive(backoutQueue);
+			String resultOnQdist008BackoutQueue = receive(qdist008Bq);
 			assertThat(resultOnQdist008BackoutQueue).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 		});
 
@@ -823,7 +822,7 @@ public class Qdist008IT {
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
 		await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
-			String resultOnQdist008BackoutQueue = receive(backoutQueue);
+			String resultOnQdist008BackoutQueue = receive(qdist008Bq);
 			assertThat(resultOnQdist008BackoutQueue).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 		});
 
@@ -878,7 +877,7 @@ public class Qdist008IT {
 
 	private void sendStringMessage(Queue queue, final String message, final String callId) {
 		jmsTemplate.send(queue, session -> {
-			TextMessage msg = new ActiveMQTextMessage();
+			TextMessage msg = session.createTextMessage();
 			msg.setText(message);
 			if (callId != null) {
 				msg.setStringProperty(CALL_ID, callId);

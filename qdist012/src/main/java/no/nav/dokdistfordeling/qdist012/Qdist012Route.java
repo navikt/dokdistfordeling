@@ -10,8 +10,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.stereotype.Component;
 
-import javax.jms.Queue;
-import javax.xml.bind.JAXBContext;
+import jakarta.jms.Queue;
+import jakarta.xml.bind.JAXBContext;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.camel.ExchangePattern.InOnly;

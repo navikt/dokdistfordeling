@@ -14,11 +14,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.jms.Queue;
-import javax.jms.TextMessage;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.jms.Queue;
+import jakarta.jms.TextMessage;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import java.io.StringWriter;
 
 @Slf4j
@@ -27,14 +27,20 @@ public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseP
 
 	private final String encryptionPassphrase;
 	private final JmsTemplate jmsTemplate;
+	private final JAXBContext jaxbContext;
 	private final Queue qdist012;
 
 	public DistribuerForsendelseProducerImpl(JmsTemplate jmsTemplate,
 											 Queue qdist012,
 											 @Value("${hentdokumenter_fra_joark_crypto_password}") String encryptionPassphrase) {
-		this.jmsTemplate = jmsTemplate;
-		this.qdist012 = qdist012;
 		this.encryptionPassphrase = encryptionPassphrase;
+		this.jmsTemplate = jmsTemplate;
+		try {
+			this.jaxbContext = JAXBContext.newInstance(HentDokumenterFraJoark.class);
+		} catch (JAXBException e) {
+			throw new MarshalHentDokumenterFraJoarkTechnicalException("Kunne ikke sette opp JAXBContext", e);
+		}
+		this.qdist012 = qdist012;
 	}
 
 	@Override
@@ -56,7 +62,6 @@ public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseP
 
 	private String marshalHentDokumenterFraJoarkToXmlStringAndEncrypt(HentDokumenterFraJoark hentDokumenterFraJoark, String bestillingsId) {
 		try {
-			JAXBContext jaxbContext = JAXBContext.newInstance(HentDokumenterFraJoark.class);
 			Marshaller marshaller = jaxbContext.createMarshaller();
 
 			StringWriter sw = new StringWriter();

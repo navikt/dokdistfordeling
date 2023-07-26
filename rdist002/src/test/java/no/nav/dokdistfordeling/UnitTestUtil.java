@@ -114,7 +114,7 @@ public class UnitTestUtil {
 	public static DistribuerJournalpostRequestTo.AdresseTo createNorskPostadresseWithPostSted(String poststed) {
 		return createBaseNorskPostadresse(POSTNUMMER, LAND_NO, poststed);
 	}
-	
+
 	public static DistribuerJournalpostRequestTo.AdresseTo createNorskPostadresseWithPostnummer(String postnummer) {
 		return createBaseNorskPostadresse(postnummer, LAND_NO, POSTSTED);
 	}
@@ -127,7 +127,7 @@ public class UnitTestUtil {
 		return createBaseNorskPostadresse(POSTNUMMER, LAND_NO, POSTSTED);
 	}
 
-	private static DistribuerJournalpostRequestTo.AdresseTo createBaseNorskPostadresse(String postnummer, String landkode, String poststed){
+	private static DistribuerJournalpostRequestTo.AdresseTo createBaseNorskPostadresse(String postnummer, String landkode, String poststed) {
 		return new DistribuerJournalpostRequestTo.AdresseTo(
 				ADRESSETYPE_NORSK,
 				postnummer,
@@ -139,10 +139,11 @@ public class UnitTestUtil {
 		);
 	}
 
-	public static Person createMottaker(){
-		return new Person()
-				.withNavn(MOTTAKER_NAVN)
-				.withPersonidentifikator(MOTTAKER_ID);
+	public static Person createMottaker() {
+		Person person = new Person();
+		person.setNavn(MOTTAKER_NAVN);
+		person.setPersonidentifikator(MOTTAKER_ID);
+		return person;
 	}
 
 	public static DistribuerJournalpostRequestTo.AdresseTo createUtenlandskPostadresse() {
