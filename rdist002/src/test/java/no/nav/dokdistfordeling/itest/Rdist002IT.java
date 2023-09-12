@@ -1,6 +1,11 @@
 package no.nav.dokdistfordeling.itest;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Queue;
+import jakarta.jms.TextMessage;
+import jakarta.xml.bind.JAXBException;
 import no.nav.dokdistfordeling.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.DistribuerJournalpostResponseTo;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
@@ -27,11 +32,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import jakarta.jms.JMSException;
-import jakarta.jms.Message;
-import jakarta.jms.Queue;
-import jakarta.jms.TextMessage;
-import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -187,11 +187,11 @@ public class Rdist002IT {
 				.withBodyFile("pdl/pdl-happy.json")));
 
 		stubFor(post("/bestemDistribusjonKanal")
-					.withRequestBody(containing("\"mottakerId\":\"0\""))
-					.withRequestBody(containing("\"mottakerType\":\"SAMHANDLER_UKJENT\""))
+				.withRequestBody(containing("\"mottakerId\":\"0\""))
+				.withRequestBody(containing("\"mottakerType\":\"SAMHANDLER_UKJENT\""))
 				.willReturn(aResponse().withStatus(HttpStatus.OK.value())
-					.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
-					.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
+						.withBodyFile("bestemkanal/distribusjonsKanalPrint.json")));
 
 		putStubOppdaterJournalpost();
 
@@ -591,24 +591,6 @@ public class Rdist002IT {
 		assertNull(restResponse.getBestillingsId());
 	}
 
-	/*
-	// Før gjorde man en sjekk i safQueryConsumer på om svaret inneholdt en journalpost. Hvvis ikke ble det kasta en journalpostIkkeFunnetException
-	// Dette skal nå kunne fjernes siden vi nå sjekker om saf returnerer en NOT_FOUND i errors i svaret
-	@Test
-	public void distribuerJournalpostThrowsSafJournalpostIkkeFunnetFunctionalException() {
-		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
-				.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())));
-
-		putStubOppdaterJournalpost();
-
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
-		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.NOT_FOUND);
-
-		assertNull(restResponse.getBestillingsId());
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
-	}*/
-
 	@Test
 	public void distribuerJournalpostThrowsSafJournalpostQueryUnauthorizedException() {
 		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.UNAUTHORIZED.value())
@@ -703,7 +685,7 @@ public class Rdist002IT {
 	}
 
 	@Test
-	void shouldReturnNotFoundWhenRequestHasNoAdresseAndMottakerErDoed() {
+	void shouldReturnGoneWhenRequestHasNoAdresseAndMottakerErDoed() {
 		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
