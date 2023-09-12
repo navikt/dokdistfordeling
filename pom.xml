@@ -26,7 +26,7 @@
     <properties>
         <java.version>17</java.version>
 
-        <camel.version>4.0.0-RC1</camel.version>
+        <camel.version>4.0.0</camel.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <ibm.mq.client.version>9.3.3.0</ibm.mq.client.version>
         <commons-io.version>2.13.0</commons-io.version>
