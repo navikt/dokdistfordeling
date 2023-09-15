@@ -85,6 +85,7 @@ public class SafJournalpostQueryServiceImpl implements SafJournalpostQueryServic
 					      dokumentvarianter {
 					        saksbehandlerHarTilgang
 					        variantformat
+					        filstoerrelse
 					      }
 					    }
 					  }

@@ -26,7 +26,8 @@
             },
             {
               "saksbehandlerHarTilgang": false,
-              "variantformat": "ARKIV"
+              "variantformat": "ARKIV",
+              "filstoerrelse": 259863
             }
           ]
         },
@@ -38,7 +39,8 @@
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "ARKIV"
+              "variantformat": "ARKIV",
+              "filstoerrelse": 2598637
             }
           ]
         }

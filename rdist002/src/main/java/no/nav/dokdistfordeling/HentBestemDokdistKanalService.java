@@ -9,9 +9,12 @@ import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentFor
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import org.springframework.stereotype.Component;
 
+import java.util.stream.Stream;
+
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Slf4j
@@ -51,12 +54,13 @@ public class HentBestemDokdistKanalService {
 				.mottakerType(getMottakerType(journalpost.getAvsenderMottaker()))
 				.erArkivert(true)
 				.tema(journalpost.getTema())
+				.forsendelseStoerrelse(getFilstoerrelse(journalpost))
 				.build();
 
 		return bestemDokdistkanal.bestemKanal(request);
 	}
 
-	private String determineMottakerId(String mottakerId){
+	private String determineMottakerId(String mottakerId) {
 		return isEmpty(mottakerId) ? "0" : mottakerId;
 	}
 
@@ -65,7 +69,7 @@ public class HentBestemDokdistKanalService {
 	}
 
 	private String getMottakerType(Journalpost.AvsenderMottaker avsenderMottaker) {
-		if(avsenderMottaker.getType() == null || isEmpty(avsenderMottaker.getType().name())){
+		if (avsenderMottaker.getType() == null || isEmpty(avsenderMottaker.getType().name())) {
 			return SAMHANDLER_UKJENT;
 		}
 		return switch (avsenderMottaker.getType()) {
@@ -74,5 +78,21 @@ public class HentBestemDokdistKanalService {
 			case UKJENT -> SAMHANDLER_UKJENT;
 			default -> SAMHANDLER_PREFIX + "_" + avsenderMottaker.getType();
 		};
+	}
+
+	private int getFilstoerrelse(Journalpost journalpost) {
+		return journalpost.getDokumenter().stream()
+				.flatMap(HentBestemDokdistKanalService::apply)
+				.map(dokumentvariant -> {
+					if (SLADDET.equals(dokumentvariant.getVariantformat())) {
+						return dokumentvariant.getFilstoerrelse();
+					}
+					return dokumentvariant.getFilstoerrelse();
+				}).mapToInt(Integer::intValue).sum() / (1024 * 1024);
+
+	}
+
+	private static Stream<? extends Journalpost.Dokumentvariant> apply(Journalpost.DokumentInfo dokumentInfo) {
+		return dokumentInfo.getDokumentvarianter().stream();
 	}
 }

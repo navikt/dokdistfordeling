@@ -59,5 +59,6 @@ public class SafJournalpostTo {
 	public static class Dokumentvariant {
 		String variantformat;
 		boolean saksbehandlerHarTilgang;
+		int filstoerrelse;
 	}
 }
