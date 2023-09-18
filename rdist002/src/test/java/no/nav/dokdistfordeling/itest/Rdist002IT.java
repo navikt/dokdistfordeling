@@ -622,8 +622,8 @@ public class Rdist002IT {
 	@CsvSource({
 			"safgraphql-bad_request.json,Bad request,400",
 			"safgraphql-not_found.json,Fant ikke journalpost,404",
-			"safgraphql-unauthorized.json,Bruker er unauthorized,401"
-
+			"safgraphql-unauthorized.json,Bruker er unauthorized,401",
+			"safgraphql-validationerror-query.json,Feil i saf query,500",
 	})
 	void shouldReturnCorrecteErrorTypeWhenSafRequestFails(String filename, String errorMessage, int httpErrorCode) {
 		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
