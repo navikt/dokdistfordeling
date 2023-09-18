@@ -9,12 +9,12 @@ import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentFor
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.List;
 
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
@@ -55,7 +55,7 @@ public class HentBestemDokdistKanalService {
 				.mottakerType(getMottakerType(journalpost.getAvsenderMottaker()))
 				.erArkivert(true)
 				.tema(journalpost.getTema())
-				.forsendelseStoerrelse(getFilstoerrelse(journalpost))
+				.forsendelseStoerrelse(getFilstoerrelseMB(journalpost))
 				.build();
 
 		return bestemDokdistkanal.bestemKanal(request);
@@ -81,19 +81,26 @@ public class HentBestemDokdistKanalService {
 		};
 	}
 
-	private Integer getFilstoerrelse(Journalpost journalpost) {
+	private int getFilstoerrelseMB(Journalpost journalpost) {
 		return journalpost.getDokumenter().stream()
-				.flatMap(HentBestemDokdistKanalService::apply)
-				.map(dokumentvariant -> {
-					if (SLADDET.equals(dokumentvariant.getVariantformat())) {
-						return dokumentvariant.getFilstoerrelse();
-					}
-					return dokumentvariant.getFilstoerrelse();
-				}).filter(Objects::nonNull).mapToInt(Integer::intValue).sum() / (1024 * 1024);
+				.map(dokumentInfo -> getSladdetOrArkivFilstoerrelse(dokumentInfo.getDokumentvarianter()))
+				.mapToInt(Integer::intValue)
+				.sum() / (1024 * 1024);
 
 	}
 
-	private static Stream<? extends Journalpost.Dokumentvariant> apply(Journalpost.DokumentInfo dokumentInfo) {
-		return dokumentInfo.getDokumentvarianter().stream();
+	private static Integer getSladdetOrArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
+		return dokumentvariants.stream()
+				.filter(dokumentvariant -> SLADDET.equals(dokumentvariant.getVariantformat()))
+				.map(dokumentvariant -> dokumentvariant.getFilstoerrelse())
+				.findFirst()
+				.orElse(getArkivFilstoerrelse(dokumentvariants));
+	}
+
+	private static Integer getArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
+		return dokumentvariants.stream()
+				.filter(dokumentvariant -> ARKIV.equals(dokumentvariant.getVariantformat()))
+				.map(dokumentvariant -> dokumentvariant.getFilstoerrelse())
+				.findFirst().orElse(0);
 	}
 }

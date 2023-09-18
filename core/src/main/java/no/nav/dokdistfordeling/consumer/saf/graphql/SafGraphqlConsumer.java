@@ -30,7 +30,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 
-import static java.util.Objects.isNull;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 
@@ -66,18 +65,21 @@ public class SafGraphqlConsumer {
 
 			if (result.getErrors() != null && result.getErrors().size() > 0) {
 				no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonResponse.Error safError = result.getErrors().get(0);
-				String safErrorCode = isNull(safError) || isNull(safError.getExtensions()) ? null : safError.getExtensions().getCode();
+				String safErrorCode = safError.getExtensions().getCode();
 
 				switch (safErrorCode) {
-					case NOT_FOUND -> throw new SafJournalpostIkkeFunnetTechnicalException("Fant ikke journalposten i fagarkivet");
+					case NOT_FOUND ->
+							throw new SafJournalpostIkkeFunnetTechnicalException("Fant ikke journalposten i fagarkivet");
 					case FORBIDDEN -> throw new SafJournalpostQueryUnauthorizedException(
 							"Saksbehandler har ikke tilgang til journalposten. Feilmelding fra SAF: " + safError.getMessage());
 					case SERVER_ERROR -> {
 						log.warn("Teknisk feil mot SAF. Feilmelding: " + safError.getMessage());
 						throw new SafJournalpostQueryTechnicalException(safError.getMessage());
 					}
-					case BAD_REQUEST -> throw new SafBadRequestException("Bad request mot SAF: " + safError.getMessage());
-					default -> throw new SafBadRequestException("Ukjent funksjonell feil mot SAF: " + safError.getMessage());
+					case BAD_REQUEST ->
+							throw new SafBadRequestException("Bad request mot SAF: " + safError.getMessage());
+					default ->
+							throw new SafBadRequestException("Ukjent funksjonell feil mot SAF: " + safError.getMessage());
 				}
 			}
 
