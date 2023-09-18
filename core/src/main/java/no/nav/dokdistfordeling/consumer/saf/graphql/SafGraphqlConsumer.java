@@ -30,6 +30,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 
+import static java.util.Objects.isNull;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 
@@ -65,7 +66,7 @@ public class SafGraphqlConsumer {
 
 			if (result.getErrors() != null && result.getErrors().size() > 0) {
 				no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonResponse.Error safError = result.getErrors().get(0);
-				String safErrorCode = safError.getExtensions().getCode();
+				String safErrorCode = isNull(safError) || isNull(safError.getExtensions()) ? null : safError.getExtensions().getCode();
 
 				switch (safErrorCode) {
 					case NOT_FOUND -> throw new SafJournalpostIkkeFunnetTechnicalException("Fant ikke journalposten i fagarkivet");
