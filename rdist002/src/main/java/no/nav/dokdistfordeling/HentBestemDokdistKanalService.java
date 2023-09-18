@@ -9,6 +9,7 @@ import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentFor
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
@@ -80,7 +81,7 @@ public class HentBestemDokdistKanalService {
 		};
 	}
 
-	private int getFilstoerrelse(Journalpost journalpost) {
+	private Integer getFilstoerrelse(Journalpost journalpost) {
 		return journalpost.getDokumenter().stream()
 				.flatMap(HentBestemDokdistKanalService::apply)
 				.map(dokumentvariant -> {
@@ -88,7 +89,7 @@ public class HentBestemDokdistKanalService {
 						return dokumentvariant.getFilstoerrelse();
 					}
 					return dokumentvariant.getFilstoerrelse();
-				}).mapToInt(Integer::intValue).sum() / (1024 * 1024);
+				}).filter(Objects::nonNull).mapToInt(Integer::intValue).sum() / (1024 * 1024);
 
 	}
 
