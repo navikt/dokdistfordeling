@@ -40,11 +40,13 @@
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "SLADDET"
+              "variantformat": "SLADDET",
+              "filstoerrelse": 2598637
             },
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "ARKIV"
+              "variantformat": "ARKIV",
+              "filstoerrelse": 2598637
             }
           ]
         }

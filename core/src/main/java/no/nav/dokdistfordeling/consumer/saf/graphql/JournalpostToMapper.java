@@ -70,6 +70,7 @@ public class JournalpostToMapper {
 		return Journalpost.Dokumentvariant.builder()
 				.variantformat(stringToEnum(Variantformat.class, dokumentvariant.getVariantformat()))
 				.saksbehandlerHarTilgang(dokumentvariant.isSaksbehandlerHarTilgang())
+				.filstoerrelse(dokumentvariant.getFilstoerrelse())
 				.build();
 	}
 

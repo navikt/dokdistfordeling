@@ -1,0 +1,16 @@
+{
+  "errors": [
+    {
+      "message": "Validation error (FieldUndefined@[journalpost/dokumenter/dokumentvarianter/filstoerrelsez]) : Field 'filstoerrelse' in type 'Dokumentvariant' is undefined",
+      "locations": [
+        {
+          "line": 28,
+          "column": 9
+        }
+      ],
+      "extensions": {
+        "classification": "ValidationError"
+      }
+    }
+  ]
+}

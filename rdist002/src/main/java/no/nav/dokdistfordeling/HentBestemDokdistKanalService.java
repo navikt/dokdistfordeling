@@ -9,9 +9,13 @@ import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentFor
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
+import java.util.List;
+
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Slf4j
@@ -51,12 +55,13 @@ public class HentBestemDokdistKanalService {
 				.mottakerType(getMottakerType(journalpost.getAvsenderMottaker()))
 				.erArkivert(true)
 				.tema(journalpost.getTema())
+				.forsendelseStoerrelse(getFilstoerrelseMB(journalpost))
 				.build();
 
 		return bestemDokdistkanal.bestemKanal(request);
 	}
 
-	private String determineMottakerId(String mottakerId){
+	private String determineMottakerId(String mottakerId) {
 		return isEmpty(mottakerId) ? "0" : mottakerId;
 	}
 
@@ -65,7 +70,7 @@ public class HentBestemDokdistKanalService {
 	}
 
 	private String getMottakerType(Journalpost.AvsenderMottaker avsenderMottaker) {
-		if(avsenderMottaker.getType() == null || isEmpty(avsenderMottaker.getType().name())){
+		if (avsenderMottaker.getType() == null || isEmpty(avsenderMottaker.getType().name())) {
 			return SAMHANDLER_UKJENT;
 		}
 		return switch (avsenderMottaker.getType()) {
@@ -75,4 +80,31 @@ public class HentBestemDokdistKanalService {
 			default -> SAMHANDLER_PREFIX + "_" + avsenderMottaker.getType();
 		};
 	}
+
+	private int getFilstoerrelseMB(Journalpost journalpost) {
+		return journalpost.getDokumenter().stream()
+				.map(Journalpost.DokumentInfo::getDokumentvarianter)
+				.map(HentBestemDokdistKanalService::getSladdetOrArkivFilstoerrelse)
+				.mapToInt(Integer::intValue)
+				.sum() / (1024 * 1024);
+
+	}
+
+	private static Integer getSladdetOrArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
+		return dokumentvariants.stream()
+				.sorted(sortSladdetFirstComparator)
+				.map(dokumentvariant -> dokumentvariant.getFilstoerrelse())
+				.findFirst()
+				.orElse(0);
+	}
+
+	private static Comparator<Journalpost.Dokumentvariant> sortSladdetFirstComparator = (dokA, dokB) -> {
+		if (dokA.getVariantformat() == dokB.getVariantformat()) {
+			return 0;
+		} else if (dokA.getVariantformat() == SLADDET) {
+			return -1;
+		} else {
+			return 1;
+		}
+	};
 }
