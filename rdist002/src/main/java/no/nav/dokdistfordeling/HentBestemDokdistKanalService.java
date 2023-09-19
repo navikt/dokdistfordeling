@@ -9,12 +9,12 @@ import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentFor
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
-import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
@@ -83,7 +83,8 @@ public class HentBestemDokdistKanalService {
 
 	private int getFilstoerrelseMB(Journalpost journalpost) {
 		return journalpost.getDokumenter().stream()
-				.map(dokumentInfo -> getSladdetOrArkivFilstoerrelse(dokumentInfo.getDokumentvarianter()))
+				.map(Journalpost.DokumentInfo::getDokumentvarianter)
+				.map(HentBestemDokdistKanalService::getSladdetOrArkivFilstoerrelse)
 				.mapToInt(Integer::intValue)
 				.sum() / (1024 * 1024);
 
@@ -91,16 +92,19 @@ public class HentBestemDokdistKanalService {
 
 	private static Integer getSladdetOrArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
 		return dokumentvariants.stream()
-				.filter(dokumentvariant -> SLADDET.equals(dokumentvariant.getVariantformat()))
+				.sorted(sortSladdetFirstComparator)
 				.map(dokumentvariant -> dokumentvariant.getFilstoerrelse())
 				.findFirst()
-				.orElse(getArkivFilstoerrelse(dokumentvariants));
+				.orElse(0);
 	}
 
-	private static Integer getArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
-		return dokumentvariants.stream()
-				.filter(dokumentvariant -> ARKIV.equals(dokumentvariant.getVariantformat()))
-				.map(dokumentvariant -> dokumentvariant.getFilstoerrelse())
-				.findFirst().orElse(0);
-	}
+	private static Comparator<Journalpost.Dokumentvariant> sortSladdetFirstComparator = (dokA, dokB) -> {
+		if (dokA.getVariantformat() == dokB.getVariantformat()) {
+			return 0;
+		} else if (dokA.getVariantformat() == SLADDET) {
+			return -1;
+		} else {
+			return 1;
+		}
+	};
 }
