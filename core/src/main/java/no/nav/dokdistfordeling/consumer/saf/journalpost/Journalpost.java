@@ -63,7 +63,7 @@ public class Journalpost {
 	public static class Dokumentvariant {
 		Variantformat variantformat;
 		boolean saksbehandlerHarTilgang;
-		int filstoerrelse;
+		Integer filstoerrelse;
 	}
 
 }

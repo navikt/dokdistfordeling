@@ -22,7 +22,8 @@
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "SLADDET"
+              "variantformat": "SLADDET",
+              "filstoerrelse": 1205634
             },
             {
               "saksbehandlerHarTilgang": false,

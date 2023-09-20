@@ -42,6 +42,7 @@ public class SafGraphqlConsumer {
 	private static final String FORBIDDEN = "forbidden";
 	private static final String SERVER_ERROR = "server_error";
 	private static final String BAD_REQUEST = "bad_request";
+	private static final String CLASSIFICATION_VALIDATIONERROR = "ValidationError";
 	private final RestTemplate restTemplate;
 	private final String graphQLurl;
 
@@ -64,7 +65,10 @@ public class SafGraphqlConsumer {
 			SafJsonResponse result = restTemplate.exchange(graphQLurl, HttpMethod.POST, new HttpEntity<>(requestToJson(graphQLRequest), httpHeaders), SafJsonResponse.class).getBody();
 
 			if (result.getErrors() != null && result.getErrors().size() > 0) {
-				no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonResponse.Error safError = result.getErrors().get(0);
+				SafJsonResponse.Error safError = result.getErrors().get(0);
+				if(safError.getExtensions().getClassification().contains(CLASSIFICATION_VALIDATIONERROR)) {
+					throw new SafJournalpostQueryTechnicalException("Feil i saf query: "+ safError.getMessage());
+				}
 				String safErrorCode = safError.getExtensions().getCode();
 
 				switch (safErrorCode) {
