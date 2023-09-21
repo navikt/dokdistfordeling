@@ -150,7 +150,7 @@ public class Rdist002ValidationUtilTest {
 	}
 
 	@ParameterizedTest
-	@CsvSource({"BV", "EE", "KG", "NO", "SE", "DK"})
+	@CsvSource({"BV", "EE", "KG", "NO", "SE", "DK", "XK"})
 	public void shouldValidateGoodLandkode(String landkode) {
 		validateAdresse(UnitTestUtil.createPostadresseWithLandkode(landkode), createMottaker());
 	}

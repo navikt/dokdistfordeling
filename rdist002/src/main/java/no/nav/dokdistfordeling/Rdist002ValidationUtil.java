@@ -35,7 +35,12 @@ import static no.nav.dokdistfordeling.util.ValidationUtil.assertStringIsNumberOf
 public class Rdist002ValidationUtil {
 
 	private static final String UTGAAENDE = Journalposttype.U.name();
+	private static final Set<String> ISO3166_TWO_LETTER_CODES = Arrays.stream(Locale.getISOCountries()).collect(Collectors.toSet());
 	private static final String KOSOVO_LAND_KODE = "XK";
+
+	static {
+		ISO3166_TWO_LETTER_CODES.add(KOSOVO_LAND_KODE);
+	}
 
 	public static void validateDistribuerJournalpostRequest(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
 		assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
@@ -73,7 +78,7 @@ public class Rdist002ValidationUtil {
 	}
 
 	private static void validateLandKode(String land) {
-		if (!getIso3166TwoLetterCodes().contains(land)) {
+		if (!ISO3166_TWO_LETTER_CODES.contains(land)) {
 			throw new ValidationException(format("Land må være en gyldig iso3166-2 landkode på 2 bokstaver. Fikk=%s", land));
 		}
 	}
@@ -117,11 +122,5 @@ public class Rdist002ValidationUtil {
 
 	private static boolean checkIfNoDokumentvariantWithTilgang(List<Journalpost.Dokumentvariant> dokumentvarianter) {
 		return dokumentvarianter.stream().noneMatch(dokumentvariant -> dokumentvariant.isSaksbehandlerHarTilgang() && (Variantformat.ARKIV.equals(dokumentvariant.getVariantformat()) || Variantformat.SLADDET.equals(dokumentvariant.getVariantformat())));
-	}
-
-	private static Set<String> getIso3166TwoLetterCodes() {
-		Set<String> iso3166Landkodes = Arrays.stream(Locale.getISOCountries()).collect(Collectors.toSet());
-		iso3166Landkodes.add(KOSOVO_LAND_KODE);
-		return iso3166Landkodes;
 	}
 }
