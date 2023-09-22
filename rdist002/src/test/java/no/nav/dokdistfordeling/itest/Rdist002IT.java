@@ -92,13 +92,11 @@ public class Rdist002IT {
 	private static final String POSTNUMMER = "1337";
 	private static final String LAND_NO = "NO";
 	private static final String LAND_US = "US";
+	private static final String LAND_KOSOVO = "XK";
 	private static final String DOKUMENTPRODAPP = "dokumentprodapp";
 
 	private static final String DOKUMENTTYPEID = "000001";
-	private static final String TEMA = "OPP";
-	private static final String MOTTAKER_ID = "09876543210";
-	private static final String MOTTAKER_NAVN = "Jan Neimansen";
-	private static final String BRUKER_ID = "12345678901";
+
 	@Autowired
 	protected TestRestTemplate restTemplate;
 	private @Value("${hentdokumenter_fra_joark_crypto_password}")
@@ -142,7 +140,7 @@ public class Rdist002IT {
 		putStubOppdaterJournalpost();
 
 		final String callId = UUID.randomUUID().toString();
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo()
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
 				.distribusjonstidspunkt(KJERNETID.name())
 				.distribusjonstype(VIKTIG.name())
 				.build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
@@ -196,7 +194,7 @@ public class Rdist002IT {
 		putStubOppdaterJournalpost();
 
 		final String callId = UUID.randomUUID().toString();
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo()
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
 				.distribusjonstidspunkt(KJERNETID.name())
 				.distribusjonstype(VIKTIG.name())
 				.build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
@@ -248,7 +246,7 @@ public class Rdist002IT {
 		putStubOppdaterJournalpost();
 
 		final String callId = UUID.randomUUID().toString();
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo()
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
 				.distribusjonstidspunkt(KJERNETID.name())
 				.distribusjonstype(VIKTIG.name())
 				.build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
@@ -283,7 +281,7 @@ public class Rdist002IT {
 		putStubOppdaterJournalpost();
 
 		final String callId = UUID.randomUUID().toString();
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo()
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
 				.distribusjonstidspunkt(KJERNETID.name())
 				.distribusjonstype(VIKTIG.name())
 				.build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
@@ -365,7 +363,7 @@ public class Rdist002IT {
 		putStubOppdaterJournalpost();
 
 		final String callId = UUID.randomUUID().toString();
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -413,7 +411,7 @@ public class Rdist002IT {
 		putStubOppdaterJournalpost();
 
 		final String callId = UUID.randomUUID().toString();
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -464,7 +462,7 @@ public class Rdist002IT {
 
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).adresse(null).build(), createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -509,7 +507,10 @@ public class Rdist002IT {
 
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(createUtenlandskAdresse()).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
+						.adresse(createUtenlandskAdresse(LAND_US))
+						.build(), createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -575,7 +576,7 @@ public class Rdist002IT {
 
 	@Test
 	public void distribuerJournalpostWithoutAuthHeader() {
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHeaderWithoutAuth());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).build(), createHeaderWithoutAuth());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.BAD_REQUEST);
 
 		assertNull(restResponse.getBestillingsId());
@@ -585,7 +586,7 @@ public class Rdist002IT {
 	public void distribuerJournalpostWithoutJournalpostId() {
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().journalpostId(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).journalpostId(null).build(), createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.BAD_REQUEST);
 
 		assertNull(restResponse.getBestillingsId());
@@ -597,7 +598,7 @@ public class Rdist002IT {
 				.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
 				.withBody("{}")));
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).build(), createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.UNAUTHORIZED);
 
 		assertNull(restResponse.getBestillingsId());
@@ -610,7 +611,7 @@ public class Rdist002IT {
 		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
 				.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())));
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).build(), createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.INTERNAL_SERVER_ERROR);
 
 		assertNull(restResponse.getBestillingsId());
@@ -630,7 +631,7 @@ public class Rdist002IT {
 				.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
 				.withBodyFile("saf/" + filename)));
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).adresse(null).build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 		assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.valueOf(httpErrorCode));
 		assertThat(responseEntity.getBody()).contains(errorMessage);
@@ -642,7 +643,7 @@ public class Rdist002IT {
 				.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
 				.withBodyFile("saf/safGraphQlResponse-inngaaendeJournalpostType.json")));
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).build(), createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.BAD_REQUEST);
 
 		assertNull(restResponse.getBestillingsId());
@@ -678,7 +679,7 @@ public class Rdist002IT {
 				.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
 				.withBody("")));
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).adresse(null).build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 		assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 		assertThat(responseEntity.getBody()).contains("Fant ikke adresseinformasjon for mottaker i PDL. Mottaker har ukjent adresse.");
@@ -712,7 +713,7 @@ public class Rdist002IT {
 				.withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
 				.withBody("")));
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().adresse(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).adresse(null).build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 		assertThat(responseEntity.getStatusCode()).isEqualTo(GONE);
 		assertThat(responseEntity.getBody()).contains("Mottaker er død og har ukjent adresse.");
@@ -722,7 +723,7 @@ public class Rdist002IT {
 	void shouldReturnBadRequestWithDokProdappLengthTooLong() {
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo().dokumentProdApp("ABCDEFGHIJKLMNOPQRSTU").build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).dokumentProdApp("ABCDEFGHIJKLMNOPQRSTU").build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 		assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 		assertThat(responseEntity.getBody()).contains("dokumentProdapp kan ikke være mer enn 20 tegn");
@@ -782,20 +783,12 @@ public class Rdist002IT {
 		return headers;
 	}
 
-	private DistribuerJournalpostRequestTo.DistribuerJournalpostRequestToBuilder createHappyPathDistribuerJournalpostRequestTo() {
+	private DistribuerJournalpostRequestTo.DistribuerJournalpostRequestToBuilder createHappyPathDistribuerJournalpostRequestTo(DistribuerJournalpostRequestTo.AdresseTo adresse) {
 		return DistribuerJournalpostRequestTo.builder()
 				.journalpostId(JOURNALPOST_ID)
 				.batchId(BATCHID)
 				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
-				.adresse(new DistribuerJournalpostRequestTo.AdresseTo(
-						ADRESSETYPE_NORSK,
-						POSTNUMMER,
-						POSTSTED,
-						ADRESSELINJE1,
-						ADRESSELINJE2,
-						ADRESSELINJE3,
-						LAND_NO
-				))
+				.adresse(adresse)
 				.distribusjonstidspunkt(KJERNETID.name())
 				.distribusjonstype(VIKTIG.name())
 				.dokumentProdApp(DOKUMENTPRODAPP);
@@ -812,7 +805,7 @@ public class Rdist002IT {
 
 	}
 
-	private DistribuerJournalpostRequestTo.AdresseTo createUtenlandskAdresse() {
+	private DistribuerJournalpostRequestTo.AdresseTo createUtenlandskAdresse(String landkode) {
 		return new DistribuerJournalpostRequestTo.AdresseTo(
 				ADRESSETYPE_UTENLANDSK,
 				null,
@@ -820,7 +813,19 @@ public class Rdist002IT {
 				ADRESSELINJE1,
 				ADRESSELINJE2,
 				ADRESSELINJE3,
-				LAND_US
+				landkode
+		);
+	}
+
+	private DistribuerJournalpostRequestTo.AdresseTo createNorskAdresse() {
+		return new DistribuerJournalpostRequestTo.AdresseTo(
+				ADRESSETYPE_NORSK,
+				POSTNUMMER,
+				POSTSTED,
+				ADRESSELINJE1,
+				ADRESSELINJE2,
+				ADRESSELINJE3,
+				LAND_NO
 		);
 	}
 

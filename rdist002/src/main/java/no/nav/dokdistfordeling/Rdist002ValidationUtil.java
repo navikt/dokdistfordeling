@@ -36,6 +36,11 @@ public class Rdist002ValidationUtil {
 
 	private static final String UTGAAENDE = Journalposttype.U.name();
 	private static final Set<String> ISO3166_TWO_LETTER_CODES = Arrays.stream(Locale.getISOCountries()).collect(Collectors.toSet());
+	private static final String KOSOVO_LAND_KODE = "XK";
+
+	static {
+		ISO3166_TWO_LETTER_CODES.add(KOSOVO_LAND_KODE);
+	}
 
 	public static void validateDistribuerJournalpostRequest(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
 		assertNotNullOrEmpty("journalpostId", distribuerJournalpostRequestTo.getJournalpostId());
