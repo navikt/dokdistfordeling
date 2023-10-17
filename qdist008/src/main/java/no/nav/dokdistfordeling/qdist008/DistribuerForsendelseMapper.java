@@ -33,7 +33,6 @@ import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
 import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
 import static org.apache.commons.lang3.EnumUtils.isValidEnumIgnoreCase;
@@ -69,7 +68,7 @@ public class DistribuerForsendelseMapper {
 						mapArkivInformasjon(distribusjonbestilling.getArkivInformasjon()))
 				.mottaker(mapAktoer(distribusjonbestilling.getMottaker()))
 				.bruker(mapAktoer(distribusjonbestilling.getBruker()))
-				.adresse(PRINT.name().equals(distribusjonbestilling.getDistribusjonKanal()) ? mapAdresse(distribusjonbestilling.getAdresse()) : null)
+				.adresse(mapAdresse(distribusjonbestilling.getAdresse()))
 				.dokumentProdApp(distribusjonbestilling.getDokumentProdApp())
 				.dokumenter(distribusjonbestilling.getDokumenter().stream()
 						.map(dokumentInformasjon -> DistribuerForsendelseTo.DokumentInformasjonTo.builder()
@@ -130,7 +129,7 @@ public class DistribuerForsendelseMapper {
 
 	private DistribuerForsendelseTo.AdresseTo mapAdresse(Adresse adresse) {
 		if (adresse == null) {
-			throw new ValidationException("Adresse kan ikke være null");
+			return null;
 		}
 
 		if (adresse instanceof NorskPostadresse norskPostadresse) {

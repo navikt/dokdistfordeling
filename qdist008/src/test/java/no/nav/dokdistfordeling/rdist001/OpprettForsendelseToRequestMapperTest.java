@@ -58,13 +58,25 @@ class OpprettForsendelseToRequestMapperTest {
 
 	private static final DistribusjonsKanalCode DISTRIBUSJONS_KANAL_CODE = DistribusjonsKanalCode.PRINT;
 
-	private OpprettForsendelseToRequestMapper opprettForsendelseToRequestMapper = new OpprettForsendelseToRequestMapper();
+	private final OpprettForsendelseToRequestMapper opprettForsendelseToRequestMapper = new OpprettForsendelseToRequestMapper();
 
 	// Happy path: Person with norsk postaddresse
 	@Test
 	public void shouldMapHappyPath() {
 		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.distribusjonKanal(DISTRIBUSJONKANAL_PRINT).build(),
+				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(), null);
+
+		assertCommon(opprettForsendelseRequestTo);
+		assertMottakerIsPerson(opprettForsendelseRequestTo.getMottaker());
+		assertDokumentInformasjon(opprettForsendelseRequestTo.getDokumenter());
+		assertNorskPostaddresseTo(opprettForsendelseRequestTo.getPostadresse());
+	}
+
+	@Test
+	public void shouldMapAdresseWhenDistribusjonskanalNotPrint() {
+		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
+						.distribusjonKanal(DISTRIBUSJONKANAL_SDP).build(),
 				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(), null);
 
 		assertCommon(opprettForsendelseRequestTo);

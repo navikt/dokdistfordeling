@@ -12,7 +12,6 @@
 			<aktoerId>1000075457001</aktoerId>
 			<navn>Bjarne Betjent</navn>
 		</bruker>
-		<!--Optional: - DistrbusjonKanal PRINT må ha adresse -->
 		<adresse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:NorskPostadresse">
 			<adresselinje1>Adresslinje 1</adresselinje1>
 			<adresselinje2>Adresslinje 2</adresselinje2>

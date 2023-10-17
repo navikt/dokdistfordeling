@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 
 @Component
 public class OpprettForsendelseToRequestMapper {
@@ -35,7 +34,7 @@ public class OpprettForsendelseToRequestMapper {
 				.arkivInformasjon(mapArkivInformasjon(arkivInformasjon))
 				.distribusjonstype(isNull(distribusjonbestilling.getDistribusjonstype()) ? null : distribusjonbestilling.getDistribusjonstype().name())
 				.distribusjonstidspunkt(isNull(distribusjonbestilling.getDistribusjonstidspunkt()) ? null : distribusjonbestilling.getDistribusjonstidspunkt().name())
-				.postadresse((PRINT.name().equals(distribusjonbestilling.getDistribusjonKanal())) ? mapPostadresse(adresse) : null)
+				.postadresse(mapPostadresse(adresse))
 				.dokumenter(dokumentInformasjonToList.stream()
 						.map(this::mapDokument)
 						.collect(Collectors.toList()))
