@@ -182,13 +182,13 @@ public class HentDokumenterFraJoarkMapperTest {
 	}
 
 	@Test
-	public void shouldThrowExceptionWhenAdresserErNullAndDistribusjonKanalKodeErPrint() {
-		ValidationException e = assertThrows(ValidationException.class, () -> mapper.map(createDistribuerJournalpostRequestToBuilder().adresse(null).build(),
+	public void shouldSetNullAdresseWhenDistribusjonKanalKodeErPrint() {
+		HentDokumenterFraJoark hentDokumenterFraJoark = mapper.map(createDistribuerJournalpostRequestToBuilder().adresse(null).build(),
 				createJournalpostBuilder().build(),
 				createPersonMottaker(),
-				BESTILLINGS_ID, PRINT));
+				BESTILLINGS_ID, PRINT);
 
-		assertEquals("Adresse kan ikke være null", e.getMessage());
+		assertNull(hentDokumenterFraJoark.getDistribusjonbestilling().getAdresse());
 	}
 
 	@ParameterizedTest
@@ -295,7 +295,6 @@ public class HentDokumenterFraJoarkMapperTest {
 				.adresse(createNorskPostadresse())
 				.dokumentProdApp(DOKUMENTPRODAPP);
 	}
-
 
 	private Person createPersonMottaker() {
 		Person person = new Person();
