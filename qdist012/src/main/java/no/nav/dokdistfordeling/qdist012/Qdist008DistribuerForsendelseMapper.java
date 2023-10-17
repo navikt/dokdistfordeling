@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling.qdist012;
 
 import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
-import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
@@ -56,7 +54,7 @@ public class Qdist008DistribuerForsendelseMapper {
 		distribusjonbestilling.setArkivInformasjon(mapArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon()));
 		distribusjonbestilling.setMottaker(mapAktoerTo(distribusjonbestillingTo.getMottaker()));
 		distribusjonbestilling.setBruker(mapAktoerTo(distribusjonbestillingTo.getBruker()));
-		distribusjonbestilling.setAdresse(mapPrintAdresse(distribusjonbestillingTo));
+		distribusjonbestilling.setAdresse(mapAdresse(distribusjonbestillingTo.getAdresse()));
 		distribusjonbestilling.setDokumentProdApp(distribusjonbestillingTo.getDokumentProdApp());
 		distribusjonbestilling.setDokumenter(distribusjonbestillingTo.getDokumenter().stream()
 				.map(dokumentInformasjonTo -> {
@@ -77,17 +75,13 @@ public class Qdist008DistribuerForsendelseMapper {
 	}
 
 	private ArkivInformasjon mapArkivInformasjon(HentDokumenterFraJoarkTo.ArkivInformasjonTo arkivInformasjonTo) {
-		if(arkivInformasjonTo == null) {
+		if (arkivInformasjonTo == null) {
 			return null;
 		}
 		ArkivInformasjon arkivInformasjon = new ArkivInformasjon();
 		arkivInformasjon.setArkivSystem(arkivInformasjonTo.getArkivSystem());
 		arkivInformasjon.setArkivId(arkivInformasjonTo.getArkivId());
 		return arkivInformasjon;
-	}
-
-	private Adresse mapPrintAdresse(HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestillingTo) {
-		return PRINT.name().equals(distribusjonbestillingTo.getDistribusjonKanal()) ? mapAdresse(distribusjonbestillingTo.getAdresse()) : null;
 	}
 
 	private Aktoer mapAktoerTo(HentDokumenterFraJoarkTo.AktoerTo aktoer) {
@@ -140,7 +134,7 @@ public class Qdist008DistribuerForsendelseMapper {
 
 	private Adresse mapAdresse(HentDokumenterFraJoarkTo.AdresseTo adresse) {
 		if (adresse == null) {
-			throw new ValidationException("Adresse kan ikke være null");
+			return null;
 		} else if (adresse instanceof HentDokumenterFraJoarkTo.NorskPostadresseTo norskPostadresseTo) {
 			NorskPostadresse norskPostadresse = new NorskPostadresse();
 			norskPostadresse.setAdresselinje1(trimAdresselinje(norskPostadresseTo.getAdresselinje1()));
@@ -175,5 +169,4 @@ public class Qdist008DistribuerForsendelseMapper {
 		return (nonNull(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.name())) ?
 				distribusjonstype.name() : null;
 	}
-
 }

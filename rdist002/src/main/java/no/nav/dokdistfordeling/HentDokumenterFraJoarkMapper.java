@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling;
 
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
-import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
@@ -27,10 +26,6 @@ import static java.util.Objects.isNull;
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
-import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
-import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.FNR;
-import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.ORGNR;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
 import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
@@ -58,7 +53,7 @@ public class HentDokumenterFraJoarkMapper {
 		distribusjonbestilling.setArkivInformasjon(mapArkivInformasjon(distribuerJournalpostRequestTo));
 		distribusjonbestilling.setMottaker(mottaker);
 		distribusjonbestilling.setBruker(mapBruker(journalpost.getBruker()));
-		distribusjonbestilling.setAdresse(PRINT.name().equals(distribusjonsKanal.name()) ? mapAdresse(distribuerJournalpostRequestTo.getAdresse()) : null);
+		distribusjonbestilling.setAdresse(mapAdresse(distribuerJournalpostRequestTo.getAdresse()));
 		distribusjonbestilling.setDokumentProdApp(distribuerJournalpostRequestTo.getDokumentProdApp());
 		distribusjonbestilling.setDokumenter(IntStream
 				.range(0, dokumenter.size())
@@ -95,7 +90,7 @@ public class HentDokumenterFraJoarkMapper {
 
 	private Adresse mapAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo) {
 		if (isNull(adresseTo)) {
-			throw new ValidationException("Adresse kan ikke være null");
+			return null;
 		} else if (adresseTo.getAdressetype().equals(NORSK_POSTADRESSE)) {
 			NorskPostadresse norskPostadresse = new NorskPostadresse();
 			norskPostadresse.setAdresselinje1(trimAdresselinje(adresseTo.getAdresselinje1()));

@@ -19,6 +19,14 @@
 		<bruker xsi:type="ns2:AktoerId" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 			<aktoerId>12345678901</aktoerId>
 		</bruker>
+		<adresse xsi:type="ns2:NorskPostadresse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<adresselinje1>eksempelveien 23 A</adresselinje1>
+			<adresselinje2>eksempelveien 24 A</adresselinje2>
+			<adresselinje3>eksempelveien 25 A</adresselinje3>
+			<postnummer>1337</postnummer>
+			<poststed>poststed</poststed>
+			<land>NO</land>
+		</adresse>
 		<dokumentProdApp>dokumentprodapp</dokumentProdApp>
 		<dokumenter>
 			<dokumentInformasjon>
