@@ -27,13 +27,10 @@ import org.springframework.http.MediaType;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
@@ -52,6 +49,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.requireNonNull;
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACHE;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -111,7 +109,6 @@ public class Qdist008IT {
 	@Autowired
 	public CacheManager cacheManager;
 
-
 	@BeforeEach
 	public void setupBefore() {
 		cacheManager.getCache(TKAT020_CACHE).clear();
@@ -139,7 +136,7 @@ public class Qdist008IT {
 
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
-						 .withStatus(HttpStatus.OK.value())));
+						.withStatus(HttpStatus.OK.value())));
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -314,7 +311,6 @@ public class Qdist008IT {
 		stubFor(patch(urlMatching(String.format("/rest/journalpostapi/%s/oppdaterDistribusjonsinfo", 1234)))
 				.willReturn(aResponse()
 						.withStatus(HttpStatus.OK.value())));
-
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_ingendistribusjon_happypath.xml"));
 
@@ -587,9 +583,9 @@ public class Qdist008IT {
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
 
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			assertTrue(listAppender.list.stream().map(ILoggingEvent::getMessage).collect(Collectors.toList()).contains("no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException: journalpostId=1234 er feilregistrert og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes;"));
-		});
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() ->
+				assertTrue(listAppender.list.stream().map(ILoggingEvent::getMessage).toList()
+						.contains("no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException: journalpostId=1234 er feilregistrert og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes;")));
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
@@ -616,7 +612,8 @@ public class Qdist008IT {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			String resultOnQdist008FunksjonellFeilQueue = receive(qdist008FunksjonellFeil);
 			assertThat(resultOnQdist008FunksjonellFeilQueue).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml").replaceAll("\r", ""));
-			assertTrue(listAppender.list.stream().map(ILoggingEvent::getMessage).collect(Collectors.toList()).contains("no.nav.dokdistfordeling.exception.functional.ValidationException: journalpostId=1234 har ugyldig status=UNDER_ARBEID og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes; bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 og forsendelseId="));
+			assertTrue(listAppender.list.stream().map(ILoggingEvent::getMessage).toList()
+					.contains("no.nav.dokdistfordeling.exception.functional.ValidationException: journalpostId=1234 har ugyldig status=UNDER_ARBEID og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes; bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 og forsendelseId="));
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
@@ -897,7 +894,7 @@ public class Qdist008IT {
 	private <T> T receive(Queue queue) {
 		Object response = jmsTemplate.receiveAndConvert(queue);
 		if (response instanceof JAXBElement) {
-			response = ((JAXBElement) response).getValue();
+			response = ((JAXBElement<?>) response).getValue();
 		}
 		return (T) response;
 	}
@@ -907,13 +904,7 @@ public class Qdist008IT {
 	}
 
 	private String getRequestAsJson(String filename) throws IOException {
-
-		File file = new ClassPathResource(filename).getFile();
-		byte[] data = new byte[(int) file.length()];
-		FileInputStream fileInputStream = new FileInputStream(file);
-		fileInputStream.read(data);
-		fileInputStream.close();
-		return new String(data);
+		return IOUtils.toString(requireNonNull(this.getClass().getResourceAsStream("/" + filename)), UTF_8);
 	}
 }
 

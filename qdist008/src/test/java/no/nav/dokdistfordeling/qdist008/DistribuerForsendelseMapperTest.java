@@ -16,13 +16,13 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Samhandler;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.UtenlandskPostadresse;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -74,7 +74,7 @@ class DistribuerForsendelseMapperTest {
 	private static final int REKKEFOLGE_1 = 1;
 	private static final int REKKEFOLGE_2 = 2;
 
-	private DistribuerForsendelseMapper distribuerForsendelseMapper = new DistribuerForsendelseMapper();
+	private final DistribuerForsendelseMapper distribuerForsendelseMapper = new DistribuerForsendelseMapper();
 
 	@Test
 	public void shouldMap() {
@@ -87,7 +87,7 @@ class DistribuerForsendelseMapperTest {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
 		distribuerForsendelse.getDistribusjonbestilling().setDistribusjonKanal(DISTRIBUSJONKANAL_SDP);
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
-		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse());
+		assertNorskPostadresseTo(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse());
 	}
 
 	@Test
@@ -95,7 +95,7 @@ class DistribuerForsendelseMapperTest {
 		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
 		distribuerForsendelse.getDistribusjonbestilling().setDistribusjonKanal(INGEN_DISTRIBUSJON);
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
-		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse());
+		assertNorskPostadresseTo(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse());
 	}
 
 	@Test
@@ -312,7 +312,7 @@ class DistribuerForsendelseMapperTest {
 		assertNorskPostadresseTo(distBestilling.getAdresse());
 
 		//assert dokumenter
-		Assertions.assertThat(distBestilling.getDokumenter())
+		assertThat(distBestilling.getDokumenter())
 				.extracting(DistribuerForsendelseTo.DokumentInformasjonTo::getDokumenttypeId,
 						DistribuerForsendelseTo.DokumentInformasjonTo::getDokumentObjektReferanse,
 						DistribuerForsendelseTo.DokumentInformasjonTo::getTilknyttetSom,
