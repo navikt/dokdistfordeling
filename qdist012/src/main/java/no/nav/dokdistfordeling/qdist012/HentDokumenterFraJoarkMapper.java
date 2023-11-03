@@ -30,7 +30,6 @@ import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
 import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -64,7 +63,7 @@ public class HentDokumenterFraJoarkMapper {
 						mapArkivInformasjon(distribusjonbestilling.getArkivInformasjon()))
 				.mottaker(mapAktoer(distribusjonbestilling.getMottaker()))
 				.bruker(mapAktoer(distribusjonbestilling.getBruker()))
-				.adresse(PRINT.name().equals(distribusjonbestilling.getDistribusjonKanal()) ? mapAdresse(distribusjonbestilling.getAdresse()) : null)
+				.adresse(mapAdresse(distribusjonbestilling.getAdresse()))
 				.dokumentProdApp(distribusjonbestilling.getDokumentProdApp())
 				.dokumenter(distribusjonbestilling.getDokumenter().stream()
 						.map(dokumentInformasjon -> HentDokumenterFraJoarkTo.DokumentInformasjonTo.builder()
@@ -121,7 +120,7 @@ public class HentDokumenterFraJoarkMapper {
 
 	private HentDokumenterFraJoarkTo.AdresseTo mapAdresse(Adresse adresse) {
 		if (adresse == null) {
-			throw new ValidationException("Adresse kan ikke være null");
+			return null;
 		} else if (adresse instanceof NorskPostadresse norskPostadresse) {
 			return HentDokumenterFraJoarkTo.NorskPostadresseTo.builder()
 					.adresselinje1(norskPostadresse.getAdresselinje1())

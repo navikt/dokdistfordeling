@@ -13,7 +13,6 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.UtenlandskPostadresse;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -22,6 +21,7 @@ import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.UMIDDELBART;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VEDTAK;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -93,10 +93,23 @@ class HentDokumenterFraJoarkMapperTest {
 	}
 
 	@Test
-	public void shouldMapDitt_NAV() {
+	public void shouldMapDittNAV() {
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(createHentDokumentFraJoarkDittNav());
 
-		assertEquals(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonKanal(), DistribusjonsKanalCode.DITTNAV.name());
+		HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
+		assertEquals(distribusjonbestilling.getDistribusjonKanal(), DistribusjonsKanalCode.DITTNAV.name());
+		assertThat(distribusjonbestilling.getAdresse()).isNotNull();
+	}
+
+	@Test
+	public void shouldMapDittNAVWhenAdresseNull() {
+		HentDokumenterFraJoark hentDokumentFraJoarkDittNav = createHentDokumentFraJoarkDittNav();
+		hentDokumentFraJoarkDittNav.getDistribusjonbestilling().setAdresse(null);
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumentFraJoarkDittNav);
+
+		HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
+		assertEquals(distribusjonbestilling.getDistribusjonKanal(), DistribusjonsKanalCode.DITTNAV.name());
+		assertThat(distribusjonbestilling.getAdresse()).isNull();
 	}
 
 	@Test
@@ -238,7 +251,7 @@ class HentDokumenterFraJoarkMapperTest {
 		assertNorskPostadresseTo(distBestilling.getAdresse());
 
 		//assert dokumenter
-		Assertions.assertThat(distBestilling.getDokumenter())
+		assertThat(distBestilling.getDokumenter())
 				.extracting(HentDokumenterFraJoarkTo.DokumentInformasjonTo::getDokumenttypeId,
 						HentDokumenterFraJoarkTo.DokumentInformasjonTo::getDokumentObjektReferanse,
 						HentDokumenterFraJoarkTo.DokumentInformasjonTo::getTilknyttetSom,
