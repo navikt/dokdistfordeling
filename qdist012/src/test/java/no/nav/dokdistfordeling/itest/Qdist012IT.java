@@ -189,7 +189,7 @@ public class Qdist012IT {
 		final String callId = UUID.randomUUID().toString();
 		encryptAndSendStringMessageWithHeaders(qdist012, classpathToString("qdist012/qdist012-happyUtenVedlegg.xml"), callId);
 
-		await().atMost(100, TimeUnit.SECONDS).untilAsserted(() -> {
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			TextMessage responseTextMessage = receiveTextMessage(qdist008);
 			assertEquals(callId, responseTextMessage.getStringProperty(CALL_ID));
 			String response = responseTextMessage.getText();

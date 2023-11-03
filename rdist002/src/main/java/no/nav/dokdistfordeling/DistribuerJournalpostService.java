@@ -114,7 +114,7 @@ public class DistribuerJournalpostService {
 										   final Journalpost journalpost,
 										   final Aktoer mottaker, DistribusjonsKanalCode distribusjonsKanalCode) {
 
-		if (PRINT.name().equals(distribusjonsKanalCode.name())) {
+		if (distribuerJournalpostRequestTo.getAdresse() != null) {
 			validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
 		}
 
