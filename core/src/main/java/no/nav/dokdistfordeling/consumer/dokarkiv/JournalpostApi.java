@@ -5,7 +5,6 @@ import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.exception.functional.JournalpostApiFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.JournalpostApiTechnicalException;
-import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import no.nav.dokdistfordeling.security.AzureToken;
 import no.nav.dokdistfordeling.security.WebClientAzureAuthentication;
 import org.slf4j.MDC;
@@ -41,7 +40,6 @@ public class JournalpostApi {
 				.build();
 	}
 
-	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "oppdaterDistribusjonsinfo"}, histogram = true)
 	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void oppdaterDistribusjonsinfo(String journalpostId, OppdaterDistribusjonsinfoTo oppdaterDistibusjonsinfoTo) {
 
@@ -55,7 +53,6 @@ public class JournalpostApi {
 				.block();
 	}
 
-	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "oppdaterJournalpost"}, histogram = true)
 	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public OppdaterJournalpostResponse oppdaterJournalpost(String journalpostId, OppdaterJournalpostRequest oppdaterJournalpostRequest) {
 

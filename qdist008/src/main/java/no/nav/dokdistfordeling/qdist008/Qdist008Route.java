@@ -1,17 +1,15 @@
 package no.nav.dokdistfordeling.qdist008;
 
+import jakarta.jms.Queue;
+import jakarta.xml.bind.JAXBContext;
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException;
-import no.nav.dokdistfordeling.qdist008.metrics.Qdist008MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.ValidationException;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.stereotype.Component;
-
-import jakarta.jms.Queue;
-import jakarta.xml.bind.JAXBContext;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
@@ -46,7 +44,6 @@ public class Qdist008Route extends RouteBuilder {
 	private final Queue qdist013;
 	private final Queue qdist016;
 	private final Queue qdist008FunksjonellFeil;
-	private final Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy;
 
 	public Qdist008Route(Queue qdist008,
 						 Queue qdist009,
@@ -56,7 +53,6 @@ public class Qdist008Route extends RouteBuilder {
 						 Queue qdist016,
 						 Queue qdist008FunksjonellFeil,
 						 Qdist008Service qdist008Service,
-						 Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy,
 						 DistribuerForsendelseMapper distribuerForsendelseMapper,
 						 ForsendelseValidator forsendelseValidator,
 						 DokdistStatusUpdater dokdistStatusUpdater) {
@@ -71,7 +67,6 @@ public class Qdist008Route extends RouteBuilder {
 		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
 		this.forsendelseValidator = forsendelseValidator;
 		this.dokdistStatusUpdater = dokdistStatusUpdater;
-		this.qdist008MetricsRoutePolicy = qdist008MetricsRoutePolicy;
 	}
 
 	@Override
@@ -99,7 +94,6 @@ public class Qdist008Route extends RouteBuilder {
 		from("jms:" + qdist008.getQueueName() +
 				"?transacted=true")
 				.routeId(SERVICE_ID)
-				.routePolicy(qdist008MetricsRoutePolicy)
 				.setExchangePattern(InOnly)
 				.process(new IdsProcessor())
 				.log(INFO, log, String.format("qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))

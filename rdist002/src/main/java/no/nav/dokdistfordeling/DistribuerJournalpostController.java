@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
-import no.nav.dokdistfordeling.metrics.Monitor;
 import no.nav.dokdistfordeling.springdoc.SwaggerRestDistribuerJournalpost;
 import org.slf4j.MDC;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +46,6 @@ public class DistribuerJournalpostController {
 
 	@SwaggerRestDistribuerJournalpost
 	@PostMapping(value = "/distribuerjournalpost")
-	@Monitor(value = "dok_metric", process = "rdist002", extraTags = {"process", "rdist002"}, histogram = true)
 	public ResponseEntity<DistribuerJournalpostResponseTo> distribuerJournalpost(
 			@RequestBody DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
 			@Parameter(hidden = true) @RequestHeader(value = AUTHORIZATION) String authorizationHeader,

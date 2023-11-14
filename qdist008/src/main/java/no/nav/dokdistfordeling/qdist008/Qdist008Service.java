@@ -22,7 +22,6 @@ import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DIST
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
-import static no.nav.dokdistfordeling.qdist008.metrics.MetricUpdater.updateQdist008Metrics;
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -71,7 +70,6 @@ public class Qdist008Service {
 		}
 
 		updateArkivIfArkivsystemIsJoark(distribusjonbestilling, distribusjonsKanal);
-		updateQdist008Metrics(distribusjonbestilling);
 
 		return distribuerTilKanal;
 	}

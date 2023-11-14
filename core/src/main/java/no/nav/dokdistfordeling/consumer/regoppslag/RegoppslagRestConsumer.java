@@ -8,7 +8,6 @@ import no.nav.dokdistfordeling.consumer.sts.StsRestConsumer;
 import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseException;
 import no.nav.dokdistfordeling.exception.functional.UkjentAdresseException;
 import no.nav.dokdistfordeling.exception.technical.StsTechnicalException;
-import no.nav.dokdistfordeling.metrics.Monitor;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -53,7 +52,6 @@ class RegoppslagRestConsumer {
 		this.stsRestConsumer = stsRestConsumer;
 	}
 
-	@Monitor(value = "dok_consumer", extraTags = {"process", "treg002HentAdresse"}, histogram = true)
 	@Retryable(retryFor = RegoppslagHentAdresseTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	HentMottakerOgAdresseResponseTo.AdresseTo hentAdresse(HentMottakerOgAdresseRequestTo request) {
 		HttpEntity<HentMottakerOgAdresseRequestTo> entity = createRequestWithHeader(request, retrieveOidcTokenAndCreateHeader());

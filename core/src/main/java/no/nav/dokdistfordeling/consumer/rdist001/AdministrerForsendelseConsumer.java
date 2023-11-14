@@ -7,7 +7,6 @@ import no.nav.dokdistfordeling.consumer.rdist001.domain.OppdaterForsendelseReque
 import no.nav.dokdistfordeling.exception.functional.AdminstrerForsendelseFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.AdminstrerForsendelseTechnicalException;
-import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import no.nav.dokdistfordeling.security.AzureToken;
 import no.nav.dokdistfordeling.security.WebClientAzureAuthentication;
 import no.nav.dokdistfordeling.support.NavHeadersFilter;
@@ -41,7 +40,6 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.build();
 	}
 
-	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "opprettForsendelse"}, histogram = true)
 	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public String opprettForsendelse(final OpprettForsendelseRequestTo opprettForsendelseRequestTo) {
 		var bestillingsId = opprettForsendelseRequestTo.getBestillingsId();
@@ -61,7 +59,6 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 		return forsendelseId;
 	}
 
-	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "oppdaterForsendelse"}, histogram = true)
 	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelse) {
 		log.info("oppdaterForsendelse oppdaterer forsendelse med forsendelseId={}", oppdaterForsendelse.forsendelseId());
