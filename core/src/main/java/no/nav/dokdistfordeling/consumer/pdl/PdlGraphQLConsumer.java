@@ -8,7 +8,6 @@ import no.nav.dokdistfordeling.exception.functional.PdlPersonIkkeFunnetFunctiona
 import no.nav.dokdistfordeling.exception.technical.PdlHentFolkeregisteridentForAktoerIdTechnicalException;
 import org.slf4j.MDC;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.retry.annotation.Retryable;
@@ -25,10 +24,15 @@ import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
+import static no.nav.dokdistfordeling.consumer.pdl.IdentType.FOLKEREGISTERIDENT;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Slf4j
 @Component
 public class PdlGraphQLConsumer {
+
     private static final String PERSON_IKKE_FUNNET_CODE = "not_found";
     private static final String HEADER_PDL_NAV_CONSUMER_TOKEN = "Nav-Consumer-Token";
     private final RestTemplate restTemplate;
@@ -46,15 +50,15 @@ public class PdlGraphQLConsumer {
         this.pdlUrl = pdlProperties.getUrl();
     }
 
-    @Retryable(include = HttpServerErrorException.class)
+    @Retryable(retryFor = HttpServerErrorException.class)
     public String hentFolkeregisteridentForAktoerId(final String aktorId) {
         try {
             final UriComponents uri = UriComponentsBuilder.fromHttpUrl(pdlUrl).build();
             final String serviceuserToken = "Bearer " + stsConsumer.getOidcToken();
             final RequestEntity<PdlRequest> requestEntity = RequestEntity.post(uri.toUri())
-                    .accept(MediaType.APPLICATION_JSON)
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .header(HttpHeaders.AUTHORIZATION, serviceuserToken)
+                    .accept(APPLICATION_JSON)
+                    .header(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .header(AUTHORIZATION, serviceuserToken)
                     .header(HEADER_PDL_NAV_CONSUMER_TOKEN, serviceuserToken)
                     .header(NAV_CALL_ID, MDC.get(NAV_CALL_ID))
                     .body(mapRequest(aktorId));
@@ -79,13 +83,11 @@ public class PdlGraphQLConsumer {
                 .map(PdlHentIdenterResponse.PdlHentIdenterData::getHentIdenter)
                 .map(PdlHentIdenterResponse.PdlIdenter::getIdenter)
                 .flatMap(identer -> identer.stream()
-                        .filter(it -> it.getGruppe() == IdentType.FOLKEREGISTERIDENT)
+                        .filter(it -> it.getGruppe() == FOLKEREGISTERIDENT)
                         .filter(it -> !it.isHistorisk())
                         .map(PdlHentIdenterResponse.PdlIdentTo::getIdent)
                         .findFirst())
-                .orElseThrow(()-> {
-                    throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Kunne ikke hente folkeregisterident fra PDL. Respons fra PDL inneholdt ikke gjeldende folkeregisterident");
-                });
+                .orElseThrow(()-> new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Kunne ikke hente folkeregisterident fra PDL. Respons fra PDL inneholdt ikke gjeldende folkeregisterident"));
     }
 
     private PdlRequest mapRequest(final String aktoerId) {

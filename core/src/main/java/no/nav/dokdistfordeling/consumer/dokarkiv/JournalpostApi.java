@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import static java.lang.String.format;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
@@ -41,7 +42,7 @@ public class JournalpostApi {
 	}
 
 	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "oppdaterDistribusjonsinfo"}, histogram = true)
-	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void oppdaterDistribusjonsinfo(String journalpostId, OppdaterDistribusjonsinfoTo oppdaterDistibusjonsinfoTo) {
 
 		webClient.patch()
@@ -55,7 +56,7 @@ public class JournalpostApi {
 	}
 
 	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "oppdaterJournalpost"}, histogram = true)
-	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public OppdaterJournalpostResponse oppdaterJournalpost(String journalpostId, OppdaterJournalpostRequest oppdaterJournalpostRequest) {
 
 		return webClient.put()
@@ -69,15 +70,13 @@ public class JournalpostApi {
 	}
 
 	private void handleError(Throwable error) {
-		if(error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
+		if (error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
 			throw new JournalpostApiFunctionalException(
-					String.format("Kall mot JournalpostAPI feilet med status=%s, feilmelding=%s",
-							response.getRawStatusCode(),
-							response.getMessage()),
+					format("Kall mot JournalpostAPI feilet med status=%s, feilmelding=%s", response.getStatusCode(), response.getMessage()),
 					error);
 		} else {
 			throw new JournalpostApiTechnicalException(
-					String.format("Kall mot JournalpostAPI feilet med feilmelding=%s", error.getMessage()),
+					format("Kall mot JournalpostAPI feilet med feilmelding=%s", error.getMessage()),
 					error);
 		}
 	}
@@ -87,7 +86,7 @@ public class JournalpostApi {
 			return Long.valueOf(journalpostId);
 		} catch (NumberFormatException e) {
 			throw new JournalpostApiTechnicalException(
-					String.format("%s er ikke en gyldig journalpostId. Kan ikke kalle journalpostApi.", journalpostId), e);
+					format("%s er ikke en gyldig journalpostId. Kan ikke kalle journalpostApi.", journalpostId), e);
 		}
 	}
 }

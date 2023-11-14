@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling.consumer.sts;
 
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
-import no.nav.dokdistfordeling.config.cache.LokalCacheConfig;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.StsTechnicalException;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 
+import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.OIDC_TOKEN_CACHE;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 
@@ -35,15 +35,13 @@ public class StsRestConsumer {
 				.build();
 	}
 
-	@Cacheable(LokalCacheConfig.OIDC_TOKEN_CACHE)
-	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Cacheable(OIDC_TOKEN_CACHE)
+	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public String getOidcToken() {
 		try {
-			return restTemplate.getForObject(stsUrl + "/token?grant_type=client_credentials&scope=openid", StsResponseTo.class)
-					.getAccessToken();
+			return restTemplate.getForObject(stsUrl + "/token?grant_type=client_credentials&scope=openid", StsResponseTo.class).getAccessToken();
 		} catch (HttpStatusCodeException e) {
-			throw new StsTechnicalException(String.format("Kall mot STS feilet med status=%s feilmelding=%s.", e.getStatusCode(), e
-					.getMessage()), e);
+			throw new StsTechnicalException(String.format("Kall mot STS feilet med status=%s feilmelding=%s.", e.getStatusCode(), e.getMessage()), e);
 		}
 	}
 }

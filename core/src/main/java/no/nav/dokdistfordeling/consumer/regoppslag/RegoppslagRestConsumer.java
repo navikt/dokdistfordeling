@@ -2,8 +2,6 @@ package no.nav.dokdistfordeling.consumer.regoppslag;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
-import no.nav.dokdistfordeling.constants.Constants;
-import no.nav.dokdistfordeling.consumer.NavHeaders;
 import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseRequestTo;
 import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseResponseTo;
 import no.nav.dokdistfordeling.consumer.sts.StsRestConsumer;
@@ -16,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -27,8 +24,13 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Duration;
 
 import static java.lang.String.format;
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
+import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
+import static org.springframework.http.HttpStatus.GONE;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Slf4j
 @Component
@@ -52,27 +54,23 @@ class RegoppslagRestConsumer {
 	}
 
 	@Monitor(value = "dok_consumer", extraTags = {"process", "treg002HentAdresse"}, histogram = true)
-	@Retryable(include = RegoppslagHentAdresseTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(retryFor = RegoppslagHentAdresseTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	HentMottakerOgAdresseResponseTo.AdresseTo hentAdresse(HentMottakerOgAdresseRequestTo request) {
 		HttpEntity<HentMottakerOgAdresseRequestTo> entity = createRequestWithHeader(request, retrieveOidcTokenAndCreateHeader());
 		try {
-			return restTemplate.postForObject(this.regoppslagUrl + "/hentMottakerOgAdresse", entity, HentMottakerOgAdresseResponseTo.class)
-					.getAdresse();
+			return restTemplate.postForObject(this.regoppslagUrl + "/hentMottakerOgAdresse", entity, HentMottakerOgAdresseResponseTo.class).getAdresse();
 		} catch (HttpClientErrorException e) {
-			if (HttpStatus.UNAUTHORIZED == e.getStatusCode()) {
-				throw new RegoppslagHentAdresseSecurityException(format("Kall mot TREG002 feilet. Ingen tilgang. feilmelding=%s", e
-						.getMessage()), e);
-			} else if (HttpStatus.NOT_FOUND == e.getStatusCode()) {
+			if (UNAUTHORIZED == e.getStatusCode()) {
+				throw new RegoppslagHentAdresseSecurityException(format("Kall mot TREG002 feilet. Ingen tilgang. feilmelding=%s", e.getMessage()), e);
+			} else if (NOT_FOUND == e.getStatusCode()) {
 				throw new UkjentAdresseException("Fant ikke adresseinformasjon for mottaker i PDL. Mottaker har ukjent adresse.", e);
-			} else if (HttpStatus.GONE == e.getStatusCode()) {
+			} else if (GONE == e.getStatusCode()) {
 				throw new PersonErDoedUkjentAdresseException("Mottaker er død og har ukjent adresse.", e);
 			} else {
-				throw new RegoppslagHentAdresseFunctionalException(format("Kunne ikke hente adresse for bruker. status=%s, feilmelding=%s", e
-						.getStatusCode(), e.getMessage()), e);
+				throw new RegoppslagHentAdresseFunctionalException(format("Kunne ikke hente adresse for bruker. status=%s, feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
 			}
 		} catch (HttpServerErrorException e) {
-			throw new RegoppslagHentAdresseTechnicalException(format("Kall mot TREG002 feilet teknisk. status=%s, feilmelding=%s", e
-					.getStatusCode(), e.getMessage()), e);
+			throw new RegoppslagHentAdresseTechnicalException(format("Kall mot TREG002 feilet teknisk. status=%s, feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
 		}
 	}
 
@@ -80,10 +78,10 @@ class RegoppslagRestConsumer {
 		try {
 			String oidcToken = stsRestConsumer.getOidcToken();
 			HttpHeaders httpHeaders = new HttpHeaders();
-			final String callId = MDC.get(Constants.CALL_ID);
-			httpHeaders.set(Constants.CALL_ID, callId);
-			httpHeaders.set(NavHeaders.NAV_CALL_ID, callId);
-			httpHeaders.set(HttpHeaders.AUTHORIZATION, "Bearer " + oidcToken);
+			final String callId = MDC.get(CALL_ID);
+			httpHeaders.set(CALL_ID, callId);
+			httpHeaders.set(NAV_CALL_ID, callId);
+			httpHeaders.setBearerAuth(oidcToken);
 			return httpHeaders;
 		} catch (StsTechnicalException e) {
 			throw new RegoppslagHentAdresseTechnicalException(format("Henting av oidctoken fra STS feilet. Feilmelding=%s", e.getMessage()), e);

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import static java.lang.String.format;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -41,7 +42,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	}
 
 	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "opprettForsendelse"}, histogram = true)
-	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public String opprettForsendelse(final OpprettForsendelseRequestTo opprettForsendelseRequestTo) {
 		var bestillingsId = opprettForsendelseRequestTo.getBestillingsId();
 
@@ -61,7 +62,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	}
 
 	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "oppdaterForsendelse"}, histogram = true)
-	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelse) {
 		log.info("oppdaterForsendelse oppdaterer forsendelse med forsendelseId={}", oppdaterForsendelse.forsendelseId());
 
@@ -75,21 +76,17 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 
 		log.info("oppdaterForsendelse har oppdatert forsendelse med forsendelseId={} til forsendelseStatus={}",
 				oppdaterForsendelse.forsendelseId(), oppdaterForsendelse.forsendelseStatus());
-
 	}
 
 	private void handleError(Throwable error) {
 		if (error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
 			throw new AdminstrerForsendelseFunctionalException(
-					String.format("Kall mot rdist001 feilet funksjonelt med status: %s, feilmelding: %s",
-							response.getRawStatusCode(),
-							response.getMessage()),
+					format("Kall mot rdist001 feilet funksjonelt med status: %s, feilmelding: %s", response.getStatusCode(), response.getMessage()),
 					error);
 		} else {
 			throw new AdminstrerForsendelseTechnicalException(
-					String.format("Kall mot rdist001 feilet feilet teknisk med feilmelding: %s", error.getMessage()),
-					error) {
-			};
+					format("Kall mot rdist001 feilet feilet teknisk med feilmelding: %s", error.getMessage()),
+					error);
 		}
 	}
 

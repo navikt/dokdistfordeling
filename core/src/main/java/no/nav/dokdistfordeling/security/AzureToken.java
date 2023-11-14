@@ -18,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import java.util.Map;
 
+import static java.lang.String.format;
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.AZURE_TOKEN_CACHE;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
@@ -43,7 +44,7 @@ public class AzureToken {
 				.build();
 	}
 
-	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	@Cacheable(AZURE_TOKEN_CACHE)
 	public String accessToken(String scope) {
 		return fetchAccessToken(scope);
@@ -68,20 +69,18 @@ public class AzureToken {
 			Map<String, Object> tokenData = objectMapper.readValue(responseJson, Map.class);
 			return (String) tokenData.get("access_token");
 		} catch (JsonProcessingException | ClassCastException e) {
-			throw new AzureTokenException(String.format("Klarte ikke parse token fra Azure. Feilmelding=%s", e.getMessage()), e);
+			throw new AzureTokenException(format("Klarte ikke parse token fra Azure. Feilmelding=%s", e.getMessage()), e);
 		}
 	}
 
 	private void handleError(Throwable error) {
 		if (error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
 			throw new AzureTokenException(
-					String.format("Klarte ikke hente token fra Azure. Feilet med statuskode=%s Feilmelding=%s",
-							response.getRawStatusCode(),
-							response.getMessage()),
+					format("Klarte ikke hente token fra Azure. Feilet med statuskode=%s Feilmelding=%s", response.getStatusCode(), response.getMessage()),
 					error);
 		} else {
 			throw new AzureTokenException(
-					String.format("Kall mot Azure feilet med feilmelding=%s", error.getMessage()),
+					format("Kall mot Azure feilet med feilmelding=%s", error.getMessage()),
 					error);
 		}
 	}
