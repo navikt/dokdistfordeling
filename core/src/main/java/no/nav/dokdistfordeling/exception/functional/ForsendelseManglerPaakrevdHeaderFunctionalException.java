@@ -5,8 +5,4 @@ public class ForsendelseManglerPaakrevdHeaderFunctionalException extends Abstrac
 	public ForsendelseManglerPaakrevdHeaderFunctionalException(String message) {
 		super(message);
 	}
-
-	public ForsendelseManglerPaakrevdHeaderFunctionalException(String message, Throwable cause) {
-		super(message, cause);
-	}
 }

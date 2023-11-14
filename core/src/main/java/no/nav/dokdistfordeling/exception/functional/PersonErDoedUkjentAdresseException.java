@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.GONE;
 
 @ResponseStatus(value = GONE)
 public class PersonErDoedUkjentAdresseException extends RegoppslagHentAdresseFunctionalException {
+
     public PersonErDoedUkjentAdresseException(String message, Throwable cause) {
         super(message, cause);
     }

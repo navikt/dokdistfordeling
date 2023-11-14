@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.DistribuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
@@ -44,7 +44,7 @@ public class HentDokumenterFraJoarkMapper {
 					.distribusjonbestilling(mapDokumentbestillingsinformasjon(hentDokumenterFraJoark.getDistribusjonbestilling()))
 					.build();
 		} catch (IllegalArgumentException e) {
-			throw new DistrubuerForsendelseMapFunctionalException(format("Kunne ikke mappe qdist012 input-XML til domene-objekter. Feilmelding=%s",
+			throw new DistribuerForsendelseMapFunctionalException(format("Kunne ikke mappe qdist012 input-XML til domene-objekter. Feilmelding=%s",
 					e.getMessage()), e);
 		}
 	}

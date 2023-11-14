@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import no.nav.dokdistfordeling.exception.functional.DistrubuerForsendelseMapFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.DistribuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
@@ -36,7 +36,7 @@ public class Qdist008DistribuerForsendelseMapper {
 			distribuerForsendelse.setDistribusjonbestilling(mapDokumentbestillingsinformasjon(hentDokumenterFraJoarkTo.getDistribusjonbestilling()));
 			return distribuerForsendelse;
 		} catch (Exception e) {
-			throw new DistrubuerForsendelseMapFunctionalException(format("Kunne ikke mappe qdist012 output. Feilmelding=%s",
+			throw new DistribuerForsendelseMapFunctionalException(format("Kunne ikke mappe qdist012 output. Feilmelding=%s",
 					e.getMessage()), e);
 		}
 	}

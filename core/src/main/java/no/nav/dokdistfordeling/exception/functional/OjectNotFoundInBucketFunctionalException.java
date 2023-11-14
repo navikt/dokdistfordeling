@@ -5,8 +5,4 @@ public class OjectNotFoundInBucketFunctionalException extends AbstractDokdistfor
 	public OjectNotFoundInBucketFunctionalException(String message) {
 		super(message);
 	}
-
-	public OjectNotFoundInBucketFunctionalException(String message, Throwable cause) {
-		super(message, cause);
-	}
 }
