@@ -48,9 +48,9 @@ public class ForsendelseValidator {
 
 	private void assertJournalpostStatus(String journalpostid, String bestillingsId) {
 		String journalpostStatus = safJournalpostQueryService.hentJournalpostStatus(journalpostid);
+
 		if (FEILREGISTRERT.equals(journalpostStatus)) {
-			JournalpostFeilregistrertException exception = new JournalpostFeilregistrertException(format("journalpostId=%s er feilregistrert og distribusjon av bestillingsId=%s avbrytes", journalpostid, bestillingsId));
-			throw exception;
+			throw new JournalpostFeilregistrertException(format("journalpostId=%s er feilregistrert og distribusjon av bestillingsId=%s avbrytes", journalpostid, bestillingsId));
 		} else if (!FERDIGSTILT.equals(journalpostStatus)) {
 			throw new ValidationException(format("journalpostId=%s har ugyldig status=%s og distribusjon av bestillingsId=%s avbrytes", journalpostid, journalpostStatus, bestillingsId));
 		}

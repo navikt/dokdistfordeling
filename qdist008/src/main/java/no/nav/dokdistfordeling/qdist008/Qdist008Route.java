@@ -11,6 +11,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.stereotype.Component;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DPVT;
@@ -96,50 +97,50 @@ public class Qdist008Route extends RouteBuilder {
 				.routeId(SERVICE_ID)
 				.setExchangePattern(InOnly)
 				.process(new IdsProcessor())
-				.log(INFO, log, String.format("qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))
+				.log(INFO, log, format("qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))
 				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist008/in/distribuerforsendelse.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
 				.bean(distribuerForsendelseMapper)
 				.bean(forsendelseValidator)
-				.log(INFO, log, String.format("qdist008 har validert forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))
+				.log(INFO, log, format("qdist008 har validert forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))
 				.bean(qdist008Service)
 				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
 				.convertBodyTo(String.class, UTF_8.toString())
 				.choice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(LOKAL_PRINT))
-					.log(INFO, log, String.format("avslutter behandling av forsendelse med %s. Distribusjonskanal=LOKAL_PRINT", getIdsForLogging()))
+					.log(INFO, log, format("avslutter behandling av forsendelse med %s. Distribusjonskanal=LOKAL_PRINT", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(INGEN_DISTRIBUSJON))
-					.log(INFO, log, String.format("avslutter behandling av forsendelse med %s. Distribusjonskanal=INGEN_DISTRIBUSJON", getIdsForLogging()))
+					.log(INFO, log, format("avslutter behandling av forsendelse med %s. Distribusjonskanal=INGEN_DISTRIBUSJON", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(PRINT))
 					.to(InOnly,"jms:" + qdist009.getQueueName())
-					.log(INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist009 for distribusjon via PRINT", getIdsForLogging()))
+					.log(INFO, log, format("qdist008 har lagt forsendelse med %s på kø til qdist009 for distribusjon via PRINT", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DITTNAV))
 					.to(InOnly, "jms:" + qdist010.getQueueName())
-					.log(INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist010 for distribusjon via DITT NAV", getIdsForLogging()))
+					.log(INFO, log, format("qdist008 har lagt forsendelse med %s på kø til qdist010 for distribusjon via DITT NAV", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(SDP))
 					.to(InOnly, "jms:" + qdist011.getQueueName())
-					.log(INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist011 for distribusjon via DPI", getIdsForLogging()))
+					.log(INFO, log, format("qdist008 har lagt forsendelse med %s på kø til qdist011 for distribusjon via DPI", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(TRYGDERETTEN))
 					.to(InOnly,"jms:" + qdist013.getQueueName())
-					.log(INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist013 for distribusjon via Trygderetten", getIdsForLogging()))
+					.log(INFO, log, format("qdist008 har lagt forsendelse med %s på kø til qdist013 for distribusjon via Trygderetten", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DPVT))
 					.to(InOnly, "jms:" + qdist016.getQueueName())
-					.log(INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist016 for distribusjon via DPVT", getIdsForLogging()))
+					.log(INFO, log, format("qdist008 har lagt forsendelse med %s på kø til qdist016 for distribusjon via DPVT", getIdsForLogging()))
 					.endChoice()
 				.end()
 				.bean(dokdistStatusUpdater)
-				.log(INFO, log, String.format("qdist008 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med %s", getIdsForLogging()));
+				.log(INFO, log, format("qdist008 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med %s", getIdsForLogging()));
 		//@formatter:on
 	}
 
 	public static String getIdsForLogging() {
-		return String.format("bestillingsId=${exchangeProperty.%s} og " +
+		return format("bestillingsId=${exchangeProperty.%s} og " +
 				"forsendelseId=${exchangeProperty.%s}", PROPERTY_BESTILLINGS_ID, PROPERTY_FORSENDELSE_ID);
 	}
 }
