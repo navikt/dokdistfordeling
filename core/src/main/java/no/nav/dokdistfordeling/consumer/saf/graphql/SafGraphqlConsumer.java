@@ -7,6 +7,7 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonResponse;
 import no.nav.dokdistfordeling.exception.functional.SafBadRequestException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
+import no.nav.dokdistfordeling.exception.technical.SafUkjentErrorCodeException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.exception.technical.MarshalGraphqlRequestToJsonTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostIkkeFunnetTechnicalException;
@@ -72,8 +73,8 @@ public class SafGraphqlConsumer {
 				switch (safErrorCode) {
 					case NOT_FOUND ->
 							throw new SafJournalpostIkkeFunnetTechnicalException("Fant ikke journalposten i fagarkivet");
-					case FORBIDDEN -> throw new SafJournalpostQueryUnauthorizedException(
-							"Saksbehandler har ikke tilgang til journalposten. Feilmelding fra SAF: " + safError.getMessage());
+					case FORBIDDEN ->
+							throw new SafJournalpostQueryUnauthorizedException("Saksbehandler har ikke tilgang til journalposten. Feilmelding fra SAF: " + safError.getMessage());
 					case SERVER_ERROR -> {
 						log.warn("Teknisk feil mot SAF. Feilmelding: " + safError.getMessage());
 						throw new SafJournalpostQueryTechnicalException(safError.getMessage());
@@ -81,7 +82,7 @@ public class SafGraphqlConsumer {
 					case BAD_REQUEST ->
 							throw new SafBadRequestException("Bad request mot SAF: " + safError.getMessage());
 					default ->
-							throw new SafBadRequestException("Ukjent funksjonell feil mot SAF: " + safError.getMessage());
+							throw new SafUkjentErrorCodeException("Ukjent error code fra SAF. Håndtering av ny feilkode må legges inn her. Feilmelding: " + safError.getMessage());
 				}
 			}
 
