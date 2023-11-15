@@ -26,8 +26,7 @@ public class DokdistStatusUpdater {
 		final String forsendelseId = exchange.getProperty(PROPERTY_FORSENDELSE_ID, String.class);
 
 		if (!isDistribusjonKanalLokalPrintOrIngenDistribusjon(exchange)) {
-			administrerForsendelse.oppdaterForsendelse(new OppdaterForsendelseRequest(Long.valueOf(forsendelseId),
-					FORSENDELSE_STATUS_KLAR_FOR_DIST));
+			administrerForsendelse.oppdaterForsendelse(new OppdaterForsendelseRequest(Long.valueOf(forsendelseId), FORSENDELSE_STATUS_KLAR_FOR_DIST));
 		}
 	}
 

@@ -7,13 +7,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import no.nav.dokdistfordeling.DistribuerJournalpostResponseTo;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+@Target({METHOD})
+@Retention(RUNTIME)
 @Documented
 @ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "OK - journalposten distribueres og bestillingsId returneres.",

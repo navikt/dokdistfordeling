@@ -5,7 +5,6 @@ import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.exception.functional.DokumenttypeInfoFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.DokumenttypeInfoTechnicalException;
-import no.nav.dokdistfordeling.metrics.ConsumerMonitor;
 import no.nav.dokdistfordeling.security.AzureToken;
 import no.nav.dokdistfordeling.security.WebClientAzureAuthentication;
 import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACHE;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
@@ -42,8 +42,7 @@ class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 	}
 
 	@Cacheable(TKAT020_CACHE)
-	@ConsumerMonitor(value = "dok_metric", extraTags = {"process", "getDokumenttypeInfo"}, histogram = true)
-	@Retryable(include = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public DokumenttypeInfoTo getDokumenttypeInfo(final String dokumenttypeId) {
 		DokumentTypeInfoToV4 dokumentTypeInfoToV4 = webclient.get()
 				.uri("/" + dokumenttypeId)
@@ -64,13 +63,11 @@ class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 	private void handleError(Throwable error) {
 		if (error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
 			throw new DokumenttypeInfoFunctionalException(
-					String.format("Kall mot tkat020 feilet funksjonelt med statuskode=%s Feilmelding=%s",
-							response.getRawStatusCode(),
-							response.getMessage()),
+					format("Kall mot tkat020 feilet funksjonelt med statuskode=%s Feilmelding=%s", response.getStatusCode(), response.getMessage()),
 					error);
 		} else {
 			throw new DokumenttypeInfoTechnicalException(
-					String.format("Kall mot tkat020 feilet teknisk med feilmelding=%s", error.getMessage()),
+					format("Kall mot tkat020 feilet teknisk med feilmelding=%s", error.getMessage()),
 					error);
 		}
 	}

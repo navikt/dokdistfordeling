@@ -1,8 +1,9 @@
 package no.nav.dokdistfordeling.qdist012;
 
+import jakarta.jms.Queue;
+import jakarta.xml.bind.JAXBContext;
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseException;
-import no.nav.dokdistfordeling.metrics.Qdist012MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
 import org.apache.camel.ValidationException;
@@ -10,15 +11,11 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.stereotype.Component;
 
-import jakarta.jms.Queue;
-import jakarta.xml.bind.JAXBContext;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.camel.ExchangePattern.InOnly;
 import static org.apache.camel.LoggingLevel.ERROR;
 import static org.apache.camel.LoggingLevel.INFO;
 import static org.apache.camel.LoggingLevel.WARN;
-
 
 @Component
 public class Qdist012Route extends RouteBuilder {
@@ -31,7 +28,6 @@ public class Qdist012Route extends RouteBuilder {
 	private final Queue qdist012;
 	private final Queue qdist012FunksjonellFeil;
 	private final Queue qdist008;
-	private final Qdist012MetricsRoutePolicy qdist012MetricsRoutePolicy;
 	private final HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper;
 	private final HentDokumenterFraJoarkDecrypter hentDokumenterFraJoarkDecrypter;
 
@@ -39,14 +35,12 @@ public class Qdist012Route extends RouteBuilder {
 						 Queue qdist012FunksjonellFeil,
 						 Queue qdist008,
 						 Qdist012Service qdist012Service,
-						 Qdist012MetricsRoutePolicy qdist012MetricsRoutePolicy,
 						 HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper,
 						 HentDokumenterFraJoarkDecrypter hentDokumenterFraJoarkDecrypter) {
 		this.qdist012 = qdist012;
 		this.qdist012FunksjonellFeil = qdist012FunksjonellFeil;
 		this.qdist008 = qdist008;
 		this.qdist012Service = qdist012Service;
-		this.qdist012MetricsRoutePolicy = qdist012MetricsRoutePolicy;
 		this.hentDokumenterFraJoarkMapper = hentDokumenterFraJoarkMapper;
 		this.hentDokumenterFraJoarkDecrypter = hentDokumenterFraJoarkDecrypter;
 	}
@@ -73,7 +67,6 @@ public class Qdist012Route extends RouteBuilder {
 		from("jms:" + qdist012.getQueueName() +
 				"?transacted=true")
 				.routeId(QDIST012_SERVICE_ID)
-				.routePolicy(qdist012MetricsRoutePolicy)
 				.setExchangePattern(InOnly)
 				.process(new HeaderProcessor())
 				.log(INFO, log, "qdist012 har mottatt forsendelse med " + getIdsForLogging())

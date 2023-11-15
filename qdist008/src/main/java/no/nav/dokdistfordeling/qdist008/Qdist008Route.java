@@ -1,8 +1,9 @@
 package no.nav.dokdistfordeling.qdist008;
 
+import jakarta.jms.Queue;
+import jakarta.xml.bind.JAXBContext;
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException;
-import no.nav.dokdistfordeling.qdist008.metrics.Qdist008MetricsRoutePolicy;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
 import org.apache.camel.ValidationException;
@@ -10,9 +11,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.stereotype.Component;
 
-import jakarta.jms.Queue;
-import jakarta.xml.bind.JAXBContext;
-
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DPVT;
@@ -46,7 +45,6 @@ public class Qdist008Route extends RouteBuilder {
 	private final Queue qdist013;
 	private final Queue qdist016;
 	private final Queue qdist008FunksjonellFeil;
-	private final Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy;
 
 	public Qdist008Route(Queue qdist008,
 						 Queue qdist009,
@@ -56,7 +54,6 @@ public class Qdist008Route extends RouteBuilder {
 						 Queue qdist016,
 						 Queue qdist008FunksjonellFeil,
 						 Qdist008Service qdist008Service,
-						 Qdist008MetricsRoutePolicy qdist008MetricsRoutePolicy,
 						 DistribuerForsendelseMapper distribuerForsendelseMapper,
 						 ForsendelseValidator forsendelseValidator,
 						 DokdistStatusUpdater dokdistStatusUpdater) {
@@ -71,7 +68,6 @@ public class Qdist008Route extends RouteBuilder {
 		this.distribuerForsendelseMapper = distribuerForsendelseMapper;
 		this.forsendelseValidator = forsendelseValidator;
 		this.dokdistStatusUpdater = dokdistStatusUpdater;
-		this.qdist008MetricsRoutePolicy = qdist008MetricsRoutePolicy;
 	}
 
 	@Override
@@ -99,53 +95,52 @@ public class Qdist008Route extends RouteBuilder {
 		from("jms:" + qdist008.getQueueName() +
 				"?transacted=true")
 				.routeId(SERVICE_ID)
-				.routePolicy(qdist008MetricsRoutePolicy)
 				.setExchangePattern(InOnly)
 				.process(new IdsProcessor())
-				.log(INFO, log, String.format("qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))
+				.log(INFO, log, format("qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))
 				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist008/in/distribuerforsendelse.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
 				.bean(distribuerForsendelseMapper)
 				.bean(forsendelseValidator)
-				.log(INFO, log, String.format("qdist008 har validert forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))
+				.log(INFO, log, format("qdist008 har validert forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))
 				.bean(qdist008Service)
 				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
 				.convertBodyTo(String.class, UTF_8.toString())
 				.choice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(LOKAL_PRINT))
-					.log(INFO, log, String.format("avslutter behandling av forsendelse med %s. Distribusjonskanal=LOKAL_PRINT", getIdsForLogging()))
+					.log(INFO, log, format("avslutter behandling av forsendelse med %s. Distribusjonskanal=LOKAL_PRINT", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(INGEN_DISTRIBUSJON))
-					.log(INFO, log, String.format("avslutter behandling av forsendelse med %s. Distribusjonskanal=INGEN_DISTRIBUSJON", getIdsForLogging()))
+					.log(INFO, log, format("avslutter behandling av forsendelse med %s. Distribusjonskanal=INGEN_DISTRIBUSJON", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(PRINT))
 					.to(InOnly,"jms:" + qdist009.getQueueName())
-					.log(INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist009 for distribusjon via PRINT", getIdsForLogging()))
+					.log(INFO, log, format("qdist008 har lagt forsendelse med %s på kø til qdist009 for distribusjon via PRINT", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DITTNAV))
 					.to(InOnly, "jms:" + qdist010.getQueueName())
-					.log(INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist010 for distribusjon via DITT NAV", getIdsForLogging()))
+					.log(INFO, log, format("qdist008 har lagt forsendelse med %s på kø til qdist010 for distribusjon via DITT NAV", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(SDP))
 					.to(InOnly, "jms:" + qdist011.getQueueName())
-					.log(INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist011 for distribusjon via DPI", getIdsForLogging()))
+					.log(INFO, log, format("qdist008 har lagt forsendelse med %s på kø til qdist011 for distribusjon via DPI", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(TRYGDERETTEN))
 					.to(InOnly,"jms:" + qdist013.getQueueName())
-					.log(INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist013 for distribusjon via Trygderetten", getIdsForLogging()))
+					.log(INFO, log, format("qdist008 har lagt forsendelse med %s på kø til qdist013 for distribusjon via Trygderetten", getIdsForLogging()))
 					.endChoice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(DPVT))
 					.to(InOnly, "jms:" + qdist016.getQueueName())
-					.log(INFO, log, String.format("qdist008 har lagt forsendelse med %s på kø til qdist016 for distribusjon via DPVT", getIdsForLogging()))
+					.log(INFO, log, format("qdist008 har lagt forsendelse med %s på kø til qdist016 for distribusjon via DPVT", getIdsForLogging()))
 					.endChoice()
 				.end()
 				.bean(dokdistStatusUpdater)
-				.log(INFO, log, String.format("qdist008 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med %s", getIdsForLogging()));
+				.log(INFO, log, format("qdist008 har oppdatert forsendelseStatus i dokdist og avslutter behandling av forsendelse med %s", getIdsForLogging()));
 		//@formatter:on
 	}
 
 	public static String getIdsForLogging() {
-		return String.format("bestillingsId=${exchangeProperty.%s} og " +
+		return format("bestillingsId=${exchangeProperty.%s} og " +
 				"forsendelseId=${exchangeProperty.%s}", PROPERTY_BESTILLINGS_ID, PROPERTY_FORSENDELSE_ID);
 	}
 }
