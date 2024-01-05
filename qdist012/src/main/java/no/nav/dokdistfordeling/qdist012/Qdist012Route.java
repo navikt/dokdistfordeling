@@ -62,6 +62,7 @@ public class Qdist012Route extends RouteBuilder {
 				.handled(true)
 				.useOriginalMessage()
 				.log(WARN, log, "${exception}; " + getIdsForLogging())
+				.log(WARN, log, "Legger melding på funksjonell backoutkø for qdist012; " + getIdsForLogging())
 				.to("jms:" + qdist012FunksjonellFeil.getQueueName());
 
 		from("jms:" + qdist012.getQueueName() +

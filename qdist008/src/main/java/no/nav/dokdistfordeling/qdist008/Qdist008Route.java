@@ -84,6 +84,7 @@ public class Qdist008Route extends RouteBuilder {
 				.handled(true)
 				.useOriginalMessage()
 				.log(WARN, log, "${exception}; " + getIdsForLogging())
+				.log(WARN, log, "Legger melding på funksjonell backoutkø for qdist008; " + getIdsForLogging())
 				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
 
 		//Om journalposten er feilregistrert skal den forkastes og ikke forsøkes distribuert
