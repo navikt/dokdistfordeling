@@ -83,14 +83,13 @@ public class Qdist008Route extends RouteBuilder {
 		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
 				.useOriginalMessage()
-				.log(WARN, log, "${exception}; " + getIdsForLogging())
-				.log(WARN, log, "Legger melding på funksjonell backoutkø for qdist008; " + getIdsForLogging())
+				.log(WARN, log, "Legger melding på funksjonell backoutkø for qdist008 for " + getIdsForLogging() + " grunnet=${exception}")
 				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
 
 		//Om journalposten er feilregistrert skal den forkastes og ikke forsøkes distribuert
 		onException(JournalpostFeilregistrertException.class)
 				.handled(true)
-				.log(WARN, log, "${exception};")
+				.log(WARN, log, "Forkaster melding på qdist008 for " + getIdsForLogging() + " grunnet=${exception}")
 				.end();
 
 		from("jms:" + qdist008.getQueueName() +
