@@ -542,7 +542,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() ->
 				assertTrue(listAppender.list.stream().map(ILoggingEvent::getMessage).toList()
-						.contains("no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException: journalpostId=1234 er feilregistrert og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes;")));
+						.contains("Forkaster melding på qdist008 for bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 og forsendelseId= grunnet=no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException: journalpostId=1234 er feilregistrert og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes")));
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
@@ -570,7 +570,7 @@ public class Qdist008IT {
 			String resultOnQdist008FunksjonellFeilQueue = receive(qdist008FunksjonellFeil);
 			assertThat(resultOnQdist008FunksjonellFeilQueue).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml").replaceAll("\r", ""));
 			assertTrue(listAppender.list.stream().map(ILoggingEvent::getMessage).toList()
-					.contains("no.nav.dokdistfordeling.exception.functional.ValidationException: journalpostId=1234 har ugyldig status=UNDER_ARBEID og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes; bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 og forsendelseId="));
+					.contains("Legger melding på funksjonell backoutkø for qdist008 for bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 og forsendelseId= grunnet=no.nav.dokdistfordeling.exception.functional.ValidationException: journalpostId=1234 har ugyldig status=UNDER_ARBEID og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes"));
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
