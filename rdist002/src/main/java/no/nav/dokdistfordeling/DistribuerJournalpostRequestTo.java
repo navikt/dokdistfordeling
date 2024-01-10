@@ -24,8 +24,6 @@ public class DistribuerJournalpostRequestTo {
 	String distribusjonstype;
 	@Schema(name = "distribusjonstidspunkt", description = "Forteller dokumentdistribusjon når dokumentet kan distribueres. \"UMIDDELBART\" eller \"KJERNETID\"", example = "UMIDDELBART", required = true)
 	String distribusjonstidspunkt;
-	@Schema(name = "tvingSentralPrint", description = "Settes til TRUE dersom forsendelsen skal sendes til sentral print, uten å sjekke om mottaker er digitalt tilgjengelig", defaultValue = "false", hidden = true)
-	boolean tvingSentralPrint;
 
 	@Builder
 	@Getter

@@ -62,7 +62,7 @@ public class DistribuerJournalpostService {
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
 		boolean harAdresse = nonNull(trimmetDistribuerJournalpostRequestTo.getAdresse());
-		DistribusjonsKanalCode distribusjonsKanalCode = trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint() ? PRINT : hentBestemDokdistKanal.bestemDistribusjonskanal(journalpost, harAdresse);
+		DistribusjonsKanalCode distribusjonsKanalCode = hentBestemDokdistKanal.bestemDistribusjonskanal(journalpost, harAdresse);
 
 		DistribuerJournalpostRequestTo distribuerRequest = isNull(trimmetDistribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonsKanalCode) ?
 				hentDistribuerAdresseFraRegoppslag(trimmetDistribuerJournalpostRequestTo, journalpost) : trimmetDistribuerJournalpostRequestTo;
