@@ -5,7 +5,6 @@ import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.Queue;
 import jakarta.jms.TextMessage;
-import jakarta.xml.bind.JAXBException;
 import no.nav.dokdistfordeling.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.DistribuerJournalpostResponseTo;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
@@ -92,7 +91,6 @@ public class Rdist002IT {
 	private static final String POSTNUMMER = "1337";
 	private static final String LAND_NO = "NO";
 	private static final String LAND_US = "US";
-	private static final String LAND_KOSOVO = "XK";
 	private static final String DOKUMENTPRODAPP = "dokumentprodapp";
 
 	private static final String DOKUMENTTYPEID = "000001";
@@ -143,6 +141,55 @@ public class Rdist002IT {
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
 				.distribusjonstidspunkt(KJERNETID.name())
 				.distribusjonstype(VIKTIG.name())
+				.build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
+
+		assertEquals(36, restResponse.getBestillingsId().length());
+
+		await().atMost(100, TimeUnit.SECONDS).untilAsserted(() -> {
+			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			assertEquals(callId, qdist012ResultMessage.getStringProperty(CALL_ID));
+			assertEquals(NAV_CONSUMER_ID, qdist012ResultMessage.getStringProperty(CONSUMER_ID));
+
+			assertNotNull(qdist012Result);
+			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
+			assertThat(classpathToString("__files/rdist002IT-hentDokumenterFraJoark-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
+		});
+
+
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
+	}
+
+	@Test
+	public void shouldDistribuerJournalpostToPrintWhenTvingSentralPrintSetToTrue() {
+		stubFor(post(urlMatching("/safgraphql")).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.withBodyFile("saf/safGraphQlResponse-happy.json")));
+
+		stubFor(get(urlMatching("/dokkat-tkat020/" + DOKUMENTTYPEID)).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON.getMimeType())
+				.withBodyFile("dokkat/tkat020-happy.json")));
+
+		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK
+						.value())
+				.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.withBodyFile("sts/stsResponse_happy.json")));
+
+		stubFor(post("/pdl").willReturn(aResponse()
+				.withStatus(HttpStatus.OK.value())
+				.withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.withBodyFile("pdl/pdl-happy.json")));
+
+
+		putStubOppdaterJournalpost();
+
+		final String callId = UUID.randomUUID().toString();
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
+				.distribusjonstidspunkt(KJERNETID.name())
+				.distribusjonstype(VIKTIG.name())
+				.tvingSentralPrint(true)
 				.build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
@@ -829,22 +876,21 @@ public class Rdist002IT {
 		);
 	}
 
-	private String extractHentDokumenterFraJoarkXmlStringAndDecrypt(Message message) throws JMSException, JAXBException {
+	private String extractHentDokumenterFraJoarkXmlStringAndDecrypt(Message message) throws JMSException {
 		String bestillingsId = message.getStringProperty(BESTILLINGS_ID);
 		String encryptedAndMarshaledBody = ((TextMessage) message).getText();
 		return new Crypto(encryptionPassphrase, bestillingsId).decrypt(encryptedAndMarshaledBody);
 	}
 
 	private String classpathToString(String classpathResource) {
-		String message = null;
 		try {
 			InputStream inputStream = new ClassPathResource(classpathResource).getInputStream();
-			message = IOUtils.toString(inputStream, UTF_8);
+			String message = IOUtils.toString(inputStream, UTF_8);
 			IOUtils.closeQuietly(inputStream);
+			return message;
 		} catch (IOException e) {
 			return "Failed to load file";
 		}
-		return message;
 	}
 
 }

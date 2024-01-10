@@ -17,7 +17,7 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -62,13 +62,13 @@ public class DistribuerJournalpostService {
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
 		boolean harAdresse = nonNull(trimmetDistribuerJournalpostRequestTo.getAdresse());
-		DistribusjonsKanalCode distribusjonsKanalCode = hentBestemDokdistKanal.bestemDistribusjonskanal(journalpost, harAdresse);
+		DistribusjonsKanalCode distribusjonsKanalCode = trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint() ? PRINT : hentBestemDokdistKanal.bestemDistribusjonskanal(journalpost, harAdresse);
 
 		DistribuerJournalpostRequestTo distribuerRequest = isNull(trimmetDistribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonsKanalCode) ?
 				hentDistribuerAdresseFraRegoppslag(trimmetDistribuerJournalpostRequestTo, journalpost) : trimmetDistribuerJournalpostRequestTo;
 
 		OppdaterJournalpostResponse oppdaterJournalpostResponse = journalpostApi.oppdaterJournalpost(trimmetDistribuerJournalpostRequestTo.getJournalpostId(), OppdaterJournalpostRequest.builder()
-				.tilleggsopplysninger(Arrays.asList(OppdaterJournalpostRequest.Tilleggsopplysning.builder()
+				.tilleggsopplysninger(List.of(OppdaterJournalpostRequest.Tilleggsopplysning.builder()
 						.nokkel(DOKDISTBESTILLINGS_ID)
 						.verdi(bestillingsId)
 						.build()))
