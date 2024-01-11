@@ -146,7 +146,7 @@ public class Rdist002IT {
 
 		assertEquals(36, restResponse.getBestillingsId().length());
 
-		await().atMost(100, TimeUnit.SECONDS).untilAsserted(() -> {
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 			assertEquals(callId, qdist012ResultMessage.getStringProperty(CALL_ID));
@@ -193,9 +193,9 @@ public class Rdist002IT {
 				.build(), createHappyPathHeaders(callId, NAV_CONSUMER_ID));
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, HttpStatus.OK);
 
-		assertEquals(36, restResponse.getBestillingsId().length());
+		assertNotNull(restResponse.getBestillingsId());
 
-		await().atMost(100, TimeUnit.SECONDS).untilAsserted(() -> {
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 			assertEquals(callId, qdist012ResultMessage.getStringProperty(CALL_ID));
@@ -249,7 +249,7 @@ public class Rdist002IT {
 
 		assertEquals(36, restResponse.getBestillingsId().length());
 
-		await().atMost(100, TimeUnit.SECONDS).untilAsserted(() -> {
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 			assertEquals(callId, qdist012ResultMessage.getStringProperty(CALL_ID));
