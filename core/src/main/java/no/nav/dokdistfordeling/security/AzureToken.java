@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.exception.functional.AzureTokenException;
@@ -28,14 +27,11 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VAL
 public class AzureToken {
 
 	private final AzureProperties azureConfig;
-	private final ObjectMapper objectMapper;
 	private final WebClient webClient;
 
 	public AzureToken(AzureProperties azureConfig,
-					  ObjectMapper objectMapper,
 					  WebClient webClient) {
 		this.azureConfig = azureConfig;
-		this.objectMapper = objectMapper;
 		this.webClient = webClient.mutate()
 				.defaultHeader(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
 				.baseUrl(azureConfig.getOpenidConfigTokenEndpoint())

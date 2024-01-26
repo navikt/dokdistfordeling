@@ -75,7 +75,7 @@ public class HentBestemDokdistKanalService {
 	private static Integer getSladdetOrArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
 		return dokumentvariants.stream()
 				.sorted(sortSladdetFirstComparator)
-				.map(dokumentvariant -> dokumentvariant.getFilstoerrelse())
+				.map(Journalpost.Dokumentvariant::getFilstoerrelse)
 				.findFirst()
 				.orElse(0);
 	}

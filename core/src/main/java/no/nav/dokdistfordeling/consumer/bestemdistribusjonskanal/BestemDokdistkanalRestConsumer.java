@@ -36,9 +36,7 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 		DokdistfordelingProperties.AzureEndpoint dokdistkanal = dokdistfordelingProperties.getEndpoints().getDokdistkanal();
 		this.webClient = webClient.mutate()
 				.baseUrl(dokdistkanal.getUrl())
-				.defaultHeaders(httpHeaders -> {
-					httpHeaders.setContentType(APPLICATION_JSON);
-				})
+				.defaultHeaders(httpHeaders -> httpHeaders.setContentType(APPLICATION_JSON))
 				.filter(new WebClientAzureAuthentication(azureToken, dokdistkanal.getScope()))
 				.build();
 	}
