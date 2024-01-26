@@ -8,11 +8,10 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class DokDistKanalRequest {
-	private String mottakerId;
-	private String dokumentTypeId;
-	private String mottakerType;
 	private String brukerId;
+	private String dokumentTypeId;
 	private boolean erArkivert;
-	private String tema;
 	private Integer forsendelseStoerrelse;
+	private String mottakerId;
+	private String tema;
 }

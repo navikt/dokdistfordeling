@@ -1,5 +1,10 @@
 package no.nav.dokdistfordeling.kodeverk;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum DistribusjonsKanalCode {
 
 	PRINT("S"),
@@ -11,12 +16,4 @@ public enum DistribusjonsKanalCode {
 	DPVT("DPVT");
 
 	private final String joarkUtsendingsKanal;
-
-	DistribusjonsKanalCode(String joarkUtsendingsKanal) {
-		this.joarkUtsendingsKanal = joarkUtsendingsKanal;
-	}
-
-	public String getJoarkUtsendingsKanal() {
-		return this.joarkUtsendingsKanal;
-	}
 }

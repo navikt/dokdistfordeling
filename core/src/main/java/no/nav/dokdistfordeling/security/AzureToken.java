@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.security;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.azure.AzureProperties;
@@ -15,8 +15,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-
-import java.util.Map;
 
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.AZURE_TOKEN_CACHE;
@@ -58,23 +56,18 @@ public class AzureToken {
 		formData.add("grant_type", "client_credentials");
 		formData.add("scope", scope);
 
-		String responseJson = webClient.post()
+		return webClient.post()
 				.body(BodyInserters.fromFormData(formData))
 				.retrieve()
-				.bodyToMono(String.class)
+				.bodyToMono(JsonNode.class)
+				.map(jsonNode -> jsonNode.get("access_token").asText())
 				.doOnError(this::handleError)
 				.block();
 
-		try {
-			Map<String, Object> tokenData = objectMapper.readValue(responseJson, Map.class);
-			return (String) tokenData.get("access_token");
-		} catch (JsonProcessingException | ClassCastException e) {
-			throw new AzureTokenException(format("Klarte ikke parse token fra Azure. Feilmelding=%s", e.getMessage()), e);
-		}
 	}
 
 	private void handleError(Throwable error) {
-		if (error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
+		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
 			throw new AzureTokenException(
 					format("Klarte ikke hente token fra Azure. Feilet med statuskode=%s Feilmelding=%s", response.getStatusCode(), response.getMessage()),
 					error);

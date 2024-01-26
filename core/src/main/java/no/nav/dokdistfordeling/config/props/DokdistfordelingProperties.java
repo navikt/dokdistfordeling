@@ -45,6 +45,12 @@ public class DokdistfordelingProperties {
 		@NotNull
 		private AzureEndpoint dokdistadmin;
 
+		/**
+		 * URL til bestem dokdistkanal api.
+		 */
+		@NotNull
+		private AzureEndpoint dokdistkanal;
+
 	}
 
 	@Data

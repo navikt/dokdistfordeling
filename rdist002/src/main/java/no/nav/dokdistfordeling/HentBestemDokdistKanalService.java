@@ -22,11 +22,6 @@ import static org.apache.logging.log4j.util.Strings.isEmpty;
 @Component
 public class HentBestemDokdistKanalService {
 
-	private static final String ORGANISASJON = "ORGANISASJON";
-	private static final String PERSON = "PERSON";
-	private static final String SAMHANDLER_PREFIX = "SAMHANDLER";
-	private static final String SAMHANDLER_UKJENT = "SAMHANDLER_UKJENT";
-
 	private final BestemDokdistkanalRestConsumer bestemDokdistkanal;
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 
@@ -52,7 +47,6 @@ public class HentBestemDokdistKanalService {
 				.dokumentTypeId(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID)
 				.brukerId(personnummer)
 				.mottakerId(determineMottakerId(journalpost.getAvsenderMottaker().getId()))
-				.mottakerType(getMottakerType(journalpost.getAvsenderMottaker()))
 				.erArkivert(true)
 				.tema(journalpost.getTema())
 				.forsendelseStoerrelse(getFilstoerrelseMB(journalpost))
@@ -67,18 +61,6 @@ public class HentBestemDokdistKanalService {
 
 	private String hentIdent(Journalpost.Bruker bruker) {
 		return AKTOERID.equals(bruker.getType()) ? pdlGraphQLConsumer.hentFolkeregisteridentForAktoerId(bruker.getId()) : bruker.getId();
-	}
-
-	private String getMottakerType(Journalpost.AvsenderMottaker avsenderMottaker) {
-		if (avsenderMottaker.getType() == null || isEmpty(avsenderMottaker.getType().name())) {
-			return SAMHANDLER_UKJENT;
-		}
-		return switch (avsenderMottaker.getType()) {
-			case FNR -> PERSON;
-			case ORGNR -> ORGANISASJON;
-			case UKJENT -> SAMHANDLER_UKJENT;
-			default -> SAMHANDLER_PREFIX + "_" + avsenderMottaker.getType();
-		};
 	}
 
 	private int getFilstoerrelseMB(Journalpost journalpost) {
