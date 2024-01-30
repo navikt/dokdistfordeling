@@ -1,13 +1,13 @@
 package no.nav.dokdistfordeling;
 
-import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
 import no.nav.dokdistfordeling.config.azure.AzureProperties;
+import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.props.DokdistmellomlagerProperties;
 import no.nav.dokdistfordeling.config.props.PdlProperties;
-import no.nav.dokdistfordeling.security.AzureToken;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Import;
@@ -18,7 +18,6 @@ import static java.lang.System.setProperty;
 
 @EnableCaching
 @EnableRetry
-@SpringBootApplication
 @EnableConfigurationProperties({
 		MqGatewayAlias.class,
 		PdlProperties.class,
@@ -28,9 +27,9 @@ import static java.lang.System.setProperty;
 })
 @Import({
 		CoreConfig.class,
-		DistribuerJournalpostConfig.class,
-		AzureToken.class
+		DistribuerJournalpostConfig.class
 })
+@SpringBootApplication(exclude = UserDetailsServiceAutoConfiguration.class)
 public class Application {
 
 	public static void main(String[] args) {

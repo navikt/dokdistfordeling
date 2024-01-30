@@ -2,7 +2,7 @@
 <ns2:hentDokumenterFraJoark xmlns:ns2="http://nav.no/melding/virksomhet/dokdistfordeling">
 	<distribusjonbestilling>
 		<batchId>66666</batchId>
-		<distribusjonKanal>SDP</distribusjonKanal>
+		<distribusjonKanal>PRINT</distribusjonKanal>
 		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
 		<tema>OPP</tema>
 		<distribusjonstype>VIKTIG</distribusjonstype>
@@ -11,21 +11,18 @@
 			<arkivSystem>JOARK</arkivSystem>
 			<arkivId>555555555</arkivId>
 		</arkivInformasjon>
-		<mottaker xsi:type="ns2:Samhandler" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-			<samhandleridentifikator>89898989898</samhandleridentifikator>
-			<navn>TSS id Mottaker</navn>
-			<samhandlerkategori>UKJENT</samhandlerkategori>
+		<mottaker xsi:type="ns2:Person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<personidentifikator>09876543210</personidentifikator>
+			<navn>Jan Neimansen</navn>
 		</mottaker>
 		<bruker xsi:type="ns2:AktoerId" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 			<aktoerId>12345678901</aktoerId>
 		</bruker>
-		<adresse xsi:type="ns2:NorskPostadresse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<adresse xsi:type="ns2:UtenlandskPostadresse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 			<adresselinje1>eksempelveien 23 A</adresselinje1>
 			<adresselinje2>eksempelveien 24 A</adresselinje2>
 			<adresselinje3>eksempelveien 25 A</adresselinje3>
-			<postnummer>1337</postnummer>
-			<poststed>poststed</poststed>
-			<land>NO</land>
+			<land>US</land>
 		</adresse>
 		<dokumentProdApp>dokumentprodapp</dokumentProdApp>
 		<dokumenter>

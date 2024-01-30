@@ -7,8 +7,6 @@ import no.nav.dokdistfordeling.consumer.rdist001.domain.OppdaterForsendelseReque
 import no.nav.dokdistfordeling.exception.functional.AdminstrerForsendelseFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.AdminstrerForsendelseTechnicalException;
-import no.nav.dokdistfordeling.security.AzureToken;
-import no.nav.dokdistfordeling.security.WebClientAzureAuthentication;
 import no.nav.dokdistfordeling.support.NavHeadersFilter;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -17,10 +15,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import static java.lang.String.format;
+import static no.nav.dokdistfordeling.config.azure.OAuthEnabledWebClientConfig.CLIENT_REGISTRATION_DOKDISTADMIN;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
 
 @Slf4j
 @Component
@@ -29,13 +29,11 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 	private final WebClient webClient;
 
 	public AdministrerForsendelseConsumer(final DokdistfordelingProperties dokdistfordelingProperties,
-										  WebClient webClient,
-										  AzureToken azureToken) {
+										  WebClient webClient) {
 		this.webClient = webClient
 				.mutate()
 				.defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.baseUrl(dokdistfordelingProperties.getEndpoints().getDokdistadmin().getUrl())
-				.filter(new WebClientAzureAuthentication(azureToken, dokdistfordelingProperties.getEndpoints().getDokdistadmin().getScope()))
 				.filter(new NavHeadersFilter())
 				.build();
 	}
@@ -47,6 +45,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 		log.info("opprettForsendelse oppretter forsendelse med bestillingsId={}", bestillingsId);
 
 		var forsendelseId = webClient.post()
+				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKDISTADMIN))
 				.bodyValue(opprettForsendelseRequestTo)
 				.retrieve()
 				.bodyToMono(OpprettForsendelseResponseTo.class)
@@ -65,6 +64,7 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 
 		webClient.put()
 				.uri("/oppdaterforsendelse")
+				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKDISTADMIN))
 				.bodyValue(oppdaterForsendelse)
 				.retrieve()
 				.toBodilessEntity()

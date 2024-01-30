@@ -6,8 +6,6 @@ import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalMappingExc
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.BestemDokdistKanalTechnicalException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
-import no.nav.dokdistfordeling.security.AzureToken;
-import no.nav.dokdistfordeling.security.WebClientAzureAuthentication;
 import org.slf4j.MDC;
 import org.springframework.http.ProblemDetail;
 import org.springframework.retry.annotation.Backoff;
@@ -18,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import java.util.function.Consumer;
 
+import static no.nav.dokdistfordeling.config.azure.OAuthEnabledWebClientConfig.CLIENT_REGISTRATION_DOKDISTKANAL;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
@@ -25,30 +24,28 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
 
 @Component
 public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal {
 	private final WebClient webClient;
 
 	public BestemDokdistkanalRestConsumer(final DokdistfordelingProperties dokdistfordelingProperties,
-										  WebClient webClient,
-										  AzureToken azureToken) {
+										  WebClient webClient) {
 		DokdistfordelingProperties.AzureEndpoint dokdistkanal = dokdistfordelingProperties.getEndpoints().getDokdistkanal();
 		this.webClient = webClient.mutate()
 				.baseUrl(dokdistkanal.getUrl())
 				.defaultHeaders(httpHeaders -> httpHeaders.setContentType(APPLICATION_JSON))
-				.filter(new WebClientAzureAuthentication(azureToken, dokdistkanal.getScope()))
 				.build();
 	}
 
 	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public DistribusjonsKanalCode bestemKanal(DokDistKanalRequest dokDistKanalRequest) {
-		final String callId = MDC.get(CALL_ID);
 		return webClient.post()
-				.headers(httpHeaders -> {
-					httpHeaders.set(CALL_ID, callId);
-					httpHeaders.set(NAV_CALL_ID, callId);
-				})
+				.uri(uriBuilder -> uriBuilder.path("/rest/bestemDistribusjonskanal")
+						.build())
+				.headers(httpHeaders -> httpHeaders.set(NAV_CALL_ID, MDC.get(CALL_ID)))
+				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKDISTKANAL))
 				.bodyValue(dokDistKanalRequest)
 				.retrieve()
 				.bodyToMono(DokDistKanalResponseTo.class)
@@ -74,7 +71,7 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 		return error -> {
 			if (error instanceof WebClientResponseException webException && webException.getStatusCode().is4xxClientError()) {
 				ProblemDetail problemDetail = webException.getResponseBodyAs(ProblemDetail.class);
-				throw new BestemDokdistKanalFunctionalException("BestemDokdistkanal feilet med statusCode=" + problemDetail.getStatus() + ", problem=" + problemDetail);
+				throw new BestemDokdistKanalFunctionalException("BestemDokdistkanal feilet med problem=" + problemDetail);
 			} else {
 				throw new BestemDokdistKanalTechnicalException("BestemDokdistkanal feilet med melding=" + error.getMessage(), error);
 			}

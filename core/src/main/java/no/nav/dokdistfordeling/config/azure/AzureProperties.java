@@ -1,19 +1,17 @@
 package no.nav.dokdistfordeling.config.azure;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.validation.constraints.NotEmpty;
 
-@Data
 @ConfigurationProperties("azure")
 @Validated
-public class AzureProperties {
-	@NotEmpty
-	private String openidConfigTokenEndpoint;
-	@NotEmpty
-	private String appClientId;
-	@NotEmpty
-	private String appClientSecret;
+public record AzureProperties(
+		@NotEmpty
+		String openidConfigTokenEndpoint,
+		@NotEmpty
+		String appClientId,
+		@NotEmpty
+		String appClientSecret) {
 }

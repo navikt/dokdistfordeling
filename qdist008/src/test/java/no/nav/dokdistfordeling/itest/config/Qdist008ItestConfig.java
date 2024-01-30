@@ -6,7 +6,6 @@ import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.props.PdlProperties;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
-import no.nav.dokdistfordeling.security.AzureToken;
 import no.nav.dokdistfordeling.storage.BucketStorage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +27,6 @@ import static org.mockito.Mockito.mock;
 		Qdist008JmsItestConfig.class,
 		LokalTestCacheConfig.class,
 		CoreConfig.class,
-		AzureToken.class,
 		JournalpostApi.class
 })
 public class Qdist008ItestConfig {

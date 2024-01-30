@@ -27,7 +27,7 @@
   "DOKDISTFORDELING_ENDPOINTS_DOKMET_SCOPE": "api://prod-fss.teamdokumenthandtering.dokmet/.default",
   "DOKDISTFORDELING_ENDPOINTS_DOKDISTADMIN_URL": "https://dokdistadmin.intern.nav.no/rest/v1/administrerforsendelse",
   "DOKDISTFORDELING_ENDPOINTS_DOKDISTADMIN_SCOPE": "api://prod-fss.teamdokumenthandtering.dokdistadmin/.default",
-  "DOKDISTFORDELING_ENDPOINTS_DOKDISTKANAL_URL": "https://dokdistkanal.intern.nav.no/rest/bestemDistribusjonskanal",
+  "DOKDISTFORDELING_ENDPOINTS_DOKDISTKANAL_URL": "https://dokdistkanal.intern.nav.no",
   "DOKDISTFORDELING_ENDPOINTS_DOKDISTKANAL_SCOPE": "api://prod-fss.teamdokumenthandtering.dokdistkanal/.default",
   "APPDYNAMICS": "/apikey/appdynamics/prod",
   "APP_NAME": "dokdistfordeling",

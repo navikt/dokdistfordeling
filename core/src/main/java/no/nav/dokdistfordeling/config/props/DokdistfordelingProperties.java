@@ -46,7 +46,7 @@ public class DokdistfordelingProperties {
 		private AzureEndpoint dokdistadmin;
 
 		/**
-		 * URL til bestem dokdistkanal api.
+		 * URL og Scope til dokdistkanal.
 		 */
 		@NotNull
 		private AzureEndpoint dokdistkanal;
