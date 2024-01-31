@@ -1,5 +1,6 @@
 package no.nav.dokdistfordeling;
 
+import no.nav.dokdistfordeling.config.SecurityConfig;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
 import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
@@ -27,7 +28,8 @@ import static java.lang.System.setProperty;
 })
 @Import({
 		CoreConfig.class,
-		DistribuerJournalpostConfig.class
+		DistribuerJournalpostConfig.class,
+		SecurityConfig.class
 })
 @SpringBootApplication(exclude = UserDetailsServiceAutoConfiguration.class)
 public class Application {
