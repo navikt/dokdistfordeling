@@ -115,7 +115,7 @@ public class OAuthEnabledWebClientConfig {
 						.clientSecret(azureProperties.appClientSecret())
 						.clientAuthenticationMethod(CLIENT_SECRET_BASIC)
 						.authorizationGrantType(CLIENT_CREDENTIALS)
-						.scope(properties.getEndpoints().getDokdistkanal().getScope())
+						.scope(properties.getEndpoints().getDokmet().getScope())
 						.build());
 	}
 
