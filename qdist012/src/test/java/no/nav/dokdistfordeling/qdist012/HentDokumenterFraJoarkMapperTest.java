@@ -1,7 +1,7 @@
 package no.nav.dokdistfordeling.qdist012;
 
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.AktoerId;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.UMIDDELBART;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VEDTAK;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -97,7 +97,7 @@ class HentDokumenterFraJoarkMapperTest {
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(createHentDokumentFraJoarkDittNav());
 
 		HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
-		assertEquals(distribusjonbestilling.getDistribusjonKanal(), DistribusjonsKanalCode.DITTNAV.name());
+		assertEquals(distribusjonbestilling.getDistribusjonKanal(), DistribusjonKanalCode.DITTNAV.name());
 		assertThat(distribusjonbestilling.getAdresse()).isNotNull();
 	}
 
@@ -108,7 +108,7 @@ class HentDokumenterFraJoarkMapperTest {
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumentFraJoarkDittNav);
 
 		HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
-		assertEquals(distribusjonbestilling.getDistribusjonKanal(), DistribusjonsKanalCode.DITTNAV.name());
+		assertEquals(distribusjonbestilling.getDistribusjonKanal(), DistribusjonKanalCode.DITTNAV.name());
 		assertThat(distribusjonbestilling.getAdresse()).isNull();
 	}
 

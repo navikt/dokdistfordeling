@@ -1,6 +1,5 @@
 package no.nav.dokdistfordeling;
 
-import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.ArkivInformasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Distribusjonbestilling;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.DokumentInformasjon;
@@ -50,9 +49,9 @@ import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresse;
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.SDP;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.DITTNAV;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.SDP;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.UMIDDELBART;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VEDTAK;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;

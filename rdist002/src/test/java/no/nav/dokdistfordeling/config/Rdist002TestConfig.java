@@ -27,7 +27,7 @@ import org.springframework.retry.annotation.EnableRetry;
 		DistribuerJournalpostConfig.class,
 		CoreConfig.class,
 		JournalpostApi.class,
-		SecurityConfigTest.class
+		SecurityConfig.class
 })
 public class Rdist002TestConfig {
 }

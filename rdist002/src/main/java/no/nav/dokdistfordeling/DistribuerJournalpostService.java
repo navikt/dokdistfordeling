@@ -8,7 +8,7 @@ import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostResponse;
 import no.nav.dokdistfordeling.consumer.regoppslag.Regoppslag;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
@@ -27,7 +27,7 @@ import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateDistribuerJ
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateJournalpostAndDokumenter;
 import static no.nav.dokdistfordeling.constants.Constants.DOKDISTBESTILLINGS_ID;
 import static no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType.UKJENT;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Component
@@ -62,9 +62,9 @@ public class DistribuerJournalpostService {
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
 		boolean harAdresse = nonNull(trimmetDistribuerJournalpostRequestTo.getAdresse());
-		DistribusjonsKanalCode distribusjonsKanalCode = trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint() ? PRINT : hentBestemDokdistKanal.bestemDistribusjonskanal(journalpost, harAdresse);
+		DistribusjonKanalCode distribusjonKanalCode = trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint() ? PRINT : hentBestemDokdistKanal.bestemDistribusjonskanal(journalpost, harAdresse);
 
-		DistribuerJournalpostRequestTo distribuerRequest = isNull(trimmetDistribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonsKanalCode) ?
+		DistribuerJournalpostRequestTo distribuerRequest = isNull(trimmetDistribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonKanalCode) ?
 				hentDistribuerAdresseFraRegoppslag(trimmetDistribuerJournalpostRequestTo, journalpost) : trimmetDistribuerJournalpostRequestTo;
 
 		OppdaterJournalpostResponse oppdaterJournalpostResponse = journalpostApi.oppdaterJournalpost(trimmetDistribuerJournalpostRequestTo.getJournalpostId(), OppdaterJournalpostRequest.builder()
@@ -75,7 +75,7 @@ public class DistribuerJournalpostService {
 				.build());
 		log.info("Oppdatert journalpost med journalpostId={} tilleggsopplysninger med nøkkel={} og verdi={}", oppdaterJournalpostResponse.getJournalpostId(), DOKDISTBESTILLINGS_ID, bestillingsId);
 
-		return doDistribuerForsendelse(distribuerRequest, bestillingsId, journalpost, mottaker, distribusjonsKanalCode);
+		return doDistribuerForsendelse(distribuerRequest, bestillingsId, journalpost, mottaker, distribusjonKanalCode);
 	}
 
 	private DistribuerJournalpostRequestTo trimAdresse(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
@@ -112,13 +112,13 @@ public class DistribuerJournalpostService {
 	private String doDistribuerForsendelse(final DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
 										   final String bestillingsId,
 										   final Journalpost journalpost,
-										   final Aktoer mottaker, DistribusjonsKanalCode distribusjonsKanalCode) {
+										   final Aktoer mottaker, DistribusjonKanalCode distribusjonKanalCode) {
 
 		if (distribuerJournalpostRequestTo.getAdresse() != null) {
 			validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
 		}
 
-		final HentDokumenterFraJoark hentDokumenterFraJoark = hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, bestillingsId, distribusjonsKanalCode);
+		final HentDokumenterFraJoark hentDokumenterFraJoark = hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, bestillingsId, distribusjonKanalCode);
 		distribuerForsendelseProducer.produce(hentDokumenterFraJoark,
 				bestillingsId,
 				distribuerJournalpostRequestTo.getJournalpostId());

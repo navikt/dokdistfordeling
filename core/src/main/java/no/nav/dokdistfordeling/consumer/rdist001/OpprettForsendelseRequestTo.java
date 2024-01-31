@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Value;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 public class OpprettForsendelseRequestTo {
 	String bestillingsId;
-	DistribusjonsKanalCode distribusjonsKanal;
+	DistribusjonKanalCode distribusjonsKanal;
 	String bestillendeFagsystem;
 	String tema;
 	String forsendelseTittel;

@@ -4,7 +4,7 @@ import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.dokdistfordeling.qdist008.domain.OpprettForsendelseToRequestMapper;
@@ -56,7 +56,7 @@ class OpprettForsendelseToRequestMapperTest {
 	private static final ArkivSystemCode ARKIV_SYSTEM_CODE = ArkivSystemCode.JOARK;
 	private static final String DOKUMENTTITTEL = "dokumentTittel";
 
-	private static final DistribusjonsKanalCode DISTRIBUSJONS_KANAL_CODE = DistribusjonsKanalCode.PRINT;
+	private static final DistribusjonKanalCode DISTRIBUSJONS_KANAL_CODE = DistribusjonKanalCode.PRINT;
 
 	private final OpprettForsendelseToRequestMapper opprettForsendelseToRequestMapper = new OpprettForsendelseToRequestMapper();
 

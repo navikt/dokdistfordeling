@@ -2,7 +2,7 @@ package no.nav.dokdistfordeling.qdist008;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Aktoer;
@@ -37,7 +37,7 @@ class DistribuerForsendelseMapperTest {
 	private static final String BATCH_ID = "batchId";
 	private static final String DISTRIBUSJONKANAL_PRINT = "PRINT";
 	private static final String DISTRIBUSJONKANAL_SDP = "SDP";
-	private static final String INGEN_DISTRIBUSJON = DistribusjonsKanalCode.INGEN_DISTRIBUSJON.name();
+	private static final String INGEN_DISTRIBUSJON = DistribusjonKanalCode.INGEN_DISTRIBUSJON.name();
 	private static final String BESTILLENDE_FAGSYSTEM = "bestillendeFagsystem";
 	private static final String TEMA = "DAG";
 	private static final String FORSENDELSE_TITTEL = "forsendelseTittel";

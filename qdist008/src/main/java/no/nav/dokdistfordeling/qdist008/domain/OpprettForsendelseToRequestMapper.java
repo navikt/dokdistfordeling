@@ -2,7 +2,7 @@ package no.nav.dokdistfordeling.qdist008.domain;
 
 import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public class OpprettForsendelseToRequestMapper {
 	public OpprettForsendelseRequestTo map(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling,
 										   DokumenttypeInfoTo dokumenttypeInfoTo,
 										   String fnrMottaker,
-										   DistribusjonsKanalCode distribusjonsKanal) {
+										   DistribusjonKanalCode distribusjonsKanal) {
 		final DistribuerForsendelseTo.AktoerTo mottaker = distribusjonbestilling.getMottaker();
 		final DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon = distribusjonbestilling.getArkivInformasjon();
 		final DistribuerForsendelseTo.AdresseTo adresse = distribusjonbestilling.getAdresse();

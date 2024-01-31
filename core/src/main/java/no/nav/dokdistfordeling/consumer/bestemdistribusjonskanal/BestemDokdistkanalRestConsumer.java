@@ -5,7 +5,7 @@ import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalFunctional
 import no.nav.dokdistfordeling.exception.functional.BestemDokdistKanalMappingException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.BestemDokdistKanalTechnicalException;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import org.slf4j.MDC;
 import org.springframework.http.ProblemDetail;
 import org.springframework.retry.annotation.Backoff;
@@ -22,7 +22,7 @@ import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.DITTNAV;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.DITTNAV;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
 
@@ -40,7 +40,7 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 	}
 
 	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	public DistribusjonsKanalCode bestemKanal(DokDistKanalRequest dokDistKanalRequest) {
+	public DistribusjonKanalCode bestemKanal(DokDistKanalRequest dokDistKanalRequest) {
 		return webClient.post()
 				.uri(uriBuilder -> uriBuilder.path("/rest/bestemDistribusjonskanal")
 						.build())
@@ -48,19 +48,19 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKDISTKANAL))
 				.bodyValue(dokDistKanalRequest)
 				.retrieve()
-				.bodyToMono(DokDistKanalResponseTo.class)
-				.map(dokDistKanalResponse -> mapToDistribusjonKanalCode(dokDistKanalResponse.getDistribusjonsKanal()))
+				.bodyToMono(BestemDistribusjonskanalResponse.class)
+				.map(dokDistKanalResponse -> mapToDistribusjonKanalCode(dokDistKanalResponse.distribusjonskanal()))
 				.doOnError(handleDokdistKanalErrors())
 				.block();
 
 	}
 
-	private DistribusjonsKanalCode mapToDistribusjonKanalCode(String distribusjonKanal) {
+	private DistribusjonKanalCode mapToDistribusjonKanalCode(DistribusjonKanalCode distribusjonKanal) {
 		try {
 			if (DITT_NAV.equals(distribusjonKanal)) {
 				return DITTNAV;
 			} else {
-				return DistribusjonsKanalCode.valueOf(distribusjonKanal);
+				return distribusjonKanal;
 			}
 		} catch (IllegalArgumentException e) {
 			throw new BestemDokdistKanalMappingException("DistribusjonKanalCode i dokdist støtter ikke enum-verdien " + distribusjonKanal);

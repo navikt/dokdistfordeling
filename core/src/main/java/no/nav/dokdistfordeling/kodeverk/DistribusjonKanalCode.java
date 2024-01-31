@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum DistribusjonsKanalCode {
+public enum DistribusjonKanalCode {
 
 	PRINT("S"),
 	SDP("SDP"),

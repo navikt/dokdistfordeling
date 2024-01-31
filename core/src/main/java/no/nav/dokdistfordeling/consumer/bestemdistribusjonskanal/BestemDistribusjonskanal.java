@@ -1,9 +1,9 @@
 package no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal;
 
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 
 public interface BestemDistribusjonskanal {
 
-	DistribusjonsKanalCode bestemKanal(DokDistKanalRequest dokDistKanalRequest);
+	DistribusjonKanalCode bestemKanal(DokDistKanalRequest dokDistKanalRequest);
 
 }

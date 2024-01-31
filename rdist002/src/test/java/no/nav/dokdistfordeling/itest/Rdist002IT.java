@@ -122,8 +122,6 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDokdistKanal("bestemkanal/distribusjonsKanalPrint.json");
 		putStubOppdaterJournalpost();
 
-		final String callId = UUID.randomUUID().toString();
-
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
 				.distribusjonstidspunkt(KJERNETID.name())
 				.distribusjonstype(VIKTIG.name())
