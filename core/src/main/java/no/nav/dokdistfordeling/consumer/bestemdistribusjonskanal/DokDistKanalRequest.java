@@ -9,7 +9,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class DokDistKanalRequest {
 	private String brukerId;
-	private String dokumentTypeId;
+	private String dokumenttypeId;
 	private boolean erArkivert;
 	private Integer forsendelseStoerrelse;
 	private String mottakerId;

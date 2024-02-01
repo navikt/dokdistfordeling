@@ -44,7 +44,7 @@ public class HentBestemDokdistKanalService {
 		}
 
 		DokDistKanalRequest request = DokDistKanalRequest.builder()
-				.dokumentTypeId(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID)
+				.dokumenttypeId(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID)
 				.brukerId(personnummer)
 				.mottakerId(determineMottakerId(journalpost.getAvsenderMottaker().getId()))
 				.erArkivert(true)
