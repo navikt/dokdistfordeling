@@ -1,3 +1,5 @@
 {
-  "distribusjonsKanal": "PRINT"
+  "distribusjonskanal": "PRINT",
+  "regel":"PERSON_STANDARD_PRINT",
+  "regelBegrunnelse": "Standard distribusjonskanal for personer er Print"
 }

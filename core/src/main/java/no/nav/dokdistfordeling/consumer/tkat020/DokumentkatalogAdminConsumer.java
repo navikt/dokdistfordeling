@@ -5,8 +5,6 @@ import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.exception.functional.DokumenttypeInfoFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.DokumenttypeInfoTechnicalException;
-import no.nav.dokdistfordeling.security.AzureToken;
-import no.nav.dokdistfordeling.security.WebClientAzureAuthentication;
 import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
 import org.slf4j.MDC;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
+import static no.nav.dokdistfordeling.config.azure.OAuthEnabledWebClientConfig.CLIENT_REGISTRATION_DOKMET;
 import static no.nav.dokdistfordeling.config.cache.LokalCacheConfig.TKAT020_CACHE;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
@@ -25,6 +24,7 @@ import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
 
 @Slf4j
 @Component
@@ -33,11 +33,10 @@ class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 	private final WebClient webclient;
 
 	public DokumentkatalogAdminConsumer(DokdistfordelingProperties dokdistfordelingProperties,
-										WebClient webclient, AzureToken azureToken) {
+										WebClient webclient) {
 		this.webclient = webclient.mutate()
 				.baseUrl(dokdistfordelingProperties.getEndpoints().getDokmet().getUrl())
 				.defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-				.filter(new WebClientAzureAuthentication(azureToken, dokdistfordelingProperties.getEndpoints().getDokmet().getScope()))
 				.build();
 	}
 
@@ -47,6 +46,7 @@ class DokumentkatalogAdminConsumer implements DokumentkatalogAdmin {
 		DokumentTypeInfoToV4 dokumentTypeInfoToV4 = webclient.get()
 				.uri("/" + dokumenttypeId)
 				.header(NAV_CALL_ID, MDC.get(CALL_ID))
+				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKMET))
 				.retrieve()
 				.bodyToMono(DokumentTypeInfoToV4.class)
 				.doOnError(this::handleError)

@@ -1,5 +1,7 @@
 package no.nav.dokdistfordeling.constants;
 
+import java.util.Set;
+
 public final class Constants {
 
 	public static final String CALL_ID = "callId";
@@ -10,6 +12,8 @@ public final class Constants {
 	public static final String BEARER_PREFIX = "Bearer ";
 	public static final String DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID = "U000001";
 	public static final String DOKDISTBESTILLINGS_ID = "dokdistBestillingsId";
+
+	public static final Set<String> ALL_MDC_KEYS = Set.of(CALL_ID);
 
 	private Constants() {
 	}

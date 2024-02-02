@@ -50,7 +50,7 @@ public class DistribuerJournalpostController {
 			@RequestBody DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
 			@Parameter(hidden = true) @RequestHeader(value = AUTHORIZATION) String authorizationHeader,
 			@Parameter(description = "Nav-CallId - teknisk sporingsid") @RequestHeader(value = "Nav-CallId", required = false) String navCallId,
-			@Parameter(description = "Nav-Consumer-Id - teknisk sporingsinfo om konsument") @RequestHeader(value = "Nav-Consumer-Id", required = false) String navConsumerId) throws Exception {
+			@Parameter(description = "Nav-Consumer-Id - teknisk sporingsinfo om konsument") @RequestHeader(value = "Nav-Consumer-Id", required = false) String navConsumerId) {
 
 		addCallIdToMDC(navCallId);
 		addConsumerIdToMDC(navConsumerId);

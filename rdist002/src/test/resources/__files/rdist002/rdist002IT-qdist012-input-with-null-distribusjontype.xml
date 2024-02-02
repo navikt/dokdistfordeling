@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:hentDokumenterFraJoark xmlns:ns2="http://nav.no/melding/virksomhet/dokdistfordeling">
 	<distribusjonbestilling>
-		<batchId>66666</batchId>
+		<batchId>126767</batchId>
 		<distribusjonKanal>PRINT</distribusjonKanal>
 		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
 		<tema>OPP</tema>
@@ -11,10 +11,9 @@
 			<arkivSystem>JOARK</arkivSystem>
 			<arkivId>555555555</arkivId>
 		</arkivInformasjon>
-		<mottaker xsi:type="ns2:Samhandler" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-			<samhandleridentifikator>UKJENT</samhandleridentifikator>
+		<mottaker xsi:type="ns2:Person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<personidentifikator>09876543210</personidentifikator>
 			<navn>Jan Neimansen</navn>
-			<samhandlerkategori>UKJENT</samhandlerkategori>
 		</mottaker>
 		<bruker xsi:type="ns2:AktoerId" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 			<aktoerId>12345678901</aktoerId>

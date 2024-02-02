@@ -6,8 +6,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
 
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DISTRIBUSJON;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.INGEN_DISTRIBUSJON;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.LOKAL_PRINT;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 

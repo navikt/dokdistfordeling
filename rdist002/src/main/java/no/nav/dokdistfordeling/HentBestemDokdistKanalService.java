@@ -6,7 +6,7 @@ import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.DokDistKanalReq
 import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentForAktoerIdFunctionalException;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
@@ -14,18 +14,13 @@ import java.util.List;
 
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Slf4j
 @Component
 public class HentBestemDokdistKanalService {
-
-	private static final String ORGANISASJON = "ORGANISASJON";
-	private static final String PERSON = "PERSON";
-	private static final String SAMHANDLER_PREFIX = "SAMHANDLER";
-	private static final String SAMHANDLER_UKJENT = "SAMHANDLER_UKJENT";
 
 	private final BestemDokdistkanalRestConsumer bestemDokdistkanal;
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
@@ -35,7 +30,7 @@ public class HentBestemDokdistKanalService {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 	}
 
-	public DistribusjonsKanalCode bestemDistribusjonskanal(Journalpost journalpost, boolean harAdresse) {
+	public DistribusjonKanalCode bestemDistribusjonskanal(Journalpost journalpost, boolean harAdresse) {
 		String personnummer;
 		try {
 			personnummer = hentIdent(journalpost.getBruker());
@@ -49,10 +44,9 @@ public class HentBestemDokdistKanalService {
 		}
 
 		DokDistKanalRequest request = DokDistKanalRequest.builder()
-				.dokumentTypeId(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID)
+				.dokumenttypeId(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID)
 				.brukerId(personnummer)
 				.mottakerId(determineMottakerId(journalpost.getAvsenderMottaker().getId()))
-				.mottakerType(getMottakerType(journalpost.getAvsenderMottaker()))
 				.erArkivert(true)
 				.tema(journalpost.getTema())
 				.forsendelseStoerrelse(getFilstoerrelseMB(journalpost))
@@ -69,18 +63,6 @@ public class HentBestemDokdistKanalService {
 		return AKTOERID.equals(bruker.getType()) ? pdlGraphQLConsumer.hentFolkeregisteridentForAktoerId(bruker.getId()) : bruker.getId();
 	}
 
-	private String getMottakerType(Journalpost.AvsenderMottaker avsenderMottaker) {
-		if (avsenderMottaker.getType() == null || isEmpty(avsenderMottaker.getType().name())) {
-			return SAMHANDLER_UKJENT;
-		}
-		return switch (avsenderMottaker.getType()) {
-			case FNR -> PERSON;
-			case ORGNR -> ORGANISASJON;
-			case UKJENT -> SAMHANDLER_UKJENT;
-			default -> SAMHANDLER_PREFIX + "_" + avsenderMottaker.getType();
-		};
-	}
-
 	private int getFilstoerrelseMB(Journalpost journalpost) {
 		return journalpost.getDokumenter().stream()
 				.map(Journalpost.DokumentInfo::getDokumentvarianter)
@@ -93,7 +75,7 @@ public class HentBestemDokdistKanalService {
 	private static Integer getSladdetOrArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
 		return dokumentvariants.stream()
 				.sorted(sortSladdetFirstComparator)
-				.map(dokumentvariant -> dokumentvariant.getFilstoerrelse())
+				.map(Journalpost.Dokumentvariant::getFilstoerrelse)
 				.findFirst()
 				.orElse(0);
 	}

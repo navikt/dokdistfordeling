@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:hentDokumenterFraJoark xmlns:ns2="http://nav.no/melding/virksomhet/dokdistfordeling">
 	<distribusjonbestilling>
-		<batchId>66666</batchId>
+		<batchId>126767</batchId>
 		<distribusjonKanal>PRINT</distribusjonKanal>
 		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
 		<tema>OPP</tema>

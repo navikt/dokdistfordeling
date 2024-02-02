@@ -35,6 +35,8 @@
         <tink.version>1.12.0</tink.version>
         <tink-gcpkms.version>1.9.0</tink-gcpkms.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
+        <context-propagation.version>1.1.0</context-propagation.version>
+        <token-support.version>3.2.0</token-support.version>
 
         <dokmet-api.version>23-5fe145a</dokmet-api.version>
         <melding-virksomhet-dokdistfordeling.version>7-18c61bf</melding-virksomhet-dokdistfordeling.version>
@@ -123,6 +125,11 @@
                 <version>${ibm.mq.client.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>context-propagation</artifactId>
+                <version>${context-propagation.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>no.nav.meldinger.virksomhet</groupId>
                 <artifactId>melding-virksomhet-dokdistfordeling</artifactId>
                 <version>${melding-virksomhet-dokdistfordeling.version}</version>
@@ -144,6 +151,12 @@
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.security</groupId>
+                <artifactId>token-validation-spring-test</artifactId>
+                <scope>test</scope>
+                <version>${token-support.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

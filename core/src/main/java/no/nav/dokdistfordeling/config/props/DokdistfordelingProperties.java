@@ -45,6 +45,12 @@ public class DokdistfordelingProperties {
 		@NotNull
 		private AzureEndpoint dokdistadmin;
 
+		/**
+		 * URL og Scope til dokdistkanal.
+		 */
+		@NotNull
+		private AzureEndpoint dokdistkanal;
+
 	}
 
 	@Data

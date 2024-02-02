@@ -5,8 +5,6 @@ import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.exception.functional.JournalpostApiFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.JournalpostApiTechnicalException;
-import no.nav.dokdistfordeling.security.AzureToken;
-import no.nav.dokdistfordeling.security.WebClientAzureAuthentication;
 import org.slf4j.MDC;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -16,12 +14,14 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 import static java.lang.String.format;
+import static no.nav.dokdistfordeling.config.azure.OAuthEnabledWebClientConfig.CLIENT_REGISTRATION_DOKARKIV;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
 
 @Slf4j
 @Component
@@ -29,14 +29,12 @@ public class JournalpostApi {
 
 	private final WebClient webClient;
 
-	public JournalpostApi(AzureToken azureToken,
-						  DokdistfordelingProperties dokdistfordelingProperties,
+	public JournalpostApi(DokdistfordelingProperties dokdistfordelingProperties,
 						  WebClient webClient) {
 		this.webClient = webClient
 				.mutate()
 				.defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.baseUrl(dokdistfordelingProperties.getEndpoints().getDokarkiv().getUrl())
-				.filter(new WebClientAzureAuthentication(azureToken, dokdistfordelingProperties.getEndpoints().getDokarkiv().getScope()))
 				.build();
 	}
 
@@ -46,6 +44,7 @@ public class JournalpostApi {
 		webClient.patch()
 				.uri("/{journalpostId}/oppdaterDistribusjonsinfo", validateJournalpostId(journalpostId))
 				.header(NAV_CALL_ID, MDC.get(CALL_ID))
+				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKARKIV))
 				.body(Mono.just(oppdaterDistibusjonsinfoTo), OppdaterDistribusjonsinfoTo.class)
 				.retrieve()
 				.toBodilessEntity()
@@ -59,6 +58,7 @@ public class JournalpostApi {
 		return webClient.put()
 				.uri("/" + validateJournalpostId(journalpostId))
 				.header(NAV_CALL_ID, MDC.get(CALL_ID))
+				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKARKIV))
 				.body(Mono.just(oppdaterJournalpostRequest), OppdaterJournalpostRequest.class)
 				.retrieve()
 				.bodyToMono(OppdaterJournalpostResponse.class)

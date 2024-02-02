@@ -2,7 +2,7 @@ package no.nav.dokdistfordeling;
 
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
@@ -39,7 +39,7 @@ public class HentDokumenterFraJoarkMapper {
 	public static final String UTENLANDSK_POSTADRESSE = "utenlandskPostadresse";
 
 	public HentDokumenterFraJoark map(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost,
-									  Aktoer mottaker, String bestillingsId, DistribusjonsKanalCode distribusjonsKanal) {
+									  Aktoer mottaker, String bestillingsId, DistribusjonKanalCode distribusjonsKanal) {
 		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
 		Distribusjonbestilling distribusjonbestilling = new Distribusjonbestilling();
 		distribusjonbestilling.setBestillingsId(bestillingsId);

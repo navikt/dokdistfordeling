@@ -7,7 +7,7 @@ import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
 import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode;
+import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.AktoerTo;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.DistribusjonbestillingTo;
@@ -18,8 +18,8 @@ import org.apache.camel.Handler;
 import org.springframework.stereotype.Service;
 
 import static no.nav.dokdistfordeling.kodeverk.ArkivSystemCode.JOARK;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.INGEN_DISTRIBUSJON;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonsKanalCode.LOKAL_PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.INGEN_DISTRIBUSJON;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.LOKAL_PRINT;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_DISTRIBUSJONSKANAL;
 import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELSE_ID;
 import static no.nav.dokdistfordeling.util.Qdist008Util.getDokumenttypeIdHoveddokument;
@@ -53,7 +53,7 @@ public class Qdist008Service {
 		final DokumenttypeInfoTo dokumenttypeInfoTo = getTittelFromDokkatIfNotProvided(distribusjonbestilling);
 		final String mottakerFnr = getFnr(distribusjonbestilling.getMottaker());
 
-		final DistribusjonsKanalCode distribusjonsKanal = DistribusjonsKanalCode.valueOf(distribusjonbestilling.getDistribusjonKanal());
+		final DistribusjonKanalCode distribusjonsKanal = DistribusjonKanalCode.valueOf(distribusjonbestilling.getDistribusjonKanal());
 		exchange.setProperty(PROPERTY_DISTRIBUSJONSKANAL, distribusjonbestilling.getDistribusjonKanal());
 
 		DistribuerTilKanal distribuerTilKanal = new DistribuerTilKanal();
@@ -90,7 +90,7 @@ public class Qdist008Service {
 		}
 	}
 
-	private void updateArkivIfArkivsystemIsJoark(DistribusjonbestillingTo distribusjonbestilling, DistribusjonsKanalCode distribusjonsKanal) {
+	private void updateArkivIfArkivsystemIsJoark(DistribusjonbestillingTo distribusjonbestilling, DistribusjonKanalCode distribusjonsKanal) {
 		final DistribuerForsendelseTo.ArkivInformasjonTo arkivInformasjon = distribusjonbestilling.getArkivInformasjon();
 		if (arkivInformasjon != null && arkivInformasjon.getArkivSystem().equals(JOARK)) {
 
