@@ -55,12 +55,12 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 
 	}
 
-	private DistribusjonKanalCode mapToDistribusjonKanalCode(DistribusjonKanalCode distribusjonKanal) {
+	private DistribusjonKanalCode mapToDistribusjonKanalCode(String distribusjonKanal) {
 		try {
 			if (DITT_NAV.equals(distribusjonKanal)) {
 				return DITTNAV;
 			} else {
-				return distribusjonKanal;
+				return DistribusjonKanalCode.valueOf(distribusjonKanal);
 			}
 		} catch (IllegalArgumentException e) {
 			throw new BestemDokdistKanalMappingException("DistribusjonKanalCode i dokdist støtter ikke enum-verdien " + distribusjonKanal);
