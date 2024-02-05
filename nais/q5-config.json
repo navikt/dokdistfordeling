@@ -30,7 +30,7 @@
   "DOKDISTFORDELING_ENDPOINTS_DOKDISTKANAL_URL": "https://dokdistkanal-q5.dev.intern.nav.no",
   "DOKDISTFORDELING_ENDPOINTS_DOKDISTKANAL_SCOPE": "api://dev-fss.teamdokumenthandtering.dokdistkanal-q5/.default",
   "DOKDISTFORDELING_ENDPOINTS_PDL_URL": "https://pdl-api-q0.dev.intern.nav.no/graphql",
-  "DOKDISTFORDELING_ENDPOINTS_PDL_SCOPE": "api://dev-fss.pdl.pdl-api/.default",
+  "DOKDISTFORDELING_ENDPOINTS_PDL_SCOPE": "api://dev-fss.pdl.pdl-api-q0/.default",
   "APPDYNAMICS": "/apikey/appdynamics/dev",
   "APP_NAME": "dokdistfordeling-q5",
   "APPD_NAME": "dokdistfordeling-q5",
