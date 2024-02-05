@@ -1,10 +1,9 @@
 package no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal;
 
 import lombok.Builder;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 
 @Builder
-public record BestemDistribusjonskanalResponse (DistribusjonKanalCode distribusjonskanal,
+public record BestemDistribusjonskanalResponse (String distribusjonskanal,
 												String regel,
 												String regelBegrunnelse){
 }
