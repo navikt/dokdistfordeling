@@ -143,7 +143,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -170,7 +170,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoNAV_NOHappy.json"))));
@@ -198,7 +198,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-			verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+			verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 			verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 			verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSDPHappy.json"))));
@@ -226,7 +226,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoTRYGDERETTENHappy.json"))));
@@ -268,7 +268,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-			verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+			verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 			verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 			verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoLHappy.json"))));
@@ -290,7 +290,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-			verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+			verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 			verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 			verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoINGEN_DISTRIBUSJONHappy.json"))));
@@ -340,7 +340,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -518,7 +518,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 	}
 
@@ -595,7 +595,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 	}
 
@@ -614,7 +614,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 	}
 
@@ -648,7 +648,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 	}
 
@@ -670,7 +670,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
@@ -695,7 +695,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files//rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
@@ -720,7 +720,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/1111111")));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -749,7 +749,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -778,7 +778,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPE_ID)));
-		verify(exactly(2), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));

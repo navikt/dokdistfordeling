@@ -51,6 +51,12 @@ public class DokdistfordelingProperties {
 		@NotNull
 		private AzureEndpoint dokdistkanal;
 
+		/**
+		 * URL og Scope til PDL.
+		 */
+		@NotNull
+		private AzureEndpoint pdl;
+
 	}
 
 	@Data

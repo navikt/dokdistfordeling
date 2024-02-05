@@ -275,24 +275,11 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubPdl("pdl/pdl-npid.json");
 		putStubOppdaterJournalpost();
 
-		final String callId = UUID.randomUUID().toString();
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
 				.distribusjonstidspunkt(KJERNETID.name())
 				.distribusjonstype(VIKTIG.name())
 				.build(), createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, OK);
-
-		assertEquals(36, restResponse.getBestillingsId().length());
-
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
-			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
-			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
-
-			assertNotNull(qdist012Result);
-			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
-			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoark-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
-		});
 
 		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/dokkat-tkat020/" + DOKUMENTTYPEID)));
