@@ -6,7 +6,6 @@ import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentFor
 import no.nav.dokdistfordeling.exception.functional.PdlPersonIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.PdlHentFolkeregisteridentForAktoerIdTechnicalException;
 import org.slf4j.MDC;
-import org.springframework.http.ProblemDetail;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
@@ -22,6 +21,7 @@ import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
 import static no.nav.dokdistfordeling.consumer.pdl.IdentType.FOLKEREGISTERIDENT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Slf4j
 @Component
@@ -60,13 +60,13 @@ public class PdlGraphQLConsumer {
 				.doOnError(handlePdlErrors())
 				.block();
 
-		if (pdlHentIdenterResponse.getErrors() == null || pdlHentIdenterResponse.getErrors().isEmpty()) {
+		if (isEmpty(pdlHentIdenterResponse.getErrors())) {
 			return getFolkeregisteridentFromResponse(pdlHentIdenterResponse);
 		} else {
 			if (PERSON_IKKE_FUNNET_CODE.equals(pdlHentIdenterResponse.getErrors().get(0).getExtensions().getCode())) {
 				throw new PdlPersonIkkeFunnetFunctionalException("Fant ikke folkeregisterident for person i PDL.");
 			}
-			throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Kunne ikke hente folkeregisterident fra PDL." + pdlHentIdenterResponse.getErrors());
+			throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Kunne ikke hente folkeregisterident fra PDL pga følgende feilmeldinger:" + pdlHentIdenterResponse.getErrors());
 		}
 	}
 
@@ -104,10 +104,9 @@ public class PdlGraphQLConsumer {
 	private Consumer<Throwable> handlePdlErrors() {
 		return error -> {
 			if (error instanceof WebClientResponseException webException && webException.getStatusCode().is4xxClientError()) {
-				ProblemDetail problemDetail = webException.getResponseBodyAs(ProblemDetail.class);
-				throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Funksjonell feil ved kall mot PDL, feilmelding=" + problemDetail);
+				throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Funksjonell feil ved kall mot PDL, feilmelding=" + webException.getMessage());
 			} else {
-				throw new PdlHentFolkeregisteridentForAktoerIdTechnicalException("Teknisk feil ved kall mot PDL, melding=" + error.getMessage(), error);
+				throw new PdlHentFolkeregisteridentForAktoerIdTechnicalException("Teknisk feil ved kall mot PDL, feilmelding=" + error.getMessage(), error);
 			}
 		};
 	}
