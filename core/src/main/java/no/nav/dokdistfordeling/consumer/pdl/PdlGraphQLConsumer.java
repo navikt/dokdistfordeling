@@ -8,7 +8,6 @@ import no.nav.dokdistfordeling.exception.technical.PdlHentFolkeregisteridentForA
 import org.slf4j.MDC;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -17,6 +16,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static no.nav.dokdistfordeling.config.azure.OAuthEnabledWebClientConfig.CLIENT_REGISTRATION_PDL;
+import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
 import static no.nav.dokdistfordeling.consumer.pdl.IdentType.FOLKEREGISTERIDENT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -48,11 +48,11 @@ public class PdlGraphQLConsumer {
 				.build();
 	}
 
-	@Retryable(retryFor = HttpServerErrorException.class)
+	@Retryable(retryFor = PdlHentFolkeregisteridentForAktoerIdTechnicalException.class)
 	public String hentFolkeregisteridentForAktoerId(final String aktorId) {
 
 		var pdlHentIdenterResponse = webClient.post()
-				.headers(httpHeaders -> httpHeaders.set(NAV_CALL_ID, MDC.get(NAV_CALL_ID)))
+				.headers(httpHeaders -> httpHeaders.set(NAV_CALL_ID, MDC.get(CALL_ID)))
 				.attributes(clientRegistrationId(CLIENT_REGISTRATION_PDL))
 				.bodyValue(mapRequest(aktorId))
 				.retrieve()

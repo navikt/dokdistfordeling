@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -69,8 +70,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @AutoConfigureWireMock(port = 0)
 @ActiveProfiles("itest")
 public class Qdist008IT {
-
-	private static final String FORSENDELSE_ID = "33333";
 	private static final String DOKUMENTTYPE_ID = "1111111";
 	private static final String STSSTRING = "/stsRest/token?grant_type=client_credentials&scope=openid";
 
@@ -147,7 +146,7 @@ public class Qdist008IT {
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
-		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
+		verify(exactly(1), postRequestedFor(urlMatching(DOKDISTADMIN_ADMINISTRERFORSENDELSE_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo(OPPDATERFORSENDELSE_URL)));
 	}
@@ -834,7 +833,8 @@ public class Qdist008IT {
 	}
 
 	private void stubPutOppdaterForsendelse() {
-		stubFor(put("/administrerforsendelse/v1?forsendelseId=" + FORSENDELSE_ID + "&forsendelseStatus=KLAR_FOR_DIST")
+		stubFor(put("/rest/v1/administrerforsendelse/oppdaterforsendelse")
+				.withRequestBody(containing("{\"forsendelseId\":33333,\"forsendelseStatus\":\"KLAR_FOR_DIST\"}"))
 				.willReturn(aResponse()
 						.withStatus(OK.value())));
 	}
