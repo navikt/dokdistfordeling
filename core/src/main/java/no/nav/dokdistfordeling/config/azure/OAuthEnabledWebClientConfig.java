@@ -29,6 +29,7 @@ public class OAuthEnabledWebClientConfig {
 	public static final String CLIENT_REGISTRATION_DOKARKIV = "azure-dokarkiv";
 	public static final String CLIENT_REGISTRATION_DOKDISTKANAL = "azure-dokdistkanal";
 	public static final String CLIENT_REGISTRATION_DOKMET = "azure-dokmet";
+	public static final String CLIENT_REGISTRATION_PDL = "azure-pdl";
 
 	@Bean
 	WebClient webClient(ReactiveOAuth2AuthorizedClientManager oAuth2AuthorizedClientManager, HttpClient nettyProxyHttpClient) {
@@ -116,6 +117,14 @@ public class OAuthEnabledWebClientConfig {
 						.clientAuthenticationMethod(CLIENT_SECRET_BASIC)
 						.authorizationGrantType(CLIENT_CREDENTIALS)
 						.scope(properties.getEndpoints().getDokmet().getScope())
+						.build(),
+				ClientRegistration.withRegistrationId(CLIENT_REGISTRATION_PDL)
+						.tokenUri(azureProperties.openidConfigTokenEndpoint())
+						.clientId(azureProperties.appClientId())
+						.clientSecret(azureProperties.appClientSecret())
+						.clientAuthenticationMethod(CLIENT_SECRET_BASIC)
+						.authorizationGrantType(CLIENT_CREDENTIALS)
+						.scope(properties.getEndpoints().getPdl().getScope())
 						.build());
 	}
 

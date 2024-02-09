@@ -5,7 +5,6 @@ import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
 import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.props.DokdistmellomlagerProperties;
-import no.nav.dokdistfordeling.config.props.PdlProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
@@ -21,7 +20,6 @@ import static java.lang.System.setProperty;
 @EnableRetry
 @EnableConfigurationProperties({
 		MqGatewayAlias.class,
-		PdlProperties.class,
 		AzureProperties.class,
 		DokdistmellomlagerProperties.class,
 		DokdistfordelingProperties.class

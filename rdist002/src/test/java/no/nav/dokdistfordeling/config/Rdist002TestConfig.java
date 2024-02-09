@@ -5,7 +5,6 @@ import no.nav.dokdistfordeling.DistribuerJournalpostConfig;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
 import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
-import no.nav.dokdistfordeling.config.props.PdlProperties;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +17,6 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableConfigurationProperties({
 		DokdistfordelingProperties.class,
 		MqGatewayAlias.class,
-		PdlProperties.class,
 		AzureProperties.class
 })
 @EnableRetry
