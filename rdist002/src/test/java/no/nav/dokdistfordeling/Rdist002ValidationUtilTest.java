@@ -107,11 +107,16 @@ public class Rdist002ValidationUtilTest {
 		assertEquals("Feltet journalpostId kan ikke være null eller tomt. Fikk journalpostId=null", thrownException.getMessage());
 	}
 
+	@Test
+	public void shouldValidateNorskPostnummerWithWhiteSpace() {
+		 validateAdresse(UnitTestUtil.createNorskPostadresseWithPostnummer("3456 "), createMottaker());
+	}
+
 	@ParameterizedTest
 	@CsvSource({
 			"ikke_et_postnummer,Feltet postnummer må være et gyldig tall med 4 siffer. Fikk postnummer=ikke_et_postnummer",
 			"12345,Feltet postnummer må være et gyldig tall med 4 siffer. Fikk postnummer=12345",
-			",Feltet postnummer må være et gyldig tall med 4 siffer. Fikk postnummer=null"
+			",Feltet postnummer kan ikke være null eller tomt. Fikk postnummer=null"
 	})
 	public void ShouldThrowValidationExceptionWhenBadNorskPostnummer(String postnummer, String expectedMessage) {
 		Exception thrownException = assertThrows(ValidationException.class, () -> validateAdresse(UnitTestUtil.createNorskPostadresseWithPostnummer(postnummer), createMottaker()));
