@@ -67,7 +67,8 @@ public class Rdist002ValidationUtil {
 
 			if (NORSK_POSTADRESSE.equals(adresseTo.getAdressetype())) {
 				assertNotNullOrEmpty("poststed", adresseTo.getPoststed());
-				assertStringIsNumberOfExactLength("postnummer", adresseTo.getPostnummer(), 4);
+				assertNotNullOrEmpty("postnummer", adresseTo.getPostnummer());
+				assertStringIsNumberOfExactLength("postnummer", adresseTo.getPostnummer().strip(), 4);
 
 			} else if (UTENLANDSK_POSTADRESSE.equals(adresseTo.getAdressetype())) {
 				assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
