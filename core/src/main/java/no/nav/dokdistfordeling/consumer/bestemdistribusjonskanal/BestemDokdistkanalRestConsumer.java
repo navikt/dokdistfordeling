@@ -50,9 +50,8 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 				.retrieve()
 				.bodyToMono(BestemDistribusjonskanalResponse.class)
 				.map(dokDistKanalResponse -> mapToDistribusjonKanalCode(dokDistKanalResponse.distribusjonskanal()))
-				.doOnError(handleDokdistKanalErrors())
+				.doOnError(this::handleErrors)
 				.block();
-
 	}
 
 	private DistribusjonKanalCode mapToDistribusjonKanalCode(String distribusjonKanal) {
@@ -67,15 +66,18 @@ public class BestemDokdistkanalRestConsumer implements BestemDistribusjonskanal 
 		}
 	}
 
-	private Consumer<Throwable> handleDokdistKanalErrors() {
-		return error -> {
-			if (error instanceof WebClientResponseException webException && webException.getStatusCode().is4xxClientError()) {
-				ProblemDetail problemDetail = webException.getResponseBodyAs(ProblemDetail.class);
-				throw new BestemDokdistKanalFunctionalException("BestemDokdistkanal feilet med problem=" + problemDetail);
-			} else {
-				throw new BestemDokdistKanalTechnicalException("BestemDokdistkanal feilet med melding=" + error.getMessage(), error);
+	private void handleErrors(Throwable error) {
+		if (error instanceof WebClientResponseException webException) {
+			ProblemDetail problemDetail = webException.getResponseBodyAs(ProblemDetail.class);
+
+			if (webException.getStatusCode().is4xxClientError()) {
+				throw new BestemDokdistKanalFunctionalException("Kall mot bestemDistribusjonskanal feilet funksjonelt med feilmelding=" + problemDetail, error);
 			}
-		};
+
+			throw new BestemDokdistKanalTechnicalException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + problemDetail, error);
+		} else {
+			throw new BestemDokdistKanalTechnicalException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + error.getMessage(), error);
+		}
 	}
 
 }
