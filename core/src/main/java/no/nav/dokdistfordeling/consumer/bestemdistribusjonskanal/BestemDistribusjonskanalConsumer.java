@@ -41,7 +41,7 @@ public class BestemDistribusjonskanalConsumer {
 	}
 
 	@Retryable(retryFor = BestemDistribusjonskanalTechnicalException.class,
-			noRetryFor = {BestemDistribusjonskanalMappingException.class, BestemDistribusjonskanalUnauthorizedException.class},
+			noRetryFor = BestemDistribusjonskanalMappingException.class,
 			backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public DistribusjonKanalCode bestemDistribusjonskanal(BestemDistribusjonskanalRequest request) {
 		return webClient.post()
@@ -51,12 +51,17 @@ public class BestemDistribusjonskanalConsumer {
 				.bodyValue(request)
 				.retrieve()
 				.bodyToMono(BestemDistribusjonskanalResponse.class)
-				.map(response -> mapToDistribusjonKanalCode(response.distribusjonskanal()))
+				.map(this::mapToDistribusjonKanalCode)
 				.doOnError(this::handleErrors)
 				.block();
 	}
 
-	private DistribusjonKanalCode mapToDistribusjonKanalCode(String distribusjonskanal) {
+	private DistribusjonKanalCode mapToDistribusjonKanalCode(BestemDistribusjonskanalResponse response) {
+		if (response == null) {
+			throw new BestemDistribusjonskanalTechnicalException("Endepunktet bestemDistribusjonskanal returnerte null som respons");
+		}
+
+		var distribusjonskanal = response.distribusjonskanal();
 		try {
 			if (DITT_NAV.equals(distribusjonskanal)) {
 				return DITTNAV;

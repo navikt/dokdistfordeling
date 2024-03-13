@@ -1,17 +1,13 @@
 package no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 
-@Data
 @Builder
-@AllArgsConstructor
-public class BestemDistribusjonskanalRequest {
-	private String brukerId;
-	private String dokumenttypeId;
-	private boolean erArkivert;
-	private Integer forsendelseStoerrelse;
-	private String mottakerId;
-	private String tema;
+public record BestemDistribusjonskanalRequest(
+		String brukerId,
+		String dokumenttypeId,
+		boolean erArkivert,
+		Integer forsendelseStoerrelse,
+		String mottakerId,
+		String tema) {
 }
