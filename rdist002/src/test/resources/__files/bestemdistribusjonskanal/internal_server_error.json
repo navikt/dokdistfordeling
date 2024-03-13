@@ -1,0 +1,7 @@
+{
+  "type": "about:blank",
+  "title": "Funksjonell feil ved kall mot ekstern tjeneste",
+  "status": 500,
+  "detail": "Kall mot dokmet feilet funksjonelt med status=404 NOT_FOUND, feilmelding=404 Not Found from GET https://dokmet.dev.intern.nav.no/rest/dokumenttypeinfo/123, response={\"timestamp\":\"2024-02-05T10:37:32.257+00:00\",\"status\":404,\"error\":\"Not Found\",\"message\":\"Fant ikke dokumenttypeId=123\",\"path\":\"/rest/dokumenttypeinfo/123\"}",
+  "instance": "/rest/bestemDistribusjonskanal"
+}

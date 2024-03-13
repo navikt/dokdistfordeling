@@ -38,18 +38,20 @@ public class DistribuerJournalpostService {
 	private final HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper;
 	private final Regoppslag regoppslag;
 	private final RegoppslagAdresseMapper regoppslagAdresseMapper;
-	private final HentBestemDokdistKanalService hentBestemDokdistKanal;
+	private final BestemDistribusjonskanalService bestemDistribusjonskanalService;
 	private final JournalpostApi journalpostApi;
 
 	public DistribuerJournalpostService(
 			DistribuerForsendelseProducer distribuerForsendelseProducer,
-			Regoppslag regoppslag, RegoppslagAdresseMapper regoppslagAdresseMapper,
-			HentBestemDokdistKanalService hentBestemDokdistKanal, JournalpostApi journalpostApi) {
+			Regoppslag regoppslag,
+			RegoppslagAdresseMapper regoppslagAdresseMapper,
+			BestemDistribusjonskanalService bestemDistribusjonskanalService,
+			JournalpostApi journalpostApi) {
 		this.distribuerForsendelseProducer = distribuerForsendelseProducer;
 		this.regoppslagAdresseMapper = regoppslagAdresseMapper;
 		this.hentDokumenterFraJoarkMapper = new HentDokumenterFraJoarkMapper();
 		this.regoppslag = regoppslag;
-		this.hentBestemDokdistKanal = hentBestemDokdistKanal;
+		this.bestemDistribusjonskanalService = bestemDistribusjonskanalService;
 		this.journalpostApi = journalpostApi;
 	}
 
@@ -62,7 +64,7 @@ public class DistribuerJournalpostService {
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
 		boolean harAdresse = nonNull(trimmetDistribuerJournalpostRequestTo.getAdresse());
-		DistribusjonKanalCode distribusjonKanalCode = trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint() ? PRINT : hentBestemDokdistKanal.bestemDistribusjonskanal(journalpost, harAdresse);
+		DistribusjonKanalCode distribusjonKanalCode = trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint() ? PRINT : bestemDistribusjonskanalService.bestemDistribusjonskanal(journalpost, harAdresse);
 
 		DistribuerJournalpostRequestTo distribuerRequest = isNull(trimmetDistribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonKanalCode) ?
 				hentDistribuerAdresseFraRegoppslag(trimmetDistribuerJournalpostRequestTo, journalpost) : trimmetDistribuerJournalpostRequestTo;

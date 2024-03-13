@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ResponseStatus(value = BAD_REQUEST)
-public class BestemDokdistKanalFunctionalException extends AbstractDokdistfordelingFunctionalException {
+public class BestemDistribusjonskanalFunctionalException extends AbstractDokdistfordelingFunctionalException {
 
-	public BestemDokdistKanalFunctionalException(String message, Throwable cause) {
+	public BestemDistribusjonskanalFunctionalException(String message, Throwable cause) {
 		super(message, cause);
 	}
 }
