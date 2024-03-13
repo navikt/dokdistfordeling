@@ -1,8 +1,8 @@
 package no.nav.dokdistfordeling;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDokdistkanalRestConsumer;
-import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.DokDistKanalRequest;
+import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanalConsumer;
+import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanalRequest;
 import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentForAktoerIdFunctionalException;
@@ -20,13 +20,14 @@ import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Slf4j
 @Component
-public class HentBestemDokdistKanalService {
+public class BestemDistribusjonskanalService {
 
-	private final BestemDokdistkanalRestConsumer bestemDokdistkanal;
+	private final BestemDistribusjonskanalConsumer bestemDistribusjonskanalConsumer;
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 
-	public HentBestemDokdistKanalService(BestemDokdistkanalRestConsumer bestemDokdistkanalRestConsumer, PdlGraphQLConsumer pdlGraphQLConsumer) {
-		this.bestemDokdistkanal = bestemDokdistkanalRestConsumer;
+	public BestemDistribusjonskanalService(BestemDistribusjonskanalConsumer bestemDistribusjonskanalConsumer,
+										   PdlGraphQLConsumer pdlGraphQLConsumer) {
+		this.bestemDistribusjonskanalConsumer = bestemDistribusjonskanalConsumer;
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 	}
 
@@ -43,7 +44,7 @@ public class HentBestemDokdistKanalService {
 			}
 		}
 
-		DokDistKanalRequest request = DokDistKanalRequest.builder()
+		BestemDistribusjonskanalRequest request = BestemDistribusjonskanalRequest.builder()
 				.dokumenttypeId(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID)
 				.brukerId(personnummer)
 				.mottakerId(determineMottakerId(journalpost.getAvsenderMottaker().getId()))
@@ -52,7 +53,7 @@ public class HentBestemDokdistKanalService {
 				.forsendelseStoerrelse(getFilstoerrelseMB(journalpost))
 				.build();
 
-		return bestemDokdistkanal.bestemKanal(request);
+		return bestemDistribusjonskanalConsumer.bestemDistribusjonskanal(request);
 	}
 
 	private String determineMottakerId(String mottakerId) {
@@ -65,11 +66,10 @@ public class HentBestemDokdistKanalService {
 
 	private int getFilstoerrelseMB(Journalpost journalpost) {
 		return journalpost.getDokumenter().stream()
-				.map(Journalpost.DokumentInfo::getDokumentvarianter)
-				.map(HentBestemDokdistKanalService::getSladdetOrArkivFilstoerrelse)
-				.mapToInt(Integer::intValue)
-				.sum() / (1024 * 1024);
-
+					   .map(Journalpost.DokumentInfo::getDokumentvarianter)
+					   .map(BestemDistribusjonskanalService::getSladdetOrArkivFilstoerrelse)
+					   .mapToInt(Integer::intValue)
+					   .sum() / (1024 * 1024);
 	}
 
 	private static Integer getSladdetOrArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
@@ -80,7 +80,7 @@ public class HentBestemDokdistKanalService {
 				.orElse(0);
 	}
 
-	private static Comparator<Journalpost.Dokumentvariant> sortSladdetFirstComparator = (dokA, dokB) -> {
+	private static final Comparator<Journalpost.Dokumentvariant> sortSladdetFirstComparator = (dokA, dokB) -> {
 		if (dokA.getVariantformat() == dokB.getVariantformat()) {
 			return 0;
 		} else if (dokA.getVariantformat() == SLADDET) {

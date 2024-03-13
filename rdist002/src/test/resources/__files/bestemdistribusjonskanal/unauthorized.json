@@ -1,0 +1,7 @@
+{
+  "type": "about:blank",
+  "title": "OIDC token mangler eller er ugyldig",
+  "status": 401,
+  "detail": "Ugyldig OIDC token mangler eller er ugyldig. Feil=No valid token found in validation context",
+  "instance": "/rest/bestemDistribusjonskanal"
+}

@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class DokDistKanalRequest {
+public class BestemDistribusjonskanalRequest {
 	private String brukerId;
 	private String dokumenttypeId;
 	private boolean erArkivert;

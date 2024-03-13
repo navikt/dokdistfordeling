@@ -1,0 +1,5 @@
+{
+  "distribusjonskanal": "UGYLDIG_KANAL",
+  "regel":"REGEL_FOR_UGYLDIG_KANAL",
+  "regelBegrunnelse": "Kanalen er ikke gyldig"
+}

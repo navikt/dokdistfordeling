@@ -1,0 +1,5 @@
+{
+  "distribusjonskanal": "SDP",
+  "regel":"BRUKER_HAR_GYLDIG_SDP_ADRESSE",
+  "regelBegrunnelse": "Bruker har gyldig digitalt postkassesertifikat, leverandøradresse og brukeradresse"
+}

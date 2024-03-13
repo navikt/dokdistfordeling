@@ -1,0 +1,5 @@
+{
+  "distribusjonskanal": "DITT_NAV",
+  "regel":"BRUKER_HAR_GYLDIG_EPOST_ELLER_MOBILNUMMER",
+  "regelBegrunnelse": "Bruker har gyldig e-post og/eller mobilnummer"
+}
