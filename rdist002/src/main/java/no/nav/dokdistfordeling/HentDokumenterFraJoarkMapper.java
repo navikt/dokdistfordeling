@@ -103,8 +103,8 @@ public class HentDokumenterFraJoarkMapper {
 		} else {
 			UtenlandskPostadresse utenlandskPostadresse = new UtenlandskPostadresse();
 			utenlandskPostadresse.setAdresselinje1(adresseTo.getAdresselinje1());
-			utenlandskPostadresse.setAdresselinje2(isBlank(adresseTo.getAdresselinje2()) ? null : adresseTo.getAdresselinje2());
-			utenlandskPostadresse.setAdresselinje3(adresseTo.getAdresselinje3());
+			utenlandskPostadresse.setAdresselinje2(trimAdresselinje(adresseTo.getAdresselinje2()));
+			utenlandskPostadresse.setAdresselinje3(trimAdresselinje(adresseTo.getAdresselinje3()));
 			utenlandskPostadresse.setLand(adresseTo.getLand());
 			return utenlandskPostadresse;
 		}

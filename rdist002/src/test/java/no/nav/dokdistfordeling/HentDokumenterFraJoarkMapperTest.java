@@ -9,12 +9,16 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.UtenlandskPostadresse;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 
+import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
+import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.UnitTestUtil.ADRESSELINJE1;
 import static no.nav.dokdistfordeling.UnitTestUtil.ADRESSELINJE2;
 import static no.nav.dokdistfordeling.UnitTestUtil.ADRESSELINJE3;
@@ -61,7 +65,6 @@ import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HentDokumenterFraJoarkMapperTest {
 
@@ -206,6 +209,54 @@ public class HentDokumenterFraJoarkMapperTest {
 		Distribusjonbestilling bestilling = result.getDistribusjonbestilling();
 
 		assertNull(bestilling.getBatchId());
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {"", " ", "  "})
+	@NullSource
+	public void shouldMapNorskAdresseAdresselinjeToNullWhenBlank(String adresselinje) {
+		var adresse = DistribuerJournalpostRequestTo.AdresseTo.builder()
+				.adressetype(NORSK_POSTADRESSE)
+				.adresselinje1(adresselinje)
+				.adresselinje2(adresselinje)
+				.adresselinje3(adresselinje)
+				.build();
+
+		HentDokumenterFraJoark result = mapper.map(
+				createDistribuerJournalpostRequestToBuilder().adresse(adresse).build(),
+				createJournalpostBuilder().build(),
+				createPersonMottaker(),
+				BESTILLINGS_ID, PRINT);
+
+		Assertions.assertThat(result.getDistribusjonbestilling().getAdresse())
+				.extracting("adresselinje1", "adresselinje2", "adresselinje3")
+				.containsOnlyNulls();
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {"", " ", "  "})
+	@NullSource
+	public void shouldMapUtenlandskAdresseAdresselinjeToNullWhenBlank(String adresselinje) {
+		var adresse = DistribuerJournalpostRequestTo.AdresseTo.builder()
+				.adressetype(UTENLANDSK_POSTADRESSE)
+				.adresselinje1(adresselinje)
+				.adresselinje2(adresselinje)
+				.adresselinje3(adresselinje)
+				.build();
+
+		HentDokumenterFraJoark result = mapper.map(
+				createDistribuerJournalpostRequestToBuilder().adresse(adresse).build(),
+				createJournalpostBuilder().build(),
+				createPersonMottaker(),
+				BESTILLINGS_ID, PRINT);
+
+		Assertions.assertThat(result.getDistribusjonbestilling().getAdresse())
+				.extracting("adresselinje1")
+				.isEqualTo(adresselinje);
+
+		Assertions.assertThat(result.getDistribusjonbestilling().getAdresse())
+				.extracting("adresselinje2", "adresselinje3")
+				.containsOnlyNulls();
 	}
 
 	private void assertDokumenter(List<DokumentInformasjon> dokumenter) {
