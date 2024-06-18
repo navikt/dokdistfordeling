@@ -7,7 +7,7 @@
 		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
 		<tema>DAG</tema>
 		<!--Optional:-->
-		<forsendelseTittel>harTittelUtenDokkat</forsendelseTittel>
+		<forsendelseTittel>harTittelUtenDokmet</forsendelseTittel>
 		<!--Optional:-->
 		<arkivInformasjon>
 			<arkivSystem>JOARK</arkivSystem>

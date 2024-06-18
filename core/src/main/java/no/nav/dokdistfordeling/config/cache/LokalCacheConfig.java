@@ -16,24 +16,24 @@ import java.util.concurrent.TimeUnit;
 @Profile({"nais", "local"})
 public class LokalCacheConfig {
 
-	public static final String TKAT020_CACHE = "tkat020Cache";
+	public static final String DOKMET_CACHE = "dokmetCache";
 	public static final String OIDC_TOKEN_CACHE = "OidcTokenCache";
-    public static final String AZURE_TOKEN_CACHE = "AzureToken";
+	public static final String AZURE_TOKEN_CACHE = "AzureToken";
 
-    @Bean
+	@Bean
 	@Primary
 	CacheManager cacheManager() {
 		SimpleCacheManager manager = new SimpleCacheManager();
 		manager.setCaches(Arrays.asList(
-				new CaffeineCache(TKAT020_CACHE, Caffeine.newBuilder()
+				new CaffeineCache(DOKMET_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(1, TimeUnit.DAYS)
 						.build()),
 				new CaffeineCache(OIDC_TOKEN_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(55, TimeUnit.MINUTES)
 						.build()),
-                new CaffeineCache(AZURE_TOKEN_CACHE, Caffeine.newBuilder()
-                        .expireAfterWrite(55, TimeUnit.MINUTES)
-                        .build()))
+				new CaffeineCache(AZURE_TOKEN_CACHE, Caffeine.newBuilder()
+						.expireAfterWrite(55, TimeUnit.MINUTES)
+						.build()))
 		);
 		return manager;
 	}

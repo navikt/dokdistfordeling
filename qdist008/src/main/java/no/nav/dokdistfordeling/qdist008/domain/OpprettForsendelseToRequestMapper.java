@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling.qdist008.domain;
 
 import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
-import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +13,7 @@ import static java.util.Objects.isNull;
 public class OpprettForsendelseToRequestMapper {
 
 	public OpprettForsendelseRequestTo map(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling,
-										   DokumenttypeInfoTo dokumenttypeInfoTo,
+										   String forsendelseTittel,
 										   String fnrMottaker,
 										   DistribusjonKanalCode distribusjonsKanal) {
 		final DistribuerForsendelseTo.AktoerTo mottaker = distribusjonbestilling.getMottaker();
@@ -27,7 +26,7 @@ public class OpprettForsendelseToRequestMapper {
 				.distribusjonsKanal(distribusjonsKanal)
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
 				.tema(distribusjonbestilling.getTema())
-				.forsendelseTittel(getForsendelseTittel(distribusjonbestilling, dokumenttypeInfoTo))
+				.forsendelseTittel(forsendelseTittel)
 				.batchId(distribusjonbestilling.getBatchId())
 				.dokumentProdApp(distribusjonbestilling.getDokumentProdApp())
 				.mottaker(mapMottaker(mottaker, fnrMottaker))
@@ -39,11 +38,6 @@ public class OpprettForsendelseToRequestMapper {
 						.map(this::mapDokument)
 						.collect(Collectors.toList()))
 				.build();
-	}
-
-	private String getForsendelseTittel(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling, DokumenttypeInfoTo dokumenttypeInfoTo) {
-		return distribusjonbestilling.getForsendelseTittel() == null ? dokumenttypeInfoTo.getDokumentTittel() : distribusjonbestilling
-				.getForsendelseTittel();
 	}
 
 	private OpprettForsendelseRequestTo.DokumentTo mapDokument(DistribuerForsendelseTo.DokumentInformasjonTo dokumentInformasjon) {

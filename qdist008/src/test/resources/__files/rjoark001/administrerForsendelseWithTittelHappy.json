@@ -3,7 +3,7 @@
   "distribusjonsKanal": "PRINT",
   "bestillendeFagsystem": "bestillendeFagsystem",
   "tema": "DAG",
-  "forsendelseTittel": "harTittelUtenDokkat",
+  "forsendelseTittel": "harTittelUtenDokmet",
   "batchId": "batchId",
   "dokumentProdApp": "token",
   "mottaker": {

@@ -28,7 +28,6 @@ public class OAuthEnabledWebClientConfig {
 	public static final String CLIENT_REGISTRATION_DOKDISTADMIN = "azure-dokdistadmin";
 	public static final String CLIENT_REGISTRATION_DOKARKIV = "azure-dokarkiv";
 	public static final String CLIENT_REGISTRATION_DOKDISTKANAL = "azure-dokdistkanal";
-	public static final String CLIENT_REGISTRATION_DOKMET = "azure-dokmet";
 	public static final String CLIENT_REGISTRATION_PDL = "azure-pdl";
 
 	@Bean
@@ -109,14 +108,6 @@ public class OAuthEnabledWebClientConfig {
 						.clientAuthenticationMethod(CLIENT_SECRET_BASIC)
 						.authorizationGrantType(CLIENT_CREDENTIALS)
 						.scope(properties.getEndpoints().getDokdistkanal().getScope())
-						.build(),
-				ClientRegistration.withRegistrationId(CLIENT_REGISTRATION_DOKMET)
-						.tokenUri(azureProperties.openidConfigTokenEndpoint())
-						.clientId(azureProperties.appClientId())
-						.clientSecret(azureProperties.appClientSecret())
-						.clientAuthenticationMethod(CLIENT_SECRET_BASIC)
-						.authorizationGrantType(CLIENT_CREDENTIALS)
-						.scope(properties.getEndpoints().getDokmet().getScope())
 						.build(),
 				ClientRegistration.withRegistrationId(CLIENT_REGISTRATION_PDL)
 						.tokenUri(azureProperties.openidConfigTokenEndpoint())
