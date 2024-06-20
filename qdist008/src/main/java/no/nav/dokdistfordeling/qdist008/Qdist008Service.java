@@ -2,11 +2,10 @@ package no.nav.dokdistfordeling.qdist008;
 
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterDistribusjonsinfoTo;
+import no.nav.dokdistfordeling.consumer.dokmet.DokmetConsumer;
 import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
 import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
-import no.nav.dokdistfordeling.consumer.tkat020.DokumentkatalogAdmin;
-import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.AktoerTo;
@@ -29,18 +28,18 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class Qdist008Service {
 
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
-	private final DokumentkatalogAdmin dokumentkatalogAdmin;
+	private final DokmetConsumer dokmetConsumer;
 	private final AdministrerForsendelse administrerForsendelse;
 	private final OpprettForsendelseToRequestMapper opprettForsendelseToRequestMapper;
 	private final JournalpostApi journalpostApi;
 
 	public Qdist008Service(PdlGraphQLConsumer pdlGraphQLConsumer,
-						   DokumentkatalogAdmin dokumentkatalogAdmin,
+						   DokmetConsumer dokmetConsumer,
 						   AdministrerForsendelse administrerForsendelse,
 						   OpprettForsendelseToRequestMapper opprettForsendelseToRequestMapper,
 						   JournalpostApi journalpostApi) {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
-		this.dokumentkatalogAdmin = dokumentkatalogAdmin;
+		this.dokmetConsumer = dokmetConsumer;
 		this.administrerForsendelse = administrerForsendelse;
 		this.opprettForsendelseToRequestMapper = opprettForsendelseToRequestMapper;
 		this.journalpostApi = journalpostApi;
@@ -50,7 +49,7 @@ public class Qdist008Service {
 	public DistribuerTilKanal distribuerForsendelseService(DistribuerForsendelseTo distribuerForsendelseTo, Exchange exchange) {
 		DistribusjonbestillingTo distribusjonbestilling = distribuerForsendelseTo.getDistribusjonbestilling();
 
-		final DokumenttypeInfoTo dokumenttypeInfoTo = getTittelFromDokkatIfNotProvided(distribusjonbestilling);
+		final String forsendelseTittel = getForsendelseTittel(distribusjonbestilling);
 		final String mottakerFnr = getFnr(distribusjonbestilling.getMottaker());
 
 		final DistribusjonKanalCode distribusjonsKanal = DistribusjonKanalCode.valueOf(distribusjonbestilling.getDistribusjonKanal());
@@ -61,7 +60,7 @@ public class Qdist008Service {
 		if (!(INGEN_DISTRIBUSJON.equals(distribusjonsKanal) || LOKAL_PRINT.equals(distribusjonsKanal))) {
 
 			final OpprettForsendelseRequestTo opprettForsendelseRequestTo = opprettForsendelseToRequestMapper
-					.map(distribusjonbestilling, dokumenttypeInfoTo, mottakerFnr, distribusjonsKanal);
+					.map(distribusjonbestilling, forsendelseTittel, mottakerFnr, distribusjonsKanal);
 
 			String forsendelseId = administrerForsendelse.opprettForsendelse(opprettForsendelseRequestTo);
 			exchange.setProperty(PROPERTY_FORSENDELSE_ID, forsendelseId);
@@ -74,12 +73,15 @@ public class Qdist008Service {
 		return distribuerTilKanal;
 	}
 
-	private DokumenttypeInfoTo getTittelFromDokkatIfNotProvided(DistribusjonbestillingTo distribusjonbestilling) {
+	private String getForsendelseTittel(DistribusjonbestillingTo distribusjonbestilling) {
 		if (isBlank(distribusjonbestilling.getForsendelseTittel())) {
-			return dokumentkatalogAdmin.getDokumenttypeInfo(getDokumenttypeIdHoveddokument(distribusjonbestilling));
-		} else {
-			return null;
+			var dokumenttypeId = getDokumenttypeIdHoveddokument(distribusjonbestilling);
+			var dokumenttypeInfo = dokmetConsumer.getDokumenttypeInfo(dokumenttypeId);
+
+			return dokumenttypeInfo.dokumentTittel();
 		}
+
+		return distribusjonbestilling.getForsendelseTittel();
 	}
 
 	private String getFnr(AktoerTo aktoer) {

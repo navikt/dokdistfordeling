@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling.rdist001;
 
 import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
-import no.nav.dokdistfordeling.consumer.tkat020.DokumenttypeInfoTo;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
@@ -65,7 +64,7 @@ class OpprettForsendelseToRequestMapperTest {
 	public void shouldMapHappyPath() {
 		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.distribusjonKanal(DISTRIBUSJONKANAL_PRINT).build(),
-				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(), null);
+				null);
 
 		assertCommon(opprettForsendelseRequestTo);
 		assertMottakerIsPerson(opprettForsendelseRequestTo.getMottaker());
@@ -77,7 +76,7 @@ class OpprettForsendelseToRequestMapperTest {
 	public void shouldMapAdresseWhenDistribusjonskanalNotPrint() {
 		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.distribusjonKanal(DISTRIBUSJONKANAL_SDP).build(),
-				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(), null);
+				null);
 
 		assertCommon(opprettForsendelseRequestTo);
 		assertMottakerIsPerson(opprettForsendelseRequestTo.getMottaker());
@@ -90,7 +89,6 @@ class OpprettForsendelseToRequestMapperTest {
 		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.mottaker(createMottakerToWithAktoerId())
 						.build(),
-				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				AKTOER_IDENTIFIKATOR);
 
 		assertMottakerIsAktoerId(opprettForsendelseRequestTo.getMottaker());
@@ -102,7 +100,6 @@ class OpprettForsendelseToRequestMapperTest {
 		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.mottaker(createMottakerToWithOrganisasjonsNr())
 						.build(),
-				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 
 		assertMottakerIsOrganisasjonNr(opprettForsendelseRequestTo.getMottaker());
@@ -113,7 +110,6 @@ class OpprettForsendelseToRequestMapperTest {
 		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.mottaker(createMottakerToWithSamhandlerHpr())
 						.build(),
-				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 
 		assertMottakerWithSamhandlerHpr(opprettForsendelseRequestTo.getMottaker());
@@ -124,7 +120,6 @@ class OpprettForsendelseToRequestMapperTest {
 		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.mottaker(createMottakerToWithSamhandlerUtlOrg())
 						.build(),
-				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 
 		assertMottakerWithSamhandlerUtlOrg(opprettForsendelseRequestTo.getMottaker());
@@ -136,7 +131,6 @@ class OpprettForsendelseToRequestMapperTest {
 						.distribusjonKanal(DISTRIBUSJONKANAL_PRINT)
 						.adresse(createUtenlandsPostadresseTo())
 						.build(),
-				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 
 		assertResponseIsPostaddresseUtenlands(opprettForsendelseRequestTo.getPostadresse());
@@ -147,7 +141,6 @@ class OpprettForsendelseToRequestMapperTest {
 		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.adresse(null)
 						.build(),
-				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 
 		assertNull(opprettForsendelseRequestTo.getPostadresse());
@@ -158,7 +151,6 @@ class OpprettForsendelseToRequestMapperTest {
 		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.forsendelseTittel(null)
 						.build(),
-				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 		assertResponseWithTomTittel(opprettForsendelseRequestTo);
 	}
@@ -168,7 +160,6 @@ class OpprettForsendelseToRequestMapperTest {
 		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(createDistribusjonbestillingToBuilder()
 						.arkivInformasjon(null)
 						.build(),
-				DokumenttypeInfoTo.builder().dokumentTittel(DOKUMENTTITTEL).build(),
 				PERSON_IDENTIFIKATOR);
 
 		assertNull(opprettForsendelseRequestTo.getArkivInformasjon());
@@ -258,11 +249,10 @@ class OpprettForsendelseToRequestMapperTest {
 	}
 
 	private OpprettForsendelseRequestTo performMapping(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo,
-													   DokumenttypeInfoTo dokumenttypeInfoTo,
 													   String hentIdentForAktoerIdResponseTo) {
 		return opprettForsendelseToRequestMapper.map(
 				distribusjonbestillingTo,
-				dokumenttypeInfoTo,
+				DOKUMENTTITTEL,
 				hentIdentForAktoerIdResponseTo,
 				DISTRIBUSJONS_KANAL_CODE);
 	}
@@ -288,8 +278,6 @@ class OpprettForsendelseToRequestMapperTest {
 				.tilknyttetSom(TILKNYTTET_SOM_CODE_1)
 				.arkivDokumentInfoId(ARKIV_DOKUMENTINFO_ID_1)
 				.rekkefolge(REKKEFOLGE_1);
-
-
 	}
 
 	private DistribuerForsendelseTo.DokumentInformasjonTo.DokumentInformasjonToBuilder createSecondDistribuerForsendelseToBuilder() {
