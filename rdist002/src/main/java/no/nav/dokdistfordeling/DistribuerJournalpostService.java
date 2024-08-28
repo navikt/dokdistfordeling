@@ -119,7 +119,7 @@ public class DistribuerJournalpostService {
 	}
 
 	private String trimAdresselinje(String opprinneligAdresse) {
-		return opprinneligAdresse != null && opprinneligAdresse.trim().length() > 0 ? opprinneligAdresse.trim() : null;
+		return opprinneligAdresse != null && !opprinneligAdresse.trim().isEmpty() ? opprinneligAdresse.trim() : null;
 	}
 
 	private DistribuerJournalpostRequestTo hentDistribuerAdresseFraRegoppslag(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
