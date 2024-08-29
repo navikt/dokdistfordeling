@@ -69,15 +69,36 @@ public class DistribuerJournalpostService {
 		DistribuerJournalpostRequestTo distribuerRequest = isNull(trimmetDistribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonKanalCode) ?
 				hentDistribuerAdresseFraRegoppslag(trimmetDistribuerJournalpostRequestTo, journalpost) : trimmetDistribuerJournalpostRequestTo;
 
-		OppdaterJournalpostResponse oppdaterJournalpostResponse = journalpostApi.oppdaterJournalpost(trimmetDistribuerJournalpostRequestTo.getJournalpostId(), OppdaterJournalpostRequest.builder()
+		if (distribuerJournalpostRequestTo.getAdresse() != null) {
+			validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
+		}
+
+		OppdaterJournalpostResponse oppdaterJournalpostResponse = oppdaterJournalpostTilleggsopplysninger(trimmetDistribuerJournalpostRequestTo.getJournalpostId(), bestillingsId);
+
+		log.info("Oppdatert journalpost med journalpostId={} tilleggsopplysninger med nøkkel={} og verdi={}", oppdaterJournalpostResponse.getJournalpostId(), DOKDISTBESTILLINGS_ID, bestillingsId);
+
+		hentDokumentOgDistribuerForsendelse(distribuerRequest, bestillingsId, journalpost, mottaker, distribusjonKanalCode);
+
+		return bestillingsId;
+	}
+
+	private void hentDokumentOgDistribuerForsendelse(final DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
+													 final String bestillingsId,
+													 final Journalpost journalpost,
+													 final Aktoer mottaker, DistribusjonKanalCode distribusjonKanalCode) {
+		final HentDokumenterFraJoark hentDokumenterFraJoark = hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, bestillingsId, distribusjonKanalCode);
+		distribuerForsendelseProducer.produce(hentDokumenterFraJoark,
+				bestillingsId,
+				distribuerJournalpostRequestTo.getJournalpostId());
+	}
+
+	private OppdaterJournalpostResponse oppdaterJournalpostTilleggsopplysninger(String journalpostId, String bestillingsId) {
+		return journalpostApi.oppdaterJournalpost(journalpostId, OppdaterJournalpostRequest.builder()
 				.tilleggsopplysninger(List.of(OppdaterJournalpostRequest.Tilleggsopplysning.builder()
 						.nokkel(DOKDISTBESTILLINGS_ID)
 						.verdi(bestillingsId)
 						.build()))
 				.build());
-		log.info("Oppdatert journalpost med journalpostId={} tilleggsopplysninger med nøkkel={} og verdi={}", oppdaterJournalpostResponse.getJournalpostId(), DOKDISTBESTILLINGS_ID, bestillingsId);
-
-		return doDistribuerForsendelse(distribuerRequest, bestillingsId, journalpost, mottaker, distribusjonKanalCode);
 	}
 
 	private DistribuerJournalpostRequestTo trimAdresse(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
@@ -98,7 +119,7 @@ public class DistribuerJournalpostService {
 	}
 
 	private String trimAdresselinje(String opprinneligAdresse) {
-		return opprinneligAdresse != null && opprinneligAdresse.trim().length() > 0 ? opprinneligAdresse.trim() : null;
+		return opprinneligAdresse != null && !opprinneligAdresse.trim().isEmpty() ? opprinneligAdresse.trim() : null;
 	}
 
 	private DistribuerJournalpostRequestTo hentDistribuerAdresseFraRegoppslag(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
@@ -109,23 +130,6 @@ public class DistribuerJournalpostService {
 		return distribuerJournalpostRequestTo.toBuilder()
 				.adresse(hentAdresse(journalpost.getAvsenderMottaker(), journalpost.getTema()))
 				.build();
-	}
-
-	private String doDistribuerForsendelse(final DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
-										   final String bestillingsId,
-										   final Journalpost journalpost,
-										   final Aktoer mottaker, DistribusjonKanalCode distribusjonKanalCode) {
-
-		if (distribuerJournalpostRequestTo.getAdresse() != null) {
-			validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
-		}
-
-		final HentDokumenterFraJoark hentDokumenterFraJoark = hentDokumenterFraJoarkMapper.map(distribuerJournalpostRequestTo, journalpost, mottaker, bestillingsId, distribusjonKanalCode);
-		distribuerForsendelseProducer.produce(hentDokumenterFraJoark,
-				bestillingsId,
-				distribuerJournalpostRequestTo.getJournalpostId());
-
-		return bestillingsId;
 	}
 
 	private DistribuerJournalpostRequestTo.AdresseTo hentAdresse(Journalpost.AvsenderMottaker avsenderMottaker, String tema) {
