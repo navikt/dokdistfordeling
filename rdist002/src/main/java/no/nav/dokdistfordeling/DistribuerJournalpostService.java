@@ -69,8 +69,8 @@ public class DistribuerJournalpostService {
 		DistribuerJournalpostRequestTo distribuerRequest = isNull(trimmetDistribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonKanalCode) ?
 				hentDistribuerAdresseFraRegoppslag(trimmetDistribuerJournalpostRequestTo, journalpost) : trimmetDistribuerJournalpostRequestTo;
 
-		if (distribuerJournalpostRequestTo.getAdresse() != null) {
-			validateAdresse(distribuerJournalpostRequestTo.getAdresse(), mottaker);
+		if (distribuerRequest.getAdresse() != null) {
+			validateAdresse(distribuerRequest.getAdresse(), mottaker);
 		}
 
 		OppdaterJournalpostResponse oppdaterJournalpostResponse = oppdaterJournalpostTilleggsopplysninger(trimmetDistribuerJournalpostRequestTo.getJournalpostId(), bestillingsId);
