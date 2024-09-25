@@ -85,44 +85,40 @@ public class HentDokumenterFraJoarkMapper {
 	}
 
 	private HentDokumenterFraJoarkTo.AktoerTo mapAktoer(Aktoer aktoer) {
-		if (aktoer instanceof Person person) {
-			return HentDokumenterFraJoarkTo.AktoerTo.builder()
+		return switch (aktoer) {
+			case Person person -> HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(person.getNavn())
 					.identifikator(person.getPersonidentifikator())
 					.aktoerType(PERSON)
 					.identifikatorAktoerId(false)
 					.build();
-		} else if (aktoer instanceof Organisasjon organisasjon) {
-			return HentDokumenterFraJoarkTo.AktoerTo.builder()
+			case Organisasjon organisasjon -> HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(organisasjon.getNavn())
 					.identifikator(organisasjon.getOrgnummer())
 					.aktoerType(ORGANISASJON)
 					.identifikatorAktoerId(false)
 					.build();
-		} else if (aktoer instanceof AktoerId aktoerId) {
-			return HentDokumenterFraJoarkTo.AktoerTo.builder()
+			case AktoerId aktoerId -> HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(aktoerId.getNavn())
 					.identifikator(aktoerId.getAktoerId())
 					.aktoerType(PERSON)
 					.identifikatorAktoerId(true)
 					.build();
-		} else if (aktoer instanceof Samhandler samhandler) {
-			return HentDokumenterFraJoarkTo.AktoerTo.builder()
+			case Samhandler samhandler -> HentDokumenterFraJoarkTo.AktoerTo.builder()
 					.navn(samhandler.getNavn())
 					.identifikator(samhandler.getSamhandleridentifikator())
 					.aktoerType(mapSamhandlerKategoriToSamhandlerType(samhandler.getSamhandlerkategori()))
 					.identifikatorAktoerId(false)
 					.build();
-		} else {
-			throw new IllegalArgumentException(format("Ugyldig type for mottaker %s", aktoer.getClass().getName()));
-		}
+			case null, default ->
+					throw new IllegalArgumentException(format("Ugyldig type for mottaker %s", aktoer.getClass().getName()));
+		};
 	}
 
 	private HentDokumenterFraJoarkTo.AdresseTo mapAdresse(Adresse adresse) {
-		if (adresse == null) {
-			return null;
-		} else if (adresse instanceof NorskPostadresse norskPostadresse) {
-			return HentDokumenterFraJoarkTo.NorskPostadresseTo.builder()
+		return switch (adresse) {
+			case null -> null;
+			case NorskPostadresse norskPostadresse -> HentDokumenterFraJoarkTo.NorskPostadresseTo.builder()
 					.adresselinje1(norskPostadresse.getAdresselinje1())
 					.adresselinje2(norskPostadresse.getAdresselinje2())
 					.adresselinje3(norskPostadresse.getAdresselinje3())
@@ -130,16 +126,16 @@ public class HentDokumenterFraJoarkMapper {
 					.poststed(norskPostadresse.getPoststed())
 					.land(norskPostadresse.getLand())
 					.build();
-		} else if (adresse instanceof UtenlandskPostadresse utenlandskPostadresse) {
-			return HentDokumenterFraJoarkTo.UtenlandskPostadresseTo.builder()
-					.adresselinje1(utenlandskPostadresse.getAdresselinje1())
-					.adresselinje2(utenlandskPostadresse.getAdresselinje2())
-					.adresselinje3(utenlandskPostadresse.getAdresselinje3())
-					.land(utenlandskPostadresse.getLand())
-					.build();
-		} else {
-			throw new IllegalArgumentException("Ugyldig adressetype. Adresse er ikke en gyldig NorskPostadresse eller UtenlandskPostadresse");
-		}
+			case UtenlandskPostadresse utenlandskPostadresse ->
+					HentDokumenterFraJoarkTo.UtenlandskPostadresseTo.builder()
+							.adresselinje1(utenlandskPostadresse.getAdresselinje1())
+							.adresselinje2(utenlandskPostadresse.getAdresselinje2())
+							.adresselinje3(utenlandskPostadresse.getAdresselinje3())
+							.land(utenlandskPostadresse.getLand())
+							.build();
+			default ->
+					throw new IllegalArgumentException("Ugyldig adressetype. Adresse er ikke en gyldig NorskPostadresse eller UtenlandskPostadresse");
+		};
 	}
 
 	private AktoerTypeCode mapSamhandlerKategoriToSamhandlerType(String samhandlerKategori) {

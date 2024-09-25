@@ -70,7 +70,7 @@ public class HentDokumenterFraJoarkMapperTest {
 
 	private static final String BESTILLINGS_ID = "7cc280ce-4168-4204-8d03-8dbdc3c4fc32";
 
-	private HentDokumenterFraJoarkMapper mapper = new HentDokumenterFraJoarkMapper();
+	private final HentDokumenterFraJoarkMapper mapper = new HentDokumenterFraJoarkMapper();
 
 	@Test
 	public void shouldMap() {

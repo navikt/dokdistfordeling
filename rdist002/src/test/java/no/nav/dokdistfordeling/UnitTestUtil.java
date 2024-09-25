@@ -9,6 +9,7 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
 
 public class UnitTestUtil {
@@ -106,7 +107,7 @@ public class UnitTestUtil {
 				.tittel(DOK_TITTEL_2)
 				.brevkode(BREVKODE)
 				.dokumentstatus(FERDIGSTILT)
-				.dokumentvarianter(Arrays.asList(Journalpost.Dokumentvariant.builder()
+				.dokumentvarianter(singletonList(Journalpost.Dokumentvariant.builder()
 						.saksbehandlerHarTilgang(true)
 						.variantformat(Variantformat.ARKIV).build()));
 	}

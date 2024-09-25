@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.storage;
 
 import com.google.api.client.http.apache.v2.ApacheHttpTransport;
+import com.google.cloud.http.HttpTransportOptions;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.google.crypto.tink.Aead;
@@ -38,11 +39,10 @@ public class GoogleCloudStorageConfiguration {
 		KeyTemplate keyTemplate = KmsEnvelopeAeadKeyManager.createKeyTemplate(kekUri, KeyTemplates.get(KEYTEMPLATE));
 		KeysetHandle handle = KeysetHandle.generateNew(keyTemplate);
 		Aead aead = handle.getPrimitive(Aead.class);
-		log.info("dokdistfordeling oppstart. Henter aead kryptering nøkkel. primaryKeyId={}", handle.getKeysetInfo().getPrimaryKeyId());
 
 		Storage storage = StorageOptions.newBuilder()
 				.setProjectId(dokdistmellomlagerProperties.getProjectid())
-				.setTransportOptions(StorageOptions.getDefaultHttpTransportOptions().toBuilder()
+				.setTransportOptions(HttpTransportOptions.newBuilder()
 						.setConnectTimeout((int) SECONDS.toMillis(5))
 						.setReadTimeout((int) SECONDS.toMillis(20))
 						.setHttpTransportFactory(ApacheHttpTransport::new)

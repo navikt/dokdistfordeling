@@ -67,7 +67,7 @@ public class Crypto {
 	}
 
 	private boolean isEmpty(String str) {
-		return str == null || str.trim().length() == 0;
+		return str == null || str.trim().isEmpty();
 	}
 
 }

@@ -63,7 +63,7 @@ public class SafGraphqlConsumer {
 
 			SafJsonResponse result = restTemplate.exchange(graphQLurl, POST, new HttpEntity<>(requestToJson(graphQLRequest), httpHeaders), SafJsonResponse.class).getBody();
 
-			if (result != null && result.getErrors() != null && result.getErrors().size() > 0) {
+			if (result != null && result.getErrors() != null && !result.getErrors().isEmpty()) {
 				SafJsonResponse.Error safError = result.getErrors().get(0);
 				if (safError.getExtensions().getClassification().contains(CLASSIFICATION_VALIDATIONERROR)) {
 					throw new SafJournalpostQueryTechnicalException("Feil i saf query: " + safError.getMessage());

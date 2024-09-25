@@ -94,37 +94,34 @@ public class DistribuerForsendelseMapper {
 	}
 
 	private DistribuerForsendelseTo.AktoerTo mapAktoer(Aktoer aktoer) {
-		if (aktoer instanceof Person person) {
-			return DistribuerForsendelseTo.AktoerTo.builder()
+		return switch (aktoer) {
+			case Person person -> DistribuerForsendelseTo.AktoerTo.builder()
 					.navn(person.getNavn())
 					.identifikator(person.getPersonidentifikator())
 					.aktoerType(PERSON)
 					.identifikatorAktoerId(false)
 					.build();
-		} else if (aktoer instanceof Organisasjon organisasjon) {
-			return DistribuerForsendelseTo.AktoerTo.builder()
+			case Organisasjon organisasjon -> DistribuerForsendelseTo.AktoerTo.builder()
 					.navn(organisasjon.getNavn())
 					.identifikator(organisasjon.getOrgnummer())
 					.aktoerType(ORGANISASJON)
 					.identifikatorAktoerId(false)
 					.build();
-		} else if (aktoer instanceof AktoerId aktoerId) {
-			return DistribuerForsendelseTo.AktoerTo.builder()
+			case AktoerId aktoerId -> DistribuerForsendelseTo.AktoerTo.builder()
 					.navn(aktoerId.getNavn())
 					.identifikator(aktoerId.getAktoerId())
 					.aktoerType(PERSON)
 					.identifikatorAktoerId(true)
 					.build();
-		} else if (aktoer instanceof Samhandler samhandler) {
-			return DistribuerForsendelseTo.AktoerTo.builder()
+			case Samhandler samhandler -> DistribuerForsendelseTo.AktoerTo.builder()
 					.navn(samhandler.getNavn())
 					.identifikator(samhandler.getSamhandleridentifikator())
 					.aktoerType(mapSamhandlerKategoriToSamhandlerType(samhandler.getSamhandlerkategori()))
 					.identifikatorAktoerId(false)
 					.build();
-		} else {
-			throw new IllegalArgumentException(format("Ugyldig type for mottaker %s", aktoer.getClass().getName()));
-		}
+			case null, default ->
+					throw new IllegalArgumentException(format("Ugyldig type for mottaker %s", aktoer.getClass().getName()));
+		};
 	}
 
 	private DistribuerForsendelseTo.AdresseTo mapAdresse(Adresse adresse) {

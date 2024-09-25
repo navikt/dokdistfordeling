@@ -68,13 +68,13 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 @ActiveProfiles("itest")
 public class Qdist012IT {
 
-	private static byte[] TEST_FILE_BYTES1 = "TestThis1".getBytes();
-	private static byte[] TEST_FILE_BYTES2 = "TestThis2".getBytes();
-	private static byte[] TEST_FILE_BYTES3 = "TestThis3".getBytes();
-	private static String BESTILLINGS_ID = "4a7d638a-6a63-11e9-a923-1681be663d3e";
+	private static final byte[] TEST_FILE_BYTES1 = "TestThis1".getBytes();
+	private static final byte[] TEST_FILE_BYTES2 = "TestThis2".getBytes();
+	private static final byte[] TEST_FILE_BYTES3 = "TestThis3".getBytes();
+	private static final String BESTILLINGS_ID = "4a7d638a-6a63-11e9-a923-1681be663d3e";
 	private static final String BESTILLINGS_ID_ATTRIBUTE = "bestillingsId";
-	private static String JOURNALPOST_ID = "arkivId";
-	private static String JOURNALPOST_ID_ATTRIBUTE = "journalpostId";
+	private static final String JOURNALPOST_ID = "arkivId";
+	private static final String JOURNALPOST_ID_ATTRIBUTE = "journalpostId";
 
 	@Autowired
 	private JmsTemplate jmsTemplate;

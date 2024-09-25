@@ -133,26 +133,28 @@ public class Qdist008DistribuerForsendelseMapper {
 	}
 
 	private Adresse mapAdresse(HentDokumenterFraJoarkTo.AdresseTo adresse) {
-		if (adresse == null) {
-			return null;
-		} else if (adresse instanceof HentDokumenterFraJoarkTo.NorskPostadresseTo norskPostadresseTo) {
-			NorskPostadresse norskPostadresse = new NorskPostadresse();
-			norskPostadresse.setAdresselinje1(trimAdresselinje(norskPostadresseTo.getAdresselinje1()));
-			norskPostadresse.setAdresselinje2(trimAdresselinje(norskPostadresseTo.getAdresselinje2()));
-			norskPostadresse.setAdresselinje3(trimAdresselinje(norskPostadresseTo.getAdresselinje3()));
-			norskPostadresse.setPostnummer(norskPostadresseTo.getPostnummer());
-			norskPostadresse.setPoststed(norskPostadresseTo.getPoststed());
-			norskPostadresse.setLand(norskPostadresseTo.getLand());
-			return norskPostadresse;
-		} else if (adresse instanceof HentDokumenterFraJoarkTo.UtenlandskPostadresseTo utenlandskPostadresseTo) {
-			UtenlandskPostadresse utenlandskPostadresse = new UtenlandskPostadresse();
-			utenlandskPostadresse.setAdresselinje1(trimAdresselinje(utenlandskPostadresseTo.getAdresselinje1()));
-			utenlandskPostadresse.setAdresselinje2(trimAdresselinje(utenlandskPostadresseTo.getAdresselinje2()));
-			utenlandskPostadresse.setAdresselinje3(utenlandskPostadresseTo.getAdresselinje3());
-			utenlandskPostadresse.setLand(utenlandskPostadresseTo.getLand());
-			return utenlandskPostadresse;
-		} else {
-			return null;
+		switch (adresse) {
+			case HentDokumenterFraJoarkTo.NorskPostadresseTo norskPostadresseTo -> {
+				NorskPostadresse norskPostadresse = new NorskPostadresse();
+				norskPostadresse.setAdresselinje1(trimAdresselinje(norskPostadresseTo.getAdresselinje1()));
+				norskPostadresse.setAdresselinje2(trimAdresselinje(norskPostadresseTo.getAdresselinje2()));
+				norskPostadresse.setAdresselinje3(trimAdresselinje(norskPostadresseTo.getAdresselinje3()));
+				norskPostadresse.setPostnummer(norskPostadresseTo.getPostnummer());
+				norskPostadresse.setPoststed(norskPostadresseTo.getPoststed());
+				norskPostadresse.setLand(norskPostadresseTo.getLand());
+				return norskPostadresse;
+			}
+			case HentDokumenterFraJoarkTo.UtenlandskPostadresseTo utenlandskPostadresseTo -> {
+				UtenlandskPostadresse utenlandskPostadresse = new UtenlandskPostadresse();
+				utenlandskPostadresse.setAdresselinje1(trimAdresselinje(utenlandskPostadresseTo.getAdresselinje1()));
+				utenlandskPostadresse.setAdresselinje2(trimAdresselinje(utenlandskPostadresseTo.getAdresselinje2()));
+				utenlandskPostadresse.setAdresselinje3(utenlandskPostadresseTo.getAdresselinje3());
+				utenlandskPostadresse.setLand(utenlandskPostadresseTo.getLand());
+				return utenlandskPostadresse;
+			}
+			case null, default -> {
+				return null;
+			}
 		}
 	}
 
