@@ -1,6 +1,11 @@
 package no.nav.dokdistfordeling.itest;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
+import jakarta.jms.JMSException;
+import jakarta.jms.Queue;
+import jakarta.jms.TextMessage;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.exception.technical.FailedBucketUploadTechnicalException;
 import no.nav.dokdistfordeling.itest.config.Qdist012TestConfig;
@@ -25,12 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import jakarta.jms.JMSException;
-import jakarta.jms.Queue;
-import jakarta.jms.TextMessage;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -100,9 +99,6 @@ public class Qdist012IT {
 	@BeforeEach
 	public void setupBefore() {
 		Mockito.reset(bucketStorage);
-		WireMock.reset();
-		WireMock.resetAllRequests();
-		WireMock.removeAllMappings();
 	}
 
 	@Test
