@@ -47,7 +47,7 @@ public class HentDokumenterFraJoarkTo {
 
 	@Getter
 	@AllArgsConstructor
-	public abstract static class AdresseTo {
+	public abstract static sealed class AdresseTo permits NorskPostadresseTo, UtenlandskPostadresseTo {
 		private final String adresselinje1;
 		private final String adresselinje2;
 		private final String adresselinje3;
