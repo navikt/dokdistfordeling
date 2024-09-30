@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 @Value
 @Builder(toBuilder = true)
 @Schema
@@ -20,9 +22,9 @@ public class DistribuerJournalpostRequestTo {
 	AdresseTo adresse;
 	@Schema(name = "dokumentProdApp", description = "Applikasjon som har produsert hoveddokumentet (for sporing og feilsøking)", example = "ELIN_STANDARD")
 	String dokumentProdApp;
-	@Schema(name = "distribusjonstype", description = "Forteller dokumentdistribusjon hva slags dokument som distribueres. \"VEDTAK\", \"VIKTIG\" eller \"ANNET\"", example = "VEDTAK", required = true)
+	@Schema(name = "distribusjonstype", description = "Forteller dokumentdistribusjon hva slags dokument som distribueres. \"VEDTAK\", \"VIKTIG\" eller \"ANNET\"", example = "VEDTAK", requiredMode = REQUIRED)
 	String distribusjonstype;
-	@Schema(name = "distribusjonstidspunkt", description = "Forteller dokumentdistribusjon når dokumentet kan distribueres. \"UMIDDELBART\" eller \"KJERNETID\"", example = "UMIDDELBART", required = true)
+	@Schema(name = "distribusjonstidspunkt", description = "Forteller dokumentdistribusjon når dokumentet kan distribueres. \"UMIDDELBART\" eller \"KJERNETID\"", example = "UMIDDELBART", requiredMode = REQUIRED)
 	String distribusjonstidspunkt;
 	@Schema(name = "tvingSentralPrint", description = "Settes til true dersom forsendelsen skal sendes til sentral print, uten å sjekke om mottaker er digitalt tilgjengelig", defaultValue = "false")
 	boolean tvingSentralPrint;

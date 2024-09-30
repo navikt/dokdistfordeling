@@ -1,6 +1,11 @@
 package no.nav.dokdistfordeling.itest;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
+import jakarta.jms.JMSException;
+import jakarta.jms.Queue;
+import jakarta.jms.TextMessage;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.exception.technical.FailedBucketUploadTechnicalException;
 import no.nav.dokdistfordeling.itest.config.Qdist012TestConfig;
@@ -25,12 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import jakarta.jms.JMSException;
-import jakarta.jms.Queue;
-import jakarta.jms.TextMessage;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -68,13 +67,13 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 @ActiveProfiles("itest")
 public class Qdist012IT {
 
-	private static byte[] TEST_FILE_BYTES1 = "TestThis1".getBytes();
-	private static byte[] TEST_FILE_BYTES2 = "TestThis2".getBytes();
-	private static byte[] TEST_FILE_BYTES3 = "TestThis3".getBytes();
-	private static String BESTILLINGS_ID = "4a7d638a-6a63-11e9-a923-1681be663d3e";
+	private static final byte[] TEST_FILE_BYTES1 = "TestThis1".getBytes();
+	private static final byte[] TEST_FILE_BYTES2 = "TestThis2".getBytes();
+	private static final byte[] TEST_FILE_BYTES3 = "TestThis3".getBytes();
+	private static final String BESTILLINGS_ID = "4a7d638a-6a63-11e9-a923-1681be663d3e";
 	private static final String BESTILLINGS_ID_ATTRIBUTE = "bestillingsId";
-	private static String JOURNALPOST_ID = "arkivId";
-	private static String JOURNALPOST_ID_ATTRIBUTE = "journalpostId";
+	private static final String JOURNALPOST_ID = "arkivId";
+	private static final String JOURNALPOST_ID_ATTRIBUTE = "journalpostId";
 
 	@Autowired
 	private JmsTemplate jmsTemplate;
@@ -100,9 +99,6 @@ public class Qdist012IT {
 	@BeforeEach
 	public void setupBefore() {
 		Mockito.reset(bucketStorage);
-		WireMock.reset();
-		WireMock.resetAllRequests();
-		WireMock.removeAllMappings();
 	}
 
 	@Test

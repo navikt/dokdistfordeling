@@ -2,9 +2,10 @@ package no.nav.dokdistfordeling.qdist008;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.AktoerTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.DokumentInformasjonTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.AktoerId;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.ArkivInformasjon;
@@ -18,10 +19,17 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Samhandler;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.UtenlandskPostadresse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UKJENT;
+import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +45,7 @@ class DistribuerForsendelseMapperTest {
 	private static final String BATCH_ID = "batchId";
 	private static final String DISTRIBUSJONKANAL_PRINT = "PRINT";
 	private static final String DISTRIBUSJONKANAL_SDP = "SDP";
-	private static final String INGEN_DISTRIBUSJON = DistribusjonKanalCode.INGEN_DISTRIBUSJON.name();
+	private static final String DISTRIBUSJONSKANAL_INGEN_DISTRIBUSJON = "INGEN_DISTRIBUSJON";
 	private static final String BESTILLENDE_FAGSYSTEM = "bestillendeFagsystem";
 	private static final String TEMA = "DAG";
 	private static final String FORSENDELSE_TITTEL = "forsendelseTittel";
@@ -53,8 +61,6 @@ class DistribuerForsendelseMapperTest {
 	private static final String MOTTAKER_ID = "mottakerId";
 	private static final String ORGNUMMER = "orgnr";
 	private static final String SAMHANDLER_IDENTIFIKATOR = "samhandlerId";
-	private static final String SAMHANDLER_KATEGORI_UTL_ORG = "UTL_ORG";
-	private static final String SAMHANDLER_KATEGORI_UKJENT = "UKJENT";
 	private static final String SAMHANDLER_KATEGORI_HPR = "HPR";
 	private static final String ADRESSELINJE_1 = "adresselinje1";
 	private static final String ADRESSELINJE_2 = "adresselinje2";
@@ -78,46 +84,81 @@ class DistribuerForsendelseMapperTest {
 
 	@Test
 	public void shouldMap() {
-		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(createDistribuerForsendelse());
+		var distribuerForsendelse = createDistribuerForsendelse();
+
+		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
+
 		assertResponse(distribuerForsendelseTo);
 	}
 
-	@Test
-	public void shouldMapWithKanalSDP() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().setDistribusjonKanal(DISTRIBUSJONKANAL_SDP);
+	@ParameterizedTest
+	@ValueSource(strings = {"", " "})
+	@NullSource
+	void shouldMapBlankOrNullBatchIdToNull(String batchId) {
+		var distribuerForsendelse = createDistribuerForsendelse();
+		distribuerForsendelse.getDistribusjonbestilling().setBatchId(batchId);
+
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
+
+		assertNotNull(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
+		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getBatchId());
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {DISTRIBUSJONKANAL_SDP, DISTRIBUSJONSKANAL_INGEN_DISTRIBUSJON})
+	public void shouldMapWhenKanalIsSDPOrIngenDistribusjon(String distribusjonskanal) {
+		var distribuerForsendelse = createDistribuerForsendelse();
+		distribuerForsendelse.getDistribusjonbestilling().setDistribusjonKanal(distribusjonskanal);
+
+		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
+
 		assertNorskPostadresseTo(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse());
 	}
 
 	@Test
-	public void shouldMapWithKanalIngenDistribusjon() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().setDistribusjonKanal(INGEN_DISTRIBUSJON);
+	public void shouldMapOkWhenForsendelseTittelIsNull() {
+		var distribuerForsendelse = createDistribuerForsendelse();
+		distribuerForsendelse.getDistribusjonbestilling().setForsendelseTittel(null);
+
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
-		assertNorskPostadresseTo(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse());
+
+		assertNotNull(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
+		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getForsendelseTittel());
 	}
 
 	@Test
-	public void shouldMapUtenlandskAdresse() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().setAdresse(createUtenlandskPostadresse());
-		distribuerForsendelse.getDistribusjonbestilling().setDistribusjonKanal(DISTRIBUSJONKANAL_PRINT);
+	public void shouldMapOkWhenAkivinformasjonIsNull() {
+		var distribuerForsendelse = createDistribuerForsendelse();
+		distribuerForsendelse.getDistribusjonbestilling().setArkivInformasjon(null);
+
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
-		assertDistribuerForsendelseTo(distribuerForsendelseTo);
-		assertUtenlandskPostadresseTo(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse());
+		assertNotNull(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
+		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getArkivInformasjon());
+	}
+
+	@Test
+	public void shouldFailUgyldigArkivsystem() {
+		var distribuerForsendelse = createDistribuerForsendelse();
+		distribuerForsendelse.getDistribusjonbestilling().getArkivInformasjon().setArkivSystem("NO_SUCH_ARKIVSYSTEM");
+
+		assertThrows(AbstractDokdistfordelingFunctionalException.class, () -> distribuerForsendelseMapper.map(distribuerForsendelse));
 	}
 
 	@Test
 	public void shouldMapAktoerId() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
+		var distribuerForsendelse = createDistribuerForsendelse();
 		distribuerForsendelse.getDistribusjonbestilling().setMottaker(createMottakerAktoerId());
+
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
-		assertDistribuerForsendelseTo(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
-		final DistribuerForsendelseTo.AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
+		final AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
 		assertEquals(mottakerTo.getIdentifikator(), MOTTAKER_ID);
 		assertEquals(mottakerTo.getNavn(), MOTTAKER_ID_NAVN);
 		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.PERSON);
@@ -126,158 +167,101 @@ class DistribuerForsendelseMapperTest {
 
 	@Test
 	public void shouldMapOrganisasjon() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
+		var distribuerForsendelse = createDistribuerForsendelse();
 		distribuerForsendelse.getDistribusjonbestilling().setMottaker(createAktoerOrganisasjon());
+
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
-		assertDistribuerForsendelseTo(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getBruker());
-		final DistribuerForsendelseTo.AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
+		final AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
 		assertEquals(mottakerTo.getIdentifikator(), ORGNUMMER);
 		assertEquals(mottakerTo.getNavn(), ORGANISASJON_NAVN);
 		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.ORGANISASJON);
 		assertFalse(mottakerTo.isIdentifikatorAktoerId());
 	}
 
-	@Test
-	public void shouldMapSamhandlerHpr() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().setMottaker(createAktoerSamhandlerHpr());
-		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
-
-		assertDistribuerForsendelseTo(distribuerForsendelseTo);
-		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
-		final DistribuerForsendelseTo.AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
-		assertEquals(mottakerTo.getIdentifikator(), SAMHANDLER_IDENTIFIKATOR);
-		assertEquals(mottakerTo.getNavn(), SAMHANDLER_NAVN);
-		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.SAMHANDLER_HPR);
-		assertFalse(mottakerTo.isIdentifikatorAktoerId());
-	}
-
-	@Test
-	public void shouldMapSamhandlerUtlOrg() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().setMottaker(createAktoerSamhandlerOrgUtl());
-		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
-
-		assertDistribuerForsendelseTo(distribuerForsendelseTo);
-		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
-		final DistribuerForsendelseTo.AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
-		assertEquals(mottakerTo.getIdentifikator(), SAMHANDLER_IDENTIFIKATOR);
-		assertEquals(mottakerTo.getNavn(), SAMHANDLER_NAVN);
-		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.SAMHANDLER_UTL_ORG);
-		assertFalse(mottakerTo.isIdentifikatorAktoerId());
-	}
-
-	@Test
-	public void shouldMapSamhandlerUkjent() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().setMottaker(createAktoerSamhandlerOrgUkjent());
-		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
-
-		assertDistribuerForsendelseTo(distribuerForsendelseTo);
-		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
-		final DistribuerForsendelseTo.AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
-		assertEquals(mottakerTo.getIdentifikator(), SAMHANDLER_IDENTIFIKATOR);
-		assertEquals(mottakerTo.getNavn(), SAMHANDLER_NAVN);
-		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.SAMHANDLER_UKJENT);
-		assertFalse(mottakerTo.isIdentifikatorAktoerId());
-	}
-
-	@Test
-	public void shouldMapOkWhenWithoutAkivinformasjon() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().setArkivInformasjon(null);
-		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
-
-		assertDistribuerForsendelseTo(distribuerForsendelseTo);
-		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getArkivInformasjon());
-	}
-
-	@Test
-	public void shouldMapOkWhenWithoutBatchId() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().setBatchId(null);
-		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
-
-		assertDistribuerForsendelseTo(distribuerForsendelseTo);
-		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getBatchId());
-	}
-
 	@ParameterizedTest
-	@ValueSource(strings = {"", " "})
-	void shouldMapBlankBatchIdToNull(String batchId) {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().setBatchId(batchId);
+	@MethodSource
+	public void shouldMapSamhandler(String samhandlerkategori, AktoerTypeCode aktoerTypeCode) {
+		var distribuerForsendelse = createDistribuerForsendelse();
+		distribuerForsendelse.getDistribusjonbestilling().setMottaker(createAktoerSamhandler(samhandlerkategori));
+
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
-		assertDistribuerForsendelseTo(distribuerForsendelseTo);
-		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getBatchId());
+		assertNotNull(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
+		final AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
+		assertEquals(mottakerTo.getIdentifikator(), SAMHANDLER_IDENTIFIKATOR);
+		assertEquals(mottakerTo.getNavn(), SAMHANDLER_NAVN);
+		assertEquals(mottakerTo.getAktoerType(), aktoerTypeCode);
+		assertFalse(mottakerTo.isIdentifikatorAktoerId());
 	}
 
-	@Test
-	public void shouldMapOkWhenWithoutForsendelseTittel() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().setForsendelseTittel(null);
-		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
-
-		assertDistribuerForsendelseTo(distribuerForsendelseTo);
-		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getForsendelseTittel());
+	private static Stream<Arguments> shouldMapSamhandler() {
+		return Stream.of(
+				Arguments.of("HPR", SAMHANDLER_HPR),
+				Arguments.of("UKJENT", SAMHANDLER_UKJENT),
+				Arguments.of("UTL_ORG", SAMHANDLER_UTL_ORG)
+		);
 	}
 
 	@Test
 	public void shouldFailUgyldigSamhandlerKategori() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		Samhandler aktoerSamhandlerHpr = (Samhandler) createAktoerSamhandlerHpr();
+		var distribuerForsendelse = createDistribuerForsendelse();
+		Samhandler aktoerSamhandlerHpr = (Samhandler) createAktoerSamhandler(SAMHANDLER_KATEGORI_HPR);
 		aktoerSamhandlerHpr.setSamhandlerkategori("NO_SUCH_KATEGORI");
-		distribuerForsendelse.getDistribusjonbestilling()
-				.setMottaker(aktoerSamhandlerHpr);
+		distribuerForsendelse.getDistribusjonbestilling().setMottaker(aktoerSamhandlerHpr);
 
-		assertThrows(AbstractDokdistfordelingFunctionalException.class,
-				() -> distribuerForsendelseMapper.map(distribuerForsendelse),
-				"Expected distribuerForsendelseMapper.map() to throw AbstractDokdistfordelingFunctionalException, but it didn't");
-	}
-
-	@Test
-	public void shouldFailUgyldigArkivsystem() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().getArkivInformasjon().setArkivSystem("NO_SUCH_ARKIVSYSTEM");
-
-		assertThrows(AbstractDokdistfordelingFunctionalException.class,
-				() -> distribuerForsendelseMapper.map(distribuerForsendelse),
-				"Expected distribuerForsendelseMapper.map() to throw AbstractDokdistfordelingFunctionalException, but it didn't");
-	}
-
-	@Test
-	public void shouldFailUgyldigTilknytning() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().getDokumenter().get(0).setTilknyttetSom("NO_SUCH_TILKNYTNING");
-
-		assertThrows(AbstractDokdistfordelingFunctionalException.class,
-				() -> distribuerForsendelseMapper.map(distribuerForsendelse),
-				"Expected distribuerForsendelseMapper.map() to throw AbstractDokdistfordelingFunctionalException, but it didn't");
+		assertThrows(AbstractDokdistfordelingFunctionalException.class, () -> distribuerForsendelseMapper.map(distribuerForsendelse));
 	}
 
 	@Test
 	public void shouldMapNorskAdresseWithEmptyString() {
-		DistribuerForsendelse distribuerForsendelse = createDistribuerForsendelse();
+		var distribuerForsendelse = createDistribuerForsendelse();
 		NorskPostadresse adresse = createNorskPostadresse();
 		adresse.setAdresselinje1("    ");
 		adresse.setAdresselinje2("           ");
 		adresse.setAdresselinje3("          " + adresse.getAdresselinje3());
 		distribuerForsendelse.getDistribusjonbestilling().setAdresse(adresse);
 		distribuerForsendelse.getDistribusjonbestilling().setDistribusjonKanal(DISTRIBUSJONKANAL_PRINT);
+
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
-		assertDistribuerForsendelseTo(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
 		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse().getAdresselinje1());
 		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse().getAdresselinje2());
 		assertEquals(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse().getAdresselinje3(), ADRESSELINJE_3);
 	}
 
+	@Test
+	public void shouldMapUtenlandskAdresse() {
+		var distribuerForsendelse = createDistribuerForsendelse();
+		distribuerForsendelse.getDistribusjonbestilling().setAdresse(createUtenlandskPostadresse());
+		distribuerForsendelse.getDistribusjonbestilling().setDistribusjonKanal(DISTRIBUSJONKANAL_PRINT);
+
+		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
+
+		assertNotNull(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
+		assertUtenlandskPostadresseTo(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse());
+	}
+
+	@Test
+	public void shouldFailUgyldigTilknytning() {
+		var distribuerForsendelse = createDistribuerForsendelse();
+		distribuerForsendelse.getDistribusjonbestilling().getDokumenter().get(0).setTilknyttetSom("NO_SUCH_TILKNYTNING");
+
+		assertThrows(AbstractDokdistfordelingFunctionalException.class, () -> distribuerForsendelseMapper.map(distribuerForsendelse));
+	}
+
 	private void assertResponse(DistribuerForsendelseTo distribuerForsendelseTo) {
-		assertDistribuerForsendelseTo(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo);
+		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
 
 		//assert DistribusjonbestillingTo
 		final DistribuerForsendelseTo.DistribusjonbestillingTo distBestilling = distribuerForsendelseTo.getDistribusjonbestilling();
@@ -313,19 +297,16 @@ class DistribuerForsendelseMapperTest {
 
 		//assert dokumenter
 		assertThat(distBestilling.getDokumenter())
-				.extracting(DistribuerForsendelseTo.DokumentInformasjonTo::getDokumenttypeId,
-						DistribuerForsendelseTo.DokumentInformasjonTo::getDokumentObjektReferanse,
-						DistribuerForsendelseTo.DokumentInformasjonTo::getTilknyttetSom,
-						DistribuerForsendelseTo.DokumentInformasjonTo::getArkivDokumentInfoId,
-						DistribuerForsendelseTo.DokumentInformasjonTo::getRekkefolge)
+				.extracting(DokumentInformasjonTo::getDokumenttypeId,
+						DokumentInformasjonTo::getDokumentObjektReferanse,
+						DokumentInformasjonTo::getTilknyttetSom,
+						DokumentInformasjonTo::getArkivDokumentInfoId,
+						DokumentInformasjonTo::getRekkefolge)
 				.hasSize(2)
-				.containsExactlyInAnyOrder(tuple(DOKUMENTTYPE_ID_1, OBJEKT_REFERANSE_1, TilknyttetSomCode.valueOf(TILKNYTTET_SOM_HOVEDDOK), ARKIV_DOKUMENTINFO_ID_1, REKKEFOLGE_1),
-						tuple(DOKUMENTTYPE_ID_2, OBJEKT_REFERANSE_2, TilknyttetSomCode.valueOf(TILKNYTTET_SOM_VEDLEGG), ARKIV_DOKUMENTINFO_ID_2, REKKEFOLGE_2));
-	}
-
-	private void assertDistribuerForsendelseTo(DistribuerForsendelseTo distribuerForsendelseTo) {
-		assertNotNull(distribuerForsendelseTo);
-		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
+				.containsExactlyInAnyOrder(
+						tuple(DOKUMENTTYPE_ID_1, OBJEKT_REFERANSE_1, TilknyttetSomCode.valueOf(TILKNYTTET_SOM_HOVEDDOK), ARKIV_DOKUMENTINFO_ID_1, REKKEFOLGE_1),
+						tuple(DOKUMENTTYPE_ID_2, OBJEKT_REFERANSE_2, TilknyttetSomCode.valueOf(TILKNYTTET_SOM_VEDLEGG), ARKIV_DOKUMENTINFO_ID_2, REKKEFOLGE_2)
+				);
 	}
 
 	private void assertNorskPostadresseTo(DistribuerForsendelseTo.AdresseTo adresse) {
@@ -429,27 +410,12 @@ class DistribuerForsendelseMapperTest {
 		return organisasjon;
 	}
 
-	private Aktoer createAktoerSamhandlerHpr() {
+	private Aktoer createAktoerSamhandler(String samhandlerkategori) {
 		Samhandler samhandler = new Samhandler();
 		samhandler.setNavn(SAMHANDLER_NAVN);
 		samhandler.setSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR);
-		samhandler.setSamhandlerkategori(SAMHANDLER_KATEGORI_HPR);
+		samhandler.setSamhandlerkategori(samhandlerkategori);
 		return samhandler;
 	}
 
-	private Aktoer createAktoerSamhandlerOrgUtl() {
-		Samhandler samhandler = new Samhandler();
-		samhandler.setNavn(SAMHANDLER_NAVN);
-		samhandler.setSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR);
-		samhandler.setSamhandlerkategori(SAMHANDLER_KATEGORI_UTL_ORG);
-		return samhandler;
-	}
-
-	private Aktoer createAktoerSamhandlerOrgUkjent() {
-		Samhandler samhandler = new Samhandler();
-		samhandler.setNavn(SAMHANDLER_NAVN);
-		samhandler.setSamhandleridentifikator(SAMHANDLER_IDENTIFIKATOR);
-		samhandler.setSamhandlerkategori(SAMHANDLER_KATEGORI_UKJENT);
-		return samhandler;
-	}
 }

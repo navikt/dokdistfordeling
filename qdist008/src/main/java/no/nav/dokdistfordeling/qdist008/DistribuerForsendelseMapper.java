@@ -9,6 +9,11 @@ import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.AdresseTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.AktoerTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.ArkivInformasjonTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.NorskPostadresseTo;
+import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.UtenlandskPostadresseTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.AktoerId;
@@ -86,54 +91,81 @@ public class DistribuerForsendelseMapper {
 		return isBlank(batchId) ? null : batchId;
 	}
 
-	private DistribuerForsendelseTo.ArkivInformasjonTo mapArkivInformasjon(ArkivInformasjon arkivInformasjon) {
-		return DistribuerForsendelseTo.ArkivInformasjonTo.builder()
+	private String mapKanalCode(String distribusjonKanal) {
+		return DITT_NAV.equals(distribusjonKanal) ? DITTNAV.name() : distribusjonKanal;
+	}
+
+	private DistribusjonstypeCode mapDistribusjonstype(String distribusjonstype) {
+		return (isNotBlank(distribusjonstype) && isValidEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype)) ?
+				getEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype) : null;
+	}
+
+	private DistribusjonstidspunktCode mapDistribusjonstidspunkt(String distribusjonstidspunkt) {
+		return (isNotBlank(distribusjonstidspunkt) && isValidEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt)) ?
+				getEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt) : null;
+	}
+
+	private ArkivInformasjonTo mapArkivInformasjon(ArkivInformasjon arkivInformasjon) {
+		return ArkivInformasjonTo.builder()
 				.arkivSystem(stringToEnum(ArkivSystemCode.class, arkivInformasjon.getArkivSystem()))
 				.arkivId(arkivInformasjon.getArkivId())
 				.build();
 	}
 
-	private DistribuerForsendelseTo.AktoerTo mapAktoer(Aktoer aktoer) {
-		if (aktoer instanceof Person person) {
-			return DistribuerForsendelseTo.AktoerTo.builder()
-					.navn(person.getNavn())
-					.identifikator(person.getPersonidentifikator())
-					.aktoerType(PERSON)
-					.identifikatorAktoerId(false)
-					.build();
-		} else if (aktoer instanceof Organisasjon organisasjon) {
-			return DistribuerForsendelseTo.AktoerTo.builder()
-					.navn(organisasjon.getNavn())
-					.identifikator(organisasjon.getOrgnummer())
-					.aktoerType(ORGANISASJON)
-					.identifikatorAktoerId(false)
-					.build();
-		} else if (aktoer instanceof AktoerId aktoerId) {
-			return DistribuerForsendelseTo.AktoerTo.builder()
-					.navn(aktoerId.getNavn())
-					.identifikator(aktoerId.getAktoerId())
-					.aktoerType(PERSON)
-					.identifikatorAktoerId(true)
-					.build();
-		} else if (aktoer instanceof Samhandler samhandler) {
-			return DistribuerForsendelseTo.AktoerTo.builder()
-					.navn(samhandler.getNavn())
-					.identifikator(samhandler.getSamhandleridentifikator())
-					.aktoerType(mapSamhandlerKategoriToSamhandlerType(samhandler.getSamhandlerkategori()))
-					.identifikatorAktoerId(false)
-					.build();
-		} else {
-			throw new IllegalArgumentException(format("Ugyldig type for mottaker %s", aktoer.getClass().getName()));
-		}
+	private AktoerTo mapAktoer(Aktoer aktoer) {
+		return switch (aktoer) {
+			case Person person -> mapToPerson(person);
+			case Organisasjon organisasjon -> mapToOrganisasjon(organisasjon);
+			case AktoerId aktoerId -> mapToAktoerId(aktoerId);
+			case Samhandler samhandler -> mapToSamhandler(samhandler);
+			case null, default ->
+					throw new IllegalArgumentException(format("Ugyldig type for mottaker %s", aktoer.getClass().getName()));
+		};
 	}
 
-	private DistribuerForsendelseTo.AdresseTo mapAdresse(Adresse adresse) {
+	private AktoerTo mapToPerson(Person person) {
+		return AktoerTo.builder()
+				.navn(person.getNavn())
+				.identifikator(person.getPersonidentifikator())
+				.aktoerType(PERSON)
+				.identifikatorAktoerId(false)
+				.build();
+	}
+
+	private AktoerTo mapToOrganisasjon(Organisasjon organisasjon) {
+		return AktoerTo.builder()
+				.navn(organisasjon.getNavn())
+				.identifikator(organisasjon.getOrgnummer())
+				.aktoerType(ORGANISASJON)
+				.identifikatorAktoerId(false)
+				.build();
+	}
+
+	private AktoerTo mapToAktoerId(AktoerId aktoerId) {
+		return AktoerTo.builder()
+				.navn(aktoerId.getNavn())
+				.identifikator(aktoerId.getAktoerId())
+				.aktoerType(PERSON)
+				.identifikatorAktoerId(true)
+				.build();
+	}
+
+	private AktoerTo mapToSamhandler(Samhandler samhandler) {
+		return AktoerTo.builder()
+				.navn(samhandler.getNavn())
+				.identifikator(samhandler.getSamhandleridentifikator())
+				.aktoerType(mapSamhandlerKategoriToSamhandlerType(samhandler.getSamhandlerkategori()))
+				.identifikatorAktoerId(false)
+				.build();
+	}
+
+	private AdresseTo mapAdresse(Adresse adresse) {
 		if (adresse == null) {
 			return null;
 		}
 
 		if (adresse instanceof NorskPostadresse norskPostadresse) {
-			return DistribuerForsendelseTo.NorskPostadresseTo.builder()
+			return NorskPostadresseTo.builder()
 					.adresselinje1(trimAdresse(norskPostadresse.getAdresselinje1()))
 					.adresselinje2(trimAdresse(norskPostadresse.getAdresselinje2()))
 					.adresselinje3(trimAdresse(norskPostadresse.getAdresselinje3()))
@@ -142,7 +174,7 @@ public class DistribuerForsendelseMapper {
 					.land(norskPostadresse.getLand())
 					.build();
 		} else if (adresse instanceof UtenlandskPostadresse utenlandskPostadresse) {
-			return DistribuerForsendelseTo.UtenlandskPostadresseTo.builder()
+			return UtenlandskPostadresseTo.builder()
 					.adresselinje1(trimAdresse(utenlandskPostadresse.getAdresselinje1()))
 					.adresselinje2(trimAdresse(utenlandskPostadresse.getAdresselinje2()))
 					.adresselinje3(trimAdresse(utenlandskPostadresse.getAdresselinje3()))
@@ -169,17 +201,4 @@ public class DistribuerForsendelseMapper {
 		};
 	}
 
-	private String mapKanalCode(String distribusjonKanal) {
-		return DITT_NAV.equals(distribusjonKanal) ? DITTNAV.name() : distribusjonKanal;
-	}
-
-	private DistribusjonstidspunktCode mapDistribusjonstidspunkt(String distribusjonstidspunkt) {
-		return (isNotBlank(distribusjonstidspunkt) && isValidEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt)) ?
-				getEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt) : null;
-	}
-
-	private DistribusjonstypeCode mapDistribusjonstype(String distribusjonstype) {
-		return (isNotBlank(distribusjonstype) && isValidEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype)) ?
-				getEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype) : null;
-	}
 }

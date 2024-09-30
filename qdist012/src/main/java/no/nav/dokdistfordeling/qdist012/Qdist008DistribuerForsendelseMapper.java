@@ -3,6 +3,12 @@ package no.nav.dokdistfordeling.qdist012;
 import no.nav.dokdistfordeling.exception.functional.DistribuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
+import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
+import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.AktoerTo;
+import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.ArkivInformasjonTo;
+import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.DistribusjonbestillingTo;
+import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.NorskPostadresseTo;
+import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.UtenlandskPostadresseTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Adresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.AktoerId;
@@ -16,8 +22,6 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Samhandler;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.UtenlandskPostadresse;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -34,14 +38,14 @@ public class Qdist008DistribuerForsendelseMapper {
 		try {
 			DistribuerForsendelse distribuerForsendelse = new DistribuerForsendelse();
 			distribuerForsendelse.setDistribusjonbestilling(mapDokumentbestillingsinformasjon(hentDokumenterFraJoarkTo.getDistribusjonbestilling()));
+
 			return distribuerForsendelse;
 		} catch (Exception e) {
-			throw new DistribuerForsendelseMapFunctionalException(format("Kunne ikke mappe qdist012 output. Feilmelding=%s",
-					e.getMessage()), e);
+			throw new DistribuerForsendelseMapFunctionalException(format("Kunne ikke mappe qdist012 output. Feilmelding=%s", e.getMessage()), e);
 		}
 	}
 
-	private Distribusjonbestilling mapDokumentbestillingsinformasjon(HentDokumenterFraJoarkTo.DistribusjonbestillingTo distribusjonbestillingTo) {
+	private Distribusjonbestilling mapDokumentbestillingsinformasjon(DistribusjonbestillingTo distribusjonbestillingTo) {
 		Distribusjonbestilling distribusjonbestilling = new Distribusjonbestilling();
 		distribusjonbestilling.setBestillingsId(distribusjonbestillingTo.getBestillingsId());
 		distribusjonbestilling.setBatchId(mapBatchId(distribusjonbestillingTo.getBatchId()));
@@ -65,8 +69,8 @@ public class Qdist008DistribuerForsendelseMapper {
 					dokumentInformasjon.setRekkefolge(dokumentInformasjonTo.getRekkefolge());
 					dokumentInformasjon.setDokumentObjektReferanse(dokumentInformasjonTo.getDokumentObjektReferanse());
 					return dokumentInformasjon;
-				})
-				.collect(Collectors.toList()));
+				}).toList()
+		);
 		return distribusjonbestilling;
 	}
 
@@ -74,7 +78,17 @@ public class Qdist008DistribuerForsendelseMapper {
 		return isBlank(batchId) ? null : batchId;
 	}
 
-	private ArkivInformasjon mapArkivInformasjon(HentDokumenterFraJoarkTo.ArkivInformasjonTo arkivInformasjonTo) {
+	private String mapDistribusjonstype(DistribusjonstypeCode distribusjonstype) {
+		return (nonNull(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.name())) ?
+				distribusjonstype.name() : null;
+	}
+
+	private String mapDistribusjonstidspunkt(DistribusjonstidspunktCode distribusjonstidspunktCode) {
+		return (nonNull(distribusjonstidspunktCode) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunktCode.name())) ?
+				distribusjonstidspunktCode.name() : null;
+	}
+
+	private ArkivInformasjon mapArkivInformasjon(ArkivInformasjonTo arkivInformasjonTo) {
 		if (arkivInformasjonTo == null) {
 			return null;
 		}
@@ -84,89 +98,84 @@ public class Qdist008DistribuerForsendelseMapper {
 		return arkivInformasjon;
 	}
 
-	private Aktoer mapAktoerTo(HentDokumenterFraJoarkTo.AktoerTo aktoer) {
-		Aktoer output;
-		switch (aktoer.getAktoerType()) {
+	private Aktoer mapAktoerTo(AktoerTo aktoerTo) {
+		return switch (aktoerTo.getAktoerType()) {
 			case PERSON -> {
-				if (aktoer.isIdentifikatorAktoerId()) {
-					AktoerId aktoerId = new AktoerId();
-					aktoerId.setAktoerId(aktoer.getIdentifikator());
-					aktoerId.setNavn(aktoer.getNavn());
-					output = aktoerId;
+				if (aktoerTo.isIdentifikatorAktoerId()) {
+					yield mapToAktoerId(aktoerTo);
 				} else {
-					Person person = new Person();
-					person.setPersonidentifikator(aktoer.getIdentifikator());
-					person.setNavn(aktoer.getNavn());
-					output = person;
+					yield mapToPerson(aktoerTo);
 				}
 			}
-			case ORGANISASJON -> {
-				Organisasjon organisasjon = new Organisasjon();
-				organisasjon.setOrgnummer(aktoer.getIdentifikator());
-				organisasjon.setNavn(aktoer.getNavn());
-				output = organisasjon;
-			}
-			case SAMHANDLER_HPR -> {
-				Samhandler samhandler = new Samhandler();
-				samhandler.setSamhandleridentifikator(aktoer.getIdentifikator());
-				samhandler.setNavn(aktoer.getNavn());
-				samhandler.setSamhandlerkategori(HPR.name());
-				output = samhandler;
-			}
-			case SAMHANDLER_UTL_ORG -> {
-				Samhandler samhandler = new Samhandler();
-				samhandler.setSamhandleridentifikator(aktoer.getIdentifikator());
-				samhandler.setNavn(aktoer.getNavn());
-				samhandler.setSamhandlerkategori(UTL_ORG.name());
-				output = samhandler;
-			}
-			case SAMHANDLER_UKJENT -> {
-				Samhandler samhandler = new Samhandler();
-				samhandler.setSamhandleridentifikator(aktoer.getIdentifikator());
-				samhandler.setNavn(aktoer.getNavn());
-				samhandler.setSamhandlerkategori(UKJENT.name());
-				output = samhandler;
-			}
-			default -> output = null;
-		}
-		return output;
+			case ORGANISASJON -> mapToOrganisasjon(aktoerTo);
+			case SAMHANDLER_HPR -> mapToSamhandler(aktoerTo, HPR);
+			case SAMHANDLER_UTL_ORG -> mapToSamhandler(aktoerTo, UTL_ORG);
+			case SAMHANDLER_UKJENT -> mapToSamhandler(aktoerTo, UKJENT);
+		};
+	}
+
+	private static AktoerId mapToAktoerId(AktoerTo aktoer) {
+		AktoerId aktoerId = new AktoerId();
+		aktoerId.setAktoerId(aktoer.getIdentifikator());
+		aktoerId.setNavn(aktoer.getNavn());
+		return aktoerId;
+	}
+
+	private static Person mapToPerson(AktoerTo aktoer) {
+		Person person = new Person();
+		person.setPersonidentifikator(aktoer.getIdentifikator());
+		person.setNavn(aktoer.getNavn());
+		return person;
+	}
+
+	private static Organisasjon mapToOrganisasjon(AktoerTo aktoer) {
+		Organisasjon organisasjon = new Organisasjon();
+		organisasjon.setOrgnummer(aktoer.getIdentifikator());
+		organisasjon.setNavn(aktoer.getNavn());
+		return organisasjon;
+	}
+
+	private static Samhandler mapToSamhandler(AktoerTo aktoer, SamhandlerKategoriCode samhandlerKategoriCode) {
+		Samhandler samhandler = new Samhandler();
+		samhandler.setSamhandleridentifikator(aktoer.getIdentifikator());
+		samhandler.setNavn(aktoer.getNavn());
+		samhandler.setSamhandlerkategori(samhandlerKategoriCode.name());
+		return samhandler;
 	}
 
 	private Adresse mapAdresse(HentDokumenterFraJoarkTo.AdresseTo adresse) {
 		if (adresse == null) {
 			return null;
-		} else if (adresse instanceof HentDokumenterFraJoarkTo.NorskPostadresseTo norskPostadresseTo) {
-			NorskPostadresse norskPostadresse = new NorskPostadresse();
-			norskPostadresse.setAdresselinje1(trimAdresselinje(norskPostadresseTo.getAdresselinje1()));
-			norskPostadresse.setAdresselinje2(trimAdresselinje(norskPostadresseTo.getAdresselinje2()));
-			norskPostadresse.setAdresselinje3(trimAdresselinje(norskPostadresseTo.getAdresselinje3()));
-			norskPostadresse.setPostnummer(norskPostadresseTo.getPostnummer());
-			norskPostadresse.setPoststed(norskPostadresseTo.getPoststed());
-			norskPostadresse.setLand(norskPostadresseTo.getLand());
-			return norskPostadresse;
-		} else if (adresse instanceof HentDokumenterFraJoarkTo.UtenlandskPostadresseTo utenlandskPostadresseTo) {
-			UtenlandskPostadresse utenlandskPostadresse = new UtenlandskPostadresse();
-			utenlandskPostadresse.setAdresselinje1(trimAdresselinje(utenlandskPostadresseTo.getAdresselinje1()));
-			utenlandskPostadresse.setAdresselinje2(trimAdresselinje(utenlandskPostadresseTo.getAdresselinje2()));
-			utenlandskPostadresse.setAdresselinje3(utenlandskPostadresseTo.getAdresselinje3());
-			utenlandskPostadresse.setLand(utenlandskPostadresseTo.getLand());
-			return utenlandskPostadresse;
-		} else {
-			return null;
 		}
+
+		return switch (adresse) {
+			case NorskPostadresseTo norskPostadresseTo -> mapToNorskPostadresse(norskPostadresseTo);
+			case UtenlandskPostadresseTo utenlandskPostadresseTo -> mapToUtenlandskPostadresse(utenlandskPostadresseTo);
+		};
+	}
+
+	private UtenlandskPostadresse mapToUtenlandskPostadresse(UtenlandskPostadresseTo utenlandskPostadresseTo) {
+		UtenlandskPostadresse utenlandskPostadresse = new UtenlandskPostadresse();
+		utenlandskPostadresse.setAdresselinje1(trimAdresselinje(utenlandskPostadresseTo.getAdresselinje1()));
+		utenlandskPostadresse.setAdresselinje2(trimAdresselinje(utenlandskPostadresseTo.getAdresselinje2()));
+		utenlandskPostadresse.setAdresselinje3(utenlandskPostadresseTo.getAdresselinje3());
+		utenlandskPostadresse.setLand(utenlandskPostadresseTo.getLand());
+		return utenlandskPostadresse;
+	}
+
+	private NorskPostadresse mapToNorskPostadresse(NorskPostadresseTo norskPostadresseTo) {
+		NorskPostadresse norskPostadresse = new NorskPostadresse();
+		norskPostadresse.setAdresselinje1(trimAdresselinje(norskPostadresseTo.getAdresselinje1()));
+		norskPostadresse.setAdresselinje2(trimAdresselinje(norskPostadresseTo.getAdresselinje2()));
+		norskPostadresse.setAdresselinje3(trimAdresselinje(norskPostadresseTo.getAdresselinje3()));
+		norskPostadresse.setPostnummer(norskPostadresseTo.getPostnummer());
+		norskPostadresse.setPoststed(norskPostadresseTo.getPoststed());
+		norskPostadresse.setLand(norskPostadresseTo.getLand());
+		return norskPostadresse;
 	}
 
 	private String trimAdresselinje(String adresselinje) {
 		return isBlank(adresselinje) ? null : adresselinje.strip();
 	}
 
-	private String mapDistribusjonstidspunkt(DistribusjonstidspunktCode distribusjonstidspunktCode) {
-		return (nonNull(distribusjonstidspunktCode) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunktCode.name())) ?
-				distribusjonstidspunktCode.name() : null;
-	}
-
-	private String mapDistribusjonstype(DistribusjonstypeCode distribusjonstype) {
-		return (nonNull(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.name())) ?
-				distribusjonstype.name() : null;
-	}
 }
