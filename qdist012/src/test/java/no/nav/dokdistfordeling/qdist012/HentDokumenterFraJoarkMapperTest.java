@@ -83,18 +83,18 @@ class HentDokumenterFraJoarkMapperTest {
 
 	@Test
 	public void shouldMap() {
-		var hentDokumentFraJoark = createHentDokumentFraJoark();
-		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstype(VEDTAK.name());
-		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstidspunkt(UMIDDELBART.name());
+		var hentDokumenterFraJoark = createHentDokumenterFraJoark();
+		hentDokumenterFraJoark.getDistribusjonbestilling().setDistribusjonstype(VEDTAK.name());
+		hentDokumenterFraJoark.getDistribusjonbestilling().setDistribusjonstidspunkt(UMIDDELBART.name());
 
-		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumentFraJoark);
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
 		assertResponse(hentDokumenterFraJoarkTo);
 	}
 
 	@Test
 	public void shouldMapOkWhenBatchIdIsNull() {
-		var hentDokumenterFraJoark = createHentDokumentFraJoark();
+		var hentDokumenterFraJoark = createHentDokumenterFraJoark();
 		hentDokumenterFraJoark.getDistribusjonbestilling().setBatchId(null);
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
@@ -106,9 +106,9 @@ class HentDokumenterFraJoarkMapperTest {
 
 	@Test
 	public void shouldMapDistribusjonskanalDittNAV() {
-		var hentDokumentFraJoark = createHentDokumentFraJoarkDittNav();
+		var hentDokumenterFraJoark = createHentDokumenterFraJoarkDittNav();
 
-		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumentFraJoark);
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
 		DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
 		assertEquals(distribusjonbestilling.getDistribusjonKanal(), DITTNAV.name());
@@ -117,7 +117,7 @@ class HentDokumenterFraJoarkMapperTest {
 
 	@Test
 	public void shouldMapOkWhenForsendelseTittelIsNull() {
-		var hentDokumenterFraJoark = createHentDokumentFraJoark();
+		var hentDokumenterFraJoark = createHentDokumenterFraJoark();
 		hentDokumenterFraJoark.getDistribusjonbestilling().setForsendelseTittel(null);
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
@@ -129,11 +129,11 @@ class HentDokumenterFraJoarkMapperTest {
 
 	@Test
 	public void shouldNotMapDistribusjonstypeAndDistribusjonstidspunktIfNullOrInvalidValue() {
-		var hentDokumentFraJoark = createHentDokumentFraJoark();
-		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstype(null);
-		hentDokumentFraJoark.getDistribusjonbestilling().setDistribusjonstidspunkt(UMIDDELBART.name().toLowerCase());
+		var hentDokumenterFraJoark = createHentDokumenterFraJoark();
+		hentDokumenterFraJoark.getDistribusjonbestilling().setDistribusjonstype(null);
+		hentDokumenterFraJoark.getDistribusjonbestilling().setDistribusjonstidspunkt(UMIDDELBART.name().toLowerCase());
 
-		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumentFraJoark);
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
 		assertEquals(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstidspunkt(), UMIDDELBART);
 		assertNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstype());
@@ -141,7 +141,7 @@ class HentDokumenterFraJoarkMapperTest {
 
 	@Test
 	public void shouldMapOkWhenArkivinformasjonIsNull() {
-		var hentDokumenterFraJoark = createHentDokumentFraJoark();
+		var hentDokumenterFraJoark = createHentDokumenterFraJoark();
 		hentDokumenterFraJoark.getDistribusjonbestilling().setArkivInformasjon(null);
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
@@ -153,7 +153,7 @@ class HentDokumenterFraJoarkMapperTest {
 
 	@Test
 	public void shouldMapAktoerId() {
-		var hentDokumenterFraJoark = createHentDokumentFraJoark();
+		var hentDokumenterFraJoark = createHentDokumenterFraJoark();
 		hentDokumenterFraJoark.getDistribusjonbestilling().setMottaker(createMottakerAktoerId());
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
@@ -170,7 +170,7 @@ class HentDokumenterFraJoarkMapperTest {
 
 	@Test
 	public void shouldMapOrganisasjon() {
-		var hentDokumenterFraJoark = createHentDokumentFraJoark();
+		var hentDokumenterFraJoark = createHentDokumenterFraJoark();
 		hentDokumenterFraJoark.getDistribusjonbestilling().setMottaker(createAktoerOrganisasjon());
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
@@ -189,7 +189,7 @@ class HentDokumenterFraJoarkMapperTest {
 	@ParameterizedTest
 	@MethodSource
 	public void shouldMapSamhandler(String samhandlerkategori, AktoerTypeCode aktoerTypeCode) {
-		var hentDokumenterFraJoark = createHentDokumentFraJoark();
+		var hentDokumenterFraJoark = createHentDokumenterFraJoark();
 		hentDokumenterFraJoark.getDistribusjonbestilling().setMottaker(createAktoerSamhandler(samhandlerkategori));
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
@@ -214,10 +214,10 @@ class HentDokumenterFraJoarkMapperTest {
 
 	@Test
 	public void shouldMapToDittNAVWhenAdresseIsNull() {
-		var hentDokumentFraJoarkDittNav = createHentDokumentFraJoarkDittNav();
-		hentDokumentFraJoarkDittNav.getDistribusjonbestilling().setAdresse(null);
+		var hentDokumenterFraJoarkDittNav = createHentDokumenterFraJoarkDittNav();
+		hentDokumenterFraJoarkDittNav.getDistribusjonbestilling().setAdresse(null);
 
-		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumentFraJoarkDittNav);
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoarkDittNav);
 
 		DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
 		assertEquals(distribusjonbestilling.getDistribusjonKanal(), DITTNAV.name());
@@ -226,7 +226,7 @@ class HentDokumenterFraJoarkMapperTest {
 
 	@Test
 	public void shouldMapUtenlandskAdresse() {
-		var hentDokumenterFraJoark = createHentDokumentFraJoark();
+		var hentDokumenterFraJoark = createHentDokumenterFraJoark();
 		hentDokumenterFraJoark.getDistribusjonbestilling().setAdresse(createUtenlandskPostadresse());
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
@@ -308,15 +308,15 @@ class HentDokumenterFraJoarkMapperTest {
 		assertEquals(postadresse.getLand(), LAND);
 	}
 
-	private HentDokumenterFraJoark createHentDokumentFraJoark() {
-		return createHentDokumentFraJoark(PRINT.name());
+	private HentDokumenterFraJoark createHentDokumenterFraJoark() {
+		return createHentDokumenterFraJoark(PRINT.name());
 	}
 
-	private HentDokumenterFraJoark createHentDokumentFraJoarkDittNav() {
-		return createHentDokumentFraJoark(DITT_NAV);
+	private HentDokumenterFraJoark createHentDokumenterFraJoarkDittNav() {
+		return createHentDokumenterFraJoark(DITT_NAV);
 	}
 
-	private HentDokumenterFraJoark createHentDokumentFraJoark(String distribusjonKanal) {
+	private HentDokumenterFraJoark createHentDokumenterFraJoark(String distribusjonKanal) {
 		Distribusjonbestilling distribusjonbestilling = new Distribusjonbestilling();
 		distribusjonbestilling.setBestillingsId(BESTILLINGS_ID);
 		distribusjonbestilling.setBatchId(BATCH_ID);
