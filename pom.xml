@@ -36,7 +36,6 @@
         <tink-gcpkms.version>1.10.0</tink-gcpkms.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
         <context-propagation.version>1.1.1</context-propagation.version>
-        <token-support.version>4.1.4</token-support.version>
         <token-support.version>5.0.5</token-support.version>
 
         <dokmet-api.version>2024.09.23-13.20-d534b40</dokmet-api.version>
