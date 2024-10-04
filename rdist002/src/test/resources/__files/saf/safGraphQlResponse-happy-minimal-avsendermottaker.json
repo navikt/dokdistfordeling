@@ -21,11 +21,13 @@
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "SLADDET"
+              "variantformat": "SLADDET",
+              "filtype": "PDF"
             },
             {
               "saksbehandlerHarTilgang": false,
               "variantformat": "ARKIV",
+              "filtype": "XML",
               "filstoerrelse": 2598637
             }
           ]
@@ -39,6 +41,7 @@
             {
               "saksbehandlerHarTilgang": true,
               "variantformat": "ARKIV",
+              "filtype": "PDFA",
               "filstoerrelse": 2598637
             }
           ]

@@ -22,7 +22,8 @@
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "SLADDET"
+              "variantformat": "SLADDET",
+              "filtype": "PDF"
             },
             {
               "saksbehandlerHarTilgang": false,
@@ -38,7 +39,8 @@
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "ARKIV"
+              "variantformat": "ARKIV",
+              "filtype": "PDFA"
             }
           ]
         }

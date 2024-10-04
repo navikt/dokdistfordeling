@@ -17,6 +17,9 @@ import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
 
 public class JournalpostToMapper {
 
+	public static final String FILTYPE_PDF = "PDF";
+	public static final String FILTYPE_PDFA = "PDFA";
+
 	public Journalpost map(SafJournalpostTo safJournalpostTo) {
 		return Journalpost.builder()
 				.tittel(safJournalpostTo.getTittel())
@@ -60,7 +63,7 @@ public class JournalpostToMapper {
 	private List<Journalpost.Dokumentvariant> mapDokumentVarianter(List<SafJournalpostTo.Dokumentvariant> dokumentvarianter) {
 		return dokumentvarianter
 				.stream()
-				.filter(this::isVariantformatArkivOrSladdet)
+				.filter(this::erVariantformatArkivOrSladdetMedPdfOrPdfAFiltype)
 				.map(this::mapDokumentVariant)
 				.collect(Collectors.toList());
 
@@ -89,7 +92,15 @@ public class JournalpostToMapper {
 				.build();
 	}
 
+	private boolean erVariantformatArkivOrSladdetMedPdfOrPdfAFiltype(SafJournalpostTo.Dokumentvariant dokumentvariant) {
+		return isVariantformatArkivOrSladdet(dokumentvariant) && isFiltypePdfOrPdfA(dokumentvariant);
+	}
+
 	private boolean isVariantformatArkivOrSladdet(SafJournalpostTo.Dokumentvariant dokumentvariant) {
 		return Variantformat.ARKIV.name().equals(dokumentvariant.getVariantformat()) || Variantformat.SLADDET.name().equals(dokumentvariant.getVariantformat());
+	}
+
+	private boolean isFiltypePdfOrPdfA(SafJournalpostTo.Dokumentvariant dokumentvariant) {
+		return FILTYPE_PDF.equals(dokumentvariant.getFiltype()) || FILTYPE_PDFA.equals(dokumentvariant.getFiltype());
 	}
 }
