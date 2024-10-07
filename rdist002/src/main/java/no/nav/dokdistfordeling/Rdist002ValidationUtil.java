@@ -3,12 +3,12 @@ package no.nav.dokdistfordeling;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.InvalidFiltypeException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
-import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 
@@ -22,6 +22,10 @@ import static java.lang.String.format;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
+import static no.nav.dokdistfordeling.consumer.saf.graphql.JournalpostToMapper.FILTYPE_PDF;
+import static no.nav.dokdistfordeling.consumer.saf.graphql.JournalpostToMapper.FILTYPE_PDFA;
+import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
+import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertHovedokumentFieldNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostFieldNotNullOrEmpty;
@@ -99,6 +103,7 @@ public class Rdist002ValidationUtil {
 		validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
 
 		journalpost.getDokumenter().forEach(Rdist002ValidationUtil::validateDokumentInfo);
+		journalpost.getDokumenter().forEach(Rdist002ValidationUtil::validateDokumentvariantWithFiltypePdfPdfA);
 	}
 
 	private static void validateHovedDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
@@ -121,9 +126,22 @@ public class Rdist002ValidationUtil {
 		}
 	}
 
+	private static void validateDokumentvariantWithFiltypePdfPdfA(Journalpost.DokumentInfo dokumentInfo) {
+		if (!isDokumentvariantArkivOrSladdetWithFiltypePdfOrPdfA(dokumentInfo.getDokumentvarianter())) {
+			dokumentInfo.getDokumentvarianter().stream().map(dokumentvariant -> {
+				throw new InvalidFiltypeException(format("Ugyldig filtype=%s, kun PDF eller PDFA filtype kan distribueres", dokumentvariant.getFiltype()));
+			});
+		}
+	}
 
 	private static boolean checkIfNoDokumentvariantWithTilgang(List<Journalpost.Dokumentvariant> dokumentvarianter) {
 		return dokumentvarianter.stream()
-				.noneMatch(dokumentvariant -> dokumentvariant.isSaksbehandlerHarTilgang() && (Variantformat.ARKIV.equals(dokumentvariant.getVariantformat()) || Variantformat.SLADDET.equals(dokumentvariant.getVariantformat())));
+				.noneMatch(dokumentvariant -> dokumentvariant.isSaksbehandlerHarTilgang() && (ARKIV.equals(dokumentvariant.getVariantformat()) || SLADDET.equals(dokumentvariant.getVariantformat())));
+	}
+
+	private static boolean isDokumentvariantArkivOrSladdetWithFiltypePdfOrPdfA(List<Journalpost.Dokumentvariant> dokumentvarianter) {
+		return dokumentvarianter.stream()
+				.anyMatch(dokumentvariant ->  (ARKIV.equals(dokumentvariant.getVariantformat()) || SLADDET.equals(dokumentvariant.getVariantformat())) &&
+						(FILTYPE_PDF.equals(dokumentvariant.getFiltype()) || FILTYPE_PDFA.equals(dokumentvariant.getFiltype())));
 	}
 }
