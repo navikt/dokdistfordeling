@@ -9,10 +9,12 @@ import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
+import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -22,8 +24,6 @@ import static java.lang.String.format;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.NORSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.HentDokumenterFraJoarkMapper.UTENLANDSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
-import static no.nav.dokdistfordeling.consumer.saf.graphql.JournalpostToMapper.FILTYPE_PDF;
-import static no.nav.dokdistfordeling.consumer.saf.graphql.JournalpostToMapper.FILTYPE_PDFA;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertHovedokumentFieldNotNullOrEmpty;
@@ -41,6 +41,12 @@ public class Rdist002ValidationUtil {
 	private static final String UTGAAENDE = Journalposttype.U.name();
 	private static final Set<String> ISO3166_TWO_LETTER_CODES = Arrays.stream(Locale.getISOCountries()).collect(Collectors.toSet());
 	private static final String KOSOVO_LAND_KODE = "XK";
+	public static final String PDF = "PDF";
+	public static final String PDFA = "PDFA";
+
+	private static final EnumSet<Variantformat> VARIANTFORMATS = EnumSet.of(ARKIV, SLADDET);
+	private static final Set<String> FILETYPE_PDF_PDFA = Set.of(PDF, PDFA);
+
 
 	static {
 		ISO3166_TWO_LETTER_CODES.add(KOSOVO_LAND_KODE);
@@ -103,7 +109,6 @@ public class Rdist002ValidationUtil {
 		validateHovedDokumentInfo(journalpost.getDokumenter().iterator().next());
 
 		journalpost.getDokumenter().forEach(Rdist002ValidationUtil::validateDokumentInfo);
-		journalpost.getDokumenter().forEach(Rdist002ValidationUtil::validateDokumentvariantWithFiltypePdfPdfA);
 	}
 
 	private static void validateHovedDokumentInfo(Journalpost.DokumentInfo dokumentInfo) {
@@ -119,29 +124,26 @@ public class Rdist002ValidationUtil {
 		if (checkIfNoDokumentvariantWithTilgang(dokumentInfo.getDokumentvarianter())) {
 			throw new BrukerManglerTilgangTilDokumentFunctionalException(
 					format("Systembruker eller saksbehandler har ikke tilgang til dokumentInfoId=%s og kan derfor ikke bestille distribusjon. " +
-						   "For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. " +
-						   "For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
-						   "Kontakt oss på #team_dokumentløsninger for bistand.", dokumentInfo.getDokumentInfoId())
+							"For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. " +
+							"For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
+							"Kontakt oss på #team_dokumentløsninger for bistand.", dokumentInfo.getDokumentInfoId())
 			);
 		}
+
+		checkIfNoDokumentvariantWithFiltypePdfOrPdfA(dokumentInfo.getDokumentvarianter());
 	}
 
-	private static void validateDokumentvariantWithFiltypePdfPdfA(Journalpost.DokumentInfo dokumentInfo) {
-		if (!isDokumentvariantArkivOrSladdetWithFiltypePdfOrPdfA(dokumentInfo.getDokumentvarianter())) {
-			dokumentInfo.getDokumentvarianter().stream().map(dokumentvariant -> {
-				throw new InvalidFiltypeException(format("Ugyldig filtype=%s, kun PDF eller PDFA filtype kan distribueres", dokumentvariant.getFiltype()));
-			});
-		}
-	}
 
 	private static boolean checkIfNoDokumentvariantWithTilgang(List<Journalpost.Dokumentvariant> dokumentvarianter) {
 		return dokumentvarianter.stream()
-				.noneMatch(dokumentvariant -> dokumentvariant.isSaksbehandlerHarTilgang() && (ARKIV.equals(dokumentvariant.getVariantformat()) || SLADDET.equals(dokumentvariant.getVariantformat())));
+				.noneMatch(dokumentvariant -> dokumentvariant.isSaksbehandlerHarTilgang() && (VARIANTFORMATS.contains(dokumentvariant.getVariantformat())));
 	}
 
-	private static boolean isDokumentvariantArkivOrSladdetWithFiltypePdfOrPdfA(List<Journalpost.Dokumentvariant> dokumentvarianter) {
-		return dokumentvarianter.stream()
-				.anyMatch(dokumentvariant ->  (ARKIV.equals(dokumentvariant.getVariantformat()) || SLADDET.equals(dokumentvariant.getVariantformat())) &&
-						(FILTYPE_PDF.equals(dokumentvariant.getFiltype()) || FILTYPE_PDFA.equals(dokumentvariant.getFiltype())));
+	private static void checkIfNoDokumentvariantWithFiltypePdfOrPdfA(List<Journalpost.Dokumentvariant> dokumentvarianter) {
+		 dokumentvarianter.forEach(dokumentvariant -> {
+			 if (!(VARIANTFORMATS.contains(dokumentvariant.getVariantformat()) && FILETYPE_PDF_PDFA.contains(dokumentvariant.getFiltype()))) {
+				 throw new InvalidFiltypeException(format("Ugyldig dokumentvariant=%s eller filtype=%s, kun dokumentvariant ARKIV/SLADDET med filtype PDF/PDFA kan distribueres", dokumentvariant.getVariantformat(), dokumentvariant.getFiltype()));
+			 }
+		 });
 	}
 }

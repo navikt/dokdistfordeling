@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
+import static no.nav.dokdistfordeling.Rdist002ValidationUtil.PDF;
+import static no.nav.dokdistfordeling.Rdist002ValidationUtil.PDFA;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
 
 public class UnitTestUtil {
@@ -95,9 +97,11 @@ public class UnitTestUtil {
 				.dokumentstatus(FERDIGSTILT)
 				.dokumentvarianter(Arrays.asList(Journalpost.Dokumentvariant.builder()
 								.saksbehandlerHarTilgang(false)
+										.filtype(PDFA)
 								.variantformat(Variantformat.ARKIV).build(),
 						Journalpost.Dokumentvariant.builder()
 								.saksbehandlerHarTilgang(true)
+								.filtype(PDF)
 								.variantformat(Variantformat.SLADDET).build()));
 	}
 
@@ -109,6 +113,7 @@ public class UnitTestUtil {
 				.dokumentstatus(FERDIGSTILT)
 				.dokumentvarianter(singletonList(Journalpost.Dokumentvariant.builder()
 						.saksbehandlerHarTilgang(true)
+						.filtype(PDFA)
 						.variantformat(Variantformat.ARKIV).build()));
 	}
 

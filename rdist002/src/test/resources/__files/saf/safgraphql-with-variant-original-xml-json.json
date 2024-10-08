@@ -9,9 +9,9 @@
         "type": "AKTOERID"
       },
       "avsenderMottaker": {
-        "id": "89898989898",
-        "type": "UKJENT",
-        "navn": "TSS id Mottaker"
+        "id": "09876543210",
+        "type": "FNR",
+        "navn": "Jan Neimansen"
       },
       "dokumenter": [
         {
@@ -22,13 +22,15 @@
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "SLADDET",
-              "filtype": "PDF"
+              "variantformat": "ORIGINAL",
+              "filtype": "JSON",
+              "filstoerrelse": 1205634
             },
             {
               "saksbehandlerHarTilgang": false,
-              "variantformat": "ARKIV",
-              "filtype": "PDFA"
+              "variantformat": "ORIGINAL",
+              "filtype": "XML",
+              "filstoerrelse": 259863
             }
           ]
         },
@@ -41,7 +43,8 @@
             {
               "saksbehandlerHarTilgang": true,
               "variantformat": "ARKIV",
-              "filtype": "PDFA"
+              "filtype": "PDF",
+              "filstoerrelse": 2598637
             }
           ]
         }

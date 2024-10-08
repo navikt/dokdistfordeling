@@ -479,6 +479,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			"safgraphql-not_found.json,Fant ikke journalpost,404",
 			"safgraphql-unauthorized.json,Bruker er unauthorized,401",
 			"safgraphql-validationerror-query.json,Feil i saf query,500",
+			"safgraphql-with-variant-original-xml-json.json, Systembruker eller saksbehandler har ikke tilgang til dokumentInfoId=666666666 og kan derfor ikke bestille distribusjon,401"
 	})
 	void shouldReturnCorrecteErrorTypeWhenSafRequestFails(String filename, String errorMessage, int httpErrorCode) {
 		stubSafGraphQl("saf/" + filename);
