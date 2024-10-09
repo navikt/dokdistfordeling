@@ -23,20 +23,8 @@
             {
               "saksbehandlerHarTilgang": true,
               "variantformat": "ARKIV",
-              "filtype": "JPEG",
-              "filstoerrelse": 305635
-            },
-            {
-              "saksbehandlerHarTilgang": true,
-              "variantformat": "ARKIV",
               "filtype": "TIFF",
               "filstoerrelse": 1205634
-            },
-            {
-              "saksbehandlerHarTilgang": false,
-              "variantformat": "ARKIV",
-              "filtype": "PNG",
-              "filstoerrelse": 259863
             }
           ]
         },

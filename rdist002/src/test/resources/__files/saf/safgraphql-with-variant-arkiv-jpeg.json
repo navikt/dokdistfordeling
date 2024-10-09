@@ -1,0 +1,48 @@
+{
+  "data": {
+    "journalpost": {
+      "journalposttype": "U",
+      "journalstatus": "FERDIGSTILT",
+      "tema": "OPP",
+      "bruker": {
+        "id": "12345678901",
+        "type": "AKTOERID"
+      },
+      "avsenderMottaker": {
+        "id": "09876543210",
+        "type": "FNR",
+        "navn": "Jan Neimansen"
+      },
+      "dokumenter": [
+        {
+          "dokumentInfoId": "666666666",
+          "tittel": "MASKERT_FELT",
+          "brevkode": "000001",
+          "dokumentstatus": "FERDIGSTILT",
+          "dokumentvarianter": [
+            {
+              "saksbehandlerHarTilgang": true,
+              "variantformat": "ARKIV",
+              "filtype": "JPEG",
+              "filstoerrelse": 305635
+            }
+          ]
+        },
+        {
+          "dokumentInfoId": "777777777",
+          "tittel": "MASKERT_FELT",
+          "brevkode": "000001",
+          "dokumentstatus": "FERDIGSTILT",
+          "dokumentvarianter": [
+            {
+              "saksbehandlerHarTilgang": true,
+              "variantformat": "ARKIV",
+              "filtype": "PDF",
+              "filstoerrelse": 2598637
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
