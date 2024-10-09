@@ -136,7 +136,7 @@ public class Rdist002ValidationUtil {
 
 	private static boolean checkIfNoDokumentvariantWithTilgang(List<Journalpost.Dokumentvariant> dokumentvarianter) {
 		return dokumentvarianter.stream()
-				.noneMatch(dokumentvariant -> dokumentvariant.isSaksbehandlerHarTilgang() && (VARIANTFORMATS.contains(dokumentvariant.getVariantformat())));
+				.noneMatch(dokumentvariant -> dokumentvariant.isSaksbehandlerHarTilgang() && VARIANTFORMATS.contains(dokumentvariant.getVariantformat()));
 	}
 
 	private static void checkIfNoDokumentvariantWithFiltypePdfOrPdfA(List<Journalpost.Dokumentvariant> dokumentvarianter) {
