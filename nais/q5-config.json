@@ -15,7 +15,6 @@
   "DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME": "QA.Q_TRASH",
   "DOKDISTDPV_QDIST016_DIST_TIL_DPV_QUEUENAME": "QA.Q_TRASH",
   "SRVDOKDISTFORDELING": "/serviceuser/data/dev/srvdokdistfordeling",
-  "DOKDISTFORDELING_CERT": "/kv/preprod/fss/dokdistfordeling-q5/certificate",
   "SAF_GRAPHQL_URL": "https://saf-q5.dev.intern.nav.no/graphql",
   "HENTDOKUMENT_URL": "https://saf-q5.dev.intern.nav.no/rest/hentdokument",
   "BESTEMDISTRIBUSJONKANAL_URL": "https://dokdistkanal-q5.dev.intern.nav.no",

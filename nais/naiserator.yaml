@@ -109,8 +109,6 @@ spec:
         mountPath: /var/run/secrets/nais.io/srvdokdistfordeling
       - kvPath: {{ APPDYNAMICS }}
         mountPath: /var/run/secrets/nais.io/appdynamics
-      - kvPath: {{ DOKDISTFORDELING_CERT }}
-        mountPath: /var/run/secrets/nais.io/certificate
   azure:
     application:
       enabled: true

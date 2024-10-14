@@ -15,7 +15,6 @@
   "DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME": "QA.Q2_DOKDISTEFORMIDLING.QDIST013_DIST_TRYGDERE",
   "DOKDISTDPV_QDIST016_DIST_TIL_DPV_QUEUENAME": "QA.Q2_DOKDISTDPV.QDIST016_DIST_TIL_DPV",
   "SRVDOKDISTFORDELING": "/serviceuser/data/dev/srvdokdistfordeling",
-  "DOKDISTFORDELING_CERT": "/kv/preprod/fss/dokdistfordeling/certificate",
   "SAF_GRAPHQL_URL": "https://saf.dev.intern.nav.no/graphql",
   "HENTDOKUMENT_URL": "https://saf.dev.intern.nav.no/rest/hentdokument",
   "DOKDISTFORDELING_ENDPOINTS_DOKARKIV_URL": "https://dokarkiv.dev.intern.nav.no/rest/journalpostapi/v1/journalpost",
