@@ -73,7 +73,7 @@ public class JmsConfig {
 
 	@Bean
 	public ConnectionFactory connectionFactory(final MqGatewayAlias mqGatewayAlias,
-												  final DokdistfordelingProperties dokdistfordelingProperties) throws JMSException {
+											   final DokdistfordelingProperties dokdistfordelingProperties) throws JMSException {
 		return createConnectionFactory(mqGatewayAlias, dokdistfordelingProperties.getServiceuser());
 	}
 
@@ -88,14 +88,10 @@ public class JmsConfig {
 		connectionFactory.setIntProperty(WMQConstants.JMS_IBM_ENCODING, MQConstants.MQENC_NATIVE);
 		connectionFactory.setIntProperty(WMQConstants.JMS_IBM_CHARACTER_SET, UTF_8_WITH_PUA);
 
-		if (mqGatewayAlias.getChannel().isEnabletls()) {
-			connectionFactory.setSSLCipherSuite(ANY_TLS13_OR_HIGHER);
-			SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-			connectionFactory.setSSLSocketFactory(factory);
-			connectionFactory.setChannel(mqGatewayAlias.getChannel().getSecurename());
-		} else {
-			connectionFactory.setChannel(mqGatewayAlias.getChannel().getName());
-		}
+		connectionFactory.setSSLCipherSuite(ANY_TLS13_OR_HIGHER);
+		SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+		connectionFactory.setSSLSocketFactory(factory);
+		connectionFactory.setChannel(mqGatewayAlias.getChannel().getSecurename());
 
 		UserCredentialsConnectionFactoryAdapter adapter = new UserCredentialsConnectionFactoryAdapter();
 		adapter.setTargetConnectionFactory(connectionFactory);

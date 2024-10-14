@@ -32,6 +32,5 @@ public class MqGatewayAlias {
 		private String name;
 		@NotBlank
 		private String securename;
-		private boolean enabletls;
 	}
 }
