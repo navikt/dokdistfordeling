@@ -1,9 +1,7 @@
 {
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.adeo.no/rest/v1/sts",
   "REGOPPSLAG_URL": "https://regoppslag.intern.nav.no/rest",
-  "MQGATEWAY01_CHANNEL_NAME": "P_DOKDISTFORDELING",
   "MQGATEWAY01_CHANNEL_SECURENAME": "P_DOKDISTFORDEL_SEC",
-  "MQGATEWAY01_CHANNEL_ENABLETLS": "true",
   "MQGATEWAY01_HOSTNAME": "mpls01.adeo.no",
   "MQGATEWAY01_PORT": "1414",
   "MQGATEWAY01_NAME": "MPLS01",
@@ -17,7 +15,6 @@
   "DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME": "QA.P_DOKDISTEFORMIDLING.QDIST013_DIST_TRYGDE",
   "DOKDISTDPV_QDIST016_DIST_TIL_DPV_QUEUENAME": "QA.P_DOKDISTDPV.QDIST016_DIST_TIL_DPV",
   "SRVDOKDISTFORDELING": "/serviceuser/data/prod/srvdokdistfordeling",
-  "DOKDISTFORDELING_CERT": "/kv/prod/fss/dokdistfordeling/certificate",
   "SAF_GRAPHQL_URL": "https://saf.intern.nav.no/graphql",
   "HENTDOKUMENT_URL": "https://saf.intern.nav.no/rest/hentdokument",
   "DOKDISTFORDELING_ENDPOINTS_DOKARKIV_URL": "https://dokarkiv.intern.nav.no/rest/journalpostapi/v1/journalpost",

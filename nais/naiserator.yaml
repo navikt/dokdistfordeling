@@ -17,12 +17,8 @@ spec:
       value: {{ SECURITY_TOKEN_SERVICE_TOKEN_URL }}
     - name: REGOPPSLAG_URL
       value: {{ REGOPPSLAG_URL }}
-    - name: MQGATEWAY01_CHANNEL_NAME
-      value: {{ MQGATEWAY01_CHANNEL_NAME }}
     - name: MQGATEWAY01_CHANNEL_SECURENAME
       value: {{ MQGATEWAY01_CHANNEL_SECURENAME }}
-    - name: MQGATEWAY01_CHANNEL_ENABLETLS
-      value: "{{ MQGATEWAY01_CHANNEL_ENABLETLS }}"
     - name: MQGATEWAY01_HOSTNAME
       value: {{ MQGATEWAY01_HOSTNAME }}
     - name: MQGATEWAY01_PORT
@@ -113,8 +109,6 @@ spec:
         mountPath: /var/run/secrets/nais.io/srvdokdistfordeling
       - kvPath: {{ APPDYNAMICS }}
         mountPath: /var/run/secrets/nais.io/appdynamics
-      - kvPath: {{ DOKDISTFORDELING_CERT }}
-        mountPath: /var/run/secrets/nais.io/certificate
   azure:
     application:
       enabled: true

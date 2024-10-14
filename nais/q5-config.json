@@ -1,9 +1,7 @@
 {
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.dev.adeo.no/rest/v1/sts",
   "REGOPPSLAG_URL": "https://regoppslag-q5.dev.intern.nav.no/rest",
-  "MQGATEWAY01_CHANNEL_NAME": "Q5_DOKDISTFORDELING",
   "MQGATEWAY01_CHANNEL_SECURENAME": "Q2_DOKDISTFORDEL_SEC",
-  "MQGATEWAY01_CHANNEL_ENABLETLS": "true",
   "MQGATEWAY01_HOSTNAME": "mqls01.preprod.local",
   "MQGATEWAY01_PORT": "1413",
   "MQGATEWAY01_NAME": "MQLS01",
@@ -17,7 +15,6 @@
   "DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME": "QA.Q_TRASH",
   "DOKDISTDPV_QDIST016_DIST_TIL_DPV_QUEUENAME": "QA.Q_TRASH",
   "SRVDOKDISTFORDELING": "/serviceuser/data/dev/srvdokdistfordeling",
-  "DOKDISTFORDELING_CERT": "/kv/preprod/fss/dokdistfordeling-q5/certificate",
   "SAF_GRAPHQL_URL": "https://saf-q5.dev.intern.nav.no/graphql",
   "HENTDOKUMENT_URL": "https://saf-q5.dev.intern.nav.no/rest/hentdokument",
   "BESTEMDISTRIBUSJONKANAL_URL": "https://dokdistkanal-q5.dev.intern.nav.no",
