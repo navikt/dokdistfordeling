@@ -62,6 +62,7 @@ public class Journalpost {
 	@Builder
 	public static class Dokumentvariant {
 		Variantformat variantformat;
+		String filtype;
 		boolean saksbehandlerHarTilgang;
 		Integer filstoerrelse;
 	}

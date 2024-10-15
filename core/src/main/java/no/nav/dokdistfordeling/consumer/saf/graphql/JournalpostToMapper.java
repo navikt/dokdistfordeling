@@ -69,6 +69,7 @@ public class JournalpostToMapper {
 	private Journalpost.Dokumentvariant mapDokumentVariant(SafJournalpostTo.Dokumentvariant dokumentvariant) {
 		return Journalpost.Dokumentvariant.builder()
 				.variantformat(stringToEnum(Variantformat.class, dokumentvariant.getVariantformat()))
+				.filtype(dokumentvariant.getFiltype())
 				.saksbehandlerHarTilgang(dokumentvariant.isSaksbehandlerHarTilgang())
 				.filstoerrelse(dokumentvariant.getFilstoerrelse())
 				.build();

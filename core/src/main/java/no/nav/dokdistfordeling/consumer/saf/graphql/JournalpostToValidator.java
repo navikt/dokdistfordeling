@@ -35,10 +35,15 @@ public class JournalpostToValidator {
 	private void validateDokument(DokumentInfo dokumentInfo) {
 		assertDokumentFieldNotNullOrEmpty("dokumentInfoId", dokumentInfo.getDokumentInfoId());
 		validateDokumentVarianter(dokumentInfo.getDokumentvarianter());
+		validateFiltype(dokumentInfo.getDokumentvarianter());
 	}
 
 	private void validateDokumentVarianter(List<Dokumentvariant> dokumentvarianter) {
 		dokumentvarianter.forEach(this::validateAndReturnDokumentVariant);
+	}
+
+	private void validateFiltype(List<Dokumentvariant> dokumentvariants) {
+		dokumentvariants.forEach(dokumentvariant -> assertNotNullOrEmpty("filtype", dokumentvariant.getFiltype()));
 	}
 
 	private void validateAndReturnDokumentVariant(Dokumentvariant dokumentvariant) {

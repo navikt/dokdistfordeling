@@ -13,12 +13,6 @@
         "type": "FNR",
         "navn": "Jan Neimansen"
       },
-      "tilleggsopplysninger": [
-        {
-          "nokkel":"dokdistBestillingsId",
-          "verdi": "1ad212d2-d46d-4e73-bf6c-c1c60382da44"
-        }
-      ],
       "dokumenter": [
         {
           "dokumentInfoId": "666666666",
@@ -28,13 +22,9 @@
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "SLADDET",
-              "filtype": "PDF"
-            },
-            {
-              "saksbehandlerHarTilgang": false,
               "variantformat": "ARKIV",
-              "filtype": "PDFA"
+              "filtype": "TIFF",
+              "filstoerrelse": 1205634
             }
           ]
         },
@@ -47,7 +37,8 @@
             {
               "saksbehandlerHarTilgang": true,
               "variantformat": "ARKIV",
-              "filtype": "PDF"
+              "filtype": "PDF",
+              "filstoerrelse": 2598637
             }
           ]
         }

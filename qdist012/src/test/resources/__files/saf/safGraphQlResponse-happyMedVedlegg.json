@@ -23,7 +23,8 @@
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "ARKIV"
+              "variantformat": "ARKIV",
+              "filtype": "PDF"
             }
           ]
         },
@@ -35,11 +36,13 @@
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "SLADDET"
+              "variantformat": "SLADDET",
+              "filtype": "PDFA"
             },
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "ARKIV"
+              "variantformat": "ARKIV",
+              "filtype": "PDFA"
             }
           ]
         },
@@ -51,7 +54,8 @@
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "ARKIV"
+              "variantformat": "ARKIV",
+              "filtype": "PDFA"
             }
           ]
         },
@@ -63,7 +67,8 @@
           "dokumentvarianter": [
             {
               "saksbehandlerHarTilgang": true,
-              "variantformat": "ARKIV"
+              "variantformat": "ARKIV",
+              "filtype": "PDF"
             }
           ]
         }

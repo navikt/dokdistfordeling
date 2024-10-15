@@ -2,6 +2,7 @@ package no.nav.dokdistfordeling;
 
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.InvalidFiltypeException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
@@ -15,6 +16,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Arrays;
 
+import static no.nav.dokdistfordeling.Rdist002ValidationUtil.PDF;
+import static no.nav.dokdistfordeling.Rdist002ValidationUtil.PDFA;
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateAdresse;
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateDistribuerJournalpostRequest;
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateJournalpostAndDokumenter;
@@ -329,9 +332,11 @@ public class Rdist002ValidationUtilTest {
 
 										Journalpost.Dokumentvariant.builder()
 												.saksbehandlerHarTilgang(false)
+												.filtype(PDF)
 												.variantformat(Variantformat.ARKIV).build(),
 										Journalpost.Dokumentvariant.builder()
 												.saksbehandlerHarTilgang(false)
+												.filtype(PDFA)
 												.variantformat(Variantformat.SLADDET).build()))
 								.build(),
 						createDokumentInfo2Builder().build()))
@@ -341,5 +346,27 @@ public class Rdist002ValidationUtilTest {
 					 "For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. " +
 					 "For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
 					 "Kontakt oss på #team_dokumentløsninger for bistand.", thrownException.getMessage());
+	}
+
+	@Test
+	public void shouldThrowValidationExceptionNoDokumentvariantWithFiltypePdfOrPdfa() {
+		Journalpost journalpost = createJournalpostBuilder()
+				.dokumenter(Arrays.asList(
+						createDokumentInfo1Builder()
+								.dokumentvarianter(Arrays.asList(
+
+										Journalpost.Dokumentvariant.builder()
+												.filtype("JSON")
+												.saksbehandlerHarTilgang(true)
+												.variantformat(Variantformat.ARKIV).build(),
+										Journalpost.Dokumentvariant.builder()
+												.filtype("XML")
+												.saksbehandlerHarTilgang(true)
+												.variantformat(Variantformat.SLADDET).build()))
+								.build(),
+						createDokumentInfo2Builder().build()))
+				.build();
+		InvalidFiltypeException thrownException = assertThrows(InvalidFiltypeException.class, () -> validateJournalpostAndDokumenter(journalpost));
+		assertEquals("Ugyldig dokumentvariant=ARKIV eller filtype=JSON, kun dokumentvariant ARKIV/SLADDET med filtype PDF/PDFA kan distribueres", thrownException.getMessage());
 	}
 }
