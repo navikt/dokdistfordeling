@@ -34,6 +34,7 @@ import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullAndValidV
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertStringIsNumberOfExactLength;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Slf4j
 public class Rdist002ValidationUtil {
@@ -82,6 +83,9 @@ public class Rdist002ValidationUtil {
 
 			} else if (UTENLANDSK_POSTADRESSE.equals(adresseTo.getAdressetype())) {
 				assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
+				if (isNotBlank(adresseTo.getPostnummer()) || isNotBlank(adresseTo.getPoststed())) {
+					log.warn("Postnummer eller poststed er satt mens adressetype={}. Dette kan resultere i at adressedata går tapt", UTENLANDSK_POSTADRESSE);
+				}
 			} else {
 				throw new ValidationException(format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, adresseType= %s", adresseTo.getAdressetype()));
 			}
@@ -124,9 +128,9 @@ public class Rdist002ValidationUtil {
 		if (checkIfNoDokumentvariantWithTilgang(dokumentInfo.getDokumentvarianter())) {
 			throw new BrukerManglerTilgangTilDokumentFunctionalException(
 					format("Systembruker eller saksbehandler har ikke tilgang til dokumentInfoId=%s og kan derfor ikke bestille distribusjon. " +
-							"For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. " +
-							"For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
-							"Kontakt oss på #team_dokumentløsninger for bistand.", dokumentInfo.getDokumentInfoId())
+						   "For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. " +
+						   "For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
+						   "Kontakt oss på #team_dokumentløsninger for bistand.", dokumentInfo.getDokumentInfoId())
 			);
 		}
 
@@ -140,10 +144,10 @@ public class Rdist002ValidationUtil {
 	}
 
 	private static void checkIfNoDokumentvariantWithFiltypePdfOrPdfA(List<Journalpost.Dokumentvariant> dokumentvarianter) {
-		 dokumentvarianter.forEach(dokumentvariant -> {
-			 if (!(VARIANTFORMATS.contains(dokumentvariant.getVariantformat()) && FILETYPE_PDF_PDFA.contains(dokumentvariant.getFiltype()))) {
-				 throw new InvalidFiltypeException(format("Ugyldig dokumentvariant=%s eller filtype=%s, kun dokumentvariant ARKIV/SLADDET med filtype PDF/PDFA kan distribueres", dokumentvariant.getVariantformat(), dokumentvariant.getFiltype()));
-			 }
-		 });
+		dokumentvarianter.forEach(dokumentvariant -> {
+			if (!(VARIANTFORMATS.contains(dokumentvariant.getVariantformat()) && FILETYPE_PDF_PDFA.contains(dokumentvariant.getFiltype()))) {
+				throw new InvalidFiltypeException(format("Ugyldig dokumentvariant=%s eller filtype=%s, kun dokumentvariant ARKIV/SLADDET med filtype PDF/PDFA kan distribueres", dokumentvariant.getVariantformat(), dokumentvariant.getFiltype()));
+			}
+		});
 	}
 }
