@@ -1,4 +1,6 @@
 {
+  "APP_NAME": "dokdistfordeling",
+  "ENVIRONMENT": "p",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.adeo.no/rest/v1/sts",
   "REGOPPSLAG_URL": "https://regoppslag.intern.nav.no/rest",
   "MQGATEWAY01_CHANNEL_SECURENAME": "P_DOKDISTFORDEL_SEC",
@@ -27,9 +29,6 @@
   "DOKDISTFORDELING_ENDPOINTS_DOKDISTKANAL_SCOPE": "api://prod-fss.teamdokumenthandtering.dokdistkanal/.default",
   "DOKDISTFORDELING_ENDPOINTS_PDL_URL": "https://pdl-api.intern.nav.no/graphql",
   "DOKDISTFORDELING_ENDPOINTS_PDL_SCOPE": "api://prod-fss.pdl.pdl-api/.default",
-  "APPDYNAMICS": "/apikey/appdynamics/prod",
-  "APP_NAME": "dokdistfordeling",
-  "APPD_NAME": "dokdistfordeling",
   "DOKDISTMELLOMLAGER_PROJECTID": "teamdokumenthandteri-prod-a63b",
   "DOKDISTMELLOMLAGER_BUCKET": "dokdistmellomlager-prod",
   "DOKDISTMELLOMLAGER_KEYRING": "dokdistmellomlager-keyring",

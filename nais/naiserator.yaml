@@ -43,8 +43,8 @@ spec:
       value: {{ DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME }}
     - name: DOKDISTDPV_QDIST016_DIST_TIL_DPV_QUEUENAME
       value: {{ DOKDISTDPV_QDIST016_DIST_TIL_DPV_QUEUENAME }}
-    - name: APPD_NAME
-      value: {{ APPD_NAME }}
+    - name: OTEL_RESOURCE_ATTRIBUTES
+      value: "deployment.environment.name={{ ENVIRONMENT }}"
     - name: DOKDISTFORDELING_ENDPOINTS_DOKMET_SCOPE
       value: {{ DOKDISTFORDELING_ENDPOINTS_DOKMET_SCOPE }}
     - name: DOKDISTFORDELING_ENDPOINTS_DOKMET_URL
@@ -107,8 +107,6 @@ spec:
     paths:
       - kvPath: {{ SRVDOKDISTFORDELING }}
         mountPath: /var/run/secrets/nais.io/srvdokdistfordeling
-      - kvPath: {{ APPDYNAMICS }}
-        mountPath: /var/run/secrets/nais.io/appdynamics
   azure:
     application:
       enabled: true
