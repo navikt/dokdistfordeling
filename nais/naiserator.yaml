@@ -111,3 +111,9 @@ spec:
     application:
       enabled: true
   webproxy: true
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+      destinations:
+        - id: "elastic-apm"
