@@ -4,8 +4,8 @@ import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterDistribusjonsinfoTo;
 import no.nav.dokdistfordeling.consumer.dokmet.DokmetConsumer;
 import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
-import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
-import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.DokdistadminConsumer;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.OpprettForsendelseRequestTo;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.AktoerTo;
@@ -29,18 +29,18 @@ public class Qdist008Service {
 
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 	private final DokmetConsumer dokmetConsumer;
-	private final AdministrerForsendelse administrerForsendelse;
+	private final DokdistadminConsumer dokdistadminConsumer;
 	private final OpprettForsendelseToRequestMapper opprettForsendelseToRequestMapper;
 	private final JournalpostApi journalpostApi;
 
 	public Qdist008Service(PdlGraphQLConsumer pdlGraphQLConsumer,
 						   DokmetConsumer dokmetConsumer,
-						   AdministrerForsendelse administrerForsendelse,
+						   DokdistadminConsumer dokdistadminConsumer,
 						   OpprettForsendelseToRequestMapper opprettForsendelseToRequestMapper,
 						   JournalpostApi journalpostApi) {
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 		this.dokmetConsumer = dokmetConsumer;
-		this.administrerForsendelse = administrerForsendelse;
+		this.dokdistadminConsumer = dokdistadminConsumer;
 		this.opprettForsendelseToRequestMapper = opprettForsendelseToRequestMapper;
 		this.journalpostApi = journalpostApi;
 	}
@@ -62,7 +62,7 @@ public class Qdist008Service {
 			final OpprettForsendelseRequestTo opprettForsendelseRequestTo = opprettForsendelseToRequestMapper
 					.map(distribusjonbestilling, forsendelseTittel, mottakerFnr, distribusjonsKanal);
 
-			String forsendelseId = administrerForsendelse.opprettForsendelse(opprettForsendelseRequestTo);
+			String forsendelseId = dokdistadminConsumer.opprettForsendelse(opprettForsendelseRequestTo);
 			exchange.setProperty(PROPERTY_FORSENDELSE_ID, forsendelseId);
 
 			distribuerTilKanal.setForsendelseId(forsendelseId);

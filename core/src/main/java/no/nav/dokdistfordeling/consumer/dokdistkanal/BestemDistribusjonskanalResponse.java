@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal;
+package no.nav.dokdistfordeling.consumer.dokdistkanal;
 
 import lombok.Builder;
 
@@ -6,5 +6,6 @@ import lombok.Builder;
 public record BestemDistribusjonskanalResponse(
 		String distribusjonskanal,
 		String regel,
-		String regelBegrunnelse) {
+		String regelBegrunnelse
+) {
 }

@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.qdist008.domain;
 
-import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.OpprettForsendelseRequestTo;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import org.springframework.stereotype.Component;
 

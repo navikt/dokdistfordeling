@@ -1,11 +1,11 @@
-package no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal;
+package no.nav.dokdistfordeling.consumer.dokdistkanal;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
-import no.nav.dokdistfordeling.exception.functional.BestemDistribusjonskanalFunctionalException;
-import no.nav.dokdistfordeling.exception.functional.BestemDistribusjonskanalUnauthorizedException;
-import no.nav.dokdistfordeling.exception.functional.BestemDistribusjonskanalMappingException;
-import no.nav.dokdistfordeling.exception.technical.BestemDistribusjonskanalTechnicalException;
+import no.nav.dokdistfordeling.exception.functional.DokdistkanalFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.DokdistkanalUnauthorizedException;
+import no.nav.dokdistfordeling.exception.functional.DokdistkanalMappingException;
+import no.nav.dokdistfordeling.exception.technical.DokdistkanalTechnicalException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import org.slf4j.MDC;
 import org.springframework.http.ProblemDetail;
@@ -28,20 +28,20 @@ import static org.springframework.security.oauth2.client.web.reactive.function.c
 
 @Slf4j
 @Component
-public class BestemDistribusjonskanalConsumer {
+public class DokdistkanalConsumer {
 
 	private final WebClient webClient;
 
-	public BestemDistribusjonskanalConsumer(final DokdistfordelingProperties dokdistfordelingProperties,
-											WebClient webClient) {
+	public DokdistkanalConsumer(final DokdistfordelingProperties dokdistfordelingProperties,
+								WebClient webClient) {
 		this.webClient = webClient.mutate()
 				.baseUrl(dokdistfordelingProperties.getEndpoints().getDokdistkanal().getUrl())
 				.defaultHeaders(httpHeaders -> httpHeaders.setContentType(APPLICATION_JSON))
 				.build();
 	}
 
-	@Retryable(retryFor = BestemDistribusjonskanalTechnicalException.class,
-			noRetryFor = BestemDistribusjonskanalMappingException.class,
+	@Retryable(retryFor = DokdistkanalTechnicalException.class,
+			noRetryFor = DokdistkanalMappingException.class,
 			backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public DistribusjonKanalCode bestemDistribusjonskanal(BestemDistribusjonskanalRequest request) {
 		return webClient.post()
@@ -58,7 +58,7 @@ public class BestemDistribusjonskanalConsumer {
 
 	private DistribusjonKanalCode mapToDistribusjonKanalCode(BestemDistribusjonskanalResponse response) {
 		if (response == null) {
-			throw new BestemDistribusjonskanalTechnicalException("Endepunktet bestemDistribusjonskanal returnerte null som respons");
+			throw new DokdistkanalTechnicalException("Endepunktet bestemDistribusjonskanal returnerte null som respons");
 		}
 
 		var distribusjonskanal = response.distribusjonskanal();
@@ -69,7 +69,7 @@ public class BestemDistribusjonskanalConsumer {
 				return DistribusjonKanalCode.valueOf(distribusjonskanal);
 			}
 		} catch (IllegalArgumentException e) {
-			throw new BestemDistribusjonskanalMappingException("DistribusjonKanalCode i dokdist støtter ikke enum-verdien " + distribusjonskanal);
+			throw new DokdistkanalMappingException("DistribusjonKanalCode i dokdist støtter ikke enum-verdien " + distribusjonskanal);
 		}
 	}
 
@@ -79,14 +79,14 @@ public class BestemDistribusjonskanalConsumer {
 
 			if (webException.getStatusCode().is4xxClientError()) {
 				if (UNAUTHORIZED.isSameCodeAs(webException.getStatusCode())) {
-					throw new BestemDistribusjonskanalUnauthorizedException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + problemDetail, error);
+					throw new DokdistkanalUnauthorizedException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + problemDetail, error);
 				}
-				throw new BestemDistribusjonskanalFunctionalException("Kall mot bestemDistribusjonskanal feilet funksjonelt med feilmelding=" + problemDetail, error);
+				throw new DokdistkanalFunctionalException("Kall mot bestemDistribusjonskanal feilet funksjonelt med feilmelding=" + problemDetail, error);
 			}
 
-			throw new BestemDistribusjonskanalTechnicalException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + problemDetail, error);
+			throw new DokdistkanalTechnicalException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + problemDetail, error);
 		} else {
-			throw new BestemDistribusjonskanalTechnicalException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + error.getMessage(), error);
+			throw new DokdistkanalTechnicalException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + error.getMessage(), error);
 		}
 	}
 

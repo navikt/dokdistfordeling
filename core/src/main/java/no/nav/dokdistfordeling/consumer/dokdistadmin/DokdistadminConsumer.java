@@ -1,12 +1,9 @@
-package no.nav.dokdistfordeling.consumer.rdist001;
+package no.nav.dokdistfordeling.consumer.dokdistadmin;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
-import no.nav.dokdistfordeling.consumer.rdist001.domain.Forsendelse;
-import no.nav.dokdistfordeling.consumer.rdist001.domain.OppdaterForsendelseRequest;
-import no.nav.dokdistfordeling.exception.functional.AdminstrerForsendelseFunctionalException;
-import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
-import no.nav.dokdistfordeling.exception.technical.AdminstrerForsendelseTechnicalException;
+import no.nav.dokdistfordeling.exception.functional.DokdistadminFunctionalException;
+import no.nav.dokdistfordeling.exception.technical.DokdistadminTechnicalException;
 import org.slf4j.MDC;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -26,12 +23,12 @@ import static org.springframework.security.oauth2.client.web.reactive.function.c
 
 @Slf4j
 @Component
-public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
+public class DokdistadminConsumer {
 
 	private final WebClient webClient;
 
-	public AdministrerForsendelseConsumer(final DokdistfordelingProperties dokdistfordelingProperties,
-										  WebClient webClient) {
+	public DokdistadminConsumer(final DokdistfordelingProperties dokdistfordelingProperties,
+								WebClient webClient) {
 		this.webClient = webClient
 				.mutate()
 				.defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -39,7 +36,8 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 				.build();
 	}
 
-	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(retryFor = DokdistadminTechnicalException.class,
+			backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public String opprettForsendelse(final OpprettForsendelseRequestTo opprettForsendelseRequestTo) {
 		var bestillingsId = opprettForsendelseRequestTo.getBestillingsId();
 
@@ -60,7 +58,8 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 		return forsendelseId;
 	}
 
-	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
+	@Retryable(retryFor = DokdistadminTechnicalException.class,
+			backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelse) {
 		log.info("oppdaterForsendelse oppdaterer forsendelse med forsendelseId={}", oppdaterForsendelse.forsendelseId());
 
@@ -80,11 +79,11 @@ public class AdministrerForsendelseConsumer implements AdministrerForsendelse {
 
 	private void handleError(Throwable error) {
 		if (error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
-			throw new AdminstrerForsendelseFunctionalException(
+			throw new DokdistadminFunctionalException(
 					format("Kall mot rdist001 feilet funksjonelt med status: %s, feilmelding: %s", response.getStatusCode(), response.getMessage()),
 					error);
 		} else {
-			throw new AdminstrerForsendelseTechnicalException(
+			throw new DokdistadminTechnicalException(
 					format("Kall mot rdist001 feilet feilet teknisk med feilmelding: %s", error.getMessage()),
 					error);
 		}

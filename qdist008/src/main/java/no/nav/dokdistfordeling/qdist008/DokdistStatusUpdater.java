@@ -1,7 +1,7 @@
 package no.nav.dokdistfordeling.qdist008;
 
-import no.nav.dokdistfordeling.consumer.rdist001.AdministrerForsendelse;
-import no.nav.dokdistfordeling.consumer.rdist001.domain.OppdaterForsendelseRequest;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.DokdistadminConsumer;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.OppdaterForsendelseRequest;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 import org.springframework.stereotype.Component;
@@ -15,10 +15,11 @@ import static no.nav.dokdistfordeling.qdist008.Qdist008Route.PROPERTY_FORSENDELS
 public class DokdistStatusUpdater {
 
 	private static final String FORSENDELSE_STATUS_KLAR_FOR_DIST = "KLAR_FOR_DIST";
-	private final AdministrerForsendelse administrerForsendelse;
 
-	public DokdistStatusUpdater(AdministrerForsendelse administrerForsendelse) {
-		this.administrerForsendelse = administrerForsendelse;
+	private final DokdistadminConsumer dokdistadminConsumer;
+
+	public DokdistStatusUpdater(DokdistadminConsumer dokdistadminConsumer) {
+		this.dokdistadminConsumer = dokdistadminConsumer;
 	}
 
 	@Handler
@@ -26,7 +27,7 @@ public class DokdistStatusUpdater {
 		final String forsendelseId = exchange.getProperty(PROPERTY_FORSENDELSE_ID, String.class);
 
 		if (!isDistribusjonKanalLokalPrintOrIngenDistribusjon(exchange)) {
-			administrerForsendelse.oppdaterForsendelse(new OppdaterForsendelseRequest(Long.valueOf(forsendelseId), FORSENDELSE_STATUS_KLAR_FOR_DIST));
+			dokdistadminConsumer.oppdaterForsendelse(new OppdaterForsendelseRequest(Long.valueOf(forsendelseId), FORSENDELSE_STATUS_KLAR_FOR_DIST));
 		}
 	}
 
@@ -34,4 +35,5 @@ public class DokdistStatusUpdater {
 		return LOKAL_PRINT.equals(exchange.getProperty(PROPERTY_DISTRIBUSJONSKANAL)) ||
 				INGEN_DISTRIBUSJON.equals(exchange.getProperty(PROPERTY_DISTRIBUSJONSKANAL));
 	}
+
 }
