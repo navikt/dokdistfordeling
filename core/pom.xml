@@ -78,10 +78,6 @@
 			<artifactId>camel-jms-starter</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>no.nav.dokmet</groupId>
-			<artifactId>api</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>google-cloud-storage</artifactId>
 		</dependency>
