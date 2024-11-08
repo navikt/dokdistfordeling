@@ -1,8 +1,8 @@
 package no.nav.dokdistfordeling;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanalConsumer;
-import no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal.BestemDistribusjonskanalRequest;
+import no.nav.dokdistfordeling.consumer.dokdistkanal.DokdistkanalConsumer;
+import no.nav.dokdistfordeling.consumer.dokdistkanal.BestemDistribusjonskanalRequest;
 import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentForAktoerIdFunctionalException;
@@ -22,12 +22,12 @@ import static org.apache.logging.log4j.util.Strings.isEmpty;
 @Component
 public class BestemDistribusjonskanalService {
 
-	private final BestemDistribusjonskanalConsumer bestemDistribusjonskanalConsumer;
+	private final DokdistkanalConsumer dokdistkanalConsumer;
 	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 
-	public BestemDistribusjonskanalService(BestemDistribusjonskanalConsumer bestemDistribusjonskanalConsumer,
+	public BestemDistribusjonskanalService(DokdistkanalConsumer dokdistkanalConsumer,
 										   PdlGraphQLConsumer pdlGraphQLConsumer) {
-		this.bestemDistribusjonskanalConsumer = bestemDistribusjonskanalConsumer;
+		this.dokdistkanalConsumer = dokdistkanalConsumer;
 		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 	}
 
@@ -53,7 +53,7 @@ public class BestemDistribusjonskanalService {
 				.forsendelseStoerrelse(getFilstoerrelseMB(journalpost))
 				.build();
 
-		return bestemDistribusjonskanalConsumer.bestemDistribusjonskanal(request);
+		return dokdistkanalConsumer.bestemDistribusjonskanal(request);
 	}
 
 	private String determineMottakerId(String mottakerId) {

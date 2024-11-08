@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.consumer.bestemdistribusjonskanal;
+package no.nav.dokdistfordeling.consumer.dokdistkanal;
 
 import lombok.Builder;
 
@@ -9,5 +9,6 @@ public record BestemDistribusjonskanalRequest(
 		boolean erArkivert,
 		Integer forsendelseStoerrelse,
 		String mottakerId,
-		String tema) {
+		String tema
+) {
 }
