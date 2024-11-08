@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.rdist001;
 
-import no.nav.dokdistfordeling.consumer.rdist001.OpprettForsendelseRequestTo;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.OpprettForsendelseRequestTo;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;

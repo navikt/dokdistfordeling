@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling.consumer.rdist001.domain;
+package no.nav.dokdistfordeling.consumer.dokdistadmin;
 
 import lombok.Value;
 
