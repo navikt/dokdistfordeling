@@ -6,9 +6,7 @@
   "sensitivt" : true,
   "utledRegisterInfo" : true,
   "tema" : null,
-  "behandlingstema" : null,
   "arkivSystem" : "JOARK",
-  "artifaktId" : null,
   "dokumentProduksjonsInfo" : {
     "vedlegg" : false,
     "eksternVedlegg" : false,
@@ -54,7 +52,6 @@
       "endretDato" : [ 2018, 5, 9, 9, 44, 9, 586000000 ]
     }
   },
-  "dokumentMottakInfo" : null,
   "changeStamp" : {
     "opprettetAv" : "srvdokkat",
     "opprettetDato" : [ 2016, 11, 21, 9, 56, 4, 408000000 ],
