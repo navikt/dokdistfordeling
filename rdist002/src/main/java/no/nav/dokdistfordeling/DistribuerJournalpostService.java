@@ -63,8 +63,8 @@ public class DistribuerJournalpostService {
 		validateJournalpostAndDokumenter(journalpost);
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
-		boolean harAdresse = nonNull(trimmetDistribuerJournalpostRequestTo.getAdresse());
-		DistribusjonKanalCode distribusjonKanalCode = trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint() ? PRINT : bestemDistribusjonskanalService.bestemDistribusjonskanal(journalpost, harAdresse);
+
+		DistribusjonKanalCode distribusjonKanalCode = bestemDistribusjonskanal(trimmetDistribuerJournalpostRequestTo, journalpost);
 
 		DistribuerJournalpostRequestTo distribuerRequest = isNull(trimmetDistribuerJournalpostRequestTo.getAdresse()) && PRINT.equals(distribusjonKanalCode) ?
 				hentDistribuerAdresseFraRegoppslag(trimmetDistribuerJournalpostRequestTo, journalpost) : trimmetDistribuerJournalpostRequestTo;
@@ -80,6 +80,16 @@ public class DistribuerJournalpostService {
 		hentDokumentOgDistribuerForsendelse(distribuerRequest, bestillingsId, journalpost, mottaker, distribusjonKanalCode);
 
 		return bestillingsId;
+	}
+
+	private DistribusjonKanalCode bestemDistribusjonskanal(DistribuerJournalpostRequestTo trimmetDistribuerJournalpostRequestTo, Journalpost journalpost){
+		boolean harAdresse = nonNull(trimmetDistribuerJournalpostRequestTo.getAdresse());
+		if(trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint()){
+			log.info("tvingSentralPrint er satt til true i input. Forsendelsen vil bli sendt til print.");
+			return PRINT;
+		} else {
+			return bestemDistribusjonskanalService.bestemDistribusjonskanal(journalpost, harAdresse);
+		}
 	}
 
 	private void hentDokumentOgDistribuerForsendelse(final DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
