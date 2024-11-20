@@ -354,7 +354,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubHentMottakerOgAdresse("regoppslag/treg002-hentadresse-person-happy.json", OK.value());
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).adresse(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(null).build(), createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, OK);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -487,7 +487,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	void shouldReturnCorrecteErrorTypeWhenSafRequestFails(String filename, String errorMessage, int httpErrorCode) {
 		stubSafGraphQl("saf/" + filename);
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).adresse(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(null).build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 
 		assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.valueOf(httpErrorCode));
@@ -513,7 +513,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		stubHentMottakerOgAdresse("", NOT_FOUND.value());
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).adresse(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(null).build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 
 		assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
@@ -528,7 +528,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		stubHentMottakerOgAdresse("", GONE.value());
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).adresse(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(null).build(), createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 
 		assertThat(responseEntity.getStatusCode()).isEqualTo(GONE);
@@ -590,6 +590,19 @@ public class Rdist002IT extends AbstractOauth2Test {
 				.build(), createHappyPathHeaders());
 
 		callDistribuerJournalpostAndAssertResponseCode(requestEntity, INTERNAL_SERVER_ERROR);
+	}
+
+	@Test
+	public void shouldReturnBadRequestIfAddressIsInvalidInRegoppslag() {
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+		stubStsToken();
+		stubPdl("pdl/pdl-happy.json");
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
+		stubHentMottakerOgAdresse("regoppslag/treg002-hentadresse-person-invalid-address.json", BAD_REQUEST.value());
+		putStubOppdaterJournalpost();
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(null).build(), createHappyPathHeaders());
+		callDistribuerJournalpostAndAssertResponseCode(requestEntity, BAD_REQUEST);
 	}
 
 	private static Stream<Arguments> shouldReturnInternalServerErrorWhenBestemDistribusjonskanalResponseIsUnauthorizedOrInternalServerError() {

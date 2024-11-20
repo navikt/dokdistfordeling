@@ -1,0 +1,7 @@
+{
+  "timestamp": 1731631020258,
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Feltet postnummer kan ikke være null eller tomt",
+  "path": "/rest/hentMottakerOgAdresse"
+}

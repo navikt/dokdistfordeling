@@ -34,9 +34,6 @@ public class DistribuerJournalpostController {
 	private final SafJournalpostQueryService safJournalpostQueryService;
 	private final DistribuerJournalpostService distribuerJournalpostService;
 
-	private static final String RDIST002_PREFIX = "rdist002 - Distribusjon feilet for journalpostId=";
-	private static final String FEILMELDING_SUFFIX = ". Feilmelding: ";
-
 
 	public DistribuerJournalpostController(SafJournalpostQueryService safJournalpostQueryService,
 										   DistribuerJournalpostService distribuerJournalpostService) {
@@ -70,12 +67,13 @@ public class DistribuerJournalpostController {
 			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(
 					distribuerJournalpostService.distribuerForsendelse(distribuerJournalpostRequestTo, journalpost));
 			return ResponseEntity.ok().body(response);
-		} catch (ValidationException e) {
-			log.warn(RDIST002_PREFIX + distribuerJournalpostRequestTo.getJournalpostId() + FEILMELDING_SUFFIX + e.getMessage());
-			throw new ValidationException("Validering av distribusjonsforespørsel feilet med feilmelding: " + e.getMessage());
 		} catch (Exception e) {
-			log.warn(RDIST002_PREFIX + distribuerJournalpostRequestTo.getJournalpostId() + FEILMELDING_SUFFIX + e.getMessage());
-			throw e;
+			log.warn("rdist002 - Distribusjon feilet for journalpostId={}. Feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage(), e);
+			if (e instanceof ValidationException validationException) {
+				throw new ValidationException("Validering av distribusjonsforespørsel feilet med feilmelding: " + validationException.getMessage());
+			} else {
+				throw e;
+			}
 		} finally {
 			MDC.clear();
 		}
