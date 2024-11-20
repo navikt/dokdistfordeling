@@ -82,7 +82,7 @@ public class DistribuerJournalpostService {
 		return bestillingsId;
 	}
 
-	public DistribusjonKanalCode bestemDistribusjonskanal(DistribuerJournalpostRequestTo trimmetDistribuerJournalpostRequestTo, Journalpost journalpost){
+	private DistribusjonKanalCode bestemDistribusjonskanal(DistribuerJournalpostRequestTo trimmetDistribuerJournalpostRequestTo, Journalpost journalpost){
 		boolean harAdresse = nonNull(trimmetDistribuerJournalpostRequestTo.getAdresse());
 		if(trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint()){
 			log.info("tvingSentralPrint er satt til true i input. Forsendelsen vil bli sendt til print.");
