@@ -65,7 +65,7 @@ class RegoppslagRestConsumer {
 			} else if (GONE == e.getStatusCode()) {
 				throw new PersonErDoedUkjentAdresseException("Mottaker er død og har ukjent adresse.", e);
 			} else {
-				throw new RegoppslagHentAdresseFunctionalException(format("Kunne ikke hente adresse for bruker. status=%s, feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
+				throw new RegoppslagHentAdresseFunctionalException(format("Henting av adresse for bruker feilet funksjonelt mot Regoppslag / PDL. Dette skyldes mest sannsynlig at bruker ikke har en gyldig adresse. status=%s, feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
 			}
 		} catch (HttpServerErrorException e) {
 			throw new RegoppslagHentAdresseTechnicalException(format("Kall mot TREG002 feilet teknisk. status=%s, feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
