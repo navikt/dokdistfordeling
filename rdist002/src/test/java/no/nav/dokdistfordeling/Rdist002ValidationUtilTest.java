@@ -35,6 +35,7 @@ import static no.nav.dokdistfordeling.UnitTestUtil.createMottaker;
 import static no.nav.dokdistfordeling.UnitTestUtil.createNorskPostadresse;
 import static no.nav.dokdistfordeling.UnitTestUtil.createPostadresseAdresstypeNull;
 import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresse;
+import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresseBuilder;
 import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresseWithAdresselinje1;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
@@ -138,13 +139,20 @@ public class Rdist002ValidationUtilTest {
 
 	@ParameterizedTest
 	@CsvSource({
-			",Feltet adresselinje1 kan ikke være null eller tomt. Fikk adresselinje1=null",
-			"'',Feltet adresselinje1 kan ikke være null eller tomt. Fikk adresselinje1= "
+			"1337,,Feltet postnummer kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk postnummer=1337",
+			"1337,Sandvika,Feltet postnummer kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk postnummer=1337",
+			",Sandvika,Feltet poststed kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk poststed=Sandvika",
 	})
-	public void shouldThrowValidationExceptionForMissingAdresselinje1WhenUtenlandskAdresse(String adresselinje1, String expectedMessage) {
-		Exception thrownException = assertThrows(ValidationException.class, () -> validateAdresse(createUtenlandskPostadresseWithAdresselinje1(adresselinje1), createMottaker()));
+	public void shouldThrowValidationExceptionForMissingAdresselinje1WhenUtenlandskAdresse(String postnummer, String poststed, String expectedMessage) {
+		Exception thrownException = assertThrows(ValidationException.class,
+				() -> validateAdresse(createUtenlandskPostadresseBuilder().postnummer(postnummer).poststed(poststed).build(), createMottaker()));
 		assertEquals(expectedMessage, thrownException.getMessage());
 	}
+	@Test
+	public void shouldThrowValidationExceptionForPostnummerOrPostStedWhenUtenlandskAdresse() {
+		validateAdresse(createUtenlandskPostadresse(), createMottaker());
+	}
+
 
 	@ParameterizedTest
 	@CsvSource({
