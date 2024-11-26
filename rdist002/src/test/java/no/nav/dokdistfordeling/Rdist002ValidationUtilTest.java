@@ -139,9 +139,9 @@ public class Rdist002ValidationUtilTest {
 
 	@ParameterizedTest
 	@CsvSource({
-			"1337,,Feltet postnummer kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk postnummer=1337",
-			"1337,Sandvika,Feltet postnummer kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk postnummer=1337",
-			",Sandvika,Feltet poststed kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk poststed=Sandvika",
+			"1337,,Feltene postnummer og poststed kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk postnummer=1337 og poststed=null",
+			"1337,Sandvika,Feltene postnummer og poststed kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk postnummer=1337 og poststed=Sandvika",
+			",Sandvika,Feltene postnummer og poststed kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk postnummer=null og poststed=Sandvika",
 	})
 	public void shouldThrowValidationExceptionForMissingAdresselinje1WhenUtenlandskAdresse(String postnummer, String poststed, String expectedMessage) {
 		Exception thrownException = assertThrows(ValidationException.class,
