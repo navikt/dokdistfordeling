@@ -156,6 +156,15 @@ public class UnitTestUtil {
 		return createUtenlandskPostadresseWithAdresselinje1(ADRESSELINJE1);
 	}
 
+	public static DistribuerJournalpostRequestTo.AdresseTo.AdresseToBuilder createUtenlandskPostadresseBuilder() {
+		return DistribuerJournalpostRequestTo.AdresseTo.builder()
+				.adressetype(ADRESSETYPE_UTENLANDSK)
+				.adresselinje1(ADRESSELINJE1)
+				.adresselinje2(ADRESSELINJE2)
+				.adresselinje3(ADRESSELINJE3)
+				.land(LAND_US);
+	}
+
 	public static DistribuerJournalpostRequestTo.AdresseTo createUtenlandskPostadresseWithAdresselinje1(String adresselinje1) {
 		return new DistribuerJournalpostRequestTo.AdresseTo(
 				ADRESSETYPE_UTENLANDSK,
