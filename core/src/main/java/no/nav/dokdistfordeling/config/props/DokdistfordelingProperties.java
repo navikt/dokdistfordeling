@@ -31,7 +31,7 @@ public class DokdistfordelingProperties {
 		 * URL til dokmet.
 		 */
 		@NotNull
-		private AzureEndpoint dokmet;
+		private Endpoint dokmet;
 
 		/**
 		 * URL til dokarkiv journalpost api.
@@ -74,4 +74,12 @@ public class DokdistfordelingProperties {
 		@NotEmpty
 		private String scope;
 	}
+
+	@Data
+	@Validated
+	public static class Endpoint {
+		@NotEmpty
+		private String url;
+	}
+
 }

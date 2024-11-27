@@ -23,7 +23,6 @@
   "DOKDISTFORDELING_ENDPOINTS_DOKARKIV_URL": "https://dokarkiv-q5.dev.intern.nav.no/rest/journalpostapi/v1/journalpost",
   "DOKDISTFORDELING_ENDPOINTS_DOKARKIV_SCOPE": "api://dev-fss.teamdokumenthandtering.dokarkiv-q5/.default",
   "DOKDISTFORDELING_ENDPOINTS_DOKMET_URL": "https://dokmet-q5.dev.intern.nav.no/rest/dokumenttypeinfo",
-  "DOKDISTFORDELING_ENDPOINTS_DOKMET_SCOPE": "api://dev-fss.teamdokumenthandtering.dokmet-q5/.default",
   "DOKDISTFORDELING_ENDPOINTS_DOKDISTADMIN_URL": "https://dokdistadmin-q5.dev.intern.nav.no/rest/v1/administrerforsendelse",
   "DOKDISTFORDELING_ENDPOINTS_DOKDISTADMIN_SCOPE": "api://dev-fss.teamdokumenthandtering.dokdistadmin-q5/.default",
   "DOKDISTFORDELING_ENDPOINTS_DOKDISTKANAL_URL": "https://dokdistkanal-q5.dev.intern.nav.no",

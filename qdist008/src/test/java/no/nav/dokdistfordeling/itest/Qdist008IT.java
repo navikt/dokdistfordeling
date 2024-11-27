@@ -74,7 +74,7 @@ public class Qdist008IT {
 	private static final String STSSTRING = "/stsRest/token?grant_type=client_credentials&scope=openid";
 
 	private static final String PDL_URL = "/pdl";
-	private static final String DOKMET_URL = "/dokmet/" + DOKUMENTTYPE_ID;
+	private static final String DOKMET_URL = "/rest/dokumenttypeinfo/" + DOKUMENTTYPE_ID;
 	private static final String DOKDISTADMIN_URL = "/rest/v1/administrerforsendelse";
 	private static final String OPPDATERFORSENDELSE_URL = "/rest/v1/administrerforsendelse/oppdaterforsendelse";
 	private static final String OPPDATERDISTRIBUSJONSINFO_URL = "/rest/journalpostapi/1234/oppdaterDistribusjonsinfo";
