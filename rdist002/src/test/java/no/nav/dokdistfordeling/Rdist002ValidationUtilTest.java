@@ -113,7 +113,7 @@ public class Rdist002ValidationUtilTest {
 
 	@Test
 	public void shouldValidateNorskPostnummerWithWhiteSpace() {
-		 validateAdresse(UnitTestUtil.createNorskPostadresseWithPostnummer("3456 "), createMottaker());
+		validateAdresse(UnitTestUtil.createNorskPostadresseWithPostnummer("3456 "), createMottaker());
 	}
 
 	@ParameterizedTest
@@ -139,18 +139,24 @@ public class Rdist002ValidationUtilTest {
 
 	@ParameterizedTest
 	@CsvSource({
-			"1337,,Feltene postnummer og poststed kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk postnummer=1337 og poststed=null",
-			"1337,Sandvika,Feltene postnummer og poststed kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk postnummer=1337 og poststed=Sandvika",
-			",Sandvika,Feltene postnummer og poststed kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk postnummer=null og poststed=Sandvika",
+			"1337,,Feltene postnummer og poststed kan ikke være satt når adressetype=utenlandskPostadresse. Fikk postnummer=1337 og poststed=null",
+			"1337,Sandvika,Feltene postnummer og poststed kan ikke være satt når adressetype=utenlandskPostadresse. Fikk postnummer=1337 og poststed=Sandvika",
+			",Sandvika,Feltene postnummer og poststed kan ikke være satt når adressetype=utenlandskPostadresse. Fikk postnummer=null og poststed=Sandvika",
 	})
-	public void shouldThrowValidationExceptionForMissingAdresselinje1WhenUtenlandskAdresse(String postnummer, String poststed, String expectedMessage) {
+	public void shouldThrowValidationExceptionForPostnummerOrPostStedWhenUtenlandskAdresse(String postnummer, String poststed, String expectedMessage) {
 		Exception thrownException = assertThrows(ValidationException.class,
 				() -> validateAdresse(createUtenlandskPostadresseBuilder().postnummer(postnummer).poststed(poststed).build(), createMottaker()));
 		assertEquals(expectedMessage, thrownException.getMessage());
 	}
-	@Test
-	public void shouldThrowValidationExceptionForPostnummerOrPostStedWhenUtenlandskAdresse() {
-		validateAdresse(createUtenlandskPostadresse(), createMottaker());
+
+	@ParameterizedTest
+	@CsvSource({
+			",Feltet adresselinje1 kan ikke være null eller tomt. Fikk adresselinje1=null",
+			"'',Feltet adresselinje1 kan ikke være null eller tomt. Fikk adresselinje1= "
+	})
+	public void shouldThrowValidationExceptionForMissingAdresselinje1WhenUtenlandskAdresse(String adresselinje1, String expectedMessage) {
+		Exception thrownException = assertThrows(ValidationException.class, () -> validateAdresse(createUtenlandskPostadresseWithAdresselinje1(adresselinje1), createMottaker()));
+		assertEquals(expectedMessage, thrownException.getMessage());
 	}
 
 
@@ -351,9 +357,9 @@ public class Rdist002ValidationUtilTest {
 				.build();
 		Exception thrownException = assertThrows(BrukerManglerTilgangTilDokumentFunctionalException.class, () -> validateJournalpostAndDokumenter(journalpost));
 		assertEquals("Systembruker eller saksbehandler har ikke tilgang til dokumentInfoId=666666666 og kan derfor ikke bestille distribusjon. " +
-					 "For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. " +
-					 "For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
-					 "Kontakt oss på #team_dokumentløsninger for bistand.", thrownException.getMessage());
+				"For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. " +
+				"For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
+				"Kontakt oss på #team_dokumentløsninger for bistand.", thrownException.getMessage());
 	}
 
 	@Test

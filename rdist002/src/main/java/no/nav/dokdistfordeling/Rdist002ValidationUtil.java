@@ -84,7 +84,7 @@ public class Rdist002ValidationUtil {
 			} else if (UTENLANDSK_POSTADRESSE.equals(adresseTo.getAdressetype())) {
 				assertNotNullOrEmpty("adresselinje1", adresseTo.getAdresselinje1());
 				if (isNotBlank(adresseTo.getPostnummer()) || isNotBlank(adresseTo.getPoststed())) {
-					throw new ValidationException(format("Feltene postnummer og poststed kan ikke være satt når adressetyper=utenlandskPostadresse. Fikk postnummer=%s og poststed=%s",adresseTo.getPostnummer(), adresseTo.getPoststed()));
+					throw new ValidationException(format("Feltene postnummer og poststed kan ikke være satt når adressetype=%s. Fikk postnummer=%s og poststed=%s", UTENLANDSK_POSTADRESSE, adresseTo.getPostnummer(), adresseTo.getPoststed()));
 				}
 			} else {
 				throw new ValidationException(format("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, adresseType= %s", adresseTo.getAdressetype()));

@@ -18,7 +18,7 @@ public class DistribuerJournalpostRequestTo {
 	String batchId;
 	@Schema(name = "bestillendeFagsystem", description = "Fagsystemet som bestiller distribusjon", example = "SYM")
 	String bestillendeFagsystem;
-	@Schema(name = "adresse", description = "Struktur for å beskrive postadresse. Inneholder enten norsk postadresse eller utenlandsk postadresse. Påkrevd hvis mottaker er samhandler, ellers skal dokdistsentralprint hente adresse fra fellesregistre hvis ikke satt. For utenlandsk adresse skal postnummer og poststed feltene være tomme. Eventuelle tilsvarende post nummer og sted plasseres i adresselinjene.")
+	@Schema(name = "adresse", description = "Struktur for å beskrive postadresse. Inneholder enten norsk postadresse eller utenlandsk postadresse. Påkrevd hvis mottaker er samhandler, ellers skal dokdistsentralprint hente adresse fra fellesregistre hvis ikke satt. For utenlandsk adresse skal postnummer og poststed feltene være tomme. Eventuelle tilsvarende postnummer og sted plasseres i adresselinjene.")
 	AdresseTo adresse;
 	@Schema(name = "dokumentProdApp", description = "Applikasjon som har produsert hoveddokumentet (for sporing og feilsøking)", example = "ELIN_STANDARD")
 	String dokumentProdApp;
