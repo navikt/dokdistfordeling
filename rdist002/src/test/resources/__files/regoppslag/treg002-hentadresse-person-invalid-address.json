@@ -1,0 +1,7 @@
+{
+  "timestamp": 1731631020258,
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Validering av feltet postnummer feilet pga. manglende data i PDL",
+  "path": "/rest/hentMottakerOgAdresse"
+}

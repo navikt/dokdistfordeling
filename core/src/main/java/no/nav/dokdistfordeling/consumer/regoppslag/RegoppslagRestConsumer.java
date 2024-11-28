@@ -8,6 +8,7 @@ import no.nav.dokdistfordeling.consumer.sts.StsRestConsumer;
 import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseException;
 import no.nav.dokdistfordeling.exception.functional.UkjentAdresseException;
 import no.nav.dokdistfordeling.exception.technical.StsTechnicalException;
+import no.nav.dokdistfordeling.storage.JsonSerializer;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -65,7 +66,8 @@ class RegoppslagRestConsumer {
 			} else if (GONE == e.getStatusCode()) {
 				throw new PersonErDoedUkjentAdresseException("Mottaker er død og har ukjent adresse.", e);
 			} else {
-				throw new RegoppslagHentAdresseFunctionalException(format("Kunne ikke hente adresse for bruker. status=%s, feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
+				RegoppslagError error = JsonSerializer.deserialize(e.getResponseBodyAsString(), RegoppslagError.class);
+				throw new RegoppslagHentAdresseFunctionalException(format("Henting av adresse for bruker feilet funksjonelt mot Regoppslag. status=%s, feilmelding=%s", e.getStatusCode(), error.message()), e);
 			}
 		} catch (HttpServerErrorException e) {
 			throw new RegoppslagHentAdresseTechnicalException(format("Kall mot TREG002 feilet teknisk. status=%s, feilmelding=%s", e.getStatusCode(), e.getMessage()), e);
