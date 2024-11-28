@@ -9,7 +9,7 @@ import no.nav.dokdistfordeling.DistribuerJournalpostResponseTo;
 import no.nav.dokdistfordeling.config.AbstractOauth2Test;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
 import no.nav.dokdistfordeling.crypto.Crypto;
-import no.nav.dokdistfordeling.util.MappingUtil;
+import no.nav.dokdistfordeling.storage.JsonSerializer;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -408,7 +407,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
 
-		DistribuerJournalpostRequestTo distribuerJournalpostRequestTo = MappingUtil.jsonStringToObject(classpathToString("__files/rdist002/rdist002-happy-adressetype.json"), DistribuerJournalpostRequestTo.class);
+		DistribuerJournalpostRequestTo distribuerJournalpostRequestTo = JsonSerializer.deserialize(classpathToString("__files/rdist002/rdist002-happy-adressetype.json"), DistribuerJournalpostRequestTo.class);
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(distribuerJournalpostRequestTo, createHappyPathHeaders());
 		DistribuerJournalpostResponseTo response = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
@@ -602,7 +601,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(null).build(), createHappyPathHeaders());
 		String body = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
-		assertThat(body).contains("Henting av adresse for bruker feilet funksjonelt mot Regoppslag / PDL. Dette skyldes mest sannsynlig at bruker ikke har en gyldig adresse.");
+		assertThat(body).contains("Henting av adresse for bruker feilet funksjonelt mot Regoppslag. status=400 BAD_REQUEST, feilmelding=Validering av feltet postnummer feilet pga. manglende data i PDL");
 	}
 
 	private static Stream<Arguments> shouldReturnInternalServerErrorWhenBestemDistribusjonskanalResponseIsUnauthorizedOrInternalServerError() {

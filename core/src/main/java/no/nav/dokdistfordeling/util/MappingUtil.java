@@ -23,15 +23,4 @@ public final class MappingUtil {
 			throw new InvalidMappingToEnumFunctionalException(format("Ulovlig verdi ble forsøkt mappet til enum: %s er ikke en gyldig kodeverdi for %s", enumName, enumClass));
 		}
 	}
-
-	public static <T> T jsonStringToObject(String jsonString, Class<T> tClass) {
-		ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-		try {
-			return mapper.readValue(jsonString, tClass);
-		} catch (IOException e) {
-			return null;
-		}
-
-	}
 }

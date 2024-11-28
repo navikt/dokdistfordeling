@@ -2,6 +2,6 @@
   "timestamp": 1731631020258,
   "status": 400,
   "error": "Bad Request",
-  "message": "Feltet postnummer kan ikke være null eller tomt",
+  "message": "Validering av feltet postnummer feilet pga. manglende data i PDL",
   "path": "/rest/hentMottakerOgAdresse"
 }
