@@ -10,6 +10,7 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
+import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Organisasjon;
@@ -25,9 +26,11 @@ import static java.util.Objects.nonNull;
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateAdresse;
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateDistribuerJournalpostRequest;
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateJournalpostAndDokumenter;
+import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateTvingKanal;
 import static no.nav.dokdistfordeling.constants.Constants.DOKDISTBESTILLINGS_ID;
 import static no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType.UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.TRYGDERETTEN;
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Component
@@ -61,6 +64,7 @@ public class DistribuerJournalpostService {
 		validateDistribuerJournalpostRequest(trimmetDistribuerJournalpostRequestTo);
 
 		validateJournalpostAndDokumenter(journalpost);
+		validateTvingKanal(trimmetDistribuerJournalpostRequestTo, journalpost);
 
 		Aktoer mottaker = mapMottaker(journalpost.getAvsenderMottaker());
 
@@ -82,14 +86,22 @@ public class DistribuerJournalpostService {
 		return bestillingsId;
 	}
 
-	private DistribusjonKanalCode bestemDistribusjonskanal(DistribuerJournalpostRequestTo trimmetDistribuerJournalpostRequestTo, Journalpost journalpost){
+	private DistribusjonKanalCode bestemDistribusjonskanal(DistribuerJournalpostRequestTo trimmetDistribuerJournalpostRequestTo, Journalpost journalpost) {
 		boolean harAdresse = nonNull(trimmetDistribuerJournalpostRequestTo.getAdresse());
-		if(trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint()){
+		if (trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint()) {
 			log.info("tvingSentralPrint er satt til true i input. Forsendelsen vil bli sendt til print.");
 			return PRINT;
-		} else {
-			return bestemDistribusjonskanalService.bestemDistribusjonskanal(journalpost, harAdresse);
+		} else if (!trimmetDistribuerJournalpostRequestTo.getTvingKanal().isEmpty()) {
+			if (trimmetDistribuerJournalpostRequestTo.getTvingKanal().equals(TvingKanal.PRINT.name())) {
+				log.info("tvingKanal er satt til {} i input. Forsendelsen vil bli sendt til print.", trimmetDistribuerJournalpostRequestTo.getTvingKanal());
+				return PRINT;
+			}
+			if (trimmetDistribuerJournalpostRequestTo.getTvingKanal().equals(TvingKanal.TRYGDERETTEN.name())) {
+				log.info("tvingKanal er satt til {} i input. Forsendelsen vil bli sendt til print.", trimmetDistribuerJournalpostRequestTo.getTvingKanal());
+				return TRYGDERETTEN;
+			}
 		}
+		return bestemDistribusjonskanalService.bestemDistribusjonskanal(journalpost, harAdresse);
 	}
 
 	private void hentDokumentOgDistribuerForsendelse(final DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
