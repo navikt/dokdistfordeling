@@ -91,7 +91,8 @@ public class DistribuerJournalpostService {
 		if (trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint()) {
 			log.info("tvingSentralPrint er satt til true i input. Forsendelsen vil bli sendt til print.");
 			return PRINT;
-		} else if (!trimmetDistribuerJournalpostRequestTo.getTvingKanal().isEmpty()) {
+		} else if (trimmetDistribuerJournalpostRequestTo.getTvingKanal() != null &&
+				!trimmetDistribuerJournalpostRequestTo.getTvingKanal().isEmpty()) {
 			if (trimmetDistribuerJournalpostRequestTo.getTvingKanal().equals(TvingKanal.PRINT.name())) {
 				log.info("tvingKanal er satt til {} i input. Forsendelsen vil bli sendt til print.", trimmetDistribuerJournalpostRequestTo.getTvingKanal());
 				return PRINT;
