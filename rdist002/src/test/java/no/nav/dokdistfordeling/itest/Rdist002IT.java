@@ -17,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -193,6 +194,36 @@ public class Rdist002IT extends AbstractOauth2Test {
 			assertNotNull(qdist012Result);
 			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
 			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoark-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
+		});
+
+
+		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {"PRINT", "TRYGDERETTEN"})
+	public void shouldDistribuerJournalpostToKanalWhenTvingKanalIsSet(String tvingKanal) {
+		stubSafGraphQl(tvingKanal.equals("TRYGDERETTEN") ? "saf/safGraphQlResponse-happy-trygderetten.json": "saf/safGraphQlResponse-happy.json");
+		stubStsToken();
+		stubPdl("pdl/pdl-happy.json");
+		putStubOppdaterJournalpost();
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
+				.distribusjonstidspunkt(KJERNETID.name())
+				.distribusjonstype(VIKTIG.name())
+				.tvingKanal(tvingKanal)
+				.build(), createHappyPathHeaders());
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, OK);
+
+		assertNotNull(restResponse.getBestillingsId());
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+
+			assertNotNull(qdist012Result);
+			assertThat(qdist012Result).contains(String.format("<distribusjonKanal>%s</distribusjonKanal>", tvingKanal));
 		});
 
 
