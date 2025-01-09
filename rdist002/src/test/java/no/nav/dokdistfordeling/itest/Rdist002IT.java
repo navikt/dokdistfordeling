@@ -129,6 +129,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
 
@@ -159,6 +160,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
 
@@ -189,6 +191,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
@@ -220,6 +223,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
@@ -249,6 +253,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
@@ -297,6 +302,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
 
@@ -321,6 +327,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 				.build(), createHappyPathHeaders());
 
 		ResponseEntity<String> responseEntity = restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, POST, requestEntity, String.class);
+		assertNotNull(responseEntity.getBody());
 		assertTrue(responseEntity.getBody().contains("Kunne ikke hente folkeregisterident fra PDL. Respons fra PDL inneholdt ikke gjeldende folkeregisterident"));
 		assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
@@ -340,6 +347,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
@@ -365,6 +373,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
@@ -391,6 +400,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
 
@@ -420,6 +430,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
@@ -446,6 +457,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
 			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
