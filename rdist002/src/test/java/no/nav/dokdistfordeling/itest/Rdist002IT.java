@@ -207,7 +207,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@ParameterizedTest
 	@ValueSource(strings = {"PRINT", "TRYGDERETTEN"})
 	public void shouldDistribuerJournalpostToKanalWhenTvingKanalIsSet(String tvingKanal) {
-		stubSafGraphQl(tvingKanal.equals("TRYGDERETTEN") ? "saf/safGraphQlResponse-happy-trygderetten.json": "saf/safGraphQlResponse-happy.json");
+		stubSafGraphQl(tvingKanal.equals("TRYGDERETTEN") ? "saf/safGraphQlResponse-happy-trygderetten.json" : "saf/safGraphQlResponse-happy.json");
 		stubStsToken();
 		stubPdl("pdl/pdl-happy.json");
 		putStubOppdaterJournalpost();
