@@ -73,11 +73,11 @@ public class DistribuerJournalpostService {
 			validateAdresse(distribuerRequest.getAdresse(), mottaker);
 		}
 
+		hentDokumentOgDistribuerForsendelse(distribuerRequest, bestillingsId, journalpost, mottaker, distribusjonKanalCode);
+
 		OppdaterJournalpostResponse oppdaterJournalpostResponse = oppdaterJournalpostTilleggsopplysninger(trimmetDistribuerJournalpostRequestTo.getJournalpostId(), bestillingsId);
 
 		log.info("Oppdatert journalpost med journalpostId={} tilleggsopplysninger med nøkkel={} og verdi={}", oppdaterJournalpostResponse.getJournalpostId(), DOKDISTBESTILLINGS_ID, bestillingsId);
-
-		hentDokumentOgDistribuerForsendelse(distribuerRequest, bestillingsId, journalpost, mottaker, distribusjonKanalCode);
 
 		return bestillingsId;
 	}
