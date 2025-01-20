@@ -217,7 +217,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 				.distribusjonstype(VIKTIG.name())
 				.tvingKanal(tvingKanal)
 				.build(), createHappyPathHeaders());
-		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity, OK);
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertNotNull(restResponse.getBestillingsId());
 
