@@ -403,6 +403,22 @@ public class Rdist002ValidationUtilTest {
 				.avsenderMottaker(createAvsenderMottakerBuilder().id("974761084").build()).build();
 		validateTvingKanal(request, journalpost);
 	}
+	@Test
+	public void shouldValidateEmptyTvingKanal() {
+		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
+				.journalpostId(JOURNALPOST_ID)
+				.batchId(BATCH_ID)
+				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
+				.adresse(createNorskPostadresse())
+				.dokumentProdApp(DOKUMENTPRODAPP)
+				.distribusjonstidspunkt(KJERNETID.name())
+				.distribusjonstype(VIKTIG.name())
+				.tvingKanal(null)
+				.build();
+		Journalpost journalpost = createJournalpostBuilder()
+				.avsenderMottaker(createAvsenderMottakerBuilder().id("974761084").build()).build();
+		validateTvingKanal(request, journalpost);
+	}
 
 	@Test
 	public void shouldThrowValidationExceptionWhenWrongOrgnrAndTrygderettenWhenValidateTvingKanal() {

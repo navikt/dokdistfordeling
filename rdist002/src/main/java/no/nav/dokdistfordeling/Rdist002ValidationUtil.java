@@ -156,9 +156,11 @@ public class Rdist002ValidationUtil {
 	}
 
 	public static void validateTvingKanal(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost) {
-		if (isNotBlank(distribuerJournalpostRequestTo.getTvingKanal()) &&
-				distribuerJournalpostRequestTo.getTvingKanal().equals(TvingKanal.TRYGDERETTEN.name()) &&
-				!journalpost.getAvsenderMottaker().getId().equals(TRYGDERETTEN_ORGNR)) {
+		var tvingKanal = distribuerJournalpostRequestTo.getTvingKanal();
+		var avsenderMottaker = journalpost.getAvsenderMottaker();
+
+		if (TvingKanal.TRYGDERETTEN.name().equals(tvingKanal) &&
+				!TRYGDERETTEN_ORGNR.equals(avsenderMottaker.getId())) {
 			throw new ValidationException(format("Ugyldig avsenderMottakerId for %s. avsenderMottakerId=%s men forventet avsenderMottakerId=%s", distribuerJournalpostRequestTo.getTvingKanal(), journalpost.getAvsenderMottaker(), TRYGDERETTEN_ORGNR));
 		}
 	}
