@@ -9,6 +9,7 @@ import no.nav.dokdistfordeling.DistribuerJournalpostResponseTo;
 import no.nav.dokdistfordeling.config.AbstractOauth2Test;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
 import no.nav.dokdistfordeling.crypto.Crypto;
+import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,7 @@ import static no.nav.dokdistfordeling.constants.Constants.BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VIKTIG;
+import static no.nav.dokdistfordeling.kodeverk.TvingKanal.TRYGDERETTEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -205,9 +208,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = {"PRINT", "TRYGDERETTEN"})
-	public void shouldDistribuerJournalpostToKanalWhenTvingKanalIsSet(String tvingKanal) {
-		stubSafGraphQl(tvingKanal.equals("TRYGDERETTEN") ? "saf/safGraphQlResponse-happy-trygderetten.json" : "saf/safGraphQlResponse-happy.json");
+	@EnumSource(TvingKanal.class)
+	public void shouldDistribuerJournalpostToKanalWhenTvingKanalIsSet(TvingKanal tvingKanal) {
+		stubSafGraphQl(tvingKanal.equals(TRYGDERETTEN)? "saf/safGraphQlResponse-happy-trygderetten.json" : "saf/safGraphQlResponse-happy.json");
 		stubStsToken();
 		stubPdl("pdl/pdl-happy.json");
 		putStubOppdaterJournalpost();
@@ -215,7 +218,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
 				.distribusjonstidspunkt(KJERNETID.name())
 				.distribusjonstype(VIKTIG.name())
-				.tvingKanal(tvingKanal)
+				.tvingKanal(tvingKanal.toString())
 				.build(), createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 

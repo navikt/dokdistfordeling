@@ -21,6 +21,7 @@ import static no.nav.dokdistfordeling.Rdist002ValidationUtil.PDFA;
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateAdresse;
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateDistribuerJournalpostRequest;
 import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateJournalpostAndDokumenter;
+import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateTvingKanal;
 import static no.nav.dokdistfordeling.UnitTestUtil.BATCH_ID;
 import static no.nav.dokdistfordeling.UnitTestUtil.BESTILLENDEFAGSYSTEM;
 import static no.nav.dokdistfordeling.UnitTestUtil.BRUKER_ID;
@@ -28,6 +29,7 @@ import static no.nav.dokdistfordeling.UnitTestUtil.DOKUMENTPRODAPP;
 import static no.nav.dokdistfordeling.UnitTestUtil.JOURNALPOST_ID;
 import static no.nav.dokdistfordeling.UnitTestUtil.MOTTAKER_ID;
 import static no.nav.dokdistfordeling.UnitTestUtil.MOTTAKER_NAVN;
+import static no.nav.dokdistfordeling.UnitTestUtil.createAvsenderMottakerBuilder;
 import static no.nav.dokdistfordeling.UnitTestUtil.createDokumentInfo1Builder;
 import static no.nav.dokdistfordeling.UnitTestUtil.createDokumentInfo2Builder;
 import static no.nav.dokdistfordeling.UnitTestUtil.createJournalpostBuilder;
@@ -40,6 +42,7 @@ import static no.nav.dokdistfordeling.UnitTestUtil.createUtenlandskPostadresseWi
 import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VIKTIG;
+import static no.nav.dokdistfordeling.kodeverk.TvingKanal.TRYGDERETTEN;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -382,5 +385,40 @@ public class Rdist002ValidationUtilTest {
 				.build();
 		InvalidFiltypeException thrownException = assertThrows(InvalidFiltypeException.class, () -> validateJournalpostAndDokumenter(journalpost));
 		assertEquals("Ugyldig dokumentvariant=ARKIV eller filtype=JSON, kun dokumentvariant ARKIV/SLADDET med filtype PDF/PDFA kan distribueres", thrownException.getMessage());
+	}
+
+	@Test
+	public void shouldValidateTvingKanal() {
+		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
+				.journalpostId(JOURNALPOST_ID)
+				.batchId(BATCH_ID)
+				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
+				.adresse(createNorskPostadresse())
+				.dokumentProdApp(DOKUMENTPRODAPP)
+				.distribusjonstidspunkt(KJERNETID.name())
+				.distribusjonstype(VIKTIG.name())
+				.tvingKanal(TRYGDERETTEN.name())
+				.build();
+		Journalpost journalpost = createJournalpostBuilder()
+				.avsenderMottaker(createAvsenderMottakerBuilder().id("974761084").build()).build();
+		validateTvingKanal(request, journalpost);
+	}
+
+	@Test
+	public void shouldThrowValidationExceptionWhenWrongOrgnrAndTrygderettenWhenValidateTvingKanal() {
+		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
+				.journalpostId(JOURNALPOST_ID)
+				.batchId(BATCH_ID)
+				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
+				.adresse(createNorskPostadresse())
+				.dokumentProdApp(DOKUMENTPRODAPP)
+				.distribusjonstidspunkt(KJERNETID.name())
+				.distribusjonstype(VIKTIG.name())
+				.tvingKanal(TRYGDERETTEN.name())
+				.build();
+		Journalpost journalpost = createJournalpostBuilder().build();
+
+		ValidationException thrownException = assertThrows(ValidationException.class, () -> validateTvingKanal(request, journalpost));
+		assertEquals("Ugyldig avsenderMottakerId for TRYGDERETTEN. avsenderMottakerId=Journalpost.AvsenderMottaker(id=09876543210, navn=Jan Neimansen, type=null) men forventet avsenderMottakerId=974761084", thrownException.getMessage());
 	}
 }

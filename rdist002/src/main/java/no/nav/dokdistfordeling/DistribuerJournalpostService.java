@@ -32,6 +32,7 @@ import static no.nav.dokdistfordeling.kodeverk.AvsenderMottakerIdType.UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.TRYGDERETTEN;
 import static org.apache.logging.log4j.util.Strings.isEmpty;
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
 
 @Component
 @Slf4j
@@ -91,14 +92,13 @@ public class DistribuerJournalpostService {
 		if (trimmetDistribuerJournalpostRequestTo.isTvingSentralPrint()) {
 			log.info("tvingSentralPrint er satt til true i input. Forsendelsen vil bli sendt til print.");
 			return PRINT;
-		} else if (trimmetDistribuerJournalpostRequestTo.getTvingKanal() != null &&
-				!trimmetDistribuerJournalpostRequestTo.getTvingKanal().isEmpty()) {
+		} else if (isNotBlank(trimmetDistribuerJournalpostRequestTo.getTvingKanal())) {
 			if (trimmetDistribuerJournalpostRequestTo.getTvingKanal().equals(TvingKanal.PRINT.name())) {
 				log.info("tvingKanal er satt til {} i input. Forsendelsen vil bli sendt til print.", trimmetDistribuerJournalpostRequestTo.getTvingKanal());
 				return PRINT;
 			}
 			if (trimmetDistribuerJournalpostRequestTo.getTvingKanal().equals(TvingKanal.TRYGDERETTEN.name())) {
-				log.info("tvingKanal er satt til {} i input. Forsendelsen vil bli sendt til print.", trimmetDistribuerJournalpostRequestTo.getTvingKanal());
+				log.info("tvingKanal er satt til {} i input. Forsendelsen vil bli sendt til Trygderetten.", trimmetDistribuerJournalpostRequestTo.getTvingKanal());
 				return TRYGDERETTEN;
 			}
 		}

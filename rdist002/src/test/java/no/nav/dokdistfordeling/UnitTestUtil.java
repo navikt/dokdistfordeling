@@ -60,15 +60,14 @@ public class UnitTestUtil {
 				.tema(TEMA)
 				.tittel(TITTEL)
 				.bruker(createBrukerWithFNR())
-				.avsenderMottaker(createAvsenderMottaker())
+				.avsenderMottaker(createAvsenderMottakerBuilder().build())
 				.dokumenter(createDefaultDokumentInfoList());
 	}
 
-	private static Journalpost.AvsenderMottaker createAvsenderMottaker() {
+	public static Journalpost.AvsenderMottaker.AvsenderMottakerBuilder createAvsenderMottakerBuilder() {
 		return Journalpost.AvsenderMottaker.builder()
 				.id(MOTTAKER_ID)
-				.navn(MOTTAKER_NAVN)
-				.build();
+				.navn(MOTTAKER_NAVN);
 	}
 
 	public static Journalpost.Bruker createBrukerWithFNR() {
