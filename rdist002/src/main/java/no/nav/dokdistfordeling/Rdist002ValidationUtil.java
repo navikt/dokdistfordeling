@@ -62,7 +62,6 @@ public class Rdist002ValidationUtil {
 		assertNotNullOrEmptyAndCorrectLength("dokumentProdapp", distribuerJournalpostRequestTo.getDokumentProdApp());
 		assertNotNullAndValidValueIgnoreCase("distribusjonstype", distribuerJournalpostRequestTo.getDistribusjonstype(), DistribusjonstypeCode.values());
 		assertNotNullAndValidValueIgnoreCase("distribusjonstidspunkt", distribuerJournalpostRequestTo.getDistribusjonstidspunkt(), DistribusjonstidspunktCode.values());
-		assertNullOrValidValueIgnoreCase("tvingKanal", distribuerJournalpostRequestTo.getTvingKanal(), TvingKanal.values());
 	}
 
 	private static void assertNotNullOrEmptyAndCorrectLength(String field, String value) {
@@ -156,6 +155,8 @@ public class Rdist002ValidationUtil {
 	}
 
 	public static void validateTvingKanal(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost) {
+		assertNullOrValidValueIgnoreCase("tvingKanal", distribuerJournalpostRequestTo.getTvingKanal(), TvingKanal.values());
+
 		var tvingKanal = distribuerJournalpostRequestTo.getTvingKanal();
 		var avsenderMottaker = journalpost.getAvsenderMottaker();
 

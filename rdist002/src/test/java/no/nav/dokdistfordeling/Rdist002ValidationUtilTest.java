@@ -6,6 +6,7 @@ import no.nav.dokdistfordeling.exception.functional.InvalidFiltypeException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
+import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.Arrays;
 
@@ -387,33 +389,12 @@ public class Rdist002ValidationUtilTest {
 		assertEquals("Ugyldig dokumentvariant=ARKIV eller filtype=JSON, kun dokumentvariant ARKIV/SLADDET med filtype PDF/PDFA kan distribueres", thrownException.getMessage());
 	}
 
-	@Test
-	public void shouldValidateTvingKanal() {
+	@ParameterizedTest
+	@EnumSource(TvingKanal.class)
+	public void shouldValidateTvingKanal(TvingKanal tvingKanal) {
 		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
 				.journalpostId(JOURNALPOST_ID)
-				.batchId(BATCH_ID)
-				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
-				.adresse(createNorskPostadresse())
-				.dokumentProdApp(DOKUMENTPRODAPP)
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.tvingKanal(TRYGDERETTEN.name())
-				.build();
-		Journalpost journalpost = createJournalpostBuilder()
-				.avsenderMottaker(createAvsenderMottakerBuilder().id("974761084").build()).build();
-		validateTvingKanal(request, journalpost);
-	}
-	@Test
-	public void shouldValidateEmptyTvingKanal() {
-		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
-				.journalpostId(JOURNALPOST_ID)
-				.batchId(BATCH_ID)
-				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
-				.adresse(createNorskPostadresse())
-				.dokumentProdApp(DOKUMENTPRODAPP)
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.tvingKanal(null)
+				.tvingKanal(tvingKanal.name())
 				.build();
 		Journalpost journalpost = createJournalpostBuilder()
 				.avsenderMottaker(createAvsenderMottakerBuilder().id("974761084").build()).build();
@@ -421,15 +402,19 @@ public class Rdist002ValidationUtilTest {
 	}
 
 	@Test
+	public void shouldValidateEmptyTvingKanal() {
+		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
+				.journalpostId(JOURNALPOST_ID)
+				.tvingKanal(null)
+				.build();
+		Journalpost journalpost = createJournalpostBuilder().build();
+		validateTvingKanal(request, journalpost);
+	}
+
+	@Test
 	public void shouldThrowValidationExceptionWhenWrongOrgnrAndTrygderettenWhenValidateTvingKanal() {
 		DistribuerJournalpostRequestTo request = DistribuerJournalpostRequestTo.builder()
 				.journalpostId(JOURNALPOST_ID)
-				.batchId(BATCH_ID)
-				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
-				.adresse(createNorskPostadresse())
-				.dokumentProdApp(DOKUMENTPRODAPP)
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
 				.tvingKanal(TRYGDERETTEN.name())
 				.build();
 		Journalpost journalpost = createJournalpostBuilder().build();
