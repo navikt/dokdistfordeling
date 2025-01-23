@@ -70,4 +70,12 @@ public final class ValidationUtil {
 		}
 
 	}
+
+	public static <T extends Enum<?>> void assertNullOrValidValueIgnoreCase(String field, String value, T... validValues) {
+		if (!isBlank(value)) {
+			if (Stream.of(validValues).map(Enum::name).noneMatch(value::equalsIgnoreCase)) {
+				throw new ValidationException(format("Feltet %s hadde en ugyldig verdi. Fikk %s=%s. Gyldige verdier er [%s]", field, field, value, Stream.of(validValues).map(Enum::name).collect(joining(", "))));
+			}
+		}
+	}
 }

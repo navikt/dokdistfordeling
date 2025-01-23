@@ -26,8 +26,10 @@ public class DistribuerJournalpostRequestTo {
 	String distribusjonstype;
 	@Schema(name = "distribusjonstidspunkt", description = "Forteller dokumentdistribusjon når dokumentet kan distribueres. \"UMIDDELBART\" eller \"KJERNETID\"", example = "UMIDDELBART", requiredMode = REQUIRED)
 	String distribusjonstidspunkt;
-	@Schema(name = "tvingSentralPrint", description = "Settes til true dersom forsendelsen skal sendes til sentral print, uten å sjekke om mottaker er digitalt tilgjengelig", defaultValue = "false")
+	@Schema(name = "tvingSentralPrint", description = "Settes til true dersom forsendelsen skal sendes til sentral print, uten å sjekke om mottaker er digitalt tilgjengelig", defaultValue = "false", deprecated = true)
 	boolean tvingSentralPrint;
+	@Schema(name = "tvingKanal", description = "Overstyr kanal forsendelsen skal distribueres gjennom. Verdi kan være en av følgende: \"PRINT\" eller \"TRYGDERETTEN\"", example = "PRINT")
+	String tvingKanal;
 
 	@Builder
 	@Getter

@@ -9,6 +9,7 @@ import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
+import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Samhandler;
@@ -32,6 +33,7 @@ import static no.nav.dokdistfordeling.util.ValidationUtil.assertJournalpostField
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNull;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullAndValidValueIgnoreCase;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertNotNullOrEmpty;
+import static no.nav.dokdistfordeling.util.ValidationUtil.assertNullOrValidValueIgnoreCase;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertParameterIsAsExpected;
 import static no.nav.dokdistfordeling.util.ValidationUtil.assertStringIsNumberOfExactLength;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -40,6 +42,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class Rdist002ValidationUtil {
 
 	private static final String UTGAAENDE = Journalposttype.U.name();
+	private static final String TRYGDERETTEN_ORGNR = "974761084";
 	private static final Set<String> ISO3166_TWO_LETTER_CODES = Arrays.stream(Locale.getISOCountries()).collect(Collectors.toSet());
 	private static final String KOSOVO_LAND_KODE = "XK";
 	public static final String PDF = "PDF";
@@ -128,9 +131,9 @@ public class Rdist002ValidationUtil {
 		if (checkIfNoDokumentvariantWithTilgang(dokumentInfo.getDokumentvarianter())) {
 			throw new BrukerManglerTilgangTilDokumentFunctionalException(
 					format("Systembruker eller saksbehandler har ikke tilgang til dokumentInfoId=%s og kan derfor ikke bestille distribusjon. " +
-						   "For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. " +
-						   "For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
-						   "Kontakt oss på #team_dokumentløsninger for bistand.", dokumentInfo.getDokumentInfoId())
+							"For saksbehandlere betyr dette ofte at saksbehandleren mangler tilgang til tema eller brukers enhet i AXSYS. " +
+							"For systembrukere betyr dette ofte at systembrukeren ikke ligger inn med riktig tema-role i Azure IAC-konfigurasjonen for SAF sin <env-config.json>. " +
+							"Kontakt oss på #team_dokumentløsninger for bistand.", dokumentInfo.getDokumentInfoId())
 			);
 		}
 
@@ -149,5 +152,17 @@ public class Rdist002ValidationUtil {
 				throw new InvalidFiltypeException(format("Ugyldig dokumentvariant=%s eller filtype=%s, kun dokumentvariant ARKIV/SLADDET med filtype PDF/PDFA kan distribueres", dokumentvariant.getVariantformat(), dokumentvariant.getFiltype()));
 			}
 		});
+	}
+
+	public static void validateTvingKanal(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost) {
+		assertNullOrValidValueIgnoreCase("tvingKanal", distribuerJournalpostRequestTo.getTvingKanal(), TvingKanal.values());
+
+		var tvingKanal = distribuerJournalpostRequestTo.getTvingKanal();
+		var avsenderMottaker = journalpost.getAvsenderMottaker();
+
+		if (TvingKanal.TRYGDERETTEN.name().equals(tvingKanal) &&
+				!TRYGDERETTEN_ORGNR.equals(avsenderMottaker.getId())) {
+			throw new ValidationException(format("Ugyldig avsenderMottakerId for %s. avsenderMottakerId=%s men forventet avsenderMottakerId=%s", distribuerJournalpostRequestTo.getTvingKanal(), journalpost.getAvsenderMottaker(), TRYGDERETTEN_ORGNR));
+		}
 	}
 }
