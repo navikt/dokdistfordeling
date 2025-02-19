@@ -650,6 +650,19 @@ public class Rdist002IT extends AbstractOauth2Test {
 		assertThat(body).contains("Henting av adresse for bruker feilet funksjonelt mot Regoppslag. status=400 BAD_REQUEST, feilmelding=Validering av feltet postnummer feilet pga. manglende data i PDL");
 	}
 
+	@Test
+	public void shouldReturnBadRequestIfAddressFromRegoppslagContainsOnlyLandkode() {
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+		stubStsToken();
+		stubPdl("pdl/pdl-happy.json");
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
+		stubHentMottakerOgAdresse("regoppslag/treg002-hentadresse-person-only-landkode.json", OK.value());
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(null).build(), createHappyPathHeaders());
+		String body = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
+		assertThat(body).contains("Validering av distribusjonsforespørsel feilet med feilmelding: Feltet poststed kan ikke være null eller tomt. Fikk poststed=null");
+	}
+
 	private static Stream<Arguments> shouldReturnInternalServerErrorWhenBestemDistribusjonskanalResponseIsUnauthorizedOrInternalServerError() {
 		return Stream.of(
 				Arguments.of(UNAUTHORIZED, "bestemdistribusjonskanal/unauthorized.json"),
