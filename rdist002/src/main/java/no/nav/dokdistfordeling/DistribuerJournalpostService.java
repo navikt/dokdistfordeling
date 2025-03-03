@@ -14,6 +14,7 @@ import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.map.HentDokumenterFraJoarkMapper;
 import no.nav.dokdistfordeling.map.MottakerMapper;
 import no.nav.dokdistfordeling.map.RegoppslagAdresseMapper;
+import no.nav.dokdistfordeling.util.SafeLoggingUtil;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
 import org.springframework.stereotype.Component;
@@ -141,7 +142,7 @@ public class DistribuerJournalpostService {
 								Journalpost journalpost) {
 
 		log.info("rdist002 request mangler adresse. Henter adresse fra regoppslag for mottaker på journalpostId={}",
-				distribuerJournalpost.journalpostId());
+				SafeLoggingUtil.removeUnsafeChars(distribuerJournalpost.journalpostId()));
 
 		var avsenderMottaker = journalpost.getAvsenderMottaker();
 		var tema = journalpost.getTema();

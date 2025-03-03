@@ -12,6 +12,7 @@ import no.nav.dokdistfordeling.map.DistribuerJournalpostMapper;
 import no.nav.dokdistfordeling.springdoc.SwaggerRestDistribuerJournalpost;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostResponseTo;
+import no.nav.dokdistfordeling.util.SafeLoggingUtil;
 import org.slf4j.MDC;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,7 +55,9 @@ public class DistribuerJournalpostController {
 
 		addCallIdToMDC(navCallId);
 		addConsumerIdToMDC(navConsumerId);
-		log.info("rdist002 har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());
+
+		String journalpostId = SafeLoggingUtil.removeUnsafeChars(distribuerJournalpostRequestTo.getJournalpostId());
+		log.info("rdist002 har mottatt kall for journalpostId={}", journalpostId);
 
 		try {
 			validateDistribuerJournalpostRequest(distribuerJournalpostRequestTo);
@@ -62,7 +65,7 @@ public class DistribuerJournalpostController {
 
 			if (journalpostHarTileggsopplysninger(journalpost.getTilleggsopplysninger())) {
 				final var bestillingsId = journalpost.getTilleggsopplysninger().getVerdi();
-				log.info("Journalpost med journalpostId={} og bestillingsId={} er allerede distribuert", distribuerJournalpostRequestTo.getJournalpostId(), bestillingsId);
+				log.info("Journalpost med journalpostId={} og bestillingsId={} er allerede distribuert", journalpostId, bestillingsId);
 				return ResponseEntity.status(CONFLICT)
 						.body(new DistribuerJournalpostResponseTo(bestillingsId));
 			}
@@ -73,13 +76,11 @@ public class DistribuerJournalpostController {
 
 			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(bestillingsId);
 
-			log.info("rdist002 har distribuert journalpost med journalpostId={} og bestillingsId={}",
-					distribuerJournalpostRequestTo.getJournalpostId(),
-					bestillingsId);
+			log.info("rdist002 har distribuert journalpost med journalpostId={} og bestillingsId={}", journalpostId, bestillingsId);
 
 			return ResponseEntity.ok().body(response);
 		} catch (Exception e) {
-			log.warn("rdist002 - Distribusjon feilet for journalpostId={}. Feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage(), e);
+			log.warn("rdist002 - Distribusjon feilet for journalpostId={}. Feilmelding: {}", journalpostId, e.getMessage(), e);
 			if (e instanceof ValidationException validationException) {
 				throw new ValidationException("Validering av distribusjonsforespørsel feilet med feilmelding: " + validationException.getMessage());
 			} else {
