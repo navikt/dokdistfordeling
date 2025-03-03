@@ -6,8 +6,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
+import no.nav.dokdistfordeling.map.DistribuerJournalpostMapper;
 import no.nav.dokdistfordeling.springdoc.SwaggerRestDistribuerJournalpost;
+import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
+import no.nav.dokdistfordeling.to.DistribuerJournalpostResponseTo;
 import org.slf4j.MDC;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,12 +20,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static java.util.Objects.isNull;
 import static java.util.UUID.randomUUID;
-import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateDistribuerJournalpostRequest;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static no.nav.dokdistfordeling.validate.DistribuerJournalpostRequestValidator.validateDistribuerJournalpostRequest;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.CONFLICT;
 
@@ -57,15 +60,23 @@ public class DistribuerJournalpostController {
 			validateDistribuerJournalpostRequest(distribuerJournalpostRequestTo);
 			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
 
-			if (!isTilleggsopplysningerNull(journalpost.getTilleggsopplysninger())) {
+			if (journalpostHarTileggsopplysninger(journalpost.getTilleggsopplysninger())) {
 				final var bestillingsId = journalpost.getTilleggsopplysninger().getVerdi();
 				log.info("Journalpost med journalpostId={} og bestillingsId={} er allerede distribuert", distribuerJournalpostRequestTo.getJournalpostId(), bestillingsId);
 				return ResponseEntity.status(CONFLICT)
 						.body(new DistribuerJournalpostResponseTo(bestillingsId));
 			}
 
-			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(
-					distribuerJournalpostService.distribuerForsendelse(distribuerJournalpostRequestTo, journalpost));
+			DistribuerJournalpost distribuerJournalpost = DistribuerJournalpostMapper.map(distribuerJournalpostRequestTo);
+
+			String bestillingsId = distribuerJournalpostService.distribuerForsendelse(distribuerJournalpost, journalpost);
+
+			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(bestillingsId);
+
+			log.info("rdist002 har distribuert journalpost med journalpostId={} og bestillingsId={}",
+					distribuerJournalpostRequestTo.getJournalpostId(),
+					bestillingsId);
+
 			return ResponseEntity.ok().body(response);
 		} catch (Exception e) {
 			log.warn("rdist002 - Distribusjon feilet for journalpostId={}. Feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage(), e);
@@ -92,7 +103,7 @@ public class DistribuerJournalpostController {
 		}
 	}
 
-	private Boolean isTilleggsopplysningerNull(Journalpost.Tilleggsopplysninger tilleggsopplysninger) {
-		return isNull(tilleggsopplysninger) || isBlank(tilleggsopplysninger.getNokkel());
+	private Boolean journalpostHarTileggsopplysninger(Journalpost.Tilleggsopplysninger tilleggsopplysninger) {
+		return tilleggsopplysninger != null && isNotBlank(tilleggsopplysninger.getNokkel());
 	}
 }

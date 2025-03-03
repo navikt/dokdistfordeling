@@ -56,7 +56,7 @@ public class JournalpostApi {
 	public OppdaterJournalpostResponse oppdaterJournalpost(String journalpostId, OppdaterJournalpostRequest oppdaterJournalpostRequest) {
 
 		return webClient.put()
-				.uri("/" + validateJournalpostId(journalpostId))
+				.uri("/{journalpostId}", validateJournalpostId(journalpostId))
 				.header(NAV_CALL_ID, MDC.get(CALL_ID))
 				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKARKIV))
 				.body(Mono.just(oppdaterJournalpostRequest), OppdaterJournalpostRequest.class)

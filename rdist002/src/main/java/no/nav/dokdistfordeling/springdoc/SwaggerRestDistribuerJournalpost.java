@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import no.nav.dokdistfordeling.DistribuerJournalpostResponseTo;
+import no.nav.dokdistfordeling.to.DistribuerJournalpostResponseTo;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
