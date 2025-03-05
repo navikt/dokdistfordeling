@@ -32,28 +32,28 @@ public class MottakerMapper {
 			case HPRNR -> {
 				Samhandler samhandler = new Samhandler();
 				samhandler.setNavn(avsenderMottaker.getNavn());
-				samhandler.setSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()));
+				samhandler.setSamhandleridentifikator(utledAvsenderMottakerId(avsenderMottaker.getId()));
 				samhandler.setSamhandlerkategori(SamhandlerKategoriCode.HPR.name());
 				yield samhandler;
 			}
 			case UTL_ORG -> {
 				Samhandler samhandler = new Samhandler();
 				samhandler.setNavn(avsenderMottaker.getNavn());
-				samhandler.setSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()));
+				samhandler.setSamhandleridentifikator(utledAvsenderMottakerId(avsenderMottaker.getId()));
 				samhandler.setSamhandlerkategori(SamhandlerKategoriCode.UTL_ORG.name());
 				yield samhandler;
 			}
 			case UKJENT -> {
 				Samhandler samhandler = new Samhandler();
 				samhandler.setNavn(avsenderMottaker.getNavn());
-				samhandler.setSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()));
+				samhandler.setSamhandleridentifikator(utledAvsenderMottakerId(avsenderMottaker.getId()));
 				samhandler.setSamhandlerkategori(SamhandlerKategoriCode.UKJENT.name());
 				yield samhandler;
 			}
 			case null -> {
 				Samhandler samhandler = new Samhandler();
 				samhandler.setNavn(avsenderMottaker.getNavn());
-				samhandler.setSamhandleridentifikator(determineAvsenderMottakerId(avsenderMottaker.getId()));
+				samhandler.setSamhandleridentifikator(utledAvsenderMottakerId(avsenderMottaker.getId()));
 				samhandler.setSamhandlerkategori(SamhandlerKategoriCode.UKJENT.name());
 				yield samhandler;
 			}
@@ -61,7 +61,7 @@ public class MottakerMapper {
 
 	}
 
-	private static String determineAvsenderMottakerId(String mottakerId) {
+	private static String utledAvsenderMottakerId(String mottakerId) {
 		return isEmpty(mottakerId) ? UKJENT.name() : mottakerId;
 	}
 }

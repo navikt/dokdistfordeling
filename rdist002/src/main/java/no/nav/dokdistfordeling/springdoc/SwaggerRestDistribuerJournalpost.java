@@ -23,7 +23,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 		@ApiResponse(responseCode = "401", description = "* Bruker mangler tilgang for å vise journalposten.\n* Ugyldig OIDC token.", content = @Content),
 		@ApiResponse(responseCode = "404", description = "Journalposten ble ikke funnet.", content = @Content),
 		@ApiResponse(responseCode = "409", description = "Journalposten er allerede distribuert."),
-		@ApiResponse(responseCode = "410", description = "Journalpost kan ikke distribueres. Bruker er død og har ukjent adresse.", content = @Content),
+		@ApiResponse(responseCode = "410", description = "Journalpost kan ikke distribueres. Bruker er død og har ukjent postadresse.", content = @Content),
 		@ApiResponse(responseCode = "500", description = "Teknisk feil under prosessering av forsendelse.", content = @Content)
 }
 )

@@ -63,7 +63,7 @@ public class DistribuerJournalpostController {
 			validateDistribuerJournalpostRequest(distribuerJournalpostRequestTo);
 			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
 
-			if (journalpostHarTileggsopplysninger(journalpost.getTilleggsopplysninger())) {
+			if (journalpost.erDistribuert()) {
 				final var bestillingsId = journalpost.getTilleggsopplysninger().getVerdi();
 				log.info("Journalpost med journalpostId={} og bestillingsId={} er allerede distribuert", journalpostId, bestillingsId);
 				return ResponseEntity.status(CONFLICT)
@@ -80,7 +80,7 @@ public class DistribuerJournalpostController {
 
 			return ResponseEntity.ok().body(response);
 		} catch (Exception e) {
-			log.warn("rdist002 - Distribusjon feilet for journalpostId={}. Feilmelding: {}", journalpostId, e.getMessage(), e);
+			log.warn("rdist002 distribusjon feilet for journalpostId={}. Feilmelding={}", journalpostId, e.getMessage(), e);
 			if (e instanceof ValidationException validationException) {
 				throw new ValidationException("Validering av distribusjonsforespørsel feilet med feilmelding: " + validationException.getMessage());
 			} else {
@@ -92,19 +92,16 @@ public class DistribuerJournalpostController {
 	}
 
 	private void addCallIdToMDC(String callId) {
-		if (callId == null || callId.isEmpty()) {
-			callId = randomUUID().toString();
+		if (isNotBlank(callId)) {
+			MDC.put(CALL_ID, callId);
 		}
-		MDC.put(CALL_ID, callId);
+
+		MDC.put(CALL_ID, randomUUID().toString());
 	}
 
 	private void addConsumerIdToMDC(String consumerId) {
-		if (consumerId != null && !consumerId.isEmpty()) {
+		if (isNotBlank(consumerId)) {
 			MDC.put(CONSUMER_ID, consumerId);
 		}
-	}
-
-	private Boolean journalpostHarTileggsopplysninger(Journalpost.Tilleggsopplysninger tilleggsopplysninger) {
-		return tilleggsopplysninger != null && isNotBlank(tilleggsopplysninger.getNokkel());
 	}
 }

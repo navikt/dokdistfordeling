@@ -20,16 +20,30 @@ public final class ValidationUtil {
 		}
 	}
 
+	public static void assertStringIsNumber(String field, String value) {
+		if (isBlank(value) || !isNumeric(value)) {
+			throw new ValidationException(format("Feltet %s må være et gyldig heltall. Fikk %s=%s", field, field, value));
+		}
+	}
+
+	public static void assertStringIsValidLong(String field, String value) {
+		try {
+			Long.parseLong(value);
+		} catch (NumberFormatException e) {
+			throw new ValidationException(format("Feltet %s må være et heltall mindre eller lik %s. Fikk %s=%s", field, field, value, Long.MAX_VALUE));
+		}
+	}
+
 	public static void assertStringIsNumberOfExactLength(String field, String value, int expectedLength) {
 		if (!isNumeric(value) || value.length() != expectedLength) {
 			throw new ValidationException(format("Feltet %s må være et gyldig tall med %s siffer. Fikk %s=%s", field, expectedLength, field, value));
 		}
 	}
 
-	public static void assertNotNullOrEmptyAndLengthNotGreaterThan(String field, String value, int length) {
+	public static void assertNotNullOrEmptyAndLengthNotGreaterThan(String field, String value, int maxLength) {
 		assertNotNullOrEmpty(field, value);
-		if (value.length() > length) {
-			throw new ValidationException(format("Feltet %s kan ikke være mer enn %s tegn", field, length));
+		if (value.length() > maxLength) {
+			throw new ValidationException(format("Feltet %s kan ikke være mer enn %s tegn", field, maxLength));
 		}
 	}
 

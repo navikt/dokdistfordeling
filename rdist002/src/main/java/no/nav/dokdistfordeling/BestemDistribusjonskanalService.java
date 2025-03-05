@@ -1,21 +1,22 @@
 package no.nav.dokdistfordeling;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.consumer.dokdistkanal.DokdistkanalConsumer;
 import no.nav.dokdistfordeling.consumer.dokdistkanal.BestemDistribusjonskanalRequest;
-import no.nav.dokdistfordeling.consumer.pdl.PdlGraphQLConsumer;
+import no.nav.dokdistfordeling.consumer.dokdistkanal.DokdistkanalConsumer;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
-import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentForAktoerIdFunctionalException;
+import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
+import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.List;
 
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
-import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.TRYGDERETTEN;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Slf4j
@@ -23,31 +24,29 @@ import static org.apache.logging.log4j.util.Strings.isEmpty;
 public class BestemDistribusjonskanalService {
 
 	private final DokdistkanalConsumer dokdistkanalConsumer;
-	private final PdlGraphQLConsumer pdlGraphQLConsumer;
 
-	public BestemDistribusjonskanalService(DokdistkanalConsumer dokdistkanalConsumer,
-										   PdlGraphQLConsumer pdlGraphQLConsumer) {
+	public BestemDistribusjonskanalService(DokdistkanalConsumer dokdistkanalConsumer) {
 		this.dokdistkanalConsumer = dokdistkanalConsumer;
-		this.pdlGraphQLConsumer = pdlGraphQLConsumer;
 	}
 
-	public DistribusjonKanalCode bestemDistribusjonskanal(Journalpost journalpost, boolean harAdresse) {
-		String personnummer;
-		try {
-			personnummer = hentIdent(journalpost.getBruker());
-		} catch (PdlHentFolkeregisteridentForAktoerIdFunctionalException e) {
-			if (harAdresse) {
-				log.info("Returnerer PRINT som distribusjonskanal etter at mapping fra aktørid til fnr feilet for person med oppgitt adresse.");
-				return PRINT;
-			} else {
-				throw e;
-			}
+	public DistribusjonKanalCode bestemDistribusjonskanal(DistribuerJournalpost distribuerJournalpost,
+														  Journalpost journalpost,
+														  String personnummer) {
+
+		DistribusjonKanalCode tvingKanal = utledTvingKanal(distribuerJournalpost);
+
+		if (tvingKanal != null) {
+			return tvingKanal;
+		}
+
+		if (personnummer == null) {
+			return PRINT;
 		}
 
 		BestemDistribusjonskanalRequest request = BestemDistribusjonskanalRequest.builder()
 				.dokumenttypeId(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID)
 				.brukerId(personnummer)
-				.mottakerId(determineMottakerId(journalpost.getAvsenderMottaker().getId()))
+				.mottakerId(utledMottakerId(journalpost.getAvsenderMottaker().getId()))
 				.erArkivert(true)
 				.tema(journalpost.getTema())
 				.forsendelseStoerrelse(getFilstoerrelseMB(journalpost))
@@ -56,12 +55,28 @@ public class BestemDistribusjonskanalService {
 		return dokdistkanalConsumer.bestemDistribusjonskanal(request);
 	}
 
-	private String determineMottakerId(String mottakerId) {
-		return isEmpty(mottakerId) ? "0" : mottakerId;
+	private static DistribusjonKanalCode utledTvingKanal(DistribuerJournalpost distribuerJournalpost) {
+		boolean tvingSentralPrint = distribuerJournalpost.tvingSentralPrint();
+		TvingKanal tvingKanal = distribuerJournalpost.tvingKanal();
+
+		if (tvingSentralPrint) {
+			log.info("tvingSentralPrint er satt til true i input. Forsendelsen vil bli sendt til print.");
+			return PRINT;
+		}
+
+		if (tvingKanal != null) {
+			log.info("tvingKanal er satt til {} i input. Forsendelsen vil bli sendt til {}.", tvingKanal, capitalize(tvingKanal.name()));
+
+			return switch (tvingKanal) {
+				case TvingKanal.PRINT -> PRINT;
+				case TvingKanal.TRYGDERETTEN -> TRYGDERETTEN;
+			};
+		}
+		return null;
 	}
 
-	private String hentIdent(Journalpost.Bruker bruker) {
-		return AKTOERID.equals(bruker.getType()) ? pdlGraphQLConsumer.hentFolkeregisteridentForAktoerId(bruker.getId()) : bruker.getId();
+	private String utledMottakerId(String mottakerId) {
+		return isEmpty(mottakerId) ? "0" : mottakerId;
 	}
 
 	private int getFilstoerrelseMB(Journalpost journalpost) {

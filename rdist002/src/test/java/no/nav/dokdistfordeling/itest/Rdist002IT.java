@@ -482,7 +482,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 				createHappyPathHeaders());
 		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
 
-		assertThat(restResponse).contains("Feltet journalpostId kan ikke være null eller tomt.");
+		assertThat(restResponse).contains("Validering av distribusjonsforespørsel feilet med feilmelding: Feltet journalpostId må være et ikke-negativt heltall. Fikk journalpostId=nul");
 	}
 
 	@Test

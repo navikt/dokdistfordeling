@@ -28,7 +28,7 @@ class DistribuerJournalpostMapperTest {
 		assertThat(result.distribusjonstidspunkt()).isEqualTo(KJERNETID);
 		assertThat(result.distribusjonstype()).isEqualTo(VIKTIG);
 
-		assertThat(result.adresse()).usingRecursiveComparison()
+		assertThat(result.postadresse()).usingRecursiveComparison()
 				.isEqualTo(request.getAdresse());
 	}
 
@@ -40,7 +40,7 @@ class DistribuerJournalpostMapperTest {
 
 		var result = DistribuerJournalpostMapper.map(request);
 
-		assertThat(result.adresse()).isNull();
+		assertThat(result.postadresse()).isNull();
 	}
 
 	@ParameterizedTest
@@ -70,7 +70,7 @@ class DistribuerJournalpostMapperTest {
 
 		var result = DistribuerJournalpostMapper.map(request);
 
-		assertThat(result.adresse())
+		assertThat(result.postadresse())
 				.extracting("adresselinje1", "adresselinje2", "adresselinje3")
 				.containsExactly("Adresselinje 1", "Adresselinje 2", "Adresselinje 3");
 	}

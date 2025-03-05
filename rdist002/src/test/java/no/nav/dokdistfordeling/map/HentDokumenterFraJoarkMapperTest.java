@@ -1,7 +1,7 @@
 package no.nav.dokdistfordeling.map;
 
-import no.nav.dokdistfordeling.domain.Adresse;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
+import no.nav.dokdistfordeling.domain.Postadresse;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.AktoerId;
@@ -33,8 +33,7 @@ import static no.nav.dokdistfordeling.TestData.DOKUMENTPRODAPP;
 import static no.nav.dokdistfordeling.TestData.DOK_INFO_ID_1;
 import static no.nav.dokdistfordeling.TestData.DOK_INFO_ID_2;
 import static no.nav.dokdistfordeling.TestData.JOURNALPOST_ID;
-import static no.nav.dokdistfordeling.TestData.LAND_NO;
-import static no.nav.dokdistfordeling.TestData.LAND_US;
+import static no.nav.dokdistfordeling.TestData.LANDKODE_US;
 import static no.nav.dokdistfordeling.TestData.MOTTAKER_ID;
 import static no.nav.dokdistfordeling.TestData.MOTTAKER_NAVN;
 import static no.nav.dokdistfordeling.TestData.ORGNR;
@@ -58,6 +57,7 @@ import static no.nav.dokdistfordeling.TestData.createUtenlandskPostadresseBuilde
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
+import static no.nav.dokdistfordeling.domain.Postadresse.LANDKODE_NORGE;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.SDP;
@@ -70,7 +70,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class HentDokumenterFraJoarkMapperTest {
 
 	private static final String BESTILLINGS_ID = "7cc280ce-4168-4204-8d03-8dbdc3c4fc32";
-	private static final Adresse ADRESSE = createNorskPostadresseBuilder().build();
+	private static final Postadresse ADRESSE = createNorskPostadresseBuilder().build();
 
 	@Test
 	void shouldMap() {
@@ -284,7 +284,7 @@ public class HentDokumenterFraJoarkMapperTest {
 	}
 
 	private void assertArkivinformasjon(ArkivInformasjon arkivInformasjon) {
-		assertThat(arkivInformasjon.getArkivId()).isEqualTo(JOURNALPOST_ID);
+		assertThat(arkivInformasjon.getArkivId()).isEqualTo(String.valueOf(JOURNALPOST_ID));
 		assertThat(arkivInformasjon.getArkivSystem()).isEqualTo(ARKIV_SYSTEM);
 	}
 
@@ -327,7 +327,7 @@ public class HentDokumenterFraJoarkMapperTest {
 	}
 
 	private void assertNorskPostadresse(NorskPostadresse adresse) {
-		assertThat(adresse.getLand()).isEqualTo(LAND_NO);
+		assertThat(adresse.getLand()).isEqualTo(LANDKODE_NORGE);
 		assertThat(adresse.getPostnummer()).isEqualTo(POSTNUMMER);
 		assertThat(adresse.getPoststed()).isEqualTo(POSTSTED);
 		assertThat(adresse.getAdresselinje1()).isEqualTo(ADRESSELINJE1);
@@ -336,7 +336,7 @@ public class HentDokumenterFraJoarkMapperTest {
 	}
 
 	private void assertUtenlandskPostadresse(UtenlandskPostadresse adresse) {
-		assertThat(adresse.getLand()).isEqualTo(LAND_US);
+		assertThat(adresse.getLand()).isEqualTo(LANDKODE_US);
 		assertThat(adresse.getAdresselinje1()).isEqualTo(ADRESSELINJE1);
 		assertThat(adresse.getAdresselinje2()).isEqualTo(ADRESSELINJE2);
 		assertThat(adresse.getAdresselinje3()).isEqualTo(ADRESSELINJE3);

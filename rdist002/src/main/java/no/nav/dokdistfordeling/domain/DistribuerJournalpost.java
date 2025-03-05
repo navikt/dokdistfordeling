@@ -6,13 +6,18 @@ import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 
 @Builder
-public record DistribuerJournalpost(String journalpostId,
-									String batchId,
-									String bestillendeFagsystem,
-									Adresse adresse,
-									String dokumentProdApp,
-									DistribusjonstypeCode distribusjonstype,
-									DistribusjonstidspunktCode distribusjonstidspunkt,
-									boolean tvingSentralPrint,
-									TvingKanal tvingKanal) {
+public record DistribuerJournalpost(
+		Long journalpostId,
+		String batchId,
+		String bestillendeFagsystem,
+		Postadresse postadresse,
+		String dokumentProdApp,
+		DistribusjonstypeCode distribusjonstype,
+		DistribusjonstidspunktCode distribusjonstidspunkt,
+		boolean tvingSentralPrint,
+		TvingKanal tvingKanal) {
+
+	public boolean harPostadresse() {
+		return this.postadresse != null;
+	}
 }

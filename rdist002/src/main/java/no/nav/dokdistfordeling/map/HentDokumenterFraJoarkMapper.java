@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.map;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost.DokumentInfo;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
+import no.nav.dokdistfordeling.domain.Postadresse;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
@@ -30,18 +31,15 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class HentDokumenterFraJoarkMapper {
 
-	public static final String NORSK_POSTADRESSE = "norskPostadresse";
-	public static final String UTENLANDSK_POSTADRESSE = "utenlandskPostadresse";
-
 	private HentDokumenterFraJoarkMapper() {
 	}
 
 	public static HentDokumenterFraJoark map(DistribuerJournalpost distribuerJournalpost,
-									  no.nav.dokdistfordeling.domain.Adresse adresse,
-									  Journalpost journalpost,
-									  Aktoer mottaker,
-									  String bestillingsId,
-									  DistribusjonKanalCode distribusjonsKanal) {
+											 Postadresse postadresse,
+											 Journalpost journalpost,
+											 Aktoer mottaker,
+											 String bestillingsId,
+											 DistribusjonKanalCode distribusjonsKanal) {
 
 		List<DokumentInfo> dokumenter = journalpost.getDokumenter();
 
@@ -57,7 +55,7 @@ public class HentDokumenterFraJoarkMapper {
 		distribusjonbestilling.setArkivInformasjon(mapArkivInformasjon(distribuerJournalpost));
 		distribusjonbestilling.setMottaker(mottaker);
 		distribusjonbestilling.setBruker(mapBruker(journalpost.getBruker()));
-		distribusjonbestilling.setAdresse(mapAdresse(adresse));
+		distribusjonbestilling.setAdresse(mapPostadresse(postadresse));
 		distribusjonbestilling.setDokumentProdApp(distribuerJournalpost.dokumentProdApp());
 
 		distribusjonbestilling.setDokumenter(IntStream
@@ -84,7 +82,7 @@ public class HentDokumenterFraJoarkMapper {
 
 	private static ArkivInformasjon mapArkivInformasjon(DistribuerJournalpost distribuerJournalpost) {
 		ArkivInformasjon arkivInformasjon = new ArkivInformasjon();
-		arkivInformasjon.setArkivId(distribuerJournalpost.journalpostId());
+		arkivInformasjon.setArkivId(String.valueOf(distribuerJournalpost.journalpostId()));
 		arkivInformasjon.setArkivSystem(ArkivSystemCode.JOARK.name());
 		return arkivInformasjon;
 	}
@@ -93,24 +91,24 @@ public class HentDokumenterFraJoarkMapper {
 		return isBlank(batchId) ? null : batchId;
 	}
 
-	private static Adresse mapAdresse(no.nav.dokdistfordeling.domain.Adresse adresse) {
-		if (adresse == null) {
+	private static Adresse mapPostadresse(Postadresse postadresse) {
+		if (postadresse == null) {
 			return null;
-		} else if (adresse.adressetype().equals(NORSK_POSTADRESSE)) {
+		} else if (postadresse.erNorskPostadresse()) {
 			NorskPostadresse norskPostadresse = new NorskPostadresse();
-			norskPostadresse.setAdresselinje1(adresse.adresselinje1());
-			norskPostadresse.setAdresselinje2(adresse.adresselinje2());
-			norskPostadresse.setAdresselinje3(adresse.adresselinje3());
-			norskPostadresse.setPostnummer(adresse.postnummer());
-			norskPostadresse.setPoststed(adresse.poststed());
-			norskPostadresse.setLand(adresse.land());
+			norskPostadresse.setAdresselinje1(postadresse.adresselinje1());
+			norskPostadresse.setAdresselinje2(postadresse.adresselinje2());
+			norskPostadresse.setAdresselinje3(postadresse.adresselinje3());
+			norskPostadresse.setPostnummer(postadresse.postnummer());
+			norskPostadresse.setPoststed(postadresse.poststed());
+			norskPostadresse.setLand(postadresse.land());
 			return norskPostadresse;
 		} else {
 			UtenlandskPostadresse utenlandskPostadresse = new UtenlandskPostadresse();
-			utenlandskPostadresse.setAdresselinje1(adresse.adresselinje1());
-			utenlandskPostadresse.setAdresselinje2(adresse.adresselinje2());
-			utenlandskPostadresse.setAdresselinje3(adresse.adresselinje3());
-			utenlandskPostadresse.setLand(adresse.land());
+			utenlandskPostadresse.setAdresselinje1(postadresse.adresselinje1());
+			utenlandskPostadresse.setAdresselinje2(postadresse.adresselinje2());
+			utenlandskPostadresse.setAdresselinje3(postadresse.adresselinje3());
+			utenlandskPostadresse.setLand(postadresse.land());
 			return utenlandskPostadresse;
 		}
 	}

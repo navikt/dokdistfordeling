@@ -134,11 +134,9 @@ class JournalpostValidatorTest {
 								.build()))
 				.build();
 
-		var motattVerdi = tittel == null ? "null" : tittel;
-
 		assertThatExceptionOfType(ValidationException.class)
 				.isThrownBy(() -> validateJournalpostAndDokumenter(journalpost))
-				.withMessage("For hoveddokumentet kan feltet tittel ikke være null eller tomt. Fikk tittel=%s, dokumentInfoId=%s", motattVerdi, DOK_INFO_ID_1);
+				.withMessage("For hoveddokumentet kan feltet tittel ikke være null eller tomt. Fikk tittel=%s, dokumentInfoId=%s", tittel, DOK_INFO_ID_1);
 	}
 
 	@ParameterizedTest
@@ -154,11 +152,9 @@ class JournalpostValidatorTest {
 								.build()))
 				.build();
 
-		var mottattVerdi = brevkode == null ? "null" : brevkode;
-
 		assertThatExceptionOfType(ValidationException.class)
 				.isThrownBy(() -> validateJournalpostAndDokumenter(journalpost))
-				.withMessage("For hoveddokumentet kan feltet brevkode ikke være null eller tomt. Fikk brevkode=%s, dokumentInfoId=%s", mottattVerdi, DOK_INFO_ID_1);
+				.withMessage("For hoveddokumentet kan feltet brevkode ikke være null eller tomt. Fikk brevkode=%s, dokumentInfoId=%s", brevkode, DOK_INFO_ID_1);
 	}
 
 	@Test

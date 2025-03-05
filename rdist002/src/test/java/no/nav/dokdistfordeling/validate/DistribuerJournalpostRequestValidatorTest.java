@@ -12,9 +12,11 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import static java.math.BigInteger.ONE;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostToBuilder;
 import static no.nav.dokdistfordeling.validate.DistribuerJournalpostRequestValidator.validateDistribuerJournalpostRequest;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -62,6 +64,24 @@ class DistribuerJournalpostRequestValidatorTest {
 
 	@ParameterizedTest
 	@MethodSource
+	void shouldThrowValidationExceptionWhenJournalpostIdIsInvalid(String journalpostId) {
+		DistribuerJournalpostRequestTo request = createDistribuerJournalpostToBuilder()
+				.journalpostId(journalpostId)
+				.build();
+
+		assertThatExceptionOfType(ValidationException.class)
+				.isThrownBy(() -> validateDistribuerJournalpostRequest(request))
+				.withMessage("Feltet journalpostId må være et ikke-negativt heltall. Fikk journalpostId=%s", journalpostId);
+	}
+
+
+
+	static Stream<String> shouldThrowValidationExceptionWhenJournalpostIdIsInvalid() {
+		return Stream.of(null, " ", "-1", "1.1", "1,1", "ikkeEttTall", BigInteger.valueOf(Long.MAX_VALUE).add(ONE).toString());
+	}
+
+	@ParameterizedTest
+	@MethodSource
 	void shouldThrowValidationExceptionWhenRequiredFieldIsEmpty(DistribuerJournalpostRequestTo request, String field) {
 		assertThatExceptionOfType(ValidationException.class)
 				.isThrownBy(() -> validateDistribuerJournalpostRequest(request))
@@ -70,7 +90,6 @@ class DistribuerJournalpostRequestValidatorTest {
 
 	private static Stream<Arguments> shouldThrowValidationExceptionWhenRequiredFieldIsEmpty() {
 		return Stream.of(
-				Arguments.of(createDistribuerJournalpostToBuilder().journalpostId(" ").build(), "journalpostId"),
 				Arguments.of(createDistribuerJournalpostToBuilder().bestillendeFagsystem(" ").build(), "bestillendeFagsystem"),
 				Arguments.of(createDistribuerJournalpostToBuilder().dokumentProdApp(" ").build(), "dokumentProdapp"),
 				Arguments.of(createDistribuerJournalpostToBuilder().distribusjonstype(" ").build(), "distribusjonstype"),
@@ -89,7 +108,6 @@ class DistribuerJournalpostRequestValidatorTest {
 
 	private static Stream<Arguments> shouldThrowValidationExceptionWhenRequiredFieldIsNull() {
 		return Stream.of(
-				Arguments.of(createDistribuerJournalpostToBuilder().journalpostId(null).build(), "journalpostId"),
 				Arguments.of(createDistribuerJournalpostToBuilder().bestillendeFagsystem(null).build(), "bestillendeFagsystem"),
 				Arguments.of(createDistribuerJournalpostToBuilder().dokumentProdApp(null).build(), "dokumentProdapp"),
 				Arguments.of(createDistribuerJournalpostToBuilder().distribusjonstype(null).build(), "distribusjonstype"),

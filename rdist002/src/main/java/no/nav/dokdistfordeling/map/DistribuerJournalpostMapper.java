@@ -1,7 +1,7 @@
 package no.nav.dokdistfordeling.map;
 
-import no.nav.dokdistfordeling.domain.Adresse;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
+import no.nav.dokdistfordeling.domain.Postadresse;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
@@ -14,10 +14,10 @@ public class DistribuerJournalpostMapper {
 
 	public static DistribuerJournalpost map(DistribuerJournalpostRequestTo request) {
 		return new DistribuerJournalpost(
-				request.getJournalpostId(),
+				Long.parseLong(request.getJournalpostId()),
 				request.getBatchId(),
 				request.getBestillendeFagsystem(),
-				mapAdresse(request.getAdresse()),
+				mapPostadresse(request.getAdresse()),
 				request.getDokumentProdApp(),
 				DistribusjonstypeCode.valueOf(request.getDistribusjonstype()),
 				DistribusjonstidspunktCode.valueOf(request.getDistribusjonstidspunkt()),
@@ -25,12 +25,12 @@ public class DistribuerJournalpostMapper {
 				mapTvingKanal(request.getTvingKanal()));
 	}
 
-	private static Adresse mapAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo) {
+	private static Postadresse mapPostadresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo) {
 		if (adresseTo == null) {
 			return null;
 		}
 
-		return new Adresse(
+		return new Postadresse(
 				adresseTo.getAdressetype(),
 				adresseTo.getPostnummer(),
 				adresseTo.getPoststed(),

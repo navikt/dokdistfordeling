@@ -10,6 +10,9 @@ import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import java.util.ArrayList;
 import java.util.List;
 
+import static no.nav.dokdistfordeling.constants.Constants.DOKDISTBESTILLINGS_ID;
+import static no.nav.dokdistfordeling.kodeverk.BrukerIdType.AKTOERID;
+
 @Value
 @Builder
 public class Journalpost {
@@ -24,6 +27,10 @@ public class Journalpost {
 	@Builder.Default
 	List<DokumentInfo> dokumenter = new ArrayList<>();
 
+	public boolean erDistribuert() {
+		return tilleggsopplysninger != null && DOKDISTBESTILLINGS_ID.equals(tilleggsopplysninger.getNokkel());
+	}
+
 	@Value
 	@Builder
 	public static class Tilleggsopplysninger {
@@ -36,6 +43,10 @@ public class Journalpost {
 	public static class Bruker {
 		String id;
 		BrukerIdType type;
+
+		public boolean erTypeAktoerId() {
+			return this.type == AKTOERID;
+		}
 	}
 
 	@Value

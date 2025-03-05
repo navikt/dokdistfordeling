@@ -1,8 +1,8 @@
 package no.nav.dokdistfordeling;
 
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
-import no.nav.dokdistfordeling.domain.Adresse;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
+import no.nav.dokdistfordeling.domain.Postadresse;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
@@ -14,6 +14,9 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
+import static no.nav.dokdistfordeling.domain.Postadresse.LANDKODE_NORGE;
+import static no.nav.dokdistfordeling.domain.Postadresse.NORSK_POSTADRESSE;
+import static no.nav.dokdistfordeling.domain.Postadresse.UTENLANDSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.UMIDDELBART;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VEDTAK;
@@ -28,17 +31,14 @@ public class TestData {
 	public static final String DOK_TITTEL_2 = "DOK_TITTEL_2";
 	public static final String BREVKODE = "000001";
 
-	public static final String ADRESSETYPE_NORSK = "norskPostadresse";
-	public static final String ADRESSETYPE_UTENLANDSK = "utenlandskPostadresse";
 	public static final String ADRESSELINJE1 = "eksempelveien 23 A";
 	public static final String ADRESSELINJE2 = "eksempelveien 24 A";
 	public static final String ADRESSELINJE3 = "eksempelveien 25 A";
 	public static final String POSTSTED = "poststed";
 	public static final String POSTNUMMER = "1337";
-	public static final String LAND_NO = "NO";
-	public static final String LAND_US = "US";
+	public static final String LANDKODE_US = "US";
 
-	public static final String JOURNALPOST_ID = "555555555";
+	public static final Long JOURNALPOST_ID = 555555555L;
 	public static final String BATCH_ID = "126767";
 	public static final String TITTEL = "journalpostTittel";
 	public static final String TEMA = "OPP";
@@ -65,7 +65,7 @@ public class TestData {
 				.journalpostId(JOURNALPOST_ID)
 				.batchId(BATCH_ID)
 				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
-				.adresse(createNorskPostadresseBuilder().build())
+				.postadresse(createNorskPostadresseBuilder().build())
 				.dokumentProdApp(DOKUMENTPRODAPP)
 				.distribusjonstype(VEDTAK)
 				.distribusjonstidspunkt(UMIDDELBART);
@@ -143,24 +143,24 @@ public class TestData {
 						.variantformat(Variantformat.ARKIV).build()));
 	}
 
-	private static Adresse.AdresseBuilder createPostadresseBuilder() {
-		return Adresse.builder()
+	private static Postadresse.PostadresseBuilder createPostadresseBuilder() {
+		return Postadresse.builder()
 				.adresselinje1(ADRESSELINJE1)
 				.adresselinje2(ADRESSELINJE2)
 				.adresselinje3(ADRESSELINJE3);
 	}
 
-	public static Adresse.AdresseBuilder createNorskPostadresseBuilder() {
+	public static Postadresse.PostadresseBuilder createNorskPostadresseBuilder() {
 		return createPostadresseBuilder()
-				.adressetype(ADRESSETYPE_NORSK)
+				.adressetype(NORSK_POSTADRESSE)
 				.postnummer(POSTNUMMER)
 				.poststed(POSTSTED)
-				.land(LAND_NO);
+				.land(LANDKODE_NORGE);
 	}
-	public static Adresse.AdresseBuilder createUtenlandskPostadresseBuilder() {
+	public static Postadresse.PostadresseBuilder createUtenlandskPostadresseBuilder() {
 		return createPostadresseBuilder()
-				.adressetype(ADRESSETYPE_UTENLANDSK)
-				.land(LAND_US);
+				.adressetype(UTENLANDSK_POSTADRESSE)
+				.land(LANDKODE_US);
 	}
 
 	public static Person createMottaker() {
@@ -172,7 +172,7 @@ public class TestData {
 
 	public static DistribuerJournalpostRequestTo.DistribuerJournalpostRequestToBuilder createDistribuerJournalpostToBuilder() {
 		return DistribuerJournalpostRequestTo.builder()
-				.journalpostId(JOURNALPOST_ID)
+				.journalpostId(String.valueOf(JOURNALPOST_ID))
 				.batchId(BATCH_ID)
 				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
 				.adresse(createNorskAdresseTo())
@@ -188,21 +188,21 @@ public class TestData {
 				.adresselinje3(ADRESSELINJE3)
 				.postnummer(POSTNUMMER)
 				.poststed(POSTSTED)
-				.land(LAND_NO);
+				.land(LANDKODE_NORGE);
 	}
 
 	public static DistribuerJournalpostRequestTo.AdresseTo createNorskAdresseTo() {
 		return createAdresseToBuilder()
-				.adressetype(ADRESSETYPE_NORSK)
+				.adressetype(NORSK_POSTADRESSE)
 				.build();
 	}
 
 	public static DistribuerJournalpostRequestTo.AdresseTo createUtenlandskAdresseTo() {
 		return createAdresseToBuilder()
-				.adressetype(ADRESSETYPE_UTENLANDSK)
+				.adressetype(UTENLANDSK_POSTADRESSE)
 				.postnummer(null)
 				.poststed(null)
-				.land(LAND_US)
+				.land(LANDKODE_US)
 				.build();
 	}
 
