@@ -6,8 +6,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
+import no.nav.dokdistfordeling.map.DistribuerJournalpostMapper;
 import no.nav.dokdistfordeling.springdoc.SwaggerRestDistribuerJournalpost;
+import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
+import no.nav.dokdistfordeling.to.DistribuerJournalpostResponseTo;
+import no.nav.dokdistfordeling.util.SafeLoggingUtil;
 import org.slf4j.MDC;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,12 +21,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static java.util.Objects.isNull;
 import static java.util.UUID.randomUUID;
-import static no.nav.dokdistfordeling.Rdist002ValidationUtil.validateDistribuerJournalpostRequest;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static no.nav.dokdistfordeling.validate.DistribuerJournalpostRequestValidator.validateDistribuerJournalpostRequest;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.CONFLICT;
 
@@ -51,24 +55,32 @@ public class DistribuerJournalpostController {
 
 		addCallIdToMDC(navCallId);
 		addConsumerIdToMDC(navConsumerId);
-		log.info("rdist002 har mottatt kall for journalpostId={}", distribuerJournalpostRequestTo.getJournalpostId());
+
+		String journalpostId = SafeLoggingUtil.removeUnsafeChars(distribuerJournalpostRequestTo.getJournalpostId());
+		log.info("rdist002 har mottatt kall for journalpostId={}", journalpostId);
 
 		try {
 			validateDistribuerJournalpostRequest(distribuerJournalpostRequestTo);
 			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
 
-			if (!isTilleggsopplysningerNull(journalpost.getTilleggsopplysninger())) {
+			if (journalpost.erDistribuert()) {
 				final var bestillingsId = journalpost.getTilleggsopplysninger().getVerdi();
-				log.info("Journalpost med journalpostId={} og bestillingsId={} er allerede distribuert", distribuerJournalpostRequestTo.getJournalpostId(), bestillingsId);
+				log.info("Journalpost med journalpostId={} og bestillingsId={} er allerede distribuert", journalpostId, bestillingsId);
 				return ResponseEntity.status(CONFLICT)
 						.body(new DistribuerJournalpostResponseTo(bestillingsId));
 			}
 
-			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(
-					distribuerJournalpostService.distribuerForsendelse(distribuerJournalpostRequestTo, journalpost));
+			DistribuerJournalpost distribuerJournalpost = DistribuerJournalpostMapper.map(distribuerJournalpostRequestTo);
+
+			String bestillingsId = distribuerJournalpostService.distribuerForsendelse(distribuerJournalpost, journalpost);
+
+			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(bestillingsId);
+
+			log.info("rdist002 har distribuert journalpost med journalpostId={} og bestillingsId={}", journalpostId, bestillingsId);
+
 			return ResponseEntity.ok().body(response);
 		} catch (Exception e) {
-			log.warn("rdist002 - Distribusjon feilet for journalpostId={}. Feilmelding: {}", distribuerJournalpostRequestTo.getJournalpostId(), e.getMessage(), e);
+			log.warn("rdist002 distribusjon feilet for journalpostId={}. Feilmelding={}", journalpostId, e.getMessage(), e);
 			if (e instanceof ValidationException validationException) {
 				throw new ValidationException("Validering av distribusjonsforespørsel feilet med feilmelding: " + validationException.getMessage());
 			} else {
@@ -80,19 +92,16 @@ public class DistribuerJournalpostController {
 	}
 
 	private void addCallIdToMDC(String callId) {
-		if (callId == null || callId.isEmpty()) {
-			callId = randomUUID().toString();
+		if (isNotBlank(callId)) {
+			MDC.put(CALL_ID, callId);
 		}
-		MDC.put(CALL_ID, callId);
+
+		MDC.put(CALL_ID, randomUUID().toString());
 	}
 
 	private void addConsumerIdToMDC(String consumerId) {
-		if (consumerId != null && !consumerId.isEmpty()) {
+		if (isNotBlank(consumerId)) {
 			MDC.put(CONSUMER_ID, consumerId);
 		}
-	}
-
-	private Boolean isTilleggsopplysningerNull(Journalpost.Tilleggsopplysninger tilleggsopplysninger) {
-		return isNull(tilleggsopplysninger) || isBlank(tilleggsopplysninger.getNokkel());
 	}
 }

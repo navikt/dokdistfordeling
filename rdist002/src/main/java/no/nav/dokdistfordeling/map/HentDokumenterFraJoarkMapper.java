@@ -1,10 +1,11 @@
-package no.nav.dokdistfordeling;
+package no.nav.dokdistfordeling.map;
 
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost.DokumentInfo;
+import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
+import no.nav.dokdistfordeling.domain.Postadresse;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
-import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Adresse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
@@ -19,54 +20,56 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.UtenlandskPostadresse;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.util.Objects.isNull;
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
-import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
-import static org.apache.commons.lang3.EnumUtils.isValidEnumIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class HentDokumenterFraJoarkMapper {
 
-	public static final String NORSK_POSTADRESSE = "norskPostadresse";
-	public static final String UTENLANDSK_POSTADRESSE = "utenlandskPostadresse";
+	private HentDokumenterFraJoarkMapper() {
+	}
 
-	public HentDokumenterFraJoark map(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo, Journalpost journalpost,
-									  Aktoer mottaker, String bestillingsId, DistribusjonKanalCode distribusjonsKanal) {
-		List<Journalpost.DokumentInfo> dokumenter = journalpost.getDokumenter();
+	public static HentDokumenterFraJoark map(DistribuerJournalpost distribuerJournalpost,
+											 Postadresse postadresse,
+											 Journalpost journalpost,
+											 Aktoer mottaker,
+											 String bestillingsId,
+											 DistribusjonKanalCode distribusjonsKanal) {
+
+		List<DokumentInfo> dokumenter = journalpost.getDokumenter();
+
 		Distribusjonbestilling distribusjonbestilling = new Distribusjonbestilling();
 		distribusjonbestilling.setBestillingsId(bestillingsId);
-		distribusjonbestilling.setBatchId(mapBatchId(distribuerJournalpostRequestTo.getBatchId()));
+		distribusjonbestilling.setBatchId(mapBatchId(distribuerJournalpost.batchId()));
 		distribusjonbestilling.setDistribusjonKanal(distribusjonsKanal.name());
-		distribusjonbestilling.setBestillendeFagsystem(distribuerJournalpostRequestTo.getBestillendeFagsystem());
+		distribusjonbestilling.setBestillendeFagsystem(distribuerJournalpost.bestillendeFagsystem());
 		distribusjonbestilling.setTema(journalpost.getTema());
 		distribusjonbestilling.setForsendelseTittel(journalpost.getTittel());
-		distribusjonbestilling.setDistribusjonstype(mapDistribusjonstype(distribuerJournalpostRequestTo.getDistribusjonstype()));
-		distribusjonbestilling.setDistribusjonstidspunkt(mapDistribusjonstidspunkt(distribuerJournalpostRequestTo.getDistribusjonstidspunkt()));
-		distribusjonbestilling.setArkivInformasjon(mapArkivInformasjon(distribuerJournalpostRequestTo));
+		distribusjonbestilling.setDistribusjonstype(distribuerJournalpost.distribusjonstype().name());
+		distribusjonbestilling.setDistribusjonstidspunkt(distribuerJournalpost.distribusjonstidspunkt().name());
+		distribusjonbestilling.setArkivInformasjon(mapArkivInformasjon(distribuerJournalpost));
 		distribusjonbestilling.setMottaker(mottaker);
 		distribusjonbestilling.setBruker(mapBruker(journalpost.getBruker()));
-		distribusjonbestilling.setAdresse(mapAdresse(distribuerJournalpostRequestTo.getAdresse()));
-		distribusjonbestilling.setDokumentProdApp(distribuerJournalpostRequestTo.getDokumentProdApp());
+		distribusjonbestilling.setAdresse(mapPostadresse(postadresse));
+		distribusjonbestilling.setDokumentProdApp(distribuerJournalpost.dokumentProdApp());
+
 		distribusjonbestilling.setDokumenter(IntStream
 				.range(0, dokumenter.size())
 				.mapToObj(i -> mapDokumentInformasjon(dokumenter, i))
-				.collect(Collectors.toList()));
+				.toList());
 
 		HentDokumenterFraJoark hentDokumenterFraJoark = new HentDokumenterFraJoark();
 		hentDokumenterFraJoark.setDistribusjonbestilling(distribusjonbestilling);
 		return hentDokumenterFraJoark;
 	}
 
-	private static DokumentInformasjon mapDokumentInformasjon(List<Journalpost.DokumentInfo> dokumenter, int i) {
-		Journalpost.DokumentInfo dokumentInfo = dokumenter.get(i);
+	private static DokumentInformasjon mapDokumentInformasjon(List<DokumentInfo> dokumenter, int i) {
+		DokumentInfo dokumentInfo = dokumenter.get(i);
 		DokumentInformasjon dokumentInformasjon = new DokumentInformasjon();
 		dokumentInformasjon.setDokumenttypeId(DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID);
 		dokumentInformasjon.setTilknyttetSom(i == 0 ? HOVEDDOKUMENT.name() : VEDLEGG.name());
@@ -77,44 +80,40 @@ public class HentDokumenterFraJoarkMapper {
 		return dokumentInformasjon;
 	}
 
-	private static ArkivInformasjon mapArkivInformasjon(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
+	private static ArkivInformasjon mapArkivInformasjon(DistribuerJournalpost distribuerJournalpost) {
 		ArkivInformasjon arkivInformasjon = new ArkivInformasjon();
-		arkivInformasjon.setArkivId(distribuerJournalpostRequestTo.getJournalpostId());
+		arkivInformasjon.setArkivId(String.valueOf(distribuerJournalpost.journalpostId()));
 		arkivInformasjon.setArkivSystem(ArkivSystemCode.JOARK.name());
 		return arkivInformasjon;
 	}
 
-	private String mapBatchId(String batchId) {
+	private static String mapBatchId(String batchId) {
 		return isBlank(batchId) ? null : batchId;
 	}
 
-	private Adresse mapAdresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo) {
-		if (isNull(adresseTo)) {
+	private static Adresse mapPostadresse(Postadresse postadresse) {
+		if (postadresse == null) {
 			return null;
-		} else if (adresseTo.getAdressetype().equals(NORSK_POSTADRESSE)) {
+		} else if (postadresse.erNorskPostadresse()) {
 			NorskPostadresse norskPostadresse = new NorskPostadresse();
-			norskPostadresse.setAdresselinje1(trimAdresselinje(adresseTo.getAdresselinje1()));
-			norskPostadresse.setAdresselinje2(trimAdresselinje(adresseTo.getAdresselinje2()));
-			norskPostadresse.setAdresselinje3(trimAdresselinje(adresseTo.getAdresselinje3()));
-			norskPostadresse.setPostnummer(adresseTo.getPostnummer());
-			norskPostadresse.setPoststed(adresseTo.getPoststed());
-			norskPostadresse.setLand(adresseTo.getLand());
+			norskPostadresse.setAdresselinje1(postadresse.adresselinje1());
+			norskPostadresse.setAdresselinje2(postadresse.adresselinje2());
+			norskPostadresse.setAdresselinje3(postadresse.adresselinje3());
+			norskPostadresse.setPostnummer(postadresse.postnummer());
+			norskPostadresse.setPoststed(postadresse.poststed());
+			norskPostadresse.setLand(postadresse.land());
 			return norskPostadresse;
 		} else {
 			UtenlandskPostadresse utenlandskPostadresse = new UtenlandskPostadresse();
-			utenlandskPostadresse.setAdresselinje1(adresseTo.getAdresselinje1());
-			utenlandskPostadresse.setAdresselinje2(trimAdresselinje(adresseTo.getAdresselinje2()));
-			utenlandskPostadresse.setAdresselinje3(trimAdresselinje(adresseTo.getAdresselinje3()));
-			utenlandskPostadresse.setLand(adresseTo.getLand());
+			utenlandskPostadresse.setAdresselinje1(postadresse.adresselinje1());
+			utenlandskPostadresse.setAdresselinje2(postadresse.adresselinje2());
+			utenlandskPostadresse.setAdresselinje3(postadresse.adresselinje3());
+			utenlandskPostadresse.setLand(postadresse.land());
 			return utenlandskPostadresse;
 		}
 	}
 
-	private String trimAdresselinje(String adresselinje) {
-		return isBlank(adresselinje) ? null : adresselinje.strip();
-	}
-
-	private Aktoer mapBruker(Journalpost.Bruker bruker) {
+	private static Aktoer mapBruker(Journalpost.Bruker bruker) {
 		return switch (bruker.getType()) {
 			case AKTOERID -> {
 				AktoerId aktoerId = new AktoerId();
@@ -132,15 +131,5 @@ public class HentDokumenterFraJoarkMapper {
 				yield organisasjon;
 			}
 		};
-	}
-
-	private String mapDistribusjonstidspunkt(String distribusjonstidspunkt) {
-		return (isNotBlank(distribusjonstidspunkt) && isValidEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt)) ?
-				getEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt).name() : null;
-	}
-
-	private String mapDistribusjonstype(String distribusjonstype) {
-		return (isNotBlank(distribusjonstype) && isValidEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype)) ?
-				getEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype).name() : null;
 	}
 }

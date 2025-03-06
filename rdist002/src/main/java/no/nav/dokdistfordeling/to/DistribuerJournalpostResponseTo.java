@@ -1,4 +1,4 @@
-package no.nav.dokdistfordeling;
+package no.nav.dokdistfordeling.to;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Value;

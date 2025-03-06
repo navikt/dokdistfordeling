@@ -20,28 +20,42 @@ public final class ValidationUtil {
 		}
 	}
 
+	public static void assertStringIsNumber(String field, String value) {
+		if (isBlank(value) || !isNumeric(value)) {
+			throw new ValidationException(format("Feltet %s må være et gyldig heltall. Fikk %s=%s", field, field, value));
+		}
+	}
+
+	public static void assertStringIsValidLong(String field, String value) {
+		try {
+			Long.parseLong(value);
+		} catch (NumberFormatException e) {
+			throw new ValidationException(format("Feltet %s må være et heltall mindre eller lik %s. Fikk %s=%s", field, field, value, Long.MAX_VALUE));
+		}
+	}
+
 	public static void assertStringIsNumberOfExactLength(String field, String value, int expectedLength) {
 		if (!isNumeric(value) || value.length() != expectedLength) {
 			throw new ValidationException(format("Feltet %s må være et gyldig tall med %s siffer. Fikk %s=%s", field, expectedLength, field, value));
 		}
 	}
 
-	public static void assertNotNull(Class inputClass, Object value) {
-		if (value == null) {
-			throw new ValidationException(format("%s kan ikke være null. Fikk %s=null", inputClass.getCanonicalName(), inputClass
-					.getCanonicalName()));
+	public static void assertNotNullOrEmptyAndLengthNotGreaterThan(String field, String value, int maxLength) {
+		assertNotNullOrEmpty(field, value);
+		if (value.length() > maxLength) {
+			throw new ValidationException(format("Feltet %s kan ikke være mer enn %s tegn", field, maxLength));
 		}
 	}
 
-	public static void assertParameterIsAsExpected(String parameterName, String value, String expected) {
+	public static void assertJournalpostParameterIsAsExpected(String parameterName, String value, String expected) {
 		if (!expected.equals(value)) {
-			throw new ValidationException(String.format("%s er ikke som forventet, fikk: %s, men forventet %s", parameterName, value, expected));
+			throw new ValidationException(String.format("Journalpostfeltet %s er ikke som forventet, fikk: %s, men forventet %s", parameterName, value, expected));
 		}
 	}
 
 	public static void assertJournalpostFieldNotNull(Class inputClass, Object value) {
 		if (value == null) {
-			throw new ValidationException(format("For journalposter kan feltet %s ikke være null eller tomt. Fikk %s=null", inputClass.getCanonicalName(), inputClass.getCanonicalName()));
+			throw new ValidationException(format("For journalposter kan feltet %s ikke være null eller tomt. Fikk %s=null", inputClass.getSimpleName(), inputClass.getSimpleName()));
 		}
 	}
 

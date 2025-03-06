@@ -1,45 +1,52 @@
 package no.nav.dokdistfordeling;
 
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
+import no.nav.dokdistfordeling.domain.Postadresse;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
 import no.nav.dokdistfordeling.kodeverk.Variantformat;
+import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
-import static no.nav.dokdistfordeling.Rdist002ValidationUtil.PDF;
-import static no.nav.dokdistfordeling.Rdist002ValidationUtil.PDFA;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
+import static no.nav.dokdistfordeling.domain.Postadresse.LANDKODE_NORGE;
+import static no.nav.dokdistfordeling.domain.Postadresse.NORSK_POSTADRESSE;
+import static no.nav.dokdistfordeling.domain.Postadresse.UTENLANDSK_POSTADRESSE;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.UMIDDELBART;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VEDTAK;
+import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VIKTIG;
+import static no.nav.dokdistfordeling.validate.JournalpostValidator.PDF;
+import static no.nav.dokdistfordeling.validate.JournalpostValidator.PDFA;
 
-public class UnitTestUtil {
+public class TestData {
 
 	public static final Journalposttype JOURNALPOST_TYPE = Journalposttype.U;
 	public static final String DOK_TITTEL_1 = "DOK_TITTEL_1";
 	public static final String DOK_TITTEL_2 = "DOK_TITTEL_2";
 	public static final String BREVKODE = "000001";
 
-	public static final String ADRESSETYPE_NORSK = "norskPostadresse";
-	public static final String ADRESSETYPE_UTENLANDSK = "utenlandskPostadresse";
 	public static final String ADRESSELINJE1 = "eksempelveien 23 A";
 	public static final String ADRESSELINJE2 = "eksempelveien 24 A";
 	public static final String ADRESSELINJE3 = "eksempelveien 25 A";
 	public static final String POSTSTED = "poststed";
 	public static final String POSTNUMMER = "1337";
-	public static final String LAND_NO = "NO";
-	public static final String LAND_US = "US";
+	public static final String LANDKODE_US = "US";
 
-	public static final String JOURNALPOST_ID = "555555555";
-	public static final String BATCH_ID = "66666";
-	public static final String DOKUMENTTYPEID = "000001";
+	public static final Long JOURNALPOST_ID = 555555555L;
+	public static final String BATCH_ID = "126767";
 	public static final String TITTEL = "journalpostTittel";
 	public static final String TEMA = "OPP";
 	public static final String ARKIV_SYSTEM = "JOARK";
 	public static final String MOTTAKER_ID = "09876543210";
 	public static final String MOTTAKER_NAVN = "Jan Neimansen";
 	public static final String BRUKER_ID = "12345678901";
+	public static final String AKTOER_ID = "123456789";
 	public static final String ORGNR = "776677665";
 	public static final String ORG_NAVN = "eksempelcorp ASA";
 	public static final String TSS_ID = "88998899890";
@@ -52,6 +59,17 @@ public class UnitTestUtil {
 	public static final String DOK_INFO_ID_2 = "777777777";
 	public static final String BESTILLENDEFAGSYSTEM = "bestillendeFagsystem";
 	public static final String DOKUMENTPRODAPP = "dokumentprodapp";
+
+	public static DistribuerJournalpost.DistribuerJournalpostBuilder createDistribuerJournalpostBuilder() {
+		return DistribuerJournalpost.builder()
+				.journalpostId(JOURNALPOST_ID)
+				.batchId(BATCH_ID)
+				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
+				.postadresse(createNorskPostadresseBuilder().build())
+				.dokumentProdApp(DOKUMENTPRODAPP)
+				.distribusjonstype(VEDTAK)
+				.distribusjonstidspunkt(UMIDDELBART);
+	}
 
 	public static Journalpost.JournalpostBuilder createJournalpostBuilder() {
 		return Journalpost.builder()
@@ -71,15 +89,24 @@ public class UnitTestUtil {
 	}
 
 	public static Journalpost.Bruker createBrukerWithFNR() {
-		return Journalpost.Bruker.builder().id(BRUKER_ID).type(BrukerIdType.FNR).build();
+		return Journalpost.Bruker.builder()
+				.id(BRUKER_ID)
+				.type(BrukerIdType.FNR)
+				.build();
 	}
 
 	public static Journalpost.Bruker createBrukerWithOrgnrId() {
-		return Journalpost.Bruker.builder().id(ORGNR).type(BrukerIdType.ORGNR).build();
+		return Journalpost.Bruker.builder()
+				.id(ORGNR)
+				.type(BrukerIdType.ORGNR)
+				.build();
 	}
 
-	public Journalpost.Bruker createBrukerWithSamhandlerId() {
-		return Journalpost.Bruker.builder().id(SAMHANDLER_ID).type(BrukerIdType.AKTOERID).build();
+	public static Journalpost.Bruker createBrukerWithAktoerId() {
+		return Journalpost.Bruker.builder()
+				.id(AKTOER_ID)
+				.type(BrukerIdType.AKTOERID)
+				.build();
 	}
 
 	public static List<Journalpost.DokumentInfo> createDefaultDokumentInfoList() {
@@ -116,32 +143,24 @@ public class UnitTestUtil {
 						.variantformat(Variantformat.ARKIV).build()));
 	}
 
-	public static DistribuerJournalpostRequestTo.AdresseTo createNorskPostadresseWithPostSted(String poststed) {
-		return createBaseNorskPostadresse(POSTNUMMER, LAND_NO, poststed);
+	private static Postadresse.PostadresseBuilder createPostadresseBuilder() {
+		return Postadresse.builder()
+				.adresselinje1(ADRESSELINJE1)
+				.adresselinje2(ADRESSELINJE2)
+				.adresselinje3(ADRESSELINJE3);
 	}
 
-	public static DistribuerJournalpostRequestTo.AdresseTo createNorskPostadresseWithPostnummer(String postnummer) {
-		return createBaseNorskPostadresse(postnummer, LAND_NO, POSTSTED);
+	public static Postadresse.PostadresseBuilder createNorskPostadresseBuilder() {
+		return createPostadresseBuilder()
+				.adressetype(NORSK_POSTADRESSE)
+				.postnummer(POSTNUMMER)
+				.poststed(POSTSTED)
+				.land(LANDKODE_NORGE);
 	}
-
-	public static DistribuerJournalpostRequestTo.AdresseTo createPostadresseWithLandkode(String landkode) {
-		return createBaseNorskPostadresse(POSTNUMMER, landkode, POSTSTED);
-	}
-
-	public static DistribuerJournalpostRequestTo.AdresseTo createNorskPostadresse() {
-		return createBaseNorskPostadresse(POSTNUMMER, LAND_NO, POSTSTED);
-	}
-
-	private static DistribuerJournalpostRequestTo.AdresseTo createBaseNorskPostadresse(String postnummer, String landkode, String poststed) {
-		return new DistribuerJournalpostRequestTo.AdresseTo(
-				ADRESSETYPE_NORSK,
-				postnummer,
-				poststed,
-				ADRESSELINJE1,
-				ADRESSELINJE2,
-				ADRESSELINJE3,
-				landkode
-		);
+	public static Postadresse.PostadresseBuilder createUtenlandskPostadresseBuilder() {
+		return createPostadresseBuilder()
+				.adressetype(UTENLANDSK_POSTADRESSE)
+				.land(LANDKODE_US);
 	}
 
 	public static Person createMottaker() {
@@ -151,41 +170,40 @@ public class UnitTestUtil {
 		return person;
 	}
 
-	public static DistribuerJournalpostRequestTo.AdresseTo createUtenlandskPostadresse() {
-		return createUtenlandskPostadresseWithAdresselinje1(ADRESSELINJE1);
+	public static DistribuerJournalpostRequestTo.DistribuerJournalpostRequestToBuilder createDistribuerJournalpostToBuilder() {
+		return DistribuerJournalpostRequestTo.builder()
+				.journalpostId(String.valueOf(JOURNALPOST_ID))
+				.batchId(BATCH_ID)
+				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
+				.adresse(createNorskAdresseTo())
+				.dokumentProdApp(DOKUMENTPRODAPP)
+				.distribusjonstidspunkt(KJERNETID.name())
+				.distribusjonstype(VIKTIG.name());
 	}
 
-	public static DistribuerJournalpostRequestTo.AdresseTo.AdresseToBuilder createUtenlandskPostadresseBuilder() {
+	public static DistribuerJournalpostRequestTo.AdresseTo.AdresseToBuilder createAdresseToBuilder() {
 		return DistribuerJournalpostRequestTo.AdresseTo.builder()
-				.adressetype(ADRESSETYPE_UTENLANDSK)
 				.adresselinje1(ADRESSELINJE1)
 				.adresselinje2(ADRESSELINJE2)
 				.adresselinje3(ADRESSELINJE3)
-				.land(LAND_US);
+				.postnummer(POSTNUMMER)
+				.poststed(POSTSTED)
+				.land(LANDKODE_NORGE);
 	}
 
-	public static DistribuerJournalpostRequestTo.AdresseTo createUtenlandskPostadresseWithAdresselinje1(String adresselinje1) {
-		return new DistribuerJournalpostRequestTo.AdresseTo(
-				ADRESSETYPE_UTENLANDSK,
-				null,
-				null,
-				adresselinje1,
-				ADRESSELINJE2,
-				ADRESSELINJE3,
-				LAND_US
-		);
+	public static DistribuerJournalpostRequestTo.AdresseTo createNorskAdresseTo() {
+		return createAdresseToBuilder()
+				.adressetype(NORSK_POSTADRESSE)
+				.build();
 	}
 
-	public static DistribuerJournalpostRequestTo.AdresseTo createPostadresseAdresstypeNull() {
-		return new DistribuerJournalpostRequestTo.AdresseTo(
-				null,
-				null,
-				null,
-				ADRESSELINJE1,
-				ADRESSELINJE2,
-				ADRESSELINJE3,
-				LAND_US
-		);
+	public static DistribuerJournalpostRequestTo.AdresseTo createUtenlandskAdresseTo() {
+		return createAdresseToBuilder()
+				.adressetype(UTENLANDSK_POSTADRESSE)
+				.postnummer(null)
+				.poststed(null)
+				.land(LANDKODE_US)
+				.build();
 	}
 
 }

@@ -4,13 +4,13 @@ import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.Queue;
 import jakarta.jms.TextMessage;
-import no.nav.dokdistfordeling.DistribuerJournalpostRequestTo;
-import no.nav.dokdistfordeling.DistribuerJournalpostResponseTo;
 import no.nav.dokdistfordeling.config.AbstractOauth2Test;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
 import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
+import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
+import no.nav.dokdistfordeling.to.DistribuerJournalpostResponseTo;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -53,10 +52,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
+import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostToBuilder;
+import static no.nav.dokdistfordeling.TestData.createUtenlandskAdresseTo;
 import static no.nav.dokdistfordeling.constants.Constants.BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
-import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VIKTIG;
 import static no.nav.dokdistfordeling.kodeverk.TvingKanal.TRYGDERETTEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -85,20 +84,6 @@ import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 public class Rdist002IT extends AbstractOauth2Test {
 
 	private static final String DISTRIBUER_JOURNALPOST_URI = "/rest/v1/distribuerjournalpost";
-	private static final String JOURNALPOST_ID = "555555555";
-
-	private static final String BATCHID = "126767";
-	private static final String BESTILLENDEFAGSYSTEM = "bestillendeFagsystem";
-	private static final String ADRESSETYPE_NORSK = "norskPostadresse";
-	private static final String ADRESSETYPE_UTENLANDSK = "utenlandskPostadresse";
-	private static final String ADRESSELINJE1 = "eksempelveien 23 A";
-	private static final String ADRESSELINJE2 = "eksempelveien 24 A";
-	private static final String ADRESSELINJE3 = "eksempelveien 25 A";
-	private static final String POSTSTED = "poststed";
-	private static final String POSTNUMMER = "1337";
-	private static final String LAND_NO = "NO";
-	private static final String LAND_US = "US";
-	private static final String DOKUMENTPRODAPP = "dokumentprodapp";
 
 	@Autowired
 	protected TestRestTemplate restTemplate;
@@ -122,10 +107,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -153,10 +137,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/dittNav.json");
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -183,11 +166,11 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubPdl("pdl/pdl-happy.json");
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.tvingSentralPrint(true)
-				.build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.tvingSentralPrint(true)
+						.build(),
+				createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertNotNull(restResponse.getBestillingsId());
@@ -215,11 +198,11 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubPdl("pdl/pdl-happy.json");
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.tvingKanal(tvingKanal.toString())
-				.build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.tvingKanal(tvingKanal.toString())
+						.build(),
+				createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertNotNull(restResponse.getBestillingsId());
@@ -246,10 +229,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -276,10 +258,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = terminateDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
@@ -295,10 +276,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubPdl("pdl/pdl-npid.json");
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -324,10 +304,11 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubPdl("pdl/pdl-npid.json");
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestIngenAdresseTo()
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.adresse(null)
+						.build(),
+				createHappyPathHeaders());
 
 		ResponseEntity<String> responseEntity = restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, POST, requestEntity, String.class);
 		assertNotNull(responseEntity.getBody());
@@ -343,7 +324,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertNotNull(restResponse.getBestillingsId());
@@ -369,7 +352,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/sdp.json");
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -396,7 +381,11 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubHentMottakerOgAdresse("regoppslag/treg002-hentadresse-person-happy.json", OK.value());
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.adresse(null)
+						.build(),
+				createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -424,9 +413,10 @@ public class Rdist002IT extends AbstractOauth2Test {
 		putStubOppdaterJournalpost();
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
-				createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
-						.adresse(createUtenlandskAdresse(LAND_US))
-						.build(), createHappyPathHeaders());
+				createDistribuerJournalpostToBuilder()
+						.adresse(createUtenlandskAdresseTo())
+						.build(),
+				createHappyPathHeaders());
 		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertEquals(36, restResponse.getBestillingsId().length());
@@ -473,7 +463,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Test
 	public void distribuerJournalpostWithoutAuthHeader() {
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).build(), createHeaderWithoutAuth());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHeaderWithoutAuth());
 		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
 
 		assertThat(restResponse).contains("Required header 'Authorization' is not present.");
@@ -483,10 +475,14 @@ public class Rdist002IT extends AbstractOauth2Test {
 	public void distribuerJournalpostWithoutJournalpostId() {
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).journalpostId(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.journalpostId(null)
+						.build(),
+				createHappyPathHeaders());
 		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
 
-		assertThat(restResponse).contains("Feltet journalpostId kan ikke være null eller tomt.");
+		assertThat(restResponse).contains("Validering av distribusjonsforespørsel feilet med feilmelding: Feltet journalpostId må være et ikke-negativt heltall. Fikk journalpostId=nul");
 	}
 
 	@Test
@@ -497,7 +493,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBody("{}")));
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, UNAUTHORIZED);
 
 		assertThat(restResponse).contains("Henting av journalpost feilet med status: 401 UNAUTHORIZED");
@@ -511,7 +509,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 						.withStatus(INTERNAL_SERVER_ERROR.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)));
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, INTERNAL_SERVER_ERROR);
 
 		assertThat(restResponse).contains("Tjenesten SAF (graphQL) feilet med status: 500 INTERNAL_SERVER_ERROR");
@@ -532,7 +532,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 	void shouldReturnCorrecteErrorTypeWhenSafRequestFails(String filename, String errorMessage, int httpErrorCode) {
 		stubSafGraphQl("saf/" + filename);
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 
 		assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.valueOf(httpErrorCode));
@@ -543,7 +545,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 	public void distribuerJournalpostWithInngaaendeJournalposttype() {
 		stubSafGraphQl("saf/safGraphQlResponse-inngaaendeJournalpostType.json");
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
 
 		assertThat(restResponse).contains("Feltet filtype kan ikke være null eller tomt. Fikk filtype=null");
@@ -558,7 +562,11 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		stubHentMottakerOgAdresse("", NOT_FOUND.value());
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.adresse(null)
+						.build(),
+				createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 
 		assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
@@ -573,7 +581,11 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		stubHentMottakerOgAdresse("", GONE.value());
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.adresse(null)
+						.build(),
+				createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 
 		assertThat(responseEntity.getStatusCode()).isEqualTo(GONE);
@@ -584,7 +596,11 @@ public class Rdist002IT extends AbstractOauth2Test {
 	void shouldReturnBadRequestWithDokProdappLengthTooLong() {
 		putStubOppdaterJournalpost();
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse()).dokumentProdApp("ABCDEFGHIJKLMNOPQRSTU").build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.dokumentProdApp("ABCDEFGHIJKLMNOPQRSTU")
+						.build(),
+				createHappyPathHeaders());
 		final ResponseEntity<String> responseEntity = callDistribuerJournalpost(requestEntity);
 
 		assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
@@ -598,10 +614,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/ugyldig.json");
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 
 		callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, INTERNAL_SERVER_ERROR);
 	}
@@ -613,10 +628,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal(BAD_REQUEST, "bestemdistribusjonskanal/bad_request.json");
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 
 		callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
 	}
@@ -629,10 +643,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal(httpStatus, response);
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(createNorskAdresse())
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
 
 		callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, INTERNAL_SERVER_ERROR);
 	}
@@ -645,9 +658,32 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		stubHentMottakerOgAdresse("regoppslag/treg002-hentadresse-person-invalid-address.json", BAD_REQUEST.value());
 
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(createHappyPathDistribuerJournalpostRequestTo(null).build(), createHappyPathHeaders());
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.adresse(null)
+						.build(),
+				createHappyPathHeaders());
+
 		String body = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
 		assertThat(body).contains("Henting av adresse for bruker feilet funksjonelt mot Regoppslag. status=400 BAD_REQUEST, feilmelding=Validering av feltet postnummer feilet pga. manglende data i PDL");
+	}
+
+	@Test
+	public void shouldReturnBadRequestIfAddressFromRegoppslagContainsOnlyLandkode() {
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+		stubStsToken();
+		stubPdl("pdl/pdl-happy.json");
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
+		stubHentMottakerOgAdresse("regoppslag/treg002-hentadresse-person-only-landkode.json", OK.value());
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.adresse(null)
+						.build(),
+				createHappyPathHeaders());
+
+		String body = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
+		assertThat(body).contains("Validering av distribusjonsforespørsel feilet med feilmelding: Feltet poststed kan ikke være null eller tomt. Fikk poststed=null");
 	}
 
 	private static Stream<Arguments> shouldReturnInternalServerErrorWhenBestemDistribusjonskanalResponseIsUnauthorizedOrInternalServerError() {
@@ -754,49 +790,6 @@ public class Rdist002IT extends AbstractOauth2Test {
 		return headers;
 	}
 
-	private DistribuerJournalpostRequestTo.DistribuerJournalpostRequestToBuilder createHappyPathDistribuerJournalpostRequestTo(DistribuerJournalpostRequestTo.AdresseTo adresse) {
-		return DistribuerJournalpostRequestTo.builder()
-				.journalpostId(JOURNALPOST_ID)
-				.batchId(BATCHID)
-				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
-				.adresse(adresse)
-				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name())
-				.dokumentProdApp(DOKUMENTPRODAPP);
-	}
-
-	private DistribuerJournalpostRequestTo.DistribuerJournalpostRequestToBuilder createHappyPathDistribuerJournalpostRequestIngenAdresseTo() {
-		return DistribuerJournalpostRequestTo.builder()
-				.journalpostId(JOURNALPOST_ID)
-				.batchId(BATCHID)
-				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
-				.adresse(null)
-				.dokumentProdApp(DOKUMENTPRODAPP);
-	}
-
-	private DistribuerJournalpostRequestTo.AdresseTo createUtenlandskAdresse(String landkode) {
-		return new DistribuerJournalpostRequestTo.AdresseTo(
-				ADRESSETYPE_UTENLANDSK,
-				null,
-				null,
-				ADRESSELINJE1,
-				ADRESSELINJE2,
-				ADRESSELINJE3,
-				landkode
-		);
-	}
-
-	private DistribuerJournalpostRequestTo.AdresseTo createNorskAdresse() {
-		return new DistribuerJournalpostRequestTo.AdresseTo(
-				ADRESSETYPE_NORSK,
-				POSTNUMMER,
-				POSTSTED,
-				ADRESSELINJE1,
-				ADRESSELINJE2,
-				ADRESSELINJE3,
-				LAND_NO
-		);
-	}
 
 	private String extractHentDokumenterFraJoarkXmlStringAndDecrypt(Message message) throws JMSException {
 		String bestillingsId = message.getStringProperty(BESTILLINGS_ID);

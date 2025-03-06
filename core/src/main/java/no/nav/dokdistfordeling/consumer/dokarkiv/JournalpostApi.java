@@ -53,10 +53,10 @@ public class JournalpostApi {
 	}
 
 	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
-	public OppdaterJournalpostResponse oppdaterJournalpost(String journalpostId, OppdaterJournalpostRequest oppdaterJournalpostRequest) {
+	public OppdaterJournalpostResponse oppdaterJournalpost(long journalpostId, OppdaterJournalpostRequest oppdaterJournalpostRequest) {
 
 		return webClient.put()
-				.uri("/" + validateJournalpostId(journalpostId))
+				.uri("/{journalpostId}", journalpostId)
 				.header(NAV_CALL_ID, MDC.get(CALL_ID))
 				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKARKIV))
 				.body(Mono.just(oppdaterJournalpostRequest), OppdaterJournalpostRequest.class)
