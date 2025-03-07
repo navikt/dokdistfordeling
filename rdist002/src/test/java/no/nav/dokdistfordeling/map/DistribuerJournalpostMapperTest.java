@@ -75,4 +75,22 @@ class DistribuerJournalpostMapperTest {
 				.containsExactly("Adresselinje 1", "Adresselinje 2", "Adresselinje 3");
 	}
 
+	@Test
+	void shouldMapAdresselinjeToNullWhenBlank() {
+		var address = createAdresseToBuilder()
+				.adresselinje1("  ")
+				.adresselinje2("  ")
+				.adresselinje3("  ")
+				.build();
+
+		var request = createDistribuerJournalpostToBuilder()
+				.adresse(address)
+				.build();
+
+		var result = DistribuerJournalpostMapper.map(request);
+
+		assertThat(result.postadresse())
+				.extracting("adresselinje1", "adresselinje2", "adresselinje3")
+				.containsExactly(null, null, null);
+	}
 }

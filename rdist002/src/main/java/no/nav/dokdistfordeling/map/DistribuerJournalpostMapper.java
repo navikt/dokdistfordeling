@@ -7,6 +7,8 @@ import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 public class DistribuerJournalpostMapper {
 
 	private DistribuerJournalpostMapper() {
@@ -34,9 +36,9 @@ public class DistribuerJournalpostMapper {
 				adresseTo.getAdressetype(),
 				adresseTo.getPostnummer(),
 				adresseTo.getPoststed(),
-				trimOrNull(adresseTo.getAdresselinje1()),
-				trimOrNull(adresseTo.getAdresselinje2()),
-				trimOrNull(adresseTo.getAdresselinje3()),
+				trimNotBlankOrNull(adresseTo.getAdresselinje1()),
+				trimNotBlankOrNull(adresseTo.getAdresselinje2()),
+				trimNotBlankOrNull(adresseTo.getAdresselinje3()),
 				adresseTo.getLand());
 	}
 
@@ -44,7 +46,7 @@ public class DistribuerJournalpostMapper {
 		return tvingKanal == null ? null : TvingKanal.valueOf(tvingKanal);
 	}
 
-	private static String trimOrNull(String s) {
-		return s == null ? null : s.trim();
+	private static String trimNotBlankOrNull(String adresselinje) {
+		return isBlank(adresselinje) ? null : adresselinje.trim();
 	}
 }
