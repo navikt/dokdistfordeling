@@ -39,8 +39,8 @@ public class HentDokumentConsumer implements HentDokument {
 		this.hentDokumentUrl = hentDokumentUrl;
 		this.stsRestConsumer = stsRestConsumer;
 		this.restTemplate = restTemplateBuilder
-				.setReadTimeout(Duration.ofSeconds(20))
-				.setConnectTimeout(Duration.ofSeconds(5))
+				.readTimeout(Duration.ofSeconds(20))
+				.connectTimeout(Duration.ofSeconds(5))
 				.build();
 	}
 

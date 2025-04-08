@@ -46,8 +46,8 @@ class RegoppslagRestConsumer {
 								  StsRestConsumer stsRestConsumer) {
 		this.regoppslagUrl = regoppslagUrl;
 		this.restTemplate = restTemplateBuilder
-				.setReadTimeout(Duration.ofSeconds(20))
-				.setConnectTimeout(Duration.ofSeconds(5))
+				.readTimeout(Duration.ofSeconds(20))
+				.connectTimeout(Duration.ofSeconds(5))
 				.basicAuthentication(dokdistfordelingProperties.getServiceuser().getUsername(), dokdistfordelingProperties.getServiceuser().getPassword())
 				.build();
 		this.stsRestConsumer = stsRestConsumer;
