@@ -10,7 +10,6 @@ import no.nav.dokdistfordeling.exception.functional.UkjentAdresseException;
 import no.nav.dokdistfordeling.exception.technical.StsTechnicalException;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -41,10 +40,9 @@ class RegoppslagRestConsumer {
 	private final StsRestConsumer stsRestConsumer;
 
 	public RegoppslagRestConsumer(RestTemplateBuilder restTemplateBuilder,
-								  @Value("${regoppslag.url}") String regoppslagUrl,
 								  final DokdistfordelingProperties dokdistfordelingProperties,
 								  StsRestConsumer stsRestConsumer) {
-		this.regoppslagUrl = regoppslagUrl;
+		this.regoppslagUrl = dokdistfordelingProperties.getEndpoints().getRegoppslag().getUrl();
 		this.restTemplate = restTemplateBuilder
 				.readTimeout(Duration.ofSeconds(20))
 				.connectTimeout(Duration.ofSeconds(5))

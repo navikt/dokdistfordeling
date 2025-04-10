@@ -78,6 +78,7 @@ public class Qdist008IT {
 	private static final String DOKDISTADMIN_URL = "/rest/v1/administrerforsendelse";
 	private static final String OPPDATERFORSENDELSE_URL = "/rest/v1/administrerforsendelse/oppdaterforsendelse";
 	private static final String OPPDATERDISTRIBUSJONSINFO_URL = "/rest/journalpostapi/1234/oppdaterDistribusjonsinfo";
+	private static final String SAF_GRAPHQL_URL = "/saf/graphql";
 
 	@Autowired
 	private JmsTemplate jmsTemplate;
@@ -118,7 +119,7 @@ public class Qdist008IT {
 		reset(bucketStorage);
 		when(bucketStorage.exists(anyString())).thenReturn(true);
 
-		stubFor(post("/safGraphQL")
+		stubFor(post(SAF_GRAPHQL_URL)
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -532,7 +533,7 @@ public class Qdist008IT {
 		stubGetDokumenttypeInfo();
 		stubSTSToken();
 		stubAzure();
-		stubFor(post("/safGraphQL")
+		stubFor(post(SAF_GRAPHQL_URL)
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -545,7 +546,7 @@ public class Qdist008IT {
 						.contains("Forkaster melding på qdist008 for bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 og forsendelseId= grunnet=no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException: journalpostId=1234 er feilregistrert og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes")));
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
 	}
 
 	@Test
@@ -555,7 +556,7 @@ public class Qdist008IT {
 		listAppender.start();
 		logger.addAppender(listAppender);
 
-		stubFor(post("/safGraphQL")
+		stubFor(post(SAF_GRAPHQL_URL)
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -574,7 +575,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
 	}
 
 	@Test
