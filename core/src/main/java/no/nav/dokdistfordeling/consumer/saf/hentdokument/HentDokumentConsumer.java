@@ -1,11 +1,11 @@
 package no.nav.dokdistfordeling.consumer.saf.hentdokument;
 
+import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.consumer.sts.StsRestConsumer;
 import no.nav.dokdistfordeling.exception.functional.SafHentDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafHentDokumentTechnicalException;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -33,14 +33,14 @@ public class HentDokumentConsumer implements HentDokument {
 	private final RestTemplate restTemplate;
 	private final StsRestConsumer stsRestConsumer;
 
-	public HentDokumentConsumer(@Value("${hentdokument.url}") String hentDokumentUrl,
+	public HentDokumentConsumer(DokdistfordelingProperties dokdistfordelingProperties,
 								RestTemplateBuilder restTemplateBuilder,
 								StsRestConsumer stsRestConsumer) {
-		this.hentDokumentUrl = hentDokumentUrl;
+		this.hentDokumentUrl = dokdistfordelingProperties.getEndpoints().getSaf().getUrl();
 		this.stsRestConsumer = stsRestConsumer;
 		this.restTemplate = restTemplateBuilder
-				.setReadTimeout(Duration.ofSeconds(20))
-				.setConnectTimeout(Duration.ofSeconds(5))
+				.readTimeout(Duration.ofSeconds(20))
+				.connectTimeout(Duration.ofSeconds(5))
 				.build();
 	}
 
@@ -48,7 +48,7 @@ public class HentDokumentConsumer implements HentDokument {
 	public HentDokumentResponseTo hentDokument(String journalpostId, String dokumentInfoId, String variantFormat) {
 		try {
 			HttpEntity entity = new HttpEntity<>(createAuthorizationHeader());
-			byte[] dokument = restTemplate.exchange(this.hentDokumentUrl + "/{journalpostId}/{dokumentInfoId}/{variantFormat}", GET, entity, byte[].class, journalpostId, dokumentInfoId, variantFormat).getBody();
+			byte[] dokument = restTemplate.exchange(this.hentDokumentUrl + "/rest/hentdokument/{journalpostId}/{dokumentInfoId}/{variantFormat}", GET, entity, byte[].class, journalpostId, dokumentInfoId, variantFormat).getBody();
 
 			return mapResponse(dokument, journalpostId, dokumentInfoId, variantFormat);
 

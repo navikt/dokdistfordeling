@@ -74,6 +74,8 @@ public class Qdist012IT {
 	private static final String BESTILLINGS_ID_ATTRIBUTE = "bestillingsId";
 	private static final String JOURNALPOST_ID = "arkivId";
 	private static final String JOURNALPOST_ID_ATTRIBUTE = "journalpostId";
+	private static final String SAF_GRAPHQL_URL = "/saf/graphql";
+	private static final String SAF_HENTDOKUMENT_URL = "/saf/rest/hentdokument";
 
 	@Autowired
 	private JmsTemplate jmsTemplate;
@@ -106,14 +108,14 @@ public class Qdist012IT {
 		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
-		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
-		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
+		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(TEST_FILE_BYTES1)));
-		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET").willReturn(
+		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(TEST_FILE_BYTES2)));
@@ -163,18 +165,18 @@ public class Qdist012IT {
 		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
-		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happyMedVedlegg.json")));
-		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
+		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(TEST_FILE_BYTES1)));
-		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET").willReturn(
+		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(TEST_FILE_BYTES2)));
-		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg2/ARKIV").willReturn(
+		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg2/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(TEST_FILE_BYTES3)));
@@ -270,8 +272,8 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
 
 	@Test
@@ -292,8 +294,8 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
 
 	@Test
@@ -317,8 +319,8 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
 
 	@Test
@@ -340,8 +342,8 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
 
 	@Test
@@ -362,8 +364,8 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
 		verify(exactly(0), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
 
 	@Test
@@ -373,10 +375,10 @@ public class Qdist012IT {
 		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
-		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
-		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
+		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(Base64.getEncoder().encode(TEST_FILE_BYTES1))));
@@ -391,9 +393,9 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(1)).upload(any(), any(), any());
 		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
 
 	@Test
@@ -412,9 +414,9 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(MAX_ATTEMPTS_SHORT), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
-		verify(exactly(0), postRequestedFor(urlEqualTo("/safGraphQL")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(0), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
 
 	@Test
@@ -422,7 +424,7 @@ public class Qdist012IT {
 		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
-		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)));
 
 		String message = classpathToString("qdist012/qdist012-happy.xml");
@@ -435,9 +437,9 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
-		verify(exactly(MAX_ATTEMPTS_SHORT), postRequestedFor(urlEqualTo("/safGraphQL")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(MAX_ATTEMPTS_SHORT), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
 
 	@Test
@@ -445,7 +447,7 @@ public class Qdist012IT {
 		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
-		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())
+		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)));
 
 		String message = classpathToString("qdist012/qdist012-happy.xml");
@@ -458,9 +460,9 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
 
 	@Test
@@ -468,10 +470,10 @@ public class Qdist012IT {
 		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
-		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
-		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
+		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
 
 		String message = classpathToString("qdist012/qdist012-happy.xml");
@@ -484,9 +486,9 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(MAX_ATTEMPTS_SHORT + 1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
-		verify(exactly(MAX_ATTEMPTS_SHORT), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
+		verify(exactly(MAX_ATTEMPTS_SHORT), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
 
 	@Test
@@ -494,10 +496,10 @@ public class Qdist012IT {
 		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
 				.withBodyFile("sts/stsResponse-happy.json")));
-		stubFor(post("/safGraphQL").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
-		stubFor(get("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
+		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 
 		String message = classpathToString("qdist012/qdist012-happy.xml");
@@ -510,9 +512,9 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safGraphQL")));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
 
 	private void encryptAndSendStringMessageWithHeaders(Queue queue, final String message) {

@@ -84,6 +84,7 @@ import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 public class Rdist002IT extends AbstractOauth2Test {
 
 	private static final String DISTRIBUER_JOURNALPOST_URI = "/rest/v1/distribuerjournalpost";
+	private static final String SAF_GRAPHQL_URI = "/saf/graphql";
 
 	@Autowired
 	protected TestRestTemplate restTemplate;
@@ -125,7 +126,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoark-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
 		});
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
 	}
 
@@ -155,7 +156,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			assertThat(classpathToString("__files/rdist002/rdist002IT-dokumenterFraJoak-dittnav.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
 		});
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
 	}
 
@@ -186,7 +187,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		});
 
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
 	}
 
@@ -217,7 +218,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		});
 
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
 	}
 
@@ -246,7 +247,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoark-happy-minimal-avsendermottaker.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
 		});
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
 	}
 
@@ -266,7 +267,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
 		assertEquals("1ad212d2-d46d-4e73-bf6c-c1c60382da44", requireNonNull(responseEntity.getBody()).getBestillingsId());
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 	}
 
 	@Test
@@ -294,7 +295,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoark-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
 		});
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 	}
 
 	@Test
@@ -341,7 +342,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			assertThat(classpathToString("__files/rdist002/rdist002IT-qdist012-input-with-null-distribusjontype.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
 		});
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 	}
 
 	@Test
@@ -369,7 +370,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoark-TSS-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
 		});
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 	}
 
 	@Test
@@ -401,7 +402,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoarkWithoutInputAdresse-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
 		});
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 	}
 
 	@Test
@@ -431,7 +432,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoarkWithUtenlandskAdresse-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
 		});
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 	}
 
 	@Test
@@ -458,7 +459,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			assertThat(classpathToString("__files/rdist002/rdist002-joark-hentdokumenter-utenlandskadresse.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
 		});
 
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 	}
 
 	@Test
@@ -487,7 +488,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Test
 	public void distribuerJournalpostThrowsSafJournalpostQueryUnauthorizedException() {
-		stubFor(post(urlMatching("/safgraphql"))
+		stubFor(post(urlMatching(SAF_GRAPHQL_URI))
 				.willReturn(aResponse()
 						.withStatus(UNAUTHORIZED.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -499,12 +500,12 @@ public class Rdist002IT extends AbstractOauth2Test {
 		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, UNAUTHORIZED);
 
 		assertThat(restResponse).contains("Henting av journalpost feilet med status: 401 UNAUTHORIZED");
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 	}
 
 	@Test
 	public void distribuerJournalpostThrowsSafJournalpostQueryTechnicalException() {
-		stubFor(post(urlMatching("/safgraphql"))
+		stubFor(post(urlMatching(SAF_GRAPHQL_URI))
 				.willReturn(aResponse()
 						.withStatus(INTERNAL_SERVER_ERROR.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)));
@@ -515,7 +516,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, INTERNAL_SERVER_ERROR);
 
 		assertThat(restResponse).contains("Tjenesten SAF (graphQL) feilet med status: 500 INTERNAL_SERVER_ERROR");
-		verify(exactly(3), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(3), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 	}
 
 	@ParameterizedTest
@@ -551,7 +552,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
 
 		assertThat(restResponse).contains("Feltet filtype kan ikke være null eller tomt. Fikk filtype=null");
-		verify(exactly(1), postRequestedFor(urlEqualTo("/safgraphql")).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 	}
 
 	@Test
@@ -702,7 +703,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	private void stubSafGraphQl(String path) {
-		stubFor(post(urlMatching("/safgraphql"))
+		stubFor(post(urlMatching(SAF_GRAPHQL_URI))
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)

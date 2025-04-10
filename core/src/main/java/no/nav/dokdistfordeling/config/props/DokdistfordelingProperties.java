@@ -1,11 +1,10 @@
 package no.nav.dokdistfordeling.config.props;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 
 @Data
 @Validated
@@ -32,6 +31,18 @@ public class DokdistfordelingProperties {
 		 */
 		@NotNull
 		private Endpoint dokmet;
+
+		/**
+		 * URL til dokmet.
+		 */
+		@NotNull
+		private Endpoint regoppslag;
+
+		/**
+		 * URL til saf.
+		 */
+		@NotNull
+		private Endpoint saf;
 
 		/**
 		 * URL til dokarkiv journalpost api.

@@ -3,17 +3,17 @@ package no.nav.dokdistfordeling.consumer.saf.graphql;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonResponse;
 import no.nav.dokdistfordeling.exception.functional.SafBadRequestException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
-import no.nav.dokdistfordeling.exception.technical.SafUkjentErrorCodeException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.exception.technical.MarshalGraphqlRequestToJsonTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostIkkeFunnetTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostQueryTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.SafUkjentErrorCodeException;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -43,16 +43,17 @@ public class SafGraphqlConsumer {
 	private static final String SERVER_ERROR = "server_error";
 	private static final String BAD_REQUEST = "bad_request";
 	private static final String CLASSIFICATION_VALIDATIONERROR = "ValidationError";
+
 	private final RestTemplate restTemplate;
-	private final String graphQLurl;
+	private final String safGraphQlUrl;
 
 	public SafGraphqlConsumer(RestTemplateBuilder restTemplateBuilder,
-							  @Value("${saf.graphql.url}") String graphQLUrl) {
+							  DokdistfordelingProperties dokdistfordelingProperties) {
 		this.restTemplate = restTemplateBuilder
-				.setReadTimeout(Duration.ofSeconds(20))
-				.setConnectTimeout(Duration.ofSeconds(5))
+				.readTimeout(Duration.ofSeconds(20))
+				.connectTimeout(Duration.ofSeconds(5))
 				.build();
-		this.graphQLurl = graphQLUrl;
+		this.safGraphQlUrl = dokdistfordelingProperties.getEndpoints().getSaf().getUrl() + "/graphql";
 	}
 
 	@Retryable(retryFor = SafJournalpostQueryTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
@@ -61,7 +62,7 @@ public class SafGraphqlConsumer {
 		try {
 			HttpHeaders httpHeaders = createAuthHeaderFromToken(authorizationHeader);
 
-			SafJsonResponse result = restTemplate.exchange(graphQLurl, POST, new HttpEntity<>(requestToJson(graphQLRequest), httpHeaders), SafJsonResponse.class).getBody();
+			SafJsonResponse result = restTemplate.exchange(safGraphQlUrl, POST, new HttpEntity<>(requestToJson(graphQLRequest), httpHeaders), SafJsonResponse.class).getBody();
 
 			if (result != null && result.getErrors() != null && !result.getErrors().isEmpty()) {
 				SafJsonResponse.Error safError = result.getErrors().get(0);
