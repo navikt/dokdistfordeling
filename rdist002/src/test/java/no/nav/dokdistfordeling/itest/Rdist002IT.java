@@ -118,7 +118,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			assertNotNull(qdist012ResultMessage);
-			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
 			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
 
 			assertNotNull(qdist012Result);
@@ -148,7 +148,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			assertNotNull(qdist012ResultMessage);
-			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
 			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
 
 			assertNotNull(qdist012Result);
@@ -179,7 +179,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			assertNotNull(qdist012ResultMessage);
-			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
 			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
@@ -211,7 +211,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			assertNotNull(qdist012ResultMessage);
-			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
 			assertThat(qdist012Result).contains(String.format("<distribusjonKanal>%s</distribusjonKanal>", tvingKanal));
@@ -240,7 +240,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			assertNotNull(qdist012ResultMessage);
-			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
 			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
@@ -287,7 +287,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			assertNotNull(qdist012ResultMessage);
-			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
 			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
 
 			assertNotNull(qdist012Result);
@@ -335,7 +335,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			assertNotNull(qdist012ResultMessage);
-			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
 			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
@@ -363,7 +363,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			assertNotNull(qdist012ResultMessage);
-			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
 			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
@@ -394,7 +394,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			assertNotNull(qdist012ResultMessage);
-			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
 			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
 
 			assertNotNull(qdist012Result);
@@ -425,7 +425,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			assertNotNull(qdist012ResultMessage);
-			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
 			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
@@ -452,7 +452,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
 			assertNotNull(qdist012ResultMessage);
-			String qdist012Result = extractHentDokumenterFraJoarkXmlStringAndDecrypt(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
 
 			assertNotNull(qdist012Result);
 			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
@@ -792,10 +792,8 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 
-	private String extractHentDokumenterFraJoarkXmlStringAndDecrypt(Message message) throws JMSException {
-		String bestillingsId = message.getStringProperty(BESTILLINGS_ID);
-		String encryptedAndMarshaledBody = ((TextMessage) message).getText();
-		return new Crypto(encryptionPassphrase, bestillingsId).decrypt(encryptedAndMarshaledBody);
+	private String extractHentDokumenterFraJoarkXmlString(Message message) throws JMSException {
+		return ((TextMessage) message).getText();
 	}
 
 	private String classpathToString(String classpathResource) {
