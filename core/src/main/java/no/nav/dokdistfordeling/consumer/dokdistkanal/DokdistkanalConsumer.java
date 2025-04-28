@@ -52,7 +52,7 @@ public class DokdistkanalConsumer {
 				.retrieve()
 				.bodyToMono(BestemDistribusjonskanalResponse.class)
 				.map(this::mapToDistribusjonKanalCode)
-				.doOnError(this::handleErrors)
+				.onErrorMap(this::mapError)
 				.block();
 	}
 
@@ -73,20 +73,20 @@ public class DokdistkanalConsumer {
 		}
 	}
 
-	private void handleErrors(Throwable error) {
+	private Throwable mapError(Throwable error) {
 		if (error instanceof WebClientResponseException webException) {
 			ProblemDetail problemDetail = webException.getResponseBodyAs(ProblemDetail.class);
 
 			if (webException.getStatusCode().is4xxClientError()) {
 				if (UNAUTHORIZED.isSameCodeAs(webException.getStatusCode())) {
-					throw new DokdistkanalUnauthorizedException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + problemDetail, error);
+					return new DokdistkanalUnauthorizedException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + problemDetail, error);
 				}
-				throw new DokdistkanalFunctionalException("Kall mot bestemDistribusjonskanal feilet funksjonelt med feilmelding=" + problemDetail, error);
+				return new DokdistkanalFunctionalException("Kall mot bestemDistribusjonskanal feilet funksjonelt med feilmelding=" + problemDetail, error);
 			}
 
-			throw new DokdistkanalTechnicalException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + problemDetail, error);
+			return new DokdistkanalTechnicalException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + problemDetail, error);
 		} else {
-			throw new DokdistkanalTechnicalException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + error.getMessage(), error);
+			return new DokdistkanalTechnicalException("Kall mot bestemDistribusjonskanal feilet teknisk med feilmelding=" + error.getMessage(), error);
 		}
 	}
 

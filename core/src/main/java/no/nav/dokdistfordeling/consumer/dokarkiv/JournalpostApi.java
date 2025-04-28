@@ -48,7 +48,7 @@ public class JournalpostApi {
 				.body(Mono.just(oppdaterDistibusjonsinfoTo), OppdaterDistribusjonsinfoTo.class)
 				.retrieve()
 				.toBodilessEntity()
-				.doOnError(this::handleError)
+				.onErrorMap(this::mapError)
 				.block();
 	}
 
@@ -62,17 +62,17 @@ public class JournalpostApi {
 				.body(Mono.just(oppdaterJournalpostRequest), OppdaterJournalpostRequest.class)
 				.retrieve()
 				.bodyToMono(OppdaterJournalpostResponse.class)
-				.doOnError(this::handleError)
+				.onErrorMap(this::mapError)
 				.block();
 	}
 
-	private void handleError(Throwable error) {
-		if (error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
-			throw new JournalpostApiFunctionalException(
+	private Throwable mapError(Throwable error) {
+		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
+			return new JournalpostApiFunctionalException(
 					format("Kall mot JournalpostAPI feilet med status=%s, feilmelding=%s", response.getStatusCode(), response.getMessage()),
 					error);
 		} else {
-			throw new JournalpostApiTechnicalException(
+			return new JournalpostApiTechnicalException(
 					format("Kall mot JournalpostAPI feilet med feilmelding=%s", error.getMessage()),
 					error);
 		}

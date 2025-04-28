@@ -44,17 +44,17 @@ public class DokmetConsumer {
 				.header(NAV_CALL_ID, MDC.get(CALL_ID))
 				.retrieve()
 				.bodyToMono(DokumenttypeInfoTo.class)
-				.doOnError(this::handleError)
+				.onErrorMap(this::mapError)
 				.block();
 	}
 
-	private void handleError(Throwable error) {
-		if (error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
-			throw new DokmetFunctionalException(
+	private Throwable mapError(Throwable error) {
+		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
+			return new DokmetFunctionalException(
 					format("Kall mot dokmet feilet funksjonelt med statuskode=%s, feilmelding=%s", response.getStatusCode(), response.getMessage()),
 					error);
 		} else {
-			throw new DokmetTechnicalException(
+			return new DokmetTechnicalException(
 					format("Kall mot dokmet feilet teknisk med feilmelding=%s", error.getMessage()),
 					error);
 		}
