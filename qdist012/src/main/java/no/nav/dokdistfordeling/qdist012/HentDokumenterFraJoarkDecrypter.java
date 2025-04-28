@@ -18,8 +18,13 @@ public class HentDokumenterFraJoarkDecrypter {
 	}
 
 	@Handler
-	public String decrypt(String hentDokumenterFraJoarkEncrypted, Exchange exchange) {
-		return new Crypto(encryptionPassphrase, exchange.getProperty(PROPERTY_BESTILLINGS_ID, String.class))
-				.decrypt(hentDokumenterFraJoarkEncrypted);
+	public String decrypt(String hentDokumenterFraJoark, Exchange exchange) {
+		Boolean plaintext = exchange.getIn().getHeader("plaintext", Boolean.class);
+		if(plaintext == null || !plaintext) {
+			return new Crypto(encryptionPassphrase, exchange.getProperty(PROPERTY_BESTILLINGS_ID, String.class))
+					.decrypt(hentDokumenterFraJoark);
+		} else {
+			return hentDokumenterFraJoark;
+		}
 	}
 }

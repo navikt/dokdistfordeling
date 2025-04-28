@@ -126,7 +126,64 @@ public class Qdist012IT {
 		final String callId = UUID.randomUUID().toString();
 		encryptAndSendStringMessageWithHeaders(qdist012, classpathToString("qdist012/qdist012-happy.xml"), callId);
 
-		await().atMost(100, TimeUnit.SECONDS).untilAsserted(() -> {
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			TextMessage responseTextMessage = receiveTextMessage(qdist008);
+			assertEquals(callId, responseTextMessage.getStringProperty(CALL_ID));
+			String response = responseTextMessage.getText();
+			assertNotNull(response);
+
+			//Alle felter bortsett fra objektreferanse verifiseres her
+			String cleanedResponse = replaceUuidBetween(response, "dokumentObjektReferanse", "<dokumentObjektReferanse>", "</dokumentObjektReferanse>");
+			assertThat(cleanedResponse).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
+
+			//verifiser at riktige objekt lagres til bucket
+			DistribuerForsendelse unmarshaledResponse = unmarshalDistribuerForsendelseFromXmlString(response);
+			Mockito.verify(bucketStorage, times(2))
+					.upload(argCaptorDokumentObjektReferanse.capture(), argCaptorDokdistDokument.capture(), eq(BESTILLINGS_ID));
+
+			DokdistDokument dokdistDokument1 = JsonSerializer.deserialize(argCaptorDokdistDokument.getAllValues()
+					.get(0), DokdistDokument.class);
+			DokdistDokument dokdistDokument2 = JsonSerializer.deserialize(argCaptorDokdistDokument.getAllValues()
+					.get(1), DokdistDokument.class);
+			assertEquals(new String(TEST_FILE_BYTES1), new String(dokdistDokument1.getPdf()));
+			assertEquals(new String(TEST_FILE_BYTES2), new String(dokdistDokument2.getPdf()));
+
+			//objektreferanse verifiseres her
+			assertEquals(argCaptorDokumentObjektReferanse.getAllValues().get(0), unmarshaledResponse.getDistribusjonbestilling()
+					.getDokumenter()
+					.get(0)
+					.getDokumentObjektReferanse());
+			assertEquals(argCaptorDokumentObjektReferanse.getAllValues().get(1), unmarshaledResponse.getDistribusjonbestilling()
+					.getDokumenter()
+					.get(1)
+					.getDokumentObjektReferanse());
+		});
+	}
+
+	@Test
+	void shouldHappyPathWhenPlaintextMessage() throws Exception {
+		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid").willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+				.withBodyFile("sts/stsResponse-happy.json")));
+		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
+				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+				.withBodyFile("saf/safGraphQlResponse-happy.json")));
+		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
+				aResponse().withStatus(HttpStatus.OK.value())
+						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
+						.withBody(TEST_FILE_BYTES1)));
+		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET").willReturn(
+				aResponse().withStatus(HttpStatus.OK.value())
+						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
+						.withBody(TEST_FILE_BYTES2)));
+
+		ArgumentCaptor<String> argCaptorDokdistDokument = ArgumentCaptor.forClass(String.class);
+		ArgumentCaptor<String> argCaptorDokumentObjektReferanse = ArgumentCaptor.forClass(String.class);
+
+		final String callId = UUID.randomUUID().toString();
+		sendStringMessageWithHeaders(qdist012, classpathToString("qdist012/qdist012-happy.xml"), callId);
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
 			TextMessage responseTextMessage = receiveTextMessage(qdist008);
 			assertEquals(callId, responseTextMessage.getStringProperty(CALL_ID));
 			String response = responseTextMessage.getText();
@@ -531,6 +588,20 @@ public class Qdist012IT {
 			}
 			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, BESTILLINGS_ID);
 			msg.setStringProperty(JOURNALPOST_ID_ATTRIBUTE, JOURNALPOST_ID);
+			return msg;
+		});
+	}
+
+	private void sendStringMessageWithHeaders(Queue queue, final String message, final String callId) {
+		jmsTemplate.send(queue, session -> {
+			TextMessage msg = session.createTextMessage();
+			msg.setText(message);
+			if (callId != null) {
+				msg.setStringProperty(CALL_ID, callId);
+			}
+			msg.setStringProperty(BESTILLINGS_ID_ATTRIBUTE, BESTILLINGS_ID);
+			msg.setStringProperty(JOURNALPOST_ID_ATTRIBUTE, JOURNALPOST_ID);
+			msg.setBooleanProperty("plaintext", true);
 			return msg;
 		});
 	}
