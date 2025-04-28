@@ -6,7 +6,6 @@ import jakarta.jms.Queue;
 import jakarta.jms.TextMessage;
 import no.nav.dokdistfordeling.config.AbstractOauth2Test;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
-import no.nav.dokdistfordeling.crypto.Crypto;
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
@@ -20,7 +19,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -54,7 +52,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostToBuilder;
 import static no.nav.dokdistfordeling.TestData.createUtenlandskAdresseTo;
-import static no.nav.dokdistfordeling.constants.Constants.BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.kodeverk.TvingKanal.TRYGDERETTEN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,8 +85,6 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Autowired
 	protected TestRestTemplate restTemplate;
-	private @Value("${hentdokumenter_fra_joark_crypto_password}")
-	String encryptionPassphrase;
 	@Autowired
 	private JmsTemplate jmsTemplate;
 	@Autowired

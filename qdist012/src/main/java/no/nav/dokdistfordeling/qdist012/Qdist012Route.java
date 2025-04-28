@@ -29,20 +29,17 @@ public class Qdist012Route extends RouteBuilder {
 	private final Queue qdist012FunksjonellFeil;
 	private final Queue qdist008;
 	private final HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper;
-	private final HentDokumenterFraJoarkDecrypter hentDokumenterFraJoarkDecrypter;
 
 	public Qdist012Route(Queue qdist012,
 						 Queue qdist012FunksjonellFeil,
 						 Queue qdist008,
 						 Qdist012Service qdist012Service,
-						 HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper,
-						 HentDokumenterFraJoarkDecrypter hentDokumenterFraJoarkDecrypter) {
+						 HentDokumenterFraJoarkMapper hentDokumenterFraJoarkMapper) {
 		this.qdist012 = qdist012;
 		this.qdist012FunksjonellFeil = qdist012FunksjonellFeil;
 		this.qdist008 = qdist008;
 		this.qdist012Service = qdist012Service;
 		this.hentDokumenterFraJoarkMapper = hentDokumenterFraJoarkMapper;
-		this.hentDokumenterFraJoarkDecrypter = hentDokumenterFraJoarkDecrypter;
 	}
 
 	@Override
@@ -65,12 +62,11 @@ public class Qdist012Route extends RouteBuilder {
 				.to("jms:" + qdist012FunksjonellFeil.getQueueName());
 
 		from("jms:" + qdist012.getQueueName() +
-				"?transacted=true")
+			 "?transacted=true")
 				.routeId(QDIST012_SERVICE_ID)
 				.setExchangePattern(InOnly)
 				.process(new HeaderProcessor())
 				.log(INFO, log, "qdist012 har mottatt forsendelse med " + getIdsForLogging())
-				.bean(hentDokumenterFraJoarkDecrypter)
 				.to("validator:/no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist012/hentdokumenterfrajoark.xsd")
 				.unmarshal(new JaxbDataFormat(JAXBContext.newInstance(HentDokumenterFraJoark.class)))
 				.bean(hentDokumenterFraJoarkMapper)
@@ -83,7 +79,7 @@ public class Qdist012Route extends RouteBuilder {
 
 	public static String getIdsForLogging() {
 		return "bestillingsId=${exchangeProperty." + PROPERTY_BESTILLINGS_ID + "} og " +
-				"journalpostId=${exchangeProperty." + PROPERTY_JOURNALPOST_ID + "}";
+			   "journalpostId=${exchangeProperty." + PROPERTY_JOURNALPOST_ID + "}";
 	}
 
 }
