@@ -49,7 +49,7 @@ public class DokdistadminConsumer {
 				.bodyValue(opprettForsendelseRequestTo)
 				.retrieve()
 				.bodyToMono(OpprettForsendelseResponseTo.class)
-				.doOnError(this::handleError)
+				.onErrorMap(this::mapError)
 				.map(response -> new Forsendelse(response.forsendelseId()).getForsendelseId())
 				.block();
 
@@ -70,20 +70,20 @@ public class DokdistadminConsumer {
 				.bodyValue(oppdaterForsendelse)
 				.retrieve()
 				.toBodilessEntity()
-				.doOnError(this::handleError)
+				.onErrorMap(this::mapError)
 				.block();
 
 		log.info("oppdaterForsendelse har oppdatert forsendelse med forsendelseId={} til forsendelseStatus={}",
 				oppdaterForsendelse.forsendelseId(), oppdaterForsendelse.forsendelseStatus());
 	}
 
-	private void handleError(Throwable error) {
-		if (error instanceof WebClientResponseException response && ((WebClientResponseException) error).getStatusCode().is4xxClientError()) {
-			throw new DokdistadminFunctionalException(
+	private Throwable mapError(Throwable error) {
+		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
+			return new DokdistadminFunctionalException(
 					format("Kall mot rdist001 feilet funksjonelt med status: %s, feilmelding: %s", response.getStatusCode(), response.getMessage()),
 					error);
 		} else {
-			throw new DokdistadminTechnicalException(
+			return new DokdistadminTechnicalException(
 					format("Kall mot rdist001 feilet feilet teknisk med feilmelding: %s", error.getMessage()),
 					error);
 		}

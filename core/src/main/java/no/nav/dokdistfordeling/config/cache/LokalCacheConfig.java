@@ -27,12 +27,15 @@ public class LokalCacheConfig {
 		manager.setCaches(Arrays.asList(
 				new CaffeineCache(DOKMET_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(1, TimeUnit.DAYS)
+						.recordStats()
 						.build()),
 				new CaffeineCache(OIDC_TOKEN_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(55, TimeUnit.MINUTES)
+						.recordStats()
 						.build()),
 				new CaffeineCache(AZURE_TOKEN_CACHE, Caffeine.newBuilder()
 						.expireAfterWrite(55, TimeUnit.MINUTES)
+						.recordStats()
 						.build()))
 		);
 		return manager;

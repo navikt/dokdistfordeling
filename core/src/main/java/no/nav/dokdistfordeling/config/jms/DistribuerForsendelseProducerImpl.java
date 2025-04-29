@@ -50,7 +50,6 @@ public class DistribuerForsendelseProducerImpl implements DistribuerForsendelseP
 					}
 					msg.setStringProperty(BESTILLINGS_ID, bestillingsId);
 					msg.setStringProperty(JOURNALPOST_ID, journalpostId);
-					msg.setBooleanProperty("plaintext", true);
 					return msg;
 				});
 		log.info("hentDokumenterFraJoark bestilling med bestillingsId={} ble lagt på kø imot qdist012", bestillingsId);

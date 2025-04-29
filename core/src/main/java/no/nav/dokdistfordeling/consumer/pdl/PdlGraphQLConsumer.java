@@ -13,7 +13,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import static no.nav.dokdistfordeling.config.azure.OAuthEnabledWebClientConfig.CLIENT_REGISTRATION_PDL;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
@@ -57,7 +56,7 @@ public class PdlGraphQLConsumer {
 				.bodyValue(mapRequest(aktorId))
 				.retrieve()
 				.bodyToMono(PdlHentIdenterResponse.class)
-				.doOnError(handlePdlErrors())
+				.onErrorMap(this::mapError)
 				.block();
 
 		if (isEmpty(pdlHentIdenterResponse.getErrors())) {
@@ -101,13 +100,11 @@ public class PdlGraphQLConsumer {
 				.build();
 	}
 
-	private Consumer<Throwable> handlePdlErrors() {
-		return error -> {
-			if (error instanceof WebClientResponseException webException && webException.getStatusCode().is4xxClientError()) {
-				throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Funksjonell feil ved kall mot PDL, feilmelding=" + webException.getMessage());
-			} else {
-				throw new PdlHentFolkeregisteridentForAktoerIdTechnicalException("Teknisk feil ved kall mot PDL, feilmelding=" + error.getMessage(), error);
-			}
-		};
+	private Throwable mapError(Throwable error) {
+		if (error instanceof WebClientResponseException webException && webException.getStatusCode().is4xxClientError()) {
+			return new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Funksjonell feil ved kall mot PDL, feilmelding=" + webException.getMessage());
+		} else {
+			return new PdlHentFolkeregisteridentForAktoerIdTechnicalException("Teknisk feil ved kall mot PDL, feilmelding=" + error.getMessage(), error);
+		}
 	}
 }
