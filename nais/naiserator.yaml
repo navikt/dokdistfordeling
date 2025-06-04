@@ -94,7 +94,7 @@ spec:
     limits:
       memory: 3Gi
     requests:
-      cpu: 60m
+      cpu: 20m
       memory: 1Gi
   vault:
     enabled: true
@@ -106,6 +106,10 @@ spec:
       enabled: true
   webproxy: true
   observability:
+    logging:
+      destinations:
+        - id: elastic
+        - id: loki
     autoInstrumentation:
       enabled: true
       runtime: java
