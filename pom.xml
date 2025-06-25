@@ -38,7 +38,7 @@
         <context-propagation.version>1.1.2</context-propagation.version>
         <token-support.version>5.0.29</token-support.version>
 
-        <melding-virksomhet-dokdistfordeling.version>8-03075b8</melding-virksomhet-dokdistfordeling.version>
+        <melding-virksomhet-dokdistfordeling.version>38-7673f0f</melding-virksomhet-dokdistfordeling.version>
 
         <!-- Test -->
         <spring-cloud-contract-wiremock.version>4.3.0</spring-cloud-contract-wiremock.version>
@@ -130,7 +130,7 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.meldinger.virksomhet</groupId>
-                <artifactId>melding-virksomhet-dokdistfordeling</artifactId>
+                <artifactId>dok-melding-virksomhet-dokdistfordeling</artifactId>
                 <version>${melding-virksomhet-dokdistfordeling.version}</version>
             </dependency>
 
@@ -159,7 +159,7 @@
     <dependencies>
         <dependency>
             <groupId>no.nav.meldinger.virksomhet</groupId>
-            <artifactId>melding-virksomhet-dokdistfordeling</artifactId>
+            <artifactId>dok-melding-virksomhet-dokdistfordeling</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
