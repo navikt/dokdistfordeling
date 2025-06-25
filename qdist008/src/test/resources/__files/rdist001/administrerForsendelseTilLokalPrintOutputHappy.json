@@ -31,5 +31,7 @@
     "dokumenttypeId" : "1111111"
   } ],
   "distribusjonstype" : null,
-  "distribusjonstidspunkt" : null
+  "distribusjonstidspunkt" : null,
+  "forsendelseMetadata" : null,
+  "forsendelseMetadataType" : null
 }

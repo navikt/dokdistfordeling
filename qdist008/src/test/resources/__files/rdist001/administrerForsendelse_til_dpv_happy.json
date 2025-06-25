@@ -1,6 +1,6 @@
 {
   "bestillingsId": "7882d37e-34f7-11e9-b210-d663bd873d93",
-  "distribusjonsKanal": "DITTNAV",
+  "distribusjonsKanal": "DPVT",
   "bestillendeFagsystem": "bestillendeFagsystem",
   "tema": "DAG",
   "forsendelseTittel": "Innkalling til informasjonsmøte",
@@ -33,5 +33,7 @@
     }
   ],
   "distribusjonstype": null,
-  "distribusjonstidspunkt": null
+  "distribusjonstidspunkt": null,
+  "forsendelseMetadata" : null,
+  "forsendelseMetadataType" : null
 }

@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.util.Qdist008Util.countHoveddokument;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
 @Component
@@ -38,6 +39,7 @@ public class ForsendelseValidator {
 		assertThatForsendelseContainsExactlyOneHoveddokument(distribusjonbestillingTo);
 		assertThatAdresseIsPresentIfMottakerIsSamhandler(distribusjonbestillingTo);
 		assertThatBestillingsIdIsAValidUuid(distribusjonbestillingTo.getBestillingsId());
+		assertForsendelseMetadataAndType(distribusjonbestillingTo);
 
 		if (distribusjonbestillingTo.getArkivInformasjon() != null) {
 			assertJournalpostStatus(distribusjonbestillingTo.getArkivInformasjon().getArkivId(), distribusjonbestillingTo.getBestillingsId());
@@ -89,5 +91,21 @@ public class ForsendelseValidator {
 						throw new OjectNotFoundInBucketFunctionalException(format("Fant ikke objectName i Google Cloud Storage. objectName=%s", dokumentObjektReferanse));
 					}
 				});
+	}
+
+	private void assertForsendelseMetadataAndType(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
+		if (isOnlyForsendelseMetadataNull(distribusjonbestilling) || isOnlyForsendelseMetadataTypeNull(distribusjonbestilling)) {
+			throw new ValidationException(String.format("forsendelsesmetadata og forsendelsesmetadataType må enten begge være satt, eller begge være null med forsendelsesmetadata=%s, forsendelsesmetadataType=%s",
+					isBlank(distribusjonbestilling.getForsendelseMetadata()) ? null : "****", distribusjonbestilling.getForsendelseMetadataType()));
+		}
+
+	}
+
+	private boolean isOnlyForsendelseMetadataTypeNull(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
+		return distribusjonbestilling.getForsendelseMetadata() == null && distribusjonbestilling.getForsendelseMetadataType() != null;
+	}
+
+	private boolean isOnlyForsendelseMetadataNull(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
+		return distribusjonbestilling.getForsendelseMetadata() != null && distribusjonbestilling.getForsendelseMetadataType() == null;
 	}
 }

@@ -20,6 +20,7 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.UtenlandskPostad
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -30,6 +31,7 @@ import java.util.stream.Stream;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
+import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.valueOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -207,6 +209,27 @@ class DistribuerForsendelseMapperTest {
 				Arguments.of("UKJENT", SAMHANDLER_UKJENT),
 				Arguments.of("UTL_ORG", SAMHANDLER_UTL_ORG)
 		);
+	}
+
+	@ParameterizedTest
+	@CsvSource(value =
+			{
+					"null, null",
+					"forsendelseMetadata, DPO_ARKIVMELDING"
+			},
+			nullValues = "null"
+	)
+	public void shouldMapForsendelseMetadataAndType(String forsendelseMetadata, String forsendelseMetadataType) {
+		var distribuerForsendelse = createDistribuerForsendelse();
+		distribuerForsendelse.getDistribusjonbestilling().setForsendelseMetadataType(forsendelseMetadataType);
+		distribuerForsendelse.getDistribusjonbestilling().setForsendelseMetadata(forsendelseMetadata);
+
+		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
+
+		assertEquals(distribuerForsendelseTo.getDistribusjonbestilling().getForsendelseMetadata(), forsendelseMetadata);
+		assertEquals(distribuerForsendelseTo.getDistribusjonbestilling().getForsendelseMetadataType(),
+				forsendelseMetadataType == null ? null : valueOf(forsendelseMetadataType));
+
 	}
 
 	@Test

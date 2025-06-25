@@ -38,7 +38,7 @@
         <context-propagation.version>1.1.2</context-propagation.version>
         <token-support.version>5.0.29</token-support.version>
 
-        <melding-virksomhet-dokdistfordeling.version>7-18c61bf</melding-virksomhet-dokdistfordeling.version>
+        <melding-virksomhet-dokdistfordeling.version>8-03075b8</melding-virksomhet-dokdistfordeling.version>
 
         <!-- Test -->
         <spring-cloud-contract-wiremock.version>4.3.0</spring-cloud-contract-wiremock.version>
