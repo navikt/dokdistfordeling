@@ -9,6 +9,7 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJo
 import org.apache.camel.ValidationException;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -65,6 +66,9 @@ public class Qdist012Route extends RouteBuilder {
 			 "?transacted=true")
 				.routeId(QDIST012_SERVICE_ID)
 				.setExchangePattern(InOnly)
+				.onCompletion()
+					.process(exchange -> MDC.clear())
+				.end() // end of onCompletion
 				.process(new HeaderProcessor())
 				.log(INFO, log, "qdist012 har mottatt forsendelse med " + getIdsForLogging())
 				.to("validator:/no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist012/hentdokumenterfrajoark.xsd")

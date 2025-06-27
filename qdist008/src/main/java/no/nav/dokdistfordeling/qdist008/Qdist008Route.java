@@ -9,6 +9,7 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKa
 import org.apache.camel.ValidationException;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import static java.lang.String.format;
@@ -96,6 +97,9 @@ public class Qdist008Route extends RouteBuilder {
 				"?transacted=true")
 				.routeId(SERVICE_ID)
 				.setExchangePattern(InOnly)
+				.onCompletion()
+					.process(exchange -> MDC.clear())
+				.end() // end of onCompletion
 				.process(new IdsProcessor())
 				.log(INFO, log, format("qdist008 har mottatt forsendelse med bestillingsId=${exchangeProperty.%s}.", PROPERTY_BESTILLINGS_ID))
 				.to("validator:no/nav/meldinger/virksomhet/dokdistfordeling/xsd/qdist008/in/distribuerforsendelse.xsd")
