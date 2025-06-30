@@ -5,6 +5,7 @@ import lombok.Value;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 
 import java.util.List;
@@ -25,6 +26,8 @@ public class OpprettForsendelseRequestTo {
 	List<DokumentTo> dokumenter;
 	String distribusjonstype;
 	String distribusjonstidspunkt;
+	String forsendelseMetadata;
+	ForsendelseMetadataType forsendelseMetadataType;
 
 
 	@Value

@@ -33,6 +33,8 @@ public class OpprettForsendelseToRequestMapper {
 				.arkivInformasjon(mapArkivInformasjon(arkivInformasjon))
 				.distribusjonstype(isNull(distribusjonbestilling.getDistribusjonstype()) ? null : distribusjonbestilling.getDistribusjonstype().name())
 				.distribusjonstidspunkt(isNull(distribusjonbestilling.getDistribusjonstidspunkt()) ? null : distribusjonbestilling.getDistribusjonstidspunkt().name())
+				.forsendelseMetadata(distribusjonbestilling.getForsendelseMetadata())
+				.forsendelseMetadataType(distribusjonbestilling.getForsendelseMetadataType())
 				.postadresse(mapPostadresse(adresse))
 				.dokumenter(dokumentInformasjonToList.stream()
 						.map(this::mapDokument)

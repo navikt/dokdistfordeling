@@ -1,0 +1,37 @@
+{
+  "bestillingsId" : "7882d37e-34f7-11e9-b210-d663bd873d93",
+  "distribusjonsKanal" : "PRINT",
+  "bestillendeFagsystem" : "bestillendeFagsystem",
+  "tema" : "DAG",
+  "forsendelseTittel" : "Innkalling til informasjonsmøte",
+  "batchId" : "batchId",
+  "dokumentProdApp" : "token",
+  "mottaker" : {
+    "mottakerId" : "20026900817",
+    "mottakerNavn" : "Bjarne Betjent",
+    "mottakerType" : "PERSON"
+  },
+  "arkivInformasjon" : {
+    "arkivSystem" : "JOARK",
+    "arkivId" : "1234"
+  },
+  "postadresse" : {
+    "adresselinje1" : "Adresslinje 1",
+    "adresselinje2" : "Adresslinje 2",
+    "adresselinje3" : "Adresslinje 3",
+    "postnummer" : "0654",
+    "poststed" : "Oslo",
+    "landkode" : "NO"
+  },
+  "dokumenter" : [ {
+    "tilknyttetSom" : "HOVEDDOKUMENT",
+    "dokumentObjektReferanse" : "testKey",
+    "rekkefolge" : 1,
+    "arkivDokumentInfoId" : "1234",
+    "dokumenttypeId" : "1111111"
+  } ],
+  "distribusjonstype" : null,
+  "distribusjonstidspunkt" : null,
+  "forsendelseMetadata" : null,
+  "forsendelseMetadataType" : null
+}

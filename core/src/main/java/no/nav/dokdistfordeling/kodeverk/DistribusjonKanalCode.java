@@ -13,7 +13,8 @@ public enum DistribusjonKanalCode {
 	LOKAL_PRINT("L"),
 	INGEN_DISTRIBUSJON("INGEN_DISTRIBUSJON"),
 	TRYGDERETTEN("TRYGDERETTEN"),
-	DPVT("DPVT");
+	DPVT("DPVT"),
+	DPO("DPO");
 
 	private final String joarkUtsendingsKanal;
 }

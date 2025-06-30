@@ -67,6 +67,11 @@ public class JmsConfig {
 	}
 
 	@Bean
+	public Queue qdist015(@Value("${dokdistdpo_qdist015_dist_til_dpo.queuename}") String qdist015QueueName) throws JMSException {
+		return new MQQueue(qdist015QueueName);
+	}
+
+	@Bean
 	public Queue qdist016(@Value("${dokdistdpv_qdist016_dist_til_dpv.queuename}") String qdist016QueueName) throws JMSException {
 		return new MQQueue(qdist016QueueName);
 	}

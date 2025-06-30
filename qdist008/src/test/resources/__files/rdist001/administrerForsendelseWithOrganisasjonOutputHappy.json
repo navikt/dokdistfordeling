@@ -1,15 +1,15 @@
 {
   "bestillingsId": "7882d37e-34f7-11e9-b210-d663bd873d93",
-  "distribusjonsKanal": "SDP",
+  "distribusjonsKanal": "PRINT",
   "bestillendeFagsystem": "bestillendeFagsystem",
   "tema": "DAG",
   "forsendelseTittel": "Innkalling til informasjonsmøte",
   "batchId": "batchId",
   "dokumentProdApp": "token",
   "mottaker": {
-    "mottakerId": "20026900817",
-    "mottakerNavn": "Bjarne Betjent",
-    "mottakerType": "PERSON"
+    "mottakerId": "555555555",
+    "mottakerNavn": "Kreativt Organisasjonsnavn",
+    "mottakerType": "ORGANISASJON"
   },
   "arkivInformasjon": {
     "arkivSystem": "JOARK",
@@ -32,6 +32,8 @@
       "dokumenttypeId": "1111111"
     }
   ],
-  "distribusjonstype": null,
-  "distribusjonstidspunkt": null
+  "distribusjonstype" : null,
+  "distribusjonstidspunkt" : null,
+  "forsendelseMetadata" : null,
+  "forsendelseMetadataType" : null
 }

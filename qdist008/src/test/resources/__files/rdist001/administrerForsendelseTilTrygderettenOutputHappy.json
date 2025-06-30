@@ -1,9 +1,9 @@
 {
   "bestillingsId": "7882d37e-34f7-11e9-b210-d663bd873d93",
-  "distribusjonsKanal": "PRINT",
+  "distribusjonsKanal": "TRYGDERETTEN",
   "bestillendeFagsystem": "bestillendeFagsystem",
   "tema": "DAG",
-  "forsendelseTittel": "harTittelUtenDokmet",
+  "forsendelseTittel": "Innkalling til informasjonsmøte",
   "batchId": "batchId",
   "dokumentProdApp": "token",
   "mottaker": {
@@ -32,6 +32,8 @@
       "dokumenttypeId": "1111111"
     }
   ],
-  "distribusjonstype" : null,
-  "distribusjonstidspunkt" : null
+  "distribusjonstype": null,
+  "distribusjonstidspunkt": null,
+  "forsendelseMetadata" : null,
+  "forsendelseMetadataType" : null
 }

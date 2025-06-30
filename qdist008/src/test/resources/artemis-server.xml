@@ -50,6 +50,11 @@
 					<queue name="qdist013"/>
 				</anycast>
 			</address>
+			<address name="qdist015">
+				<anycast>
+					<queue name="qdist015"/>
+				</anycast>
+			</address>
 			<address name="qdist016">
 				<anycast>
 					<queue name="qdist016"/>

@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.util.Qdist008Util.countHoveddokument;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
 @Component
@@ -38,6 +39,7 @@ public class ForsendelseValidator {
 		assertThatForsendelseContainsExactlyOneHoveddokument(distribusjonbestillingTo);
 		assertThatAdresseIsPresentIfMottakerIsSamhandler(distribusjonbestillingTo);
 		assertThatBestillingsIdIsAValidUuid(distribusjonbestillingTo.getBestillingsId());
+		assertForsendelseMetadataAndType(distribusjonbestillingTo);
 
 		if (distribusjonbestillingTo.getArkivInformasjon() != null) {
 			assertJournalpostStatus(distribusjonbestillingTo.getArkivInformasjon().getArkivId(), distribusjonbestillingTo.getBestillingsId());
@@ -90,4 +92,20 @@ public class ForsendelseValidator {
 					}
 				});
 	}
+
+	private void assertForsendelseMetadataAndType(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
+		if (isOnlyForsendelseMetadataSet(distribusjonbestilling) || isOnlyForsendelseMetadataTypeSet(distribusjonbestilling)) {
+			throw new ValidationException(format("forsendelsesMetadata og forsendelsesMetadataType må enten begge være satt, eller begge være null med forsendelsesmetadata=%s, forsendelsesmetadataType=%s",
+					isBlank(distribusjonbestilling.getForsendelseMetadata()) ? null : "****", distribusjonbestilling.getForsendelseMetadataType()));
+		}
+	}
+
+	private boolean isOnlyForsendelseMetadataSet(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
+		return distribusjonbestilling.getForsendelseMetadata() != null && distribusjonbestilling.getForsendelseMetadataType() == null;
+	}
+
+	private boolean isOnlyForsendelseMetadataTypeSet(DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestilling) {
+		return distribusjonbestilling.getForsendelseMetadata() == null && distribusjonbestilling.getForsendelseMetadataType() != null;
+	}
+
 }

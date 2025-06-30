@@ -105,6 +105,9 @@ public class Qdist008IT {
 	private Queue qdist013;
 
 	@Autowired
+	private Queue qdist015;
+
+	@Autowired
 	private Queue qdist016;
 
 	@Autowired
@@ -149,7 +152,7 @@ public class Qdist008IT {
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlMatching(DOKDISTADMIN_URL))
-				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilPrintOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo(OPPDATERFORSENDELSE_URL)));
 	}
 
@@ -176,7 +179,7 @@ public class Qdist008IT {
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoNAV_NOHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilDittNavOutputHappy.json"))));
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilDittNavOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo(OPPDATERFORSENDELSE_URL)));
 	}
 
@@ -204,7 +207,7 @@ public class Qdist008IT {
 			verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSDPHappy.json"))));
 			verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-					.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilSDPOutputHappy.json"))));
+					.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilSDPOutputHappy.json"))));
 			verify(exactly(1), putRequestedFor(urlEqualTo(OPPDATERFORSENDELSE_URL)));
 		});
 	}
@@ -232,8 +235,32 @@ public class Qdist008IT {
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoTRYGDERETTENHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilTrygderettenOutputHappy.json"))));
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilTrygderettenOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo(OPPDATERFORSENDELSE_URL)));
+	}
+
+	@Test
+	public void shouldProcessForsendelseWithUtsendingskanalDPO() throws Exception {
+		stubGetDokumenttypeInfo();
+		stubPostPdl();
+		stubSTSToken();
+		stubAzure();
+		stubPostRdist001();
+		stubPatchOppdaterDistribusjonsinfo();
+		stubPutOppdaterForsendelse();
+
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_dpo_happypath.xml"));
+
+		await().atMost(30, SECONDS).untilAsserted(() -> {
+			String response = receive(qdist015);
+			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
+		});
+
+		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
+		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
+		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfo_dpo_happy.json"))));
 	}
 
 	@Test
@@ -254,7 +281,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelse_til_dpv_happy.json"))));
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelse_til_dpv_happy.json"))));
 	}
 
 	@Test
@@ -274,7 +301,7 @@ public class Qdist008IT {
 			verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoLHappy.json"))));
 			verify(exactly(0), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-					.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilLokalPrintOutputHappy.json"))));
+					.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilLokalPrintOutputHappy.json"))));
 			verify(exactly(0), putRequestedFor(urlEqualTo("/administrerforsendelse/oppdaterforsendelse")));
 		});
 	}
@@ -296,7 +323,7 @@ public class Qdist008IT {
 			verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoINGEN_DISTRIBUSJONHappy.json"))));
 			verify(exactly(0), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-					.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilIngenDistribusjonOutputHappy.json"))));
+					.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilIngenDistribusjonOutputHappy.json"))));
 			verify(exactly(0), putRequestedFor(urlEqualTo("/administrerforsendelse/oppdaterforsendelse")));
 		});
 	}
@@ -346,7 +373,7 @@ public class Qdist008IT {
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseWithTittelHappy.json"))));
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseWithTittelHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo(OPPDATERFORSENDELSE_URL)));
 	}
 
@@ -372,7 +399,7 @@ public class Qdist008IT {
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseWithOrganisasjonOutputHappy.json"))));
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseWithOrganisasjonOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo(OPPDATERFORSENDELSE_URL)));
 	}
 
@@ -448,6 +475,18 @@ public class Qdist008IT {
 			String resultOnQdist008FunksjonellFeilQueue = receive(qdist008FunksjonellFeil);
 			assertNotNull(resultOnQdist008FunksjonellFeilQueue);
 			assertEquals(resultOnQdist008FunksjonellFeilQueue, classpathToString("qdist008/distribuerforsendelse_example_samhandler_uten_addresse.xml"));
+		});
+	}
+
+	@Test
+	public void shouldThrowValidationExceptionWhenOnlyForsendelseMetadataIsSet() throws Exception {
+
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_dpo_sett_kun_forsendelseMetadata.xml"));
+
+		await().atMost(10, SECONDS).untilAsserted(() -> {
+			String resultOnQdist008FunksjonellFeilQueue = receive(qdist008FunksjonellFeil);
+			assertNotNull(resultOnQdist008FunksjonellFeilQueue);
+			assertEquals(resultOnQdist008FunksjonellFeilQueue, classpathToString("qdist008/distribuerforsendelse_dpo_sett_kun_forsendelseMetadata.xml"));
 		});
 	}
 
@@ -674,7 +713,7 @@ public class Qdist008IT {
 		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilPrintOutputHappy.json"))));
 	}
 
 
@@ -699,7 +738,7 @@ public class Qdist008IT {
 		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilPrintOutputHappy.json"))));
 	}
 
 	@Test
@@ -726,7 +765,7 @@ public class Qdist008IT {
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilPrintOutputHappy.json"))));
 	}
 
 	@Test
@@ -755,7 +794,7 @@ public class Qdist008IT {
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilPrintOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo((OPPDATERFORSENDELSE_URL))));
 	}
 
@@ -784,7 +823,7 @@ public class Qdist008IT {
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
-				.withRequestBody(equalToJson(getRequestAsJson("__files/rjoark001/administrerForsendelseTilPrintOutputHappy.json"))));
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilPrintOutputHappy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo((OPPDATERFORSENDELSE_URL))));
 	}
 
@@ -793,7 +832,7 @@ public class Qdist008IT {
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("rjoark001/administrerForsendelseV1Happy.json")));
+						.withBodyFile("rdist001/administrerForsendelseV1Happy.json")));
 	}
 
 	private void stubPostPdl() {
