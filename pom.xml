@@ -38,7 +38,7 @@
         <context-propagation.version>1.1.2</context-propagation.version>
         <token-support.version>5.0.29</token-support.version>
 
-        <dok-legacy-tjenestespesifikasjoner>38-7673f0f</dok-legacy-tjenestespesifikasjoner>
+        <dok-legacy-tjenestespesifikasjoner.version>38-7673f0f</dok-legacy-tjenestespesifikasjoner.version>
 
         <!-- Test -->
         <spring-cloud-contract-wiremock.version>4.3.0</spring-cloud-contract-wiremock.version>
@@ -131,7 +131,7 @@
             <dependency>
                 <groupId>no.nav.meldinger.virksomhet</groupId>
                 <artifactId>dok-melding-virksomhet-dokdistfordeling</artifactId>
-                <version>${dok-legacy-tjenestespesifikasjoner}</version>
+                <version>${dok-legacy-tjenestespesifikasjoner.version}</version>
             </dependency>
 
             <!-- Test -->
