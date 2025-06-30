@@ -36,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -161,9 +162,9 @@ class DistribuerForsendelseMapperTest {
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
 		final AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
-		assertEquals(mottakerTo.getIdentifikator(), MOTTAKER_ID);
-		assertEquals(mottakerTo.getNavn(), MOTTAKER_ID_NAVN);
-		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.PERSON);
+		assertEquals(MOTTAKER_ID, mottakerTo.getIdentifikator());
+		assertEquals(MOTTAKER_ID_NAVN, mottakerTo.getNavn());
+		assertEquals(AktoerTypeCode.PERSON, mottakerTo.getAktoerType());
 		assertTrue(mottakerTo.isIdentifikatorAktoerId());
 	}
 
@@ -179,9 +180,9 @@ class DistribuerForsendelseMapperTest {
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getBruker());
 		final AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
-		assertEquals(mottakerTo.getIdentifikator(), ORGNUMMER);
-		assertEquals(mottakerTo.getNavn(), ORGANISASJON_NAVN);
-		assertEquals(mottakerTo.getAktoerType(), AktoerTypeCode.ORGANISASJON);
+		assertEquals(ORGNUMMER, mottakerTo.getIdentifikator());
+		assertEquals(ORGANISASJON_NAVN, mottakerTo.getNavn());
+		assertEquals(AktoerTypeCode.ORGANISASJON, mottakerTo.getAktoerType());
 		assertFalse(mottakerTo.isIdentifikatorAktoerId());
 	}
 
@@ -197,8 +198,8 @@ class DistribuerForsendelseMapperTest {
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling().getMottaker());
 		final AktoerTo mottakerTo = distribuerForsendelseTo.getDistribusjonbestilling().getMottaker();
-		assertEquals(mottakerTo.getIdentifikator(), SAMHANDLER_IDENTIFIKATOR);
-		assertEquals(mottakerTo.getNavn(), SAMHANDLER_NAVN);
+		assertEquals(SAMHANDLER_IDENTIFIKATOR, mottakerTo.getIdentifikator());
+		assertEquals(SAMHANDLER_NAVN, mottakerTo.getNavn());
 		assertEquals(mottakerTo.getAktoerType(), aktoerTypeCode);
 		assertFalse(mottakerTo.isIdentifikatorAktoerId());
 	}
@@ -221,14 +222,13 @@ class DistribuerForsendelseMapperTest {
 	)
 	public void shouldMapForsendelseMetadataAndType(String forsendelseMetadata, String forsendelseMetadataType) {
 		var distribuerForsendelse = createDistribuerForsendelse();
-		distribuerForsendelse.getDistribusjonbestilling().setForsendelseMetadataType(forsendelseMetadataType);
 		distribuerForsendelse.getDistribusjonbestilling().setForsendelseMetadata(forsendelseMetadata);
+		distribuerForsendelse.getDistribusjonbestilling().setForsendelseMetadataType(forsendelseMetadataType);
 
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
-		assertEquals(distribuerForsendelseTo.getDistribusjonbestilling().getForsendelseMetadata(), forsendelseMetadata);
-		assertEquals(distribuerForsendelseTo.getDistribusjonbestilling().getForsendelseMetadataType(),
-				forsendelseMetadataType == null ? null : valueOf(forsendelseMetadataType));
+		assertEquals(forsendelseMetadata, distribuerForsendelseTo.getDistribusjonbestilling().getForsendelseMetadata());
+		assertEquals(forsendelseMetadataType == null ? null : valueOf(forsendelseMetadataType), distribuerForsendelseTo.getDistribusjonbestilling().getForsendelseMetadataType());
 
 	}
 
@@ -258,7 +258,7 @@ class DistribuerForsendelseMapperTest {
 		assertNotNull(distribuerForsendelseTo.getDistribusjonbestilling());
 		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse().getAdresselinje1());
 		assertNull(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse().getAdresselinje2());
-		assertEquals(distribuerForsendelseTo.getDistribusjonbestilling().getAdresse().getAdresselinje3(), ADRESSELINJE_3);
+		assertEquals(ADRESSELINJE_3, distribuerForsendelseTo.getDistribusjonbestilling().getAdresse().getAdresselinje3());
 	}
 
 	@Test
@@ -288,30 +288,30 @@ class DistribuerForsendelseMapperTest {
 
 		//assert DistribusjonbestillingTo
 		final DistribuerForsendelseTo.DistribusjonbestillingTo distBestilling = distribuerForsendelseTo.getDistribusjonbestilling();
-		assertEquals(distBestilling.getBestillingsId(), BESTILLINGS_ID);
-		assertEquals(distBestilling.getBatchId(), BATCH_ID);
-		assertEquals(distBestilling.getBestillendeFagsystem(), BESTILLENDE_FAGSYSTEM);
-		assertEquals(distBestilling.getTema(), TEMA);
-		assertEquals(distBestilling.getForsendelseTittel(), FORSENDELSE_TITTEL);
-		assertEquals(distBestilling.getDokumentProdApp(), DOKUMENT_PROD_APP);
+		assertEquals(BESTILLINGS_ID, distBestilling.getBestillingsId());
+		assertEquals(BATCH_ID, distBestilling.getBatchId());
+		assertEquals(BESTILLENDE_FAGSYSTEM, distBestilling.getBestillendeFagsystem());
+		assertEquals(TEMA, distBestilling.getTema());
+		assertEquals(FORSENDELSE_TITTEL, distBestilling.getForsendelseTittel());
+		assertEquals(DOKUMENT_PROD_APP, distBestilling.getDokumentProdApp());
 
 		//assert Arkivinformasjon
 		assertNotNull(distBestilling.getArkivInformasjon());
-		assertEquals(distBestilling.getArkivInformasjon().getArkivId(), ARKIV_ID);
-		assertEquals(distBestilling.getArkivInformasjon().getArkivSystem().name(), ARKIV_SYSTEM);
+		assertEquals(ARKIV_ID, distBestilling.getArkivInformasjon().getArkivId());
+		assertEquals(ARKIV_SYSTEM, distBestilling.getArkivInformasjon().getArkivSystem().name());
 
 		//assert mottaker Person
 		assertNotNull(distBestilling.getMottaker());
-		assertEquals(distBestilling.getMottaker().getIdentifikator(), PERSON_IDENTIFIKATOR_MOTTAKER);
-		assertEquals(distBestilling.getMottaker().getNavn(), PERSON_NAVN_MOTTAKER);
-		assertEquals(distBestilling.getMottaker().getAktoerType(), AktoerTypeCode.PERSON);
+		assertEquals(PERSON_IDENTIFIKATOR_MOTTAKER, distBestilling.getMottaker().getIdentifikator());
+		assertEquals(PERSON_NAVN_MOTTAKER, distBestilling.getMottaker().getNavn());
+		assertEquals(AktoerTypeCode.PERSON, distBestilling.getMottaker().getAktoerType());
 		assertFalse(distBestilling.getMottaker().isIdentifikatorAktoerId());
 
 		//assert bruker Person
 		assertNotNull(distBestilling.getBruker());
-		assertEquals(distBestilling.getBruker().getIdentifikator(), PERSON_IDENTIFIKATOR_BRUKER);
-		assertEquals(distBestilling.getBruker().getNavn(), PERSON_NAVN_BRUKER);
-		assertEquals(distBestilling.getBruker().getAktoerType(), AktoerTypeCode.PERSON);
+		assertEquals(PERSON_IDENTIFIKATOR_BRUKER, distBestilling.getBruker().getIdentifikator());
+		assertEquals(PERSON_NAVN_BRUKER, distBestilling.getBruker().getNavn());
+		assertEquals(AktoerTypeCode.PERSON, distBestilling.getBruker().getAktoerType());
 		assertFalse(distBestilling.getBruker().isIdentifikatorAktoerId());
 
 
@@ -333,23 +333,23 @@ class DistribuerForsendelseMapperTest {
 	}
 
 	private void assertNorskPostadresseTo(DistribuerForsendelseTo.AdresseTo adresse) {
-		assertTrue(adresse instanceof DistribuerForsendelseTo.NorskPostadresseTo);
+		assertInstanceOf(DistribuerForsendelseTo.NorskPostadresseTo.class, adresse);
 		final DistribuerForsendelseTo.NorskPostadresseTo postadresse = (DistribuerForsendelseTo.NorskPostadresseTo) adresse;
-		assertEquals(postadresse.getAdresselinje1(), ADRESSELINJE_1);
-		assertEquals(postadresse.getAdresselinje2(), ADRESSELINJE_2);
-		assertEquals(postadresse.getAdresselinje3(), ADRESSELINJE_3);
-		assertEquals(postadresse.getPostnummer(), POSTNUMMER);
-		assertEquals(postadresse.getPoststed(), POSTSTED);
-		assertEquals(postadresse.getLand(), LAND);
+		assertEquals(ADRESSELINJE_1, postadresse.getAdresselinje1());
+		assertEquals(ADRESSELINJE_2, postadresse.getAdresselinje2());
+		assertEquals(ADRESSELINJE_3, postadresse.getAdresselinje3());
+		assertEquals(POSTNUMMER, postadresse.getPostnummer());
+		assertEquals(POSTSTED, postadresse.getPoststed());
+		assertEquals(LAND, postadresse.getLand());
 	}
 
 	private void assertUtenlandskPostadresseTo(DistribuerForsendelseTo.AdresseTo adresse) {
-		assertTrue(adresse instanceof DistribuerForsendelseTo.UtenlandskPostadresseTo);
+		assertInstanceOf(DistribuerForsendelseTo.UtenlandskPostadresseTo.class, adresse);
 		final DistribuerForsendelseTo.UtenlandskPostadresseTo postadresse = (DistribuerForsendelseTo.UtenlandskPostadresseTo) adresse;
-		assertEquals(postadresse.getAdresselinje1(), ADRESSELINJE_1);
-		assertEquals(postadresse.getAdresselinje2(), ADRESSELINJE_2);
-		assertEquals(postadresse.getAdresselinje3(), ADRESSELINJE_3);
-		assertEquals(postadresse.getLand(), LAND);
+		assertEquals(ADRESSELINJE_1, postadresse.getAdresselinje1());
+		assertEquals(ADRESSELINJE_2, postadresse.getAdresselinje2());
+		assertEquals(ADRESSELINJE_3, postadresse.getAdresselinje3());
+		assertEquals(LAND, postadresse.getLand());
 	}
 
 	private DistribuerForsendelse createDistribuerForsendelse() {

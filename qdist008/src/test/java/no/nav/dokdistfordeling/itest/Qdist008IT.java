@@ -479,7 +479,7 @@ public class Qdist008IT {
 	}
 
 	@Test
-	public void shouldThrowValidationExceptionWhenOnlyForsendelseMetadatSet() throws Exception {
+	public void shouldThrowValidationExceptionWhenOnlyForsendelseMetadataIsSet() throws Exception {
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_dpo_sett_kun_forsendelseMetadata.xml"));
 
