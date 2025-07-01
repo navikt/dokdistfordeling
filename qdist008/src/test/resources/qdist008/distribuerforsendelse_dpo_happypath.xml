@@ -11,7 +11,100 @@
 			<arkivSystem>JOARK</arkivSystem>
 			<arkivId>1234</arkivId>
 		</arkivInformasjon>
-		<forsendelseMetadata>forsendelseMetadata</forsendelseMetadata>
+		<forsendelseMetadata>
+			<![CDATA[
+			<?xml version="1.0" encoding="UTF-8"?>
+			<arkivmelding >
+				<system>dokdisteformidling</system>
+				<meldingId>bestillingsId</meldingId>
+				<tidspunkt>2025-03-05T16:24:05.247+01:00</tidspunkt>
+				<antallFiler>2</antallFiler>
+				<mappe xsi:type="saksmappe" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<tittel>Dagpenger</tittel>
+					<opprettetDato>2025-03-15T13:15:30.01</opprettetDato>
+					<opprettetAv>Sak Sakbehandlersen</opprettetAv>
+					<virksomhetsspesifikkeMetadata xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">111111</virksomhetsspesifikkeMetadata>
+					<part>
+						<partNavn>NAV Klageinstans</partNavn>
+						<partRolle>AMP</partRolle>
+						<organisasjonsnummer>
+							<organisasjonsnummer>991078045</organisasjonsnummer>
+						</organisasjonsnummer>
+						<kontaktperson>Sak Sakbehandlersen</kontaktperson>
+					</part>
+					<part>
+						<partNavn>Bjarne Betjent</partNavn>
+						<partRolle>DAP</partRolle>
+						<organisasjonsnummer/>
+						<foedselsnummer>
+							<foedselsnummer>20026900000</foedselsnummer>
+						</foedselsnummer>
+					</part>
+					<registrering xsi:type="journalpost">
+						<opprettetDato>2025-03-14T13:15:30.01</opprettetDato>
+						<opprettetAv>Sak Sakbehandlersen</opprettetAv>
+						<dokumentbeskrivelse>
+							<dokumenttype>Dokumentasjon</dokumenttype>
+							<dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus>
+							<tittel>Klage på saksbehandling</tittel>
+							<opprettetDato>2025-03-13T13:15:30.01</opprettetDato>
+							<opprettetAv>Sak Sakbehandlersen</opprettetAv>
+							<tilknyttetRegistreringSom>Hoveddokument</tilknyttetRegistreringSom>
+							<dokumentnummer>1</dokumentnummer>
+							<tilknyttetDato>2025-03-05T16:24:05.247+01:00</tilknyttetDato>
+							<tilknyttetAv>Sak Sakbehandlersen</tilknyttetAv>
+							<dokumentobjekt>
+								<versjonsnummer>1</versjonsnummer>
+								<variantformat>Dokument hvor deler av innholdet er skjermet</variantformat>
+								<opprettetDato>2025-03-13T13:15:30.01</opprettetDato>
+								<opprettetAv>Sak Sakbehandlersen</opprettetAv>
+								<referanseDokumentfil>987654321-1234567-Dokument hvor deler av innholdet er skjermet-PDF</referanseDokumentfil>
+							</dokumentobjekt>
+						</dokumentbeskrivelse>
+						<dokumentbeskrivelse>
+							<dokumenttype>Dokumentasjon</dokumenttype>
+							<dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus>
+							<tittel>Dokumentasjon til klage</tittel>
+							<opprettetDato>2025-03-13T13:15:30.01</opprettetDato>
+							<opprettetAv>Sak Sakbehandlersen</opprettetAv>
+							<tilknyttetRegistreringSom>Vedlegg</tilknyttetRegistreringSom>
+							<dokumentnummer>2</dokumentnummer>
+							<tilknyttetDato>2025-03-05T16:24:05.247+01:00</tilknyttetDato>
+							<tilknyttetAv>Sak Sakbehandlersen</tilknyttetAv>
+							<dokumentobjekt>
+								<versjonsnummer>1</versjonsnummer>
+								<variantformat>Arkivformat</variantformat>
+								<opprettetDato>2025-03-13T13:15:30.01</opprettetDato>
+								<opprettetAv>Sak Sakbehandlersen</opprettetAv>
+								<referanseDokumentfil>987654321-7654321-Arkivformat-JPEG</referanseDokumentfil>
+							</dokumentobjekt>
+						</dokumentbeskrivelse>
+						<tittel>Klage på saksbehandling</tittel>
+						<korrespondansepart>
+							<korrespondanseparttype>Mottaker</korrespondanseparttype>
+							<korrespondansepartNavn>TRYGDERETTEN</korrespondansepartNavn>
+							<organisasjonsnummer>
+								<organisasjonsnummer>974761084</organisasjonsnummer>
+							</organisasjonsnummer>
+						</korrespondansepart>
+						<korrespondansepart>
+							<korrespondanseparttype>Avsender</korrespondanseparttype>
+							<korrespondansepartNavn>NAV Klageinstans</korrespondansepartNavn>
+							<organisasjonsnummer>
+								<organisasjonsnummer>974761084</organisasjonsnummer>
+							</organisasjonsnummer>
+						</korrespondansepart>
+						<journalposttype>Utgående dokument</journalposttype>
+						<journalstatus>Ekspedert</journalstatus>
+						<journaldato>2025-03-13</journaldato>
+					</registrering>
+					<saksdato>2025-03-15</saksdato>
+					<administrativEnhet>NAV Klageinstans</administrativEnhet>
+					<saksansvarlig>Sak Sakbehandlersen</saksansvarlig>
+					<saksstatus>Under behandling</saksstatus>
+				</mappe>
+			</arkivmelding>]]>
+		</forsendelseMetadata>
 		<forsendelseMetadataType>DPO_ARKIVMELDING</forsendelseMetadataType>
 		<mottaker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
 			<aktoerId>1000075457001</aktoerId>
