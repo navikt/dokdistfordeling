@@ -251,7 +251,7 @@ public class Qdist008IT {
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_dpo_happypath.xml"));
 
-		await().atMost(30, SECONDS).untilAsserted(() -> {
+		await().atMost(10, SECONDS).untilAsserted(() -> {
 			String response = receive(qdist015);
 			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
 		});

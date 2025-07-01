@@ -5,9 +5,11 @@ import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.exception.functional.DokdistadminFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.DokdistadminTechnicalException;
 import org.slf4j.MDC;
+import org.springframework.boot.autoconfigure.http.codec.HttpCodecsProperties;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -28,11 +30,15 @@ public class DokdistadminConsumer {
 	private final WebClient webClient;
 
 	public DokdistadminConsumer(final DokdistfordelingProperties dokdistfordelingProperties,
-								WebClient webClient) {
+								WebClient webClient, HttpCodecsProperties codecProperties) {
 		this.webClient = webClient
 				.mutate()
 				.defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.baseUrl(dokdistfordelingProperties.getEndpoints().getDokdistadmin().getUrl())
+				.exchangeStrategies(ExchangeStrategies.builder()
+						.codecs(configurer ->
+								configurer.defaultCodecs().maxInMemorySize((int) codecProperties.getMaxInMemorySize().toBytes()))
+						.build())
 				.build();
 	}
 
