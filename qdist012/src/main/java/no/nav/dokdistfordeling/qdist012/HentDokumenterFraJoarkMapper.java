@@ -5,6 +5,7 @@ import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.AdresseTo;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.AktoerTo;
@@ -37,7 +38,7 @@ import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.DITTNAV;
 import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
-import static org.apache.commons.lang3.EnumUtils.isValidEnum;
+import static org.apache.commons.lang3.EnumUtils.isValidEnumIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
@@ -63,6 +64,8 @@ public class HentDokumenterFraJoarkMapper {
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
 				.tema(distribusjonbestilling.getTema())
 				.forsendelseTittel(distribusjonbestilling.getForsendelseTittel())
+				.forsendelseMetadata(distribusjonbestilling.getForsendelseMetadata())
+				.forsendelseMetadataType(mapForsendelseMetadataType(distribusjonbestilling.getForsendelseMetadataType()))
 				.distribusjonstype(mapDistribusjonstype(distribusjonbestilling.getDistribusjonstype()))
 				.distribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestilling.getDistribusjonstidspunkt()))
 				.arkivInformasjon(distribusjonbestilling.getArkivInformasjon() == null ? null :
@@ -87,13 +90,18 @@ public class HentDokumenterFraJoarkMapper {
 		return DITT_NAV.equals(distribusjonKanal) ? DITTNAV.name() : distribusjonKanal;
 	}
 
+	private ForsendelseMetadataType mapForsendelseMetadataType(String forsendelseMetadataType) {
+		return (isNotBlank(forsendelseMetadataType) && isValidEnumIgnoreCase(ForsendelseMetadataType.class, forsendelseMetadataType)) ?
+				getEnumIgnoreCase(ForsendelseMetadataType.class, forsendelseMetadataType) : null;
+	}
+
 	private DistribusjonstypeCode mapDistribusjonstype(String distribusjonstype) {
-		return (isNotBlank(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.toUpperCase())) ?
+		return (isNotBlank(distribusjonstype) && isValidEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype)) ?
 				getEnumIgnoreCase(DistribusjonstypeCode.class, distribusjonstype) : null;
 	}
 
 	private DistribusjonstidspunktCode mapDistribusjonstidspunkt(String distribusjonstidspunkt) {
-		return (isNotBlank(distribusjonstidspunkt) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunkt.toUpperCase())) ?
+		return (isNotBlank(distribusjonstidspunkt) && isValidEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt)) ?
 				getEnumIgnoreCase(DistribusjonstidspunktCode.class, distribusjonstidspunkt) : null;
 	}
 

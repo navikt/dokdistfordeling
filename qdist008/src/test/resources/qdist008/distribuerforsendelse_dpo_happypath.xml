@@ -7,105 +7,14 @@
 		<bestillendeFagsystem>bestillendeFagsystem</bestillendeFagsystem>
 		<tema>DAG</tema>
 		<!--Optional:-->
+		<forsendelseMetadata>
+			PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KCQkJPGFya2l2bWVsZGluZyA+CgkJCQk8c3lzdGVtPmRva2Rpc3RlZm9ybWlkbGluZzwvc3lzdGVtPgoJCQkJPG1lbGRpbmdJZD5iZXN0aWxsaW5nc0lkPC9tZWxkaW5nSWQ+CgkJCQk8dGlkc3B1bmt0PjIwMjUtMDMtMDVUMTY6MjQ6MDUuMjQ3KzAxOjAwPC90aWRzcHVua3Q+CgkJCQk8YW50YWxsRmlsZXI+MjwvYW50YWxsRmlsZXI+CgkJCQk8bWFwcGUgeHNpOnR5cGU9InNha3NtYXBwZSIgeG1sbnM6eHNpPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYS1pbnN0YW5jZSI+CgkJCQkJPHRpdHRlbD5EYWdwZW5nZXI8L3RpdHRlbD4KCQkJCQk8b3BwcmV0dGV0RGF0bz4yMDI1LTAzLTE1VDEzOjE1OjMwLjAxPC9vcHByZXR0ZXREYXRvPgoJCQkJCTxvcHByZXR0ZXRBdj5TYWsgU2FrYmVoYW5kbGVyc2VuPC9vcHByZXR0ZXRBdj4KCQkJCQk8dmlya3NvbWhldHNzcGVzaWZpa2tlTWV0YWRhdGEgeHNpOnR5cGU9InhzOnN0cmluZyIgeG1sbnM6eHM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hIj4xMTExMTE8L3Zpcmtzb21oZXRzc3Blc2lmaWtrZU1ldGFkYXRhPgoJCQkJCTxwYXJ0PgoJCQkJCQk8cGFydE5hdm4+TkFWIEtsYWdlaW5zdGFuczwvcGFydE5hdm4+CgkJCQkJCTxwYXJ0Um9sbGU+QU1QPC9wYXJ0Um9sbGU+CgkJCQkJCTxvcmdhbmlzYXNqb25zbnVtbWVyPgoJCQkJCQkJPG9yZ2FuaXNhc2pvbnNudW1tZXI+OTkxMDc4MDQ1PC9vcmdhbmlzYXNqb25zbnVtbWVyPgoJCQkJCQk8L29yZ2FuaXNhc2pvbnNudW1tZXI+CgkJCQkJCTxrb250YWt0cGVyc29uPlNhayBTYWtiZWhhbmRsZXJzZW48L2tvbnRha3RwZXJzb24+CgkJCQkJPC9wYXJ0PgoJCQkJCTxwYXJ0PgoJCQkJCQk8cGFydE5hdm4+Qmphcm5lIEJldGplbnQ8L3BhcnROYXZuPgoJCQkJCQk8cGFydFJvbGxlPkRBUDwvcGFydFJvbGxlPgoJCQkJCQk8b3JnYW5pc2Fzam9uc251bW1lci8+CgkJCQkJCTxmb2Vkc2Vsc251bW1lcj4KCQkJCQkJCTxmb2Vkc2Vsc251bW1lcj4yMDAyNjkwMDAwMDwvZm9lZHNlbHNudW1tZXI+CgkJCQkJCTwvZm9lZHNlbHNudW1tZXI+CgkJCQkJPC9wYXJ0PgoJCQkJCTxyZWdpc3RyZXJpbmcgeHNpOnR5cGU9ImpvdXJuYWxwb3N0Ij4KCQkJCQkJPG9wcHJldHRldERhdG8+MjAyNS0wMy0xNFQxMzoxNTozMC4wMTwvb3BwcmV0dGV0RGF0bz4KCQkJCQkJPG9wcHJldHRldEF2PlNhayBTYWtiZWhhbmRsZXJzZW48L29wcHJldHRldEF2PgoJCQkJCQk8ZG9rdW1lbnRiZXNrcml2ZWxzZT4KCQkJCQkJCTxkb2t1bWVudHR5cGU+RG9rdW1lbnRhc2pvbjwvZG9rdW1lbnR0eXBlPgoJCQkJCQkJPGRva3VtZW50c3RhdHVzPkRva3VtZW50ZXQgZXIgZmVyZGlnc3RpbHQ8L2Rva3VtZW50c3RhdHVzPgoJCQkJCQkJPHRpdHRlbD5LbGFnZSBww6Ugc2Frc2JlaGFuZGxpbmc8L3RpdHRlbD4KCQkJCQkJCTxvcHByZXR0ZXREYXRvPjIwMjUtMDMtMTNUMTM6MTU6MzAuMDE8L29wcHJldHRldERhdG8+CgkJCQkJCQk8b3BwcmV0dGV0QXY+U2FrIFNha2JlaGFuZGxlcnNlbjwvb3BwcmV0dGV0QXY+CgkJCQkJCQk8dGlsa255dHRldFJlZ2lzdHJlcmluZ1NvbT5Ib3ZlZGRva3VtZW50PC90aWxrbnl0dGV0UmVnaXN0cmVyaW5nU29tPgoJCQkJCQkJPGRva3VtZW50bnVtbWVyPjE8L2Rva3VtZW50bnVtbWVyPgoJCQkJCQkJPHRpbGtueXR0ZXREYXRvPjIwMjUtMDMtMDVUMTY6MjQ6MDUuMjQ3KzAxOjAwPC90aWxrbnl0dGV0RGF0bz4KCQkJCQkJCTx0aWxrbnl0dGV0QXY+U2FrIFNha2JlaGFuZGxlcnNlbjwvdGlsa255dHRldEF2PgoJCQkJCQkJPGRva3VtZW50b2JqZWt0PgoJCQkJCQkJCTx2ZXJzam9uc251bW1lcj4xPC92ZXJzam9uc251bW1lcj4KCQkJCQkJCQk8dmFyaWFudGZvcm1hdD5Eb2t1bWVudCBodm9yIGRlbGVyIGF2IGlubmhvbGRldCBlciBza2plcm1ldDwvdmFyaWFudGZvcm1hdD4KCQkJCQkJCQk8b3BwcmV0dGV0RGF0bz4yMDI1LTAzLTEzVDEzOjE1OjMwLjAxPC9vcHByZXR0ZXREYXRvPgoJCQkJCQkJCTxvcHByZXR0ZXRBdj5TYWsgU2FrYmVoYW5kbGVyc2VuPC9vcHByZXR0ZXRBdj4KCQkJCQkJCQk8cmVmZXJhbnNlRG9rdW1lbnRmaWw+OTg3NjU0MzIxLTEyMzQ1NjctRG9rdW1lbnQgaHZvciBkZWxlciBhdiBpbm5ob2xkZXQgZXIgc2tqZXJtZXQtUERGPC9yZWZlcmFuc2VEb2t1bWVudGZpbD4KCQkJCQkJCTwvZG9rdW1lbnRvYmpla3Q+CgkJCQkJCTwvZG9rdW1lbnRiZXNrcml2ZWxzZT4KCQkJCQkJPGRva3VtZW50YmVza3JpdmVsc2U+CgkJCQkJCQk8ZG9rdW1lbnR0eXBlPkRva3VtZW50YXNqb248L2Rva3VtZW50dHlwZT4KCQkJCQkJCTxkb2t1bWVudHN0YXR1cz5Eb2t1bWVudGV0IGVyIGZlcmRpZ3N0aWx0PC9kb2t1bWVudHN0YXR1cz4KCQkJCQkJCTx0aXR0ZWw+RG9rdW1lbnRhc2pvbiB0aWwga2xhZ2U8L3RpdHRlbD4KCQkJCQkJCTxvcHByZXR0ZXREYXRvPjIwMjUtMDMtMTNUMTM6MTU6MzAuMDE8L29wcHJldHRldERhdG8+CgkJCQkJCQk8b3BwcmV0dGV0QXY+U2FrIFNha2JlaGFuZGxlcnNlbjwvb3BwcmV0dGV0QXY+CgkJCQkJCQk8dGlsa255dHRldFJlZ2lzdHJlcmluZ1NvbT5WZWRsZWdnPC90aWxrbnl0dGV0UmVnaXN0cmVyaW5nU29tPgoJCQkJCQkJPGRva3VtZW50bnVtbWVyPjI8L2Rva3VtZW50bnVtbWVyPgoJCQkJCQkJPHRpbGtueXR0ZXREYXRvPjIwMjUtMDMtMDVUMTY6MjQ6MDUuMjQ3KzAxOjAwPC90aWxrbnl0dGV0RGF0bz4KCQkJCQkJCTx0aWxrbnl0dGV0QXY+U2FrIFNha2JlaGFuZGxlcnNlbjwvdGlsa255dHRldEF2PgoJCQkJCQkJPGRva3VtZW50b2JqZWt0PgoJCQkJCQkJCTx2ZXJzam9uc251bW1lcj4xPC92ZXJzam9uc251bW1lcj4KCQkJCQkJCQk8dmFyaWFudGZvcm1hdD5BcmtpdmZvcm1hdDwvdmFyaWFudGZvcm1hdD4KCQkJCQkJCQk8b3BwcmV0dGV0RGF0bz4yMDI1LTAzLTEzVDEzOjE1OjMwLjAxPC9vcHByZXR0ZXREYXRvPgoJCQkJCQkJCTxvcHByZXR0ZXRBdj5TYWsgU2FrYmVoYW5kbGVyc2VuPC9vcHByZXR0ZXRBdj4KCQkJCQkJCQk8cmVmZXJhbnNlRG9rdW1lbnRmaWw+OTg3NjU0MzIxLTc2NTQzMjEtQXJraXZmb3JtYXQtSlBFRzwvcmVmZXJhbnNlRG9rdW1lbnRmaWw+CgkJCQkJCQk8L2Rva3VtZW50b2JqZWt0PgoJCQkJCQk8L2Rva3VtZW50YmVza3JpdmVsc2U+CgkJCQkJCTx0aXR0ZWw+S2xhZ2UgcMOlIHNha3NiZWhhbmRsaW5nPC90aXR0ZWw+CgkJCQkJCTxrb3JyZXNwb25kYW5zZXBhcnQ+CgkJCQkJCQk8a29ycmVzcG9uZGFuc2VwYXJ0dHlwZT5Nb3R0YWtlcjwva29ycmVzcG9uZGFuc2VwYXJ0dHlwZT4KCQkJCQkJCTxrb3JyZXNwb25kYW5zZXBhcnROYXZuPlRSWUdERVJFVFRFTjwva29ycmVzcG9uZGFuc2VwYXJ0TmF2bj4KCQkJCQkJCTxvcmdhbmlzYXNqb25zbnVtbWVyPgoJCQkJCQkJCTxvcmdhbmlzYXNqb25zbnVtbWVyPjk3NDc2MTA4NDwvb3JnYW5pc2Fzam9uc251bW1lcj4KCQkJCQkJCTwvb3JnYW5pc2Fzam9uc251bW1lcj4KCQkJCQkJPC9rb3JyZXNwb25kYW5zZXBhcnQ+CgkJCQkJCTxrb3JyZXNwb25kYW5zZXBhcnQ+CgkJCQkJCQk8a29ycmVzcG9uZGFuc2VwYXJ0dHlwZT5BdnNlbmRlcjwva29ycmVzcG9uZGFuc2VwYXJ0dHlwZT4KCQkJCQkJCTxrb3JyZXNwb25kYW5zZXBhcnROYXZuPk5BViBLbGFnZWluc3RhbnM8L2tvcnJlc3BvbmRhbnNlcGFydE5hdm4+CgkJCQkJCQk8b3JnYW5pc2Fzam9uc251bW1lcj4KCQkJCQkJCQk8b3JnYW5pc2Fzam9uc251bW1lcj45NzQ3NjEwODQ8L29yZ2FuaXNhc2pvbnNudW1tZXI+CgkJCQkJCQk8L29yZ2FuaXNhc2pvbnNudW1tZXI+CgkJCQkJCTwva29ycmVzcG9uZGFuc2VwYXJ0PgoJCQkJCQk8am91cm5hbHBvc3R0eXBlPlV0Z8OlZW5kZSBkb2t1bWVudDwvam91cm5hbHBvc3R0eXBlPgoJCQkJCQk8am91cm5hbHN0YXR1cz5Fa3NwZWRlcnQ8L2pvdXJuYWxzdGF0dXM+CgkJCQkJCTxqb3VybmFsZGF0bz4yMDI1LTAzLTEzPC9qb3VybmFsZGF0bz4KCQkJCQk8L3JlZ2lzdHJlcmluZz4KCQkJCQk8c2Frc2RhdG8+MjAyNS0wMy0xNTwvc2Frc2RhdG8+CgkJCQkJPGFkbWluaXN0cmF0aXZFbmhldD5OQVYgS2xhZ2VpbnN0YW5zPC9hZG1pbmlzdHJhdGl2RW5oZXQ+CgkJCQkJPHNha3NhbnN2YXJsaWc+U2FrIFNha2JlaGFuZGxlcnNlbjwvc2Frc2Fuc3ZhcmxpZz4KCQkJCQk8c2Frc3N0YXR1cz5VbmRlciBiZWhhbmRsaW5nPC9zYWtzc3RhdHVzPgoJCQkJPC9tYXBwZT4KCQkJPC9hcmtpdm1lbGRpbmc+Cg==
+		</forsendelseMetadata>
+		<forsendelseMetadataType>DPO_ARKIVMELDING</forsendelseMetadataType>
 		<arkivInformasjon>
 			<arkivSystem>JOARK</arkivSystem>
 			<arkivId>1234</arkivId>
 		</arkivInformasjon>
-		<forsendelseMetadata>
-			<![CDATA[
-			<?xml version="1.0" encoding="UTF-8"?>
-			<arkivmelding >
-				<system>dokdisteformidling</system>
-				<meldingId>bestillingsId</meldingId>
-				<tidspunkt>2025-03-05T16:24:05.247+01:00</tidspunkt>
-				<antallFiler>2</antallFiler>
-				<mappe xsi:type="saksmappe" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<tittel>Dagpenger</tittel>
-					<opprettetDato>2025-03-15T13:15:30.01</opprettetDato>
-					<opprettetAv>Sak Sakbehandlersen</opprettetAv>
-					<virksomhetsspesifikkeMetadata xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">111111</virksomhetsspesifikkeMetadata>
-					<part>
-						<partNavn>NAV Klageinstans</partNavn>
-						<partRolle>AMP</partRolle>
-						<organisasjonsnummer>
-							<organisasjonsnummer>991078045</organisasjonsnummer>
-						</organisasjonsnummer>
-						<kontaktperson>Sak Sakbehandlersen</kontaktperson>
-					</part>
-					<part>
-						<partNavn>Bjarne Betjent</partNavn>
-						<partRolle>DAP</partRolle>
-						<organisasjonsnummer/>
-						<foedselsnummer>
-							<foedselsnummer>20026900000</foedselsnummer>
-						</foedselsnummer>
-					</part>
-					<registrering xsi:type="journalpost">
-						<opprettetDato>2025-03-14T13:15:30.01</opprettetDato>
-						<opprettetAv>Sak Sakbehandlersen</opprettetAv>
-						<dokumentbeskrivelse>
-							<dokumenttype>Dokumentasjon</dokumenttype>
-							<dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus>
-							<tittel>Klage på saksbehandling</tittel>
-							<opprettetDato>2025-03-13T13:15:30.01</opprettetDato>
-							<opprettetAv>Sak Sakbehandlersen</opprettetAv>
-							<tilknyttetRegistreringSom>Hoveddokument</tilknyttetRegistreringSom>
-							<dokumentnummer>1</dokumentnummer>
-							<tilknyttetDato>2025-03-05T16:24:05.247+01:00</tilknyttetDato>
-							<tilknyttetAv>Sak Sakbehandlersen</tilknyttetAv>
-							<dokumentobjekt>
-								<versjonsnummer>1</versjonsnummer>
-								<variantformat>Dokument hvor deler av innholdet er skjermet</variantformat>
-								<opprettetDato>2025-03-13T13:15:30.01</opprettetDato>
-								<opprettetAv>Sak Sakbehandlersen</opprettetAv>
-								<referanseDokumentfil>987654321-1234567-Dokument hvor deler av innholdet er skjermet-PDF</referanseDokumentfil>
-							</dokumentobjekt>
-						</dokumentbeskrivelse>
-						<dokumentbeskrivelse>
-							<dokumenttype>Dokumentasjon</dokumenttype>
-							<dokumentstatus>Dokumentet er ferdigstilt</dokumentstatus>
-							<tittel>Dokumentasjon til klage</tittel>
-							<opprettetDato>2025-03-13T13:15:30.01</opprettetDato>
-							<opprettetAv>Sak Sakbehandlersen</opprettetAv>
-							<tilknyttetRegistreringSom>Vedlegg</tilknyttetRegistreringSom>
-							<dokumentnummer>2</dokumentnummer>
-							<tilknyttetDato>2025-03-05T16:24:05.247+01:00</tilknyttetDato>
-							<tilknyttetAv>Sak Sakbehandlersen</tilknyttetAv>
-							<dokumentobjekt>
-								<versjonsnummer>1</versjonsnummer>
-								<variantformat>Arkivformat</variantformat>
-								<opprettetDato>2025-03-13T13:15:30.01</opprettetDato>
-								<opprettetAv>Sak Sakbehandlersen</opprettetAv>
-								<referanseDokumentfil>987654321-7654321-Arkivformat-JPEG</referanseDokumentfil>
-							</dokumentobjekt>
-						</dokumentbeskrivelse>
-						<tittel>Klage på saksbehandling</tittel>
-						<korrespondansepart>
-							<korrespondanseparttype>Mottaker</korrespondanseparttype>
-							<korrespondansepartNavn>TRYGDERETTEN</korrespondansepartNavn>
-							<organisasjonsnummer>
-								<organisasjonsnummer>974761084</organisasjonsnummer>
-							</organisasjonsnummer>
-						</korrespondansepart>
-						<korrespondansepart>
-							<korrespondanseparttype>Avsender</korrespondanseparttype>
-							<korrespondansepartNavn>NAV Klageinstans</korrespondansepartNavn>
-							<organisasjonsnummer>
-								<organisasjonsnummer>974761084</organisasjonsnummer>
-							</organisasjonsnummer>
-						</korrespondansepart>
-						<journalposttype>Utgående dokument</journalposttype>
-						<journalstatus>Ekspedert</journalstatus>
-						<journaldato>2025-03-13</journaldato>
-					</registrering>
-					<saksdato>2025-03-15</saksdato>
-					<administrativEnhet>NAV Klageinstans</administrativEnhet>
-					<saksansvarlig>Sak Sakbehandlersen</saksansvarlig>
-					<saksstatus>Under behandling</saksstatus>
-				</mappe>
-			</arkivmelding>]]>
-		</forsendelseMetadata>
-		<forsendelseMetadataType>DPO_ARKIVMELDING</forsendelseMetadataType>
 		<mottaker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="dok:AktoerId">
 			<aktoerId>1000075457001</aktoerId>
 			<navn>Bjarne Betjent</navn>

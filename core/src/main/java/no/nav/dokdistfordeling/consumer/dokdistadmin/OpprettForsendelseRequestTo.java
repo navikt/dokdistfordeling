@@ -18,6 +18,8 @@ public class OpprettForsendelseRequestTo {
 	String bestillendeFagsystem;
 	String tema;
 	String forsendelseTittel;
+	String forsendelseMetadata;
+	ForsendelseMetadataType forsendelseMetadataType;
 	String batchId;
 	String dokumentProdApp;
 	MottakerTo mottaker;
@@ -26,9 +28,6 @@ public class OpprettForsendelseRequestTo {
 	List<DokumentTo> dokumenter;
 	String distribusjonstype;
 	String distribusjonstidspunkt;
-	String forsendelseMetadata;
-	ForsendelseMetadataType forsendelseMetadataType;
-
 
 	@Value
 	@Builder

@@ -2,6 +2,7 @@ package no.nav.dokdistfordeling.qdist008;
 
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo.AktoerTo;
@@ -20,7 +21,6 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.UtenlandskPostad
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -31,7 +31,8 @@ import java.util.stream.Stream;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
-import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.valueOf;
+import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_ARKIVMELDING;
+import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_AVTALEMELDING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -213,14 +214,8 @@ class DistribuerForsendelseMapperTest {
 	}
 
 	@ParameterizedTest
-	@CsvSource(value =
-			{
-					"null, null",
-					"forsendelseMetadata, DPO_ARKIVMELDING"
-			},
-			nullValues = "null"
-	)
-	public void shouldMapForsendelseMetadataAndType(String forsendelseMetadata, String forsendelseMetadataType) {
+	@MethodSource
+	public void shouldMapForsendelseMetadataAndType(String forsendelseMetadata, String forsendelseMetadataType, ForsendelseMetadataType forventetForsendelseMetadataType) {
 		var distribuerForsendelse = createDistribuerForsendelse();
 		distribuerForsendelse.getDistribusjonbestilling().setForsendelseMetadata(forsendelseMetadata);
 		distribuerForsendelse.getDistribusjonbestilling().setForsendelseMetadataType(forsendelseMetadataType);
@@ -228,8 +223,16 @@ class DistribuerForsendelseMapperTest {
 		DistribuerForsendelseTo distribuerForsendelseTo = distribuerForsendelseMapper.map(distribuerForsendelse);
 
 		assertEquals(forsendelseMetadata, distribuerForsendelseTo.getDistribusjonbestilling().getForsendelseMetadata());
-		assertEquals(forsendelseMetadataType == null ? null : valueOf(forsendelseMetadataType), distribuerForsendelseTo.getDistribusjonbestilling().getForsendelseMetadataType());
+		assertEquals(forventetForsendelseMetadataType, distribuerForsendelseTo.getDistribusjonbestilling().getForsendelseMetadataType());
+	}
 
+	private static Stream<Arguments> shouldMapForsendelseMetadataAndType() {
+		return Stream.of(
+				Arguments.of("forsendelseMetadata", "DPO_ARKIVMELDING", DPO_ARKIVMELDING),
+				Arguments.of("forsendelseMetadata", "DPO_AVTALEMELDING", DPO_AVTALEMELDING),
+				Arguments.of("forsendelseMetadata", "dpo_avtalemelding", DPO_AVTALEMELDING),
+				Arguments.of(null, null, null)
+		);
 	}
 
 	@Test

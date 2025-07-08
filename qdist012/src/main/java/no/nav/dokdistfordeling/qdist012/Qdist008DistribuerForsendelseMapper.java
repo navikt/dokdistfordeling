@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.qdist012;
 import no.nav.dokdistfordeling.exception.functional.DistribuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.AktoerTo;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.ArkivInformasjonTo;
@@ -53,6 +54,8 @@ public class Qdist008DistribuerForsendelseMapper {
 		distribusjonbestilling.setBestillendeFagsystem(distribusjonbestillingTo.getBestillendeFagsystem());
 		distribusjonbestilling.setTema(distribusjonbestillingTo.getTema());
 		distribusjonbestilling.setForsendelseTittel(distribusjonbestillingTo.getForsendelseTittel());
+		distribusjonbestilling.setForsendelseMetadata(distribusjonbestillingTo.getForsendelseMetadata());
+		distribusjonbestilling.setForsendelseMetadataType(mapForsendelseMetadataType(distribusjonbestillingTo.getForsendelseMetadataType()));
 		distribusjonbestilling.setDistribusjonstype(mapDistribusjonstype(distribusjonbestillingTo.getDistribusjonstype()));
 		distribusjonbestilling.setDistribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestillingTo.getDistribusjonstidspunkt()));
 		distribusjonbestilling.setArkivInformasjon(mapArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon()));
@@ -76,6 +79,11 @@ public class Qdist008DistribuerForsendelseMapper {
 
 	private String mapBatchId(String batchId) {
 		return isBlank(batchId) ? null : batchId;
+	}
+
+	private String mapForsendelseMetadataType(ForsendelseMetadataType forsendelseMetadataType) {
+		return (nonNull(forsendelseMetadataType) && isValidEnum(ForsendelseMetadataType.class, forsendelseMetadataType.name())) ?
+				forsendelseMetadataType.name() : null;
 	}
 
 	private String mapDistribusjonstype(DistribusjonstypeCode distribusjonstype) {
