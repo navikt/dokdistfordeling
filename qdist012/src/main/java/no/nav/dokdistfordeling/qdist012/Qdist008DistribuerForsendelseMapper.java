@@ -82,18 +82,15 @@ public class Qdist008DistribuerForsendelseMapper {
 	}
 
 	private String mapForsendelseMetadataType(ForsendelseMetadataType forsendelseMetadataType) {
-		return (nonNull(forsendelseMetadataType) && isValidEnum(ForsendelseMetadataType.class, forsendelseMetadataType.name())) ?
-				forsendelseMetadataType.name() : null;
+		return nonNull(forsendelseMetadataType) ? forsendelseMetadataType.name() : null;
 	}
 
 	private String mapDistribusjonstype(DistribusjonstypeCode distribusjonstype) {
-		return (nonNull(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.name())) ?
-				distribusjonstype.name() : null;
+		return nonNull(distribusjonstype) ? distribusjonstype.name() : null;
 	}
 
 	private String mapDistribusjonstidspunkt(DistribusjonstidspunktCode distribusjonstidspunktCode) {
-		return (nonNull(distribusjonstidspunktCode) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunktCode.name())) ?
-				distribusjonstidspunktCode.name() : null;
+		return nonNull(distribusjonstidspunktCode) ? distribusjonstidspunktCode.name() : null;
 	}
 
 	private ArkivInformasjon mapArkivInformasjon(ArkivInformasjonTo arkivInformasjonTo) {
