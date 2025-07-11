@@ -1,6 +1,5 @@
 package no.nav.dokdistfordeling.qdist008.domain;
 
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -12,7 +11,6 @@ import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
 import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
-import no.nav.dokdistfordeling.util.CDataAdapter;
 
 import java.util.List;
 
@@ -35,7 +33,6 @@ public class DistribuerForsendelseTo {
 		String bestillendeFagsystem;
 		String tema;
 		String forsendelseTittel;
-		@XmlJavaTypeAdapter(CDataAdapter.class)
 		String forsendelseMetadata;
 		ForsendelseMetadataType forsendelseMetadataType;
 		DistribusjonstypeCode distribusjonstype;

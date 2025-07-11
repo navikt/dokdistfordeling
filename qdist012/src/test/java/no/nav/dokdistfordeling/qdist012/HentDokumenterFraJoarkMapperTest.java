@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.qdist012;
 
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.AdresseTo;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.DistribusjonbestillingTo;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.NorskPostadresseTo;
@@ -34,6 +35,8 @@ import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.UMIDDELBART;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VEDTAK;
+import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_ARKIVMELDING;
+import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_AVTALEMELDING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -125,6 +128,40 @@ class HentDokumenterFraJoarkMapperTest {
 		assertNotNull(hentDokumenterFraJoarkTo);
 		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
 		assertNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getForsendelseTittel());
+	}
+
+	@Test
+	public void shouldMapOkWhenForsendelseMetadataIsNull() {
+		var hentDokumenterFraJoark = createHentDokumenterFraJoark();
+		hentDokumenterFraJoark.getDistribusjonbestilling().setForsendelseMetadata(null);
+
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
+
+		assertNotNull(hentDokumenterFraJoarkTo);
+		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
+		assertNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getForsendelseMetadata());
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void shouldMapForsendelseMetadataType(String forsendelseMetadataType, ForsendelseMetadataType forventetForsendelseMetadataType) {
+		var hentDokumenterFraJoark = createHentDokumenterFraJoark();
+		hentDokumenterFraJoark.getDistribusjonbestilling().setForsendelseMetadataType(forsendelseMetadataType);
+
+		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
+
+		assertNotNull(hentDokumenterFraJoarkTo);
+		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getForsendelseMetadataType()).isEqualTo(forventetForsendelseMetadataType);
+	}
+
+	private static Stream<Arguments> shouldMapForsendelseMetadataType() {
+		return Stream.of(
+				Arguments.of("DPO_ARKIVMELDING", DPO_ARKIVMELDING),
+				Arguments.of("DPO_AVTALEMELDING", DPO_AVTALEMELDING),
+				Arguments.of("dpo_avtalemelding", DPO_AVTALEMELDING),
+				Arguments.of(null, null)
+		);
 	}
 
 	@Test

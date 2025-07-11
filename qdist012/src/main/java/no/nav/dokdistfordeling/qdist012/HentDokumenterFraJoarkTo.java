@@ -9,6 +9,7 @@ import lombok.Value;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 
 import java.util.List;
 
@@ -26,6 +27,8 @@ public class HentDokumenterFraJoarkTo {
 		String bestillendeFagsystem;
 		String tema;
 		String forsendelseTittel;
+		String forsendelseMetadata;
+		ForsendelseMetadataType forsendelseMetadataType;
 		DistribusjonstypeCode distribusjonstype;
 		DistribusjonstidspunktCode distribusjonstidspunkt;
 		ArkivInformasjonTo arkivInformasjon;

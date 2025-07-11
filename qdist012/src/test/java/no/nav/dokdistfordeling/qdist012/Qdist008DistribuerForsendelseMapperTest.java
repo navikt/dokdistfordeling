@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.qdist012;
 
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.AktoerTo;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.ArkivInformasjonTo;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.DistribusjonbestillingTo;
@@ -17,11 +18,9 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Organisasjon;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Person;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.Samhandler;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.UtenlandskPostadresse;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -37,6 +36,8 @@ import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VEDTAK;
+import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_ARKIVMELDING;
+import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_AVTALEMELDING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -96,6 +97,30 @@ class Qdist008DistribuerForsendelseMapperTest {
 		DistribuerForsendelse distribuerForsendelse = qdist008DistribuerForsendelseMapper.map(hentDokumenterFraJoarkTo);
 
 		assertResponse(distribuerForsendelse);
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	public void shouldMapForsendelseMetadataType(ForsendelseMetadataType forsendelseMetadataType, String forventetForsendelseMetadataType) {
+		var hentDokumenterFraJoarkTo = HentDokumenterFraJoarkTo.builder()
+				.distribusjonbestilling(createDistribusjonbestillingToBuilder()
+						.forsendelseMetadataType(forsendelseMetadataType)
+						.build())
+				.build();
+
+		DistribuerForsendelse distribuerForsendelse = qdist008DistribuerForsendelseMapper.map(hentDokumenterFraJoarkTo);
+
+		assertThat(distribuerForsendelse).isNotNull();
+		assertThat(distribuerForsendelse.getDistribusjonbestilling()).isNotNull();
+		assertThat(distribuerForsendelse.getDistribusjonbestilling().getForsendelseMetadataType()).isEqualTo(forventetForsendelseMetadataType);
+	}
+
+	private static Stream<Arguments> shouldMapForsendelseMetadataType() {
+		return Stream.of(
+				Arguments.of(DPO_ARKIVMELDING, "DPO_ARKIVMELDING"),
+				Arguments.of(DPO_AVTALEMELDING, "DPO_AVTALEMELDING"),
+				Arguments.of(null, null)
+		);
 	}
 
 	@ParameterizedTest

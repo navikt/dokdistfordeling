@@ -259,6 +259,8 @@ public class Qdist008IT {
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
 		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
+		verify(exactly(1), postRequestedFor(urlPathMatching(DOKDISTADMIN_URL))
+				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelse_til_dpo_happy.json"))));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfo_dpo_happy.json"))));
 	}

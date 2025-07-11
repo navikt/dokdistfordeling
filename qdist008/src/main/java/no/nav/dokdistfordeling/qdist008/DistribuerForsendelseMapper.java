@@ -6,6 +6,7 @@ import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ArkivSystemCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode;
 import no.nav.dokdistfordeling.qdist008.domain.DistribuerForsendelseTo;
@@ -38,9 +39,9 @@ import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_HPR;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.DITTNAV;
-import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.valueOf;
 import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
 import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
+import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.EnumUtils.isValidEnumIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -68,6 +69,8 @@ public class DistribuerForsendelseMapper {
 				.bestillendeFagsystem(distribusjonbestilling.getBestillendeFagsystem())
 				.tema(distribusjonbestilling.getTema())
 				.forsendelseTittel(distribusjonbestilling.getForsendelseTittel())
+				.forsendelseMetadata(distribusjonbestilling.getForsendelseMetadata())
+				.forsendelseMetadataType(mapForsendelseMetadataType(distribusjonbestilling.getForsendelseMetadataType()))
 				.distribusjonstype(mapDistribusjonstype(distribusjonbestilling.getDistribusjonstype()))
 				.distribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestilling.getDistribusjonstidspunkt()))
 				.arkivInformasjon(distribusjonbestilling.getArkivInformasjon() == null ? null :
@@ -76,9 +79,6 @@ public class DistribuerForsendelseMapper {
 				.bruker(mapAktoer(distribusjonbestilling.getBruker()))
 				.adresse(mapAdresse(distribusjonbestilling.getAdresse()))
 				.dokumentProdApp(distribusjonbestilling.getDokumentProdApp())
-				.forsendelseMetadata(distribusjonbestilling.getForsendelseMetadata())
-				.forsendelseMetadataType(isBlank(distribusjonbestilling.getForsendelseMetadataType()) ? null :
-						valueOf(distribusjonbestilling.getForsendelseMetadataType()))
 				.dokumenter(distribusjonbestilling.getDokumenter().stream()
 						.map(dokumentInformasjon -> DistribuerForsendelseTo.DokumentInformasjonTo.builder()
 								.dokumenttypeId(dokumentInformasjon.getDokumenttypeId())
@@ -97,6 +97,11 @@ public class DistribuerForsendelseMapper {
 
 	private String mapKanalCode(String distribusjonKanal) {
 		return DITT_NAV.equals(distribusjonKanal) ? DITTNAV.name() : distribusjonKanal;
+	}
+
+	private ForsendelseMetadataType mapForsendelseMetadataType(String forsendelseMetadataType) {
+		return (isNotBlank(forsendelseMetadataType) && isValidEnumIgnoreCase(ForsendelseMetadataType.class, forsendelseMetadataType)) ?
+				getEnumIgnoreCase(ForsendelseMetadataType.class, forsendelseMetadataType) : null;
 	}
 
 	private DistribusjonstypeCode mapDistribusjonstype(String distribusjonstype) {

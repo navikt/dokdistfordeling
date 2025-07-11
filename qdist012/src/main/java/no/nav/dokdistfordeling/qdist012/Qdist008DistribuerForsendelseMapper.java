@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.qdist012;
 import no.nav.dokdistfordeling.exception.functional.DistribuerForsendelseMapFunctionalException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.AktoerTo;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.ArkivInformasjonTo;
@@ -53,6 +54,8 @@ public class Qdist008DistribuerForsendelseMapper {
 		distribusjonbestilling.setBestillendeFagsystem(distribusjonbestillingTo.getBestillendeFagsystem());
 		distribusjonbestilling.setTema(distribusjonbestillingTo.getTema());
 		distribusjonbestilling.setForsendelseTittel(distribusjonbestillingTo.getForsendelseTittel());
+		distribusjonbestilling.setForsendelseMetadata(distribusjonbestillingTo.getForsendelseMetadata());
+		distribusjonbestilling.setForsendelseMetadataType(mapForsendelseMetadataType(distribusjonbestillingTo.getForsendelseMetadataType()));
 		distribusjonbestilling.setDistribusjonstype(mapDistribusjonstype(distribusjonbestillingTo.getDistribusjonstype()));
 		distribusjonbestilling.setDistribusjonstidspunkt(mapDistribusjonstidspunkt(distribusjonbestillingTo.getDistribusjonstidspunkt()));
 		distribusjonbestilling.setArkivInformasjon(mapArkivInformasjon(distribusjonbestillingTo.getArkivInformasjon()));
@@ -78,14 +81,16 @@ public class Qdist008DistribuerForsendelseMapper {
 		return isBlank(batchId) ? null : batchId;
 	}
 
+	private String mapForsendelseMetadataType(ForsendelseMetadataType forsendelseMetadataType) {
+		return nonNull(forsendelseMetadataType) ? forsendelseMetadataType.name() : null;
+	}
+
 	private String mapDistribusjonstype(DistribusjonstypeCode distribusjonstype) {
-		return (nonNull(distribusjonstype) && isValidEnum(DistribusjonstypeCode.class, distribusjonstype.name())) ?
-				distribusjonstype.name() : null;
+		return nonNull(distribusjonstype) ? distribusjonstype.name() : null;
 	}
 
 	private String mapDistribusjonstidspunkt(DistribusjonstidspunktCode distribusjonstidspunktCode) {
-		return (nonNull(distribusjonstidspunktCode) && isValidEnum(DistribusjonstidspunktCode.class, distribusjonstidspunktCode.name())) ?
-				distribusjonstidspunktCode.name() : null;
+		return nonNull(distribusjonstidspunktCode) ? distribusjonstidspunktCode.name() : null;
 	}
 
 	private ArkivInformasjon mapArkivInformasjon(ArkivInformasjonTo arkivInformasjonTo) {
