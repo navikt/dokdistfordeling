@@ -10,8 +10,10 @@ import no.nav.dokdistfordeling.qdist008.domain.OpprettForsendelseToRequestMapper
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
+import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_AVTALEMELDING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -54,6 +56,7 @@ class OpprettForsendelseToRequestMapperTest {
 	private static final TilknyttetSomCode TILKNYTTET_SOM_CODE_2 = TilknyttetSomCode.VEDLEGG;
 	private static final ArkivSystemCode ARKIV_SYSTEM_CODE = ArkivSystemCode.JOARK;
 	private static final String DOKUMENTTITTEL = "dokumentTittel";
+	private static final String FORSENDELSE_METADATA = "forsendelseMetadata";
 
 	private static final DistribusjonKanalCode DISTRIBUSJONS_KANAL_CODE = DistribusjonKanalCode.PRINT;
 
@@ -163,6 +166,22 @@ class OpprettForsendelseToRequestMapperTest {
 				PERSON_IDENTIFIKATOR);
 
 		assertNull(opprettForsendelseRequestTo.getArkivInformasjon());
+	}
+
+	@Test
+	public void shouldMapForsendelseMetadata() {
+		DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo = createDistribusjonbestillingToBuilder()
+				.forsendelseMetadata(Base64.getEncoder().encodeToString(FORSENDELSE_METADATA.getBytes()))
+				.forsendelseMetadataType(DPO_AVTALEMELDING)
+				.build();
+
+		OpprettForsendelseRequestTo opprettForsendelseRequestTo = performMapping(distribusjonbestillingTo, PERSON_IDENTIFIKATOR);
+
+		assertCommon(opprettForsendelseRequestTo);
+		assertMottakerIsPerson(opprettForsendelseRequestTo.getMottaker());
+		assertDokumentInformasjon(opprettForsendelseRequestTo.getDokumenter());
+		assertEquals(FORSENDELSE_METADATA, new String(opprettForsendelseRequestTo.getForsendelseMetadata()));
+		assertEquals(DPO_AVTALEMELDING, opprettForsendelseRequestTo.getForsendelseMetadataType());
 	}
 
 

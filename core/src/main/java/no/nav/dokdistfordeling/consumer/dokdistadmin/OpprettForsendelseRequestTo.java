@@ -18,7 +18,7 @@ public class OpprettForsendelseRequestTo {
 	String bestillendeFagsystem;
 	String tema;
 	String forsendelseTittel;
-	String forsendelseMetadata;
+	byte[] forsendelseMetadata;
 	ForsendelseMetadataType forsendelseMetadataType;
 	String batchId;
 	String dokumentProdApp;

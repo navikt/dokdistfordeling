@@ -4,10 +4,12 @@ import no.nav.dokdistfordeling.consumer.dokdistadmin.OpprettForsendelseRequestTo
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import org.springframework.stereotype.Component;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Component
 public class OpprettForsendelseToRequestMapper {
@@ -33,7 +35,7 @@ public class OpprettForsendelseToRequestMapper {
 				.arkivInformasjon(mapArkivInformasjon(arkivInformasjon))
 				.distribusjonstype(isNull(distribusjonbestilling.getDistribusjonstype()) ? null : distribusjonbestilling.getDistribusjonstype().name())
 				.distribusjonstidspunkt(isNull(distribusjonbestilling.getDistribusjonstidspunkt()) ? null : distribusjonbestilling.getDistribusjonstidspunkt().name())
-				.forsendelseMetadata(distribusjonbestilling.getForsendelseMetadata())
+				.forsendelseMetadata(isBlank(distribusjonbestilling.getForsendelseMetadata()) ? null : Base64.getDecoder().decode(distribusjonbestilling.getForsendelseMetadata()))
 				.forsendelseMetadataType(distribusjonbestilling.getForsendelseMetadataType())
 				.postadresse(mapPostadresse(adresse))
 				.dokumenter(dokumentInformasjonToList.stream()
