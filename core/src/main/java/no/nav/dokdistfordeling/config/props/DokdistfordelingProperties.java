@@ -1,5 +1,6 @@
 package no.nav.dokdistfordeling.config.props;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -11,67 +12,74 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties("dokdistfordeling")
 public class DokdistfordelingProperties {
 
+	@Valid
 	private final Endpoints endpoints = new Endpoints();
+	@Valid
 	private final Serviceuser serviceuser = new Serviceuser();
 
 	@Data
-	@Validated
 	public static class Serviceuser {
 		@NotEmpty
 		private String username;
+
 		@NotEmpty
 		private String password;
 	}
 
 	@Data
-	@Validated
 	public static class Endpoints {
 		/**
 		 * URL til dokmet.
 		 */
+		@Valid
 		@NotNull
 		private Endpoint dokmet;
 
 		/**
-		 * URL til dokmet.
+		 * URL til regoppslag.
 		 */
+		@Valid
 		@NotNull
 		private Endpoint regoppslag;
 
 		/**
 		 * URL til saf.
 		 */
+		@Valid
 		@NotNull
-		private Endpoint saf;
+		private AzureEndpoint saf;
 
 		/**
 		 * URL til dokarkiv journalpost api.
 		 */
+		@Valid
 		@NotNull
 		private AzureEndpoint dokarkiv;
 
 		/**
 		 * URL til dokdistadmin administrerforsendelse api.
 		 */
+		@Valid
 		@NotNull
 		private AzureEndpoint dokdistadmin;
 
 		/**
 		 * URL og Scope til dokdistkanal.
 		 */
+		@Valid
 		@NotNull
 		private AzureEndpoint dokdistkanal;
 
 		/**
 		 * URL og Scope til PDL.
 		 */
+		@Valid
 		@NotNull
 		private AzureEndpoint pdl;
 
 	}
 
 	@Data
-	@Validated
 	public static class AzureEndpoint {
 		/**
 		 * Url til tjeneste som har azure autorisasjon
@@ -87,7 +95,6 @@ public class DokdistfordelingProperties {
 	}
 
 	@Data
-	@Validated
 	public static class Endpoint {
 		@NotEmpty
 		private String url;

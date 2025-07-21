@@ -47,6 +47,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
+import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,6 +56,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
@@ -95,6 +97,7 @@ public class Qdist012IT {
 
 	@BeforeEach
 	public void setupBefore() {
+		stubNaisTexasToken();
 		Mockito.reset(bucketStorage);
 	}
 
@@ -338,7 +341,7 @@ public class Qdist012IT {
 			assertEquals(message, response);
 		});
 		Mockito.verify(bucketStorage, times(1)).upload(any(), any(), any());
-		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
 		verify(exactly(1), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -420,7 +423,10 @@ public class Qdist012IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
 		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
-				aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())));
+				aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+						.withBody("""
+								{"timestamp":"2025-07-21T07:45:37.626+00:00","status":500,"error":"Internal Server Error","message":"No message available","path":"/rest/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV"}
+								""")));
 
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		sendStringMessageWithHeaders(qdist012, message);
@@ -431,7 +437,7 @@ public class Qdist012IT {
 			assertEquals(message, response);
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
-		verify(exactly(MAX_ATTEMPTS_SHORT + 1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
 		verify(exactly(MAX_ATTEMPTS_SHORT), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -446,7 +452,9 @@ public class Qdist012IT {
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
 		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
-				aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
+				aResponse().withStatus(HttpStatus.NOT_FOUND.value()).withBody("""
+						{"timestamp":"2025-07-21T07:45:37.626+00:00","status":401,"error":"Unauthorized","message":"No message available","path":"/rest/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV"}
+						""")));
 
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		sendStringMessageWithHeaders(qdist012, message);
@@ -457,7 +465,7 @@ public class Qdist012IT {
 			assertEquals(message, response);
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
-		verify(exactly(2), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
+		verify(exactly(1), getRequestedFor(urlEqualTo("/stsRest/token?grant_type=client_credentials&scope=openid")));
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
 		verify(exactly(1), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
@@ -510,6 +518,14 @@ public class Qdist012IT {
 		} catch (JAXBException | IllegalArgumentException e) {
 			throw new IllegalArgumentException("Kunne ikke marshalle bestilling til xmlString");
 		}
+	}
+
+	void stubNaisTexasToken() {
+		stubFor(post("/nais-texas")
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("nais-texas/token_response.json")));
 	}
 }
 
