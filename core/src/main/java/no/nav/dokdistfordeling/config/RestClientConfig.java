@@ -2,13 +2,13 @@ package no.nav.dokdistfordeling.config;
 
 import no.nav.dokdistfordeling.consumer.token.NaisTexasConsumer;
 import no.nav.dokdistfordeling.consumer.token.NaisTexasRequestInterceptor;
-import org.slf4j.MDC;
+import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
-import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
+import java.time.Duration;
 
 @Configuration
 public class RestClientConfig {
@@ -16,8 +16,15 @@ public class RestClientConfig {
 	@Bean
 	RestClient restClientTexas(RestClient.Builder restClientBuilder, NaisTexasConsumer naisTexasConsumer) {
 		return restClientBuilder
-				.defaultHeaders(httpHeaders -> httpHeaders.set(NAV_CALL_ID, MDC.get(CALL_ID)))
+				.requestFactory(jdkClientHttpRequestFactory())
 				.requestInterceptor(new NaisTexasRequestInterceptor(naisTexasConsumer))
+				.build();
+	}
+
+	private static JdkClientHttpRequestFactory jdkClientHttpRequestFactory() {
+		return ClientHttpRequestFactoryBuilder.jdk()
+				.withCustomizer(jdkClientHttpRequestFactory ->
+						jdkClientHttpRequestFactory.setReadTimeout(Duration.ofSeconds(20)))
 				.build();
 	}
 }
