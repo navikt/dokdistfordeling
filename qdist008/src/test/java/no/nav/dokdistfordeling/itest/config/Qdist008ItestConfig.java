@@ -4,6 +4,7 @@ import no.nav.dokdistfordeling.CoreConfig;
 import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
 import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
+import no.nav.dokdistfordeling.config.props.NaisProperties;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.storage.BucketStorage;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -19,7 +20,8 @@ import static org.mockito.Mockito.mock;
 @EnableConfigurationProperties({
 		DokdistfordelingProperties.class,
 		MqGatewayAlias.class,
-		AzureProperties.class
+		AzureProperties.class,
+		NaisProperties.class
 })
 @Import({
 		Qdist008JmsItestConfig.class,
