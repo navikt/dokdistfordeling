@@ -6,12 +6,16 @@ import no.nav.dokdistfordeling.exception.functional.DokdistadminFunctionalExcept
 import no.nav.dokdistfordeling.exception.technical.DokdistadminTechnicalException;
 import org.slf4j.MDC;
 import org.springframework.boot.autoconfigure.http.codec.HttpCodecsProperties;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.netty.http.client.HttpClient;
+
+import java.time.Duration;
 
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.config.azure.OAuthEnabledWebClientConfig.CLIENT_REGISTRATION_DOKDISTADMIN;
@@ -31,6 +35,11 @@ public class DokdistadminConsumer {
 
 	public DokdistadminConsumer(final DokdistfordelingProperties dokdistfordelingProperties,
 								WebClient webClient, HttpCodecsProperties codecProperties) {
+
+		var clientHttpConnector = new ReactorClientHttpConnector(HttpClient.create()
+				.proxyWithSystemProperties()
+				.responseTimeout(Duration.ofSeconds(60)));
+
 		this.webClient = webClient
 				.mutate()
 				.defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -39,6 +48,7 @@ public class DokdistadminConsumer {
 						.codecs(configurer ->
 								configurer.defaultCodecs().maxInMemorySize((int) codecProperties.getMaxInMemorySize().toBytes()))
 						.build())
+				.clientConnector(clientHttpConnector)
 				.build();
 	}
 
