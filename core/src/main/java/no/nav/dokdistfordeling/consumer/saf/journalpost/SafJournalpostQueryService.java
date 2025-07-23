@@ -1,10 +1,9 @@
-package no.nav.dokdistfordeling.consumer.saf;
+package no.nav.dokdistfordeling.consumer.saf.journalpost;
 
 import no.nav.dokdistfordeling.consumer.saf.graphql.GraphQLRequest;
 import no.nav.dokdistfordeling.consumer.saf.graphql.JournalpostToMapper;
 import no.nav.dokdistfordeling.consumer.saf.graphql.JournalpostToValidator;
 import no.nav.dokdistfordeling.consumer.saf.graphql.SafGraphqlConsumer;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;

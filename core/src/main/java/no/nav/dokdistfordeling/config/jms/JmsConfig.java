@@ -8,7 +8,7 @@ import com.ibm.msg.client.jakarta.wmq.WMQConstants;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
 import jakarta.jms.Queue;
-import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
+import no.nav.dokdistfordeling.config.props.MqProperties;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,17 +77,17 @@ public class JmsConfig {
 	}
 
 	@Bean
-	public ConnectionFactory connectionFactory(final MqGatewayAlias mqGatewayAlias,
+	public ConnectionFactory connectionFactory(final MqProperties mqProperties,
 											   final DokdistfordelingProperties dokdistfordelingProperties) throws JMSException {
-		return createConnectionFactory(mqGatewayAlias, dokdistfordelingProperties.getServiceuser());
+		return createConnectionFactory(mqProperties, dokdistfordelingProperties.getServiceuser());
 	}
 
-	private JmsPoolConnectionFactory createConnectionFactory(final MqGatewayAlias mqGatewayAlias,
+	private JmsPoolConnectionFactory createConnectionFactory(final MqProperties mqProperties,
 															 final DokdistfordelingProperties.Serviceuser serviceuser) throws JMSException {
 		MQConnectionFactory connectionFactory = new MQConnectionFactory();
-		connectionFactory.setHostName(mqGatewayAlias.getHostname());
-		connectionFactory.setPort(mqGatewayAlias.getPort());
-		connectionFactory.setQueueManager(mqGatewayAlias.getName());
+		connectionFactory.setHostName(mqProperties.getHostname());
+		connectionFactory.setPort(mqProperties.getPort());
+		connectionFactory.setQueueManager(mqProperties.getName());
 		connectionFactory.setTransportType(WMQConstants.WMQ_CM_CLIENT);
 		connectionFactory.setCCSID(UTF_8_WITH_PUA);
 		connectionFactory.setIntProperty(WMQConstants.JMS_IBM_ENCODING, MQConstants.MQENC_NATIVE);
@@ -96,7 +96,7 @@ public class JmsConfig {
 		connectionFactory.setSSLCipherSuite(ANY_TLS13_OR_HIGHER);
 		SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
 		connectionFactory.setSSLSocketFactory(factory);
-		connectionFactory.setChannel(mqGatewayAlias.getChannel().getSecurename());
+		connectionFactory.setChannel(mqProperties.getChannel().getSecurename());
 
 		UserCredentialsConnectionFactoryAdapter adapter = new UserCredentialsConnectionFactoryAdapter();
 		adapter.setTargetConnectionFactory(connectionFactory);

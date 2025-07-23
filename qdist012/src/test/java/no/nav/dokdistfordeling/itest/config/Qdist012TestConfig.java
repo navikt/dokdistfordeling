@@ -1,7 +1,7 @@
 package no.nav.dokdistfordeling.itest.config;
 
 import no.nav.dokdistfordeling.CoreConfig;
-import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
+import no.nav.dokdistfordeling.config.props.MqProperties;
 import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.props.NaisProperties;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 @EnableRetry
 @EnableConfigurationProperties({
 		DokdistfordelingProperties.class,
-		MqGatewayAlias.class,
+		MqProperties.class,
 		AzureProperties.class,
 		NaisProperties.class
 })

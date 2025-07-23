@@ -5,7 +5,7 @@ import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseRespo
 import org.springframework.stereotype.Component;
 
 @Component
-class RegoppslagService implements Regoppslag {
+public class RegoppslagService {
     private static final String ORGANISASJON_TYPE = "ORGANISASJON";
     private static final String PERSON_TYPE = "PERSON";
 
@@ -15,7 +15,6 @@ class RegoppslagService implements Regoppslag {
         this.regoppslagRestConsumer = regoppslagRestConsumer;
     }
 
-    @Override
     public HentMottakerOgAdresseResponseTo.AdresseTo hentOrganisasjonAdresse(String orgnummer) {
         return regoppslagRestConsumer.hentAdresse(HentMottakerOgAdresseRequestTo.builder()
                 .identifikator(orgnummer)
@@ -23,7 +22,6 @@ class RegoppslagService implements Regoppslag {
                 .build());
     }
 
-    @Override
     public HentMottakerOgAdresseResponseTo.AdresseTo hentPersonAdresse(String foedselsnummer, String tema) {
         return regoppslagRestConsumer.hentAdresse(HentMottakerOgAdresseRequestTo.builder()
                 .identifikator(foedselsnummer)

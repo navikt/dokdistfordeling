@@ -22,6 +22,7 @@ public class DokdistStatusUpdater {
 		this.dokdistadminConsumer = dokdistadminConsumer;
 	}
 
+	@SuppressWarnings("unused")
 	@Handler
 	public void doUpdate(Exchange exchange) {
 		final String forsendelseId = exchange.getProperty(PROPERTY_FORSENDELSE_ID, String.class);

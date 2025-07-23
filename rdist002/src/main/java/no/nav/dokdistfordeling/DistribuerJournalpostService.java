@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostRequest;
-import no.nav.dokdistfordeling.consumer.regoppslag.Regoppslag;
+import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.domain.Postadresse;
@@ -30,13 +30,13 @@ import static no.nav.dokdistfordeling.validate.TvingKanalValidator.validateTving
 public class DistribuerJournalpostService {
 
 	private final DistribuerForsendelseProducer distribuerForsendelseProducer;
-	private final Regoppslag regoppslag;
+	private final RegoppslagService regoppslag;
 	private final BestemDistribusjonskanalService bestemDistribusjonskanalService;
 	private final JournalpostApi journalpostApi;
 	private final PersonnummerService personnummerService;
 
 	public DistribuerJournalpostService(DistribuerForsendelseProducer distribuerForsendelseProducer,
-										Regoppslag regoppslag,
+										RegoppslagService regoppslag,
 										BestemDistribusjonskanalService bestemDistribusjonskanalService,
 										JournalpostApi journalpostApi,
 										PersonnummerService personnummerService) {

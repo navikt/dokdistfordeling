@@ -4,7 +4,7 @@ package no.nav.dokdistfordeling;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;

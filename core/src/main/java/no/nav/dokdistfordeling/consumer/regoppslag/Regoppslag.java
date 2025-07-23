@@ -1,9 +1,0 @@
-package no.nav.dokdistfordeling.consumer.regoppslag;
-
-
-import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseResponseTo;
-
-public interface Regoppslag {
-    HentMottakerOgAdresseResponseTo.AdresseTo hentOrganisasjonAdresse(final String orgnummer);
-    HentMottakerOgAdresseResponseTo.AdresseTo hentPersonAdresse(final String foedselsnummer, String tema);
-}
