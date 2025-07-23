@@ -1,11 +1,13 @@
 package no.nav.dokdistfordeling.util;
 
 import static java.lang.String.format;
+import static no.nav.dokdistfordeling.constants.Constants.BEARER_PREFIX;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.dokdistfordeling.exception.functional.InvalidMappingToEnumFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.ValidationException;
 
 import java.io.IOException;
 
@@ -22,5 +24,13 @@ public final class MappingUtil {
 		} catch (IllegalArgumentException e) {
 			throw new InvalidMappingToEnumFunctionalException(format("Ulovlig verdi ble forsøkt mappet til enum: %s er ikke en gyldig kodeverdi for %s", enumName, enumClass));
 		}
+	}
+
+	public static String splitBearerToken(String authorizationHeader) {
+		if (authorizationHeader == null || !BEARER_PREFIX.equalsIgnoreCase(authorizationHeader.split(" ")[0])) {
+			throw new ValidationException("Authorization header må være på formen Bearer {token}");
+		}
+
+		return authorizationHeader.split(" ")[1];
 	}
 }
