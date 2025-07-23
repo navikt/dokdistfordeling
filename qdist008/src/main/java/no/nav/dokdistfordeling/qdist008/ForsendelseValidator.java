@@ -1,7 +1,7 @@
 package no.nav.dokdistfordeling.qdist008;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException;
 import no.nav.dokdistfordeling.exception.functional.OjectNotFoundInBucketFunctionalException;
@@ -33,6 +33,7 @@ public class ForsendelseValidator {
 		this.safJournalpostQueryService = safJournalpostQueryService;
 	}
 
+	@SuppressWarnings("unused")
 	@Handler
 	public void validate(DistribuerForsendelseTo distribuerForsendelseTo) {
 		final DistribuerForsendelseTo.DistribusjonbestillingTo distribusjonbestillingTo = distribuerForsendelseTo.getDistribusjonbestilling();

@@ -39,7 +39,7 @@ class RegoppslagRestConsumer {
 	private final String regoppslagUrl;
 	private final StsRestConsumer stsRestConsumer;
 
-	public RegoppslagRestConsumer(RestTemplateBuilder restTemplateBuilder,
+	RegoppslagRestConsumer(RestTemplateBuilder restTemplateBuilder,
 								  final DokdistfordelingProperties dokdistfordelingProperties,
 								  StsRestConsumer stsRestConsumer) {
 		this.regoppslagUrl = dokdistfordelingProperties.getEndpoints().getRegoppslag().getUrl();

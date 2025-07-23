@@ -1,7 +1,7 @@
 package no.nav.dokdistfordeling;
 
 import no.nav.dokdistfordeling.config.SecurityConfig;
-import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
+import no.nav.dokdistfordeling.config.props.MqProperties;
 import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.props.DokdistmellomlagerProperties;
@@ -17,7 +17,7 @@ import org.springframework.retry.annotation.EnableRetry;
 @EnableCaching
 @EnableRetry
 @EnableConfigurationProperties({
-		MqGatewayAlias.class,
+		MqProperties.class,
 		AzureProperties.class,
 		DokdistmellomlagerProperties.class,
 		DokdistfordelingProperties.class,

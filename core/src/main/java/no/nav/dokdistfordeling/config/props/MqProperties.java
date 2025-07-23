@@ -1,5 +1,6 @@
-package no.nav.dokdistfordeling.config.alias;
+package no.nav.dokdistfordeling.config.props;
 
+import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,17 +17,17 @@ import jakarta.validation.constraints.NotEmpty;
 @ToString
 @ConfigurationProperties("mqgateway01")
 @Validated
-public class MqGatewayAlias {
+public class MqProperties {
 	@NotEmpty
 	private String hostname;
 	@NotEmpty
 	private String name;
 	@Min(0)
 	private int port;
+	@Valid
 	private MqChannel channel = new MqChannel();
 
 	@Data
-	@Validated
 	public static class MqChannel {
 		@NotBlank
 		private String securename;

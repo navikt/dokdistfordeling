@@ -2,7 +2,7 @@ package no.nav.dokdistfordeling.config;
 
 import no.nav.dokdistfordeling.CoreConfig;
 import no.nav.dokdistfordeling.DistribuerJournalpostConfig;
-import no.nav.dokdistfordeling.config.alias.MqGatewayAlias;
+import no.nav.dokdistfordeling.config.props.MqProperties;
 import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.props.NaisProperties;
@@ -17,7 +17,7 @@ import org.springframework.retry.annotation.EnableRetry;
 @Profile("itest")
 @EnableConfigurationProperties({
 		DokdistfordelingProperties.class,
-		MqGatewayAlias.class,
+		MqProperties.class,
 		AzureProperties.class,
 		NaisProperties.class
 })

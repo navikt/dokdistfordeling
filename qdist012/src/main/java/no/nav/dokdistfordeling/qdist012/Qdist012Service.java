@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import no.nav.dokdistfordeling.consumer.saf.SafJournalpostQueryService;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.hentdokument.SafHentDokumentConsumer;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.DistribusjonbestillingTo;

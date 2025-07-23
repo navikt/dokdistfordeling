@@ -45,6 +45,7 @@ public class Qdist008Service {
 		this.journalpostApi = journalpostApi;
 	}
 
+	@SuppressWarnings("unused")
 	@Handler
 	public DistribuerTilKanal distribuerForsendelseService(DistribuerForsendelseTo distribuerForsendelseTo, Exchange exchange) {
 		DistribusjonbestillingTo distribusjonbestilling = distribuerForsendelseTo.getDistribusjonbestilling();
