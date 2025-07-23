@@ -1,7 +1,5 @@
 package no.nav.dokdistfordeling.consumer.saf.graphql;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
@@ -9,63 +7,68 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonResponse;
 import no.nav.dokdistfordeling.exception.functional.SafBadRequestException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
-import no.nav.dokdistfordeling.exception.technical.MarshalGraphqlRequestToJsonTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostIkkeFunnetTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostQueryTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafUkjentErrorCodeException;
 import org.slf4j.MDC;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
-import java.time.Duration;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
-import static org.springframework.http.HttpMethod.POST;
+import static no.nav.dokdistfordeling.consumer.token.NaisTexasRequestInterceptor.TARGET_SCOPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Component
 @Slf4j
 public class SafGraphqlConsumer {
 
-	private static final String OIDC_TOKEN_PREFIX = "Bearer";
+	private static final String BEARER_PREFIX = "Bearer";
 	private static final String NOT_FOUND = "not_found";
 	private static final String FORBIDDEN = "forbidden";
 	private static final String SERVER_ERROR = "server_error";
 	private static final String BAD_REQUEST = "bad_request";
 	private static final String CLASSIFICATION_VALIDATIONERROR = "ValidationError";
 
-	private final RestTemplate restTemplate;
-	private final String safGraphQlUrl;
+	private final RestClient restClientTexas;
+	private final String safScope;
 
-	public SafGraphqlConsumer(RestTemplateBuilder restTemplateBuilder,
+	public SafGraphqlConsumer(RestClient restClientTexas,
 							  DokdistfordelingProperties dokdistfordelingProperties) {
-		this.restTemplate = restTemplateBuilder
-				.readTimeout(Duration.ofSeconds(20))
-				.connectTimeout(Duration.ofSeconds(5))
+		this.restClientTexas = restClientTexas.mutate()
+				.baseUrl(dokdistfordelingProperties.getEndpoints().getSaf().getUrl())
 				.build();
-		this.safGraphQlUrl = dokdistfordelingProperties.getEndpoints().getSaf().getUrl() + "/graphql";
+		this.safScope = dokdistfordelingProperties.getEndpoints().getSaf().getScope();
 	}
 
 	@Retryable(retryFor = SafJournalpostQueryTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
-	public SafJournalpostTo performQuery(GraphQLRequest graphQLRequest, String authorizationHeader) {
-
+	public SafJournalpostTo performQuery(GraphQLRequest graphQLRequest, Optional<String> authorizationHeader) {
 		try {
-			HttpHeaders httpHeaders = createAuthHeaderFromToken(authorizationHeader);
-
-			SafJsonResponse result = restTemplate.exchange(safGraphQlUrl, POST, new HttpEntity<>(requestToJson(graphQLRequest), httpHeaders), SafJsonResponse.class).getBody();
+			SafJsonResponse result = restClientTexas.post()
+					.uri("/graphql")
+					.body(graphQLRequest)
+					.headers(httpHeaders -> {
+						httpHeaders.setContentType(APPLICATION_JSON);
+						authorizationHeader.ifPresent(bearerToken -> httpHeaders.setBearerAuth(splitBearerToken(bearerToken)));
+					})
+					.attributes(attributes -> {
+						if (authorizationHeader.isEmpty()) {
+							attributes.put(TARGET_SCOPE, safScope);
+						}
+					})
+					.retrieve()
+					.body(SafJsonResponse.class);
 
 			if (result != null && result.getErrors() != null && !result.getErrors().isEmpty()) {
-				SafJsonResponse.Error safError = result.getErrors().get(0);
+				SafJsonResponse.Error safError = result.getErrors().getFirst();
 				if (safError.getExtensions().getClassification().contains(CLASSIFICATION_VALIDATIONERROR)) {
 					throw new SafJournalpostQueryTechnicalException("Feil i saf query: " + safError.getMessage());
 				}
@@ -100,24 +103,12 @@ public class SafGraphqlConsumer {
 		}
 	}
 
-	private HttpHeaders createAuthHeaderFromToken(String authorizationHeader) {
-		HttpHeaders headers = new HttpHeaders();
-		if (authorizationHeader == null || !OIDC_TOKEN_PREFIX.equalsIgnoreCase(authorizationHeader.split(" ")[0])) {
+	private String splitBearerToken(String authorizationHeader) {
+		if (authorizationHeader == null || !BEARER_PREFIX.equalsIgnoreCase(authorizationHeader.split(" ")[0])) {
 			throw new ValidationException("Authorization header må være på formen Bearer {token}");
 		}
 
-		headers.setContentType(APPLICATION_JSON);
-		headers.set(NAV_CALL_ID, MDC.get(CALL_ID));
-		headers.setBearerAuth(authorizationHeader.split(" ")[1]);
-		return headers;
+		return authorizationHeader.split(" ")[1];
 	}
 
-	private String requestToJson(GraphQLRequest graphQLRequest) {
-		try {
-			return new ObjectMapper().writeValueAsString(graphQLRequest);
-		} catch (JsonProcessingException e) {
-			throw new MarshalGraphqlRequestToJsonTechnicalException(format("Kunne ikke konvertere graphQlRequest til json, feilmelding=%s", e
-					.getMessage()), e);
-		}
-	}
 }

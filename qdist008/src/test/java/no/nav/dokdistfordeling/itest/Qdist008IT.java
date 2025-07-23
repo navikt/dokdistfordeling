@@ -71,7 +71,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @ActiveProfiles("itest")
 public class Qdist008IT {
 	private static final String DOKUMENTTYPE_ID = "1111111";
-	private static final String STSSTRING = "/stsRest/token?grant_type=client_credentials&scope=openid";
 
 	private static final String PDL_URL = "/pdl";
 	private static final String DOKMET_URL = "/rest/dokumenttypeinfo/" + DOKUMENTTYPE_ID;
@@ -131,7 +130,7 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldProcessForsendelseAndWithUtsendingskanalPrint() throws Exception {
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubPostPdl();
 		stubAzure();
 		stubGetDokumenttypeInfo();
@@ -147,7 +146,6 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -160,7 +158,7 @@ public class Qdist008IT {
 	public void shouldProcessForsendelseAndWithUtsendingskanalDittNav() throws Exception {
 		stubGetDokumenttypeInfo();
 		stubPostPdl();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostRdist001();
 		stubPatchOppdaterDistribusjonsinfo();
@@ -174,7 +172,6 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoNAV_NOHappy.json"))));
@@ -187,7 +184,7 @@ public class Qdist008IT {
 	public void shouldProcessForsendelseWithUtsendingskanalSDP() throws Exception {
 		stubGetDokumenttypeInfo();
 		stubPostPdl();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostRdist001();
 		stubPatchOppdaterDistribusjonsinfo();
@@ -202,7 +199,6 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-			verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 			verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 			verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSDPHappy.json"))));
@@ -216,7 +212,7 @@ public class Qdist008IT {
 	public void shouldProcessForsendelseWithUtsendingskanalTrygderetten() throws Exception {
 		stubGetDokumenttypeInfo();
 		stubPostPdl();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostRdist001();
 		stubPatchOppdaterDistribusjonsinfo();
@@ -230,7 +226,6 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoTRYGDERETTENHappy.json"))));
@@ -243,7 +238,7 @@ public class Qdist008IT {
 	public void shouldProcessForsendelseWithUtsendingskanalDPO() throws Exception {
 		stubGetDokumenttypeInfo();
 		stubPostPdl();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostRdist001();
 		stubPatchOppdaterDistribusjonsinfo();
@@ -257,7 +252,6 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), postRequestedFor(urlPathMatching(DOKDISTADMIN_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelse_til_dpo_happy.json"))));
@@ -269,7 +263,7 @@ public class Qdist008IT {
 	public void shouldDistribuereForsendelseTilDPV() throws Exception {
 		stubGetDokumenttypeInfo();
 		stubPostPdl();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostRdist001();
 		stubPatchOppdaterDistribusjonsinfo();
@@ -290,7 +284,7 @@ public class Qdist008IT {
 	public void shouldProcessForsendelseWithUtsendingskanalLokalPrint() throws Exception {
 		stubGetDokumenttypeInfo();
 		stubPostPdl();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPatchOppdaterDistribusjonsinfo();
 
@@ -298,7 +292,6 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-			verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 			verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 			verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoLHappy.json"))));
@@ -312,7 +305,7 @@ public class Qdist008IT {
 	public void shouldProcessForsendelseWithUtsendingskanalIngenDistribusjon() throws Exception {
 		stubGetDokumenttypeInfo();
 		stubPostPdl();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPatchOppdaterDistribusjonsinfo();
 
@@ -320,7 +313,6 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-			verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 			verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 			verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 					.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoINGEN_DISTRIBUSJONHappy.json"))));
@@ -334,7 +326,7 @@ public class Qdist008IT {
 	public void shouldProcessForsendelseOnlyRequiredInputFieds() throws Exception {
 		stubGetDokumenttypeInfo();
 		stubPostPdl();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostRdist001();
 		stubPatchOppdaterDistribusjonsinfo();
@@ -354,7 +346,7 @@ public class Qdist008IT {
 	public void shouldProcessWithoutContactingDokmet() throws Exception {
 		stubGetDokumenttypeInfo();
 		stubPostPdl();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostRdist001();
 		stubPatchOppdaterDistribusjonsinfo();
@@ -370,7 +362,6 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(0), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -385,7 +376,7 @@ public class Qdist008IT {
 		stubPostRdist001();
 		stubPutOppdaterForsendelse();
 		stubPatchOppdaterDistribusjonsinfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_avoid_pdl_happypath.xml"));
@@ -396,7 +387,6 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(0), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -409,7 +399,7 @@ public class Qdist008IT {
 	public void shouldPassOnCallId() throws Exception {
 		stubGetDokumenttypeInfo();
 		stubPostPdl();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostRdist001();
 		stubPatchOppdaterDistribusjonsinfo();
@@ -451,7 +441,7 @@ public class Qdist008IT {
 	@Test
 	public void shouldThrowExceptionIfTemaErNullorEmpty() throws Exception {
 		stubPostPdl();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPatchOppdaterDistribusjonsinfo();
 		stubFor(post("/administrerforsendelse/v1")
@@ -506,7 +496,7 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowNotAvailableInBucketValidationException() throws Exception {
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		when(bucketStorage.exists(anyString())).thenReturn(false);
 
@@ -521,7 +511,7 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowDokmetTechnicalException() throws Exception {
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubFor(get(DOKMET_URL)
 				.willReturn(aResponse()
@@ -536,14 +526,13 @@ public class Qdist008IT {
 			assertThat(resultOnQdist008BackoutQueue).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 		});
 
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
 	}
 
 	@Test
 	public void shouldThrowPdlFunctionalException() throws Exception {
 		stubGetDokumenttypeInfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubFor(post(PDL_URL)
 				.willReturn(aResponse()
@@ -560,7 +549,6 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 	}
 
@@ -572,7 +560,7 @@ public class Qdist008IT {
 		logger.addAppender(listAppender);
 
 		stubGetDokumenttypeInfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubFor(post(SAF_GRAPHQL_URL)
 				.willReturn(aResponse()
@@ -586,7 +574,6 @@ public class Qdist008IT {
 				assertTrue(listAppender.list.stream().map(ILoggingEvent::getMessage).toList()
 						.contains("Forkaster melding på qdist008 for bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 og forsendelseId= grunnet=no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException: journalpostId=1234 er feilregistrert og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes")));
 
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
 	}
 
@@ -603,7 +590,7 @@ public class Qdist008IT {
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("saf/safGraphQlResponse-UNDER_ARBEID.json")));
 		stubGetDokumenttypeInfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
@@ -615,14 +602,13 @@ public class Qdist008IT {
 					.contains("Legger melding på funksjonell backoutkø for qdist008 for bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 og forsendelseId= grunnet=no.nav.dokdistfordeling.exception.functional.ValidationException: journalpostId=1234 har ugyldig status=UNDER_ARBEID og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes"));
 		});
 
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
 	}
 
 	@Test
 	public void shouldThrowPdlTechicalException() throws Exception {
 		stubGetDokumenttypeInfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubFor(post(PDL_URL)
 				.willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR.value())
@@ -637,14 +623,13 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 	}
 
 	@Test
 	public void shouldThrowBestemDokdistKanalFunctionalException() throws Exception {
 		stubGetDokumenttypeInfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostPdl();
 
@@ -656,14 +641,13 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 	}
 
 	@Test
 	public void shouldThrowBestemDokdistKanalTechnicalException() throws Exception {
 		stubGetDokumenttypeInfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostPdl();
 
@@ -678,7 +662,7 @@ public class Qdist008IT {
 	@Test
 	public void shouldThrowBestemDokdistKanalMappingException() throws Exception {
 		stubGetDokumenttypeInfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostPdl();
 
@@ -690,14 +674,13 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 	}
 
 	@Test
 	public void shouldThrowOpprettForsendelseFunctionalException() throws Exception {
 		stubGetDokumenttypeInfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostPdl();
 		stubFor(post(DOKDISTADMIN_URL)
@@ -712,7 +695,6 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilPrintOutputHappy.json"))));
@@ -722,7 +704,7 @@ public class Qdist008IT {
 	@Test
 	public void shouldThrowOpprettForsendelseTechnicalException() throws Exception {
 		stubGetDokumenttypeInfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostPdl();
 		stubFor(post(DOKDISTADMIN_URL)
@@ -737,7 +719,6 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilPrintOutputHappy.json"))));
@@ -746,7 +727,7 @@ public class Qdist008IT {
 	@Test
 	public void shouldThrowJournalpostAPITechnicalException() throws Exception {
 		stubGetDokumenttypeInfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostPdl();
 		stubPostRdist001();
@@ -762,7 +743,6 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -773,7 +753,7 @@ public class Qdist008IT {
 	@Test
 	public void shouldPutMessageOnFunksjonellBoqWhenBadRequestFromDokdistadmin() throws Exception {
 		stubGetDokumenttypeInfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostPdl();
 		stubPostRdist001();
@@ -791,7 +771,6 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
@@ -803,7 +782,7 @@ public class Qdist008IT {
 	@Test
 	public void shouldPutMessageOnBoqWhenInternalServerErrorFromDokdistadmin() throws Exception {
 		stubGetDokumenttypeInfo();
-		stubSTSToken();
+		stubNaisTexasToken();
 		stubAzure();
 		stubPostPdl();
 		stubPostRdist001();
@@ -820,8 +799,6 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(STSSTRING)));
-		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
 		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
@@ -844,13 +821,13 @@ public class Qdist008IT {
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("pdl/pdl-happy.json")));
 	}
-
-	private void stubSTSToken() {
-		stubFor(get(STSSTRING)
+	
+	void stubNaisTexasToken() {
+		stubFor(post("/nais-texas")
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("sts/stsResponse_happy.json")));
+						.withBodyFile("nais-texas/token_response.json")));
 	}
 
 	void stubAzure() {

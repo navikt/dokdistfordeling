@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 import static java.util.UUID.randomUUID;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
@@ -61,7 +63,7 @@ public class DistribuerJournalpostController {
 
 		try {
 			validateDistribuerJournalpostRequest(distribuerJournalpostRequestTo);
-			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), authorizationHeader);
+			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId(), Optional.of(authorizationHeader));
 
 			if (journalpost.erDistribuert()) {
 				final var bestillingsId = journalpost.getTilleggsopplysninger().getVerdi();
