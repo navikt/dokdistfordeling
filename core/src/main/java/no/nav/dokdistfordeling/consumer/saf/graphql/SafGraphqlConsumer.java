@@ -6,11 +6,9 @@ import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonResponse;
 import no.nav.dokdistfordeling.exception.functional.SafBadRequestException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
-import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostIkkeFunnetTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostQueryTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafUkjentErrorCodeException;
-import org.slf4j.MDC;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -21,17 +19,15 @@ import org.springframework.web.client.RestClient;
 import java.util.Optional;
 
 import static java.lang.String.format;
-import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
 import static no.nav.dokdistfordeling.consumer.token.NaisTexasRequestInterceptor.TARGET_SCOPE;
+import static no.nav.dokdistfordeling.util.MappingUtil.splitBearerToken;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Component
 @Slf4j
 public class SafGraphqlConsumer {
 
-	private static final String BEARER_PREFIX = "Bearer";
 	private static final String NOT_FOUND = "not_found";
 	private static final String FORBIDDEN = "forbidden";
 	private static final String SERVER_ERROR = "server_error";
@@ -102,13 +98,4 @@ public class SafGraphqlConsumer {
 					.getStatusCode(), e.getMessage()), e);
 		}
 	}
-
-	private String splitBearerToken(String authorizationHeader) {
-		if (authorizationHeader == null || !BEARER_PREFIX.equalsIgnoreCase(authorizationHeader.split(" ")[0])) {
-			throw new ValidationException("Authorization header må være på formen Bearer {token}");
-		}
-
-		return authorizationHeader.split(" ")[1];
-	}
-
 }

@@ -97,6 +97,10 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>no.nav.security</groupId>
+			<artifactId>token-validation-spring</artifactId>
+		</dependency>
 		<!-- Runtime-avhengigheit brukt av google-cloud-storage -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>

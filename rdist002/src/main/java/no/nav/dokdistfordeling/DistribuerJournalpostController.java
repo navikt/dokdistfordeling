@@ -4,8 +4,8 @@ package no.nav.dokdistfordeling;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.map.DistribuerJournalpostMapper;
@@ -23,11 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
-import static java.util.UUID.randomUUID;
-import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
 import static no.nav.dokdistfordeling.validate.DistribuerJournalpostRequestValidator.validateDistribuerJournalpostRequest;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.CONFLICT;
 
@@ -51,13 +47,7 @@ public class DistribuerJournalpostController {
 	@PostMapping(value = "/distribuerjournalpost")
 	public ResponseEntity<DistribuerJournalpostResponseTo> distribuerJournalpost(
 			@RequestBody DistribuerJournalpostRequestTo distribuerJournalpostRequestTo,
-			@Parameter(hidden = true) @RequestHeader(value = AUTHORIZATION) String authorizationHeader,
-			@Parameter(description = "Nav-CallId - teknisk sporingsid") @RequestHeader(value = "Nav-CallId", required = false) String navCallId,
-			@Parameter(description = "Nav-Consumer-Id - teknisk sporingsinfo om konsument") @RequestHeader(value = "Nav-Consumer-Id", required = false) String navConsumerId) {
-
-		addCallIdToMDC(navCallId);
-		addConsumerIdToMDC(navConsumerId);
-
+			@Parameter(hidden = true) @RequestHeader(value = AUTHORIZATION) String authorizationHeader) {
 		String journalpostId = SafeLoggingUtil.removeUnsafeChars(distribuerJournalpostRequestTo.getJournalpostId());
 		log.info("rdist002 har mottatt kall for journalpostId={}", journalpostId);
 
@@ -90,20 +80,6 @@ public class DistribuerJournalpostController {
 			}
 		} finally {
 			MDC.clear();
-		}
-	}
-
-	private void addCallIdToMDC(String callId) {
-		if (isNotBlank(callId)) {
-			MDC.put(CALL_ID, callId);
-		}
-
-		MDC.put(CALL_ID, randomUUID().toString());
-	}
-
-	private void addConsumerIdToMDC(String consumerId) {
-		if (isNotBlank(consumerId)) {
-			MDC.put(CONSUMER_ID, consumerId);
 		}
 	}
 }

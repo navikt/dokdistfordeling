@@ -133,6 +133,11 @@
                 <artifactId>dok-melding-virksomhet-dokdistfordeling</artifactId>
                 <version>${dok-legacy-tjenestespesifikasjoner.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.security</groupId>
+                <artifactId>token-validation-spring</artifactId>
+                <version>${token-support.version}</version>
+            </dependency>
 
             <!-- Test -->
             <dependency>
