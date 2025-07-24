@@ -1,0 +1,19 @@
+{
+  "journalpostId": "555555555",
+  "batchId": "126767",
+  "bestillendeFagSystem": "bestillendeFagsystem",
+  "adresse": {
+    "adressetype": "norskPostadresse",
+    "postnummer": "1337",
+    "poststed": "poststed",
+    "adresselinje1": "eksempelveien 23 A",
+    "adresselinje2": "eksempelveien 24 A",
+    "adresselinje3": "eksempelveien 25 A",
+    "land": "NO"
+  },
+  "dokumentProdApp": "dokumentprodapp",
+  "distribusjonstype": "VIKTIG",
+  "distribusjonstidspunkt": "KJERNETID",
+  "tvingSentralPrint": false,
+  "tvingKanal": null
+}
