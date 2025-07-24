@@ -125,6 +125,33 @@ public class Rdist002IT extends AbstractOauth2Test {
 		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
 	}
 
+	/**
+	 * DistribuerJournalpost kall skal takle json requests på en case insensitive måte
+	 */
+	@Test
+	public void distribuerJournalpostHappyPathJsonCaseInsensitive() {
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+		stubStsToken();
+		stubPdl("pdl/pdl-happy.json");
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
+		putStubOppdaterJournalpost();
+
+		HttpEntity<String> requestEntity = new HttpEntity<>(classpathToString("distribuerjournalpost-case-insensitive.json"), createHappyPathHeaders());
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = callDistribuerJournalpostJson(requestEntity);
+		assertThat(responseEntity.getStatusCode()).isEqualTo(OK);
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
+			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
+
+			assertNotNull(qdist012Result);
+			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
+			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoark-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
+		});
+	}
+
 	@Test
 	public void distribuerJournalpostToDittNAV() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
@@ -189,7 +216,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@ParameterizedTest
 	@EnumSource(TvingKanal.class)
 	public void shouldDistribuerJournalpostToKanalWhenTvingKanalIsSet(TvingKanal tvingKanal) {
-		stubSafGraphQl(tvingKanal.equals(TRYGDERETTEN)? "saf/safGraphQlResponse-happy-trygderetten.json" : "saf/safGraphQlResponse-happy.json");
+		stubSafGraphQl(tvingKanal.equals(TRYGDERETTEN) ? "saf/safGraphQlResponse-happy-trygderetten.json" : "saf/safGraphQlResponse-happy.json");
 		stubStsToken();
 		stubPdl("pdl/pdl-happy.json");
 		putStubOppdaterJournalpost();
@@ -757,6 +784,10 @@ public class Rdist002IT extends AbstractOauth2Test {
 		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, POST, requestEntity, DistribuerJournalpostResponseTo.class);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		return responseEntity.getBody();
+	}
+
+	private ResponseEntity<DistribuerJournalpostResponseTo> callDistribuerJournalpostJson(HttpEntity<String> requestEntity) {
+		return restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, POST, requestEntity, DistribuerJournalpostResponseTo.class);
 	}
 
 	private String callDistribuerJournalpostAndAssertErrorResponseCode(HttpEntity<DistribuerJournalpostRequestTo> requestEntity, HttpStatus expectedStatus) {
