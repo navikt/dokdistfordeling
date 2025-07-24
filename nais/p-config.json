@@ -1,7 +1,10 @@
 {
   "APP_NAME": "dokdistfordeling",
   "ENVIRONMENT": "p",
+  "DOKDISTFORDELING_NAIS_SECRETS": "dokdistfordeling",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.nais.adeo.no/rest/v1/sts",
+  "NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_DISCOVERYURL": "https://security-token-service.nais.adeo.no/rest/v1/sts/.well-known/openid-configuration",
+  "NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_ACCEPTED_AUDIENCE": "srvmelosys,srvarena-dokgen,srvdbarkiv,srvfamilie-ks-opps,srvccmarkivogdist",
   "MQGATEWAY01_CHANNEL_SECURENAME": "P_DOKDISTFORDEL_SEC",
   "MQGATEWAY01_HOSTNAME": "mpls01.adeo.no",
   "MQGATEWAY01_PORT": "1414",
@@ -39,5 +42,127 @@
     "https://dokdistfordeling.nais.adeo.no",
     "https://dokdistfordeling.prod-fss-pub.nais.io",
     "https://dokdistfordeling.intern.nav.no"
+  ],
+  "ENTRA_ID_PREAUTH": [
+    {
+      "app": "veilarbvedtaksstotte",
+      "namespace": "obo",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "fpformidling",
+      "namespace": "teamforeldrepenger",
+      "cluster": "prod-fss"
+    },
+    {
+      "app": "fptilbake",
+      "namespace": "teamforeldrepenger",
+      "cluster": "prod-fss"
+    },
+    {
+      "app": "pensjon-dokdist",
+      "namespace": "pensjonsbrev",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "yrkesskade-brevutsending",
+      "namespace": "yrkesskade",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "brev-administrasjon",
+      "namespace": "isa",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "k9-formidling",
+      "namespace": "k9saksbehandling",
+      "cluster": "prod-fss"
+    },
+    {
+      "app": "k9-tilbake",
+      "namespace": "k9saksbehandling",
+      "cluster": "prod-fss"
+    },
+    {
+      "app": "pensjon-pen",
+      "namespace": "pensjondeployer",
+      "cluster": "prod-fss"
+    },
+    {
+      "app": "su-se-bakover",
+      "namespace": "supstonad",
+      "cluster": "prod-fss"
+    },
+    {
+      "app": "etterlatte-brev-api",
+      "namespace": "etterlatte",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "kabal-document",
+      "namespace": "klage",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "dp-behov-distribuering",
+      "namespace": "teamdagpenger",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "tiltak-vedtaksbrev",
+      "namespace": "arbeidsgiver",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "amt-distribusjon",
+      "namespace": "amt",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "hm-saksbehandling",
+      "namespace": "teamdigihot",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "tilleggsstonader-integrasjoner",
+      "namespace": "tilleggsstonader",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "esyfovarsel",
+      "namespace": "team-esyfo",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "rpa-nos-robot1",
+      "namespace": "team-rpa",
+      "cluster": "prod-fss"
+    },
+    {
+      "app": "familie-integrasjoner",
+      "namespace": "teamfamilie",
+      "cluster": "prod-fss"
+    },
+    {
+      "app": "brev",
+      "namespace": "aap",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "bidrag-dokument-arkiv",
+      "namespace": "bidrag",
+      "cluster": "prod-fss"
+    },
+    {
+      "app": "ung-sak",
+      "namespace": "k9saksbehandling",
+      "cluster": "prod-gcp"
+    },
+    {
+      "app": "tiltakspenger-saksbehandling-api",
+      "namespace": "tpts",
+      "cluster": "prod-gcp"
+    }
   ]
 }

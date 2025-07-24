@@ -6,6 +6,7 @@ import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.props.DokdistmellomlagerProperties;
 import no.nav.dokdistfordeling.config.props.NaisProperties;
+import no.nav.security.token.support.spring.api.EnableJwtTokenValidation;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
@@ -28,6 +29,7 @@ import org.springframework.retry.annotation.EnableRetry;
 		DistribuerJournalpostConfig.class,
 		SecurityConfig.class
 })
+@EnableJwtTokenValidation(ignore = {"org.springframework", "org.springdoc"})
 @SpringBootApplication(exclude = UserDetailsServiceAutoConfiguration.class)
 public class Application {
 

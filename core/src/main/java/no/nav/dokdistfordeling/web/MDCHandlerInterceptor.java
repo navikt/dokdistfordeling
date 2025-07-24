@@ -3,38 +3,53 @@ package no.nav.dokdistfordeling.web;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.dokdistfordeling.config.azure.AzureProperties;
+import no.nav.dokdistfordeling.exception.functional.UnauthorizedException;
+import no.nav.security.token.support.core.context.TokenValidationContext;
+import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import no.nav.security.token.support.core.jwt.JwtToken;
 import org.slf4j.MDC;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.util.List;
 import java.util.UUID;
 
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
 import static no.nav.dokdistfordeling.constants.Constants.HEADER_NAV_CALLID;
 import static no.nav.dokdistfordeling.constants.Constants.USER_ID;
-import static no.nav.dokdistfordeling.util.MappingUtil.splitBearerToken;
 import static no.nav.dokdistfordeling.web.TokenClaimExtractor.UKJENT_CONSUMER_ID;
 import static no.nav.dokdistfordeling.web.TokenClaimExtractor.UKJENT_USER_ID;
 import static no.nav.dokdistfordeling.web.TokenClaimExtractor.getConsumerId;
 import static no.nav.dokdistfordeling.web.TokenClaimExtractor.getUserId;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
 public class MDCHandlerInterceptor implements HandlerInterceptor {
+	private static final String AUTH_ERRORMESSAGE = "Tilgang er avvist. Ingen gyldig token på Authorization header. " +
+													"Token må være utsted av NAV onprem security-token-service eller Entra Id.";
+	private final TokenValidationContextHolder tokenValidationContextHolder;
+	private final AzureProperties azureProperties;
+
+	public MDCHandlerInterceptor(TokenValidationContextHolder tokenValidationContextHolder,
+								 AzureProperties azureProperties) {
+		this.tokenValidationContextHolder = tokenValidationContextHolder;
+		this.azureProperties = azureProperties;
+	}
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-		String authorizationHeader = request.getHeader(AUTHORIZATION);
-		if (authorizationHeader == null) {
-			return true;
+		TokenValidationContext tokenValidationContext = tokenValidationContextHolder.getTokenValidationContext();
+
+		JwtToken jwtToken = tokenValidationContext.getFirstValidToken();
+		if (jwtToken == null) {
+			throw new UnauthorizedException(AUTH_ERRORMESSAGE);
 		}
 
-		JwtToken jwtToken = new JwtToken(splitBearerToken(authorizationHeader));
 		populateCallId(request);
-		populateConsumerId(jwtToken);
-		populateUserId(jwtToken);
+		populateConsumerId(tokenValidationContext, jwtToken);
+		populateUserId(tokenValidationContext, jwtToken);
+		markUsingSafClientId(jwtToken);
 		return true;
 	}
 
@@ -49,8 +64,8 @@ public class MDCHandlerInterceptor implements HandlerInterceptor {
 		MDC.put(CALL_ID, UUID.randomUUID().toString());
 	}
 
-	private void populateConsumerId(JwtToken jwtToken) {
-		final String consumerId = getConsumerId(jwtToken);
+	private void populateConsumerId(TokenValidationContext tokenValidationContext, JwtToken jwtToken) {
+		final String consumerId = getConsumerId(tokenValidationContext, jwtToken);
 
 		if (isNotBlank(consumerId)) {
 			MDC.put(CONSUMER_ID, consumerId);
@@ -60,8 +75,8 @@ public class MDCHandlerInterceptor implements HandlerInterceptor {
 		MDC.put(CONSUMER_ID, UKJENT_CONSUMER_ID);
 	}
 
-	private void populateUserId(JwtToken jwtToken) {
-		final String userId = getUserId(jwtToken);
+	private void populateUserId(TokenValidationContext tokenValidationContext, JwtToken jwtToken) {
+		final String userId = getUserId(tokenValidationContext, jwtToken);
 
 		if (isNotBlank(userId)) {
 			MDC.put(USER_ID, userId);
@@ -71,4 +86,16 @@ public class MDCHandlerInterceptor implements HandlerInterceptor {
 		MDC.put(USER_ID, UKJENT_USER_ID);
 	}
 
+	private void markUsingSafClientId(JwtToken jwtToken) {
+		try {
+			List<String> aud = jwtToken.getJwtTokenClaims().getAsList("aud");
+			if (aud.contains(azureProperties.appClientId())) {
+				MDC.put("saf_clientid", "false");
+			} else {
+				MDC.put("saf_clientid", "true");
+			}
+		} catch (Exception e) {
+			// noop
+		}
+	}
 }

@@ -7,6 +7,7 @@ import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.props.NaisProperties;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.storage.BucketStorage;
+import no.nav.security.token.support.spring.api.EnableJwtTokenValidation;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.mock;
 		CoreConfig.class,
 		JournalpostApi.class
 })
+@EnableJwtTokenValidation(ignore = {"org.springframework", "org.springdoc"})
 public class Qdist008ItestConfig {
 
 	@Bean

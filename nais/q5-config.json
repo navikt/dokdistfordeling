@@ -1,7 +1,10 @@
 {
   "APP_NAME": "dokdistfordeling-q5",
   "ENVIRONMENT": "q5",
+  "DOKDISTFORDELING_NAIS_SECRETS": "dokdistfordeling-q5",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.dev.adeo.no/rest/v1/sts",
+  "NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_DISCOVERYURL": "https://security-token-service.dev.adeo.no/rest/v1/sts/.well-known/openid-configuration",
+  "NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_ACCEPTED_AUDIENCE": "srvmelosys,srvarena-dokgen,srvdbarkiv,srvfamilie-ks-opps",
   "MQGATEWAY01_CHANNEL_SECURENAME": "Q2_DOKDISTFORDEL_SEC",
   "MQGATEWAY01_HOSTNAME": "mqls01.preprod.local",
   "MQGATEWAY01_PORT": "1413",
@@ -37,5 +40,17 @@
   "MAX_REPLICAS": "2",
   "INGRESSES": [
     "https://dokdistfordeling-q5.dev.intern.nav.no"
+  ],
+  "ENTRA_ID_PREAUTH": [
+    {
+      "app": "ida",
+      "namespace": "traktor",
+      "cluster": "prod-fss"
+    },
+    {
+      "app": "pensjon-pen-q5",
+      "namespace": "pensjon-q5",
+      "cluster": "dev-fss"
+    }
   ]
 }

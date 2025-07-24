@@ -7,7 +7,6 @@ import no.nav.dokdistfordeling.consumer.saf.graphql.SafGraphqlConsumer;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
-import java.util.Optional;
 
 @Component
 public class SafJournalpostQueryService {
@@ -21,17 +20,13 @@ public class SafJournalpostQueryService {
 	}
 
 	public Journalpost hentJournalpost(String journalpostid) {
-		return hentJournalpost(journalpostid, Optional.empty());
-	}
-
-	public Journalpost hentJournalpost(String journalpostid, Optional<String> authorizationHeader) {
 		return journalpostMapper.map(
 				journalpostToValidator.validateAndReturn(
 						safGraphqlConsumer.performQuery(GraphQLRequest.builder()
 								.query(JOURNALPOST_QUERY)
 								.operationName("journalpost")
 								.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
-								.build(), authorizationHeader))
+								.build()))
 		);
 	}
 
@@ -40,7 +35,7 @@ public class SafJournalpostQueryService {
 				.query(JOURNALPOSTSTATUS_QUERY)
 				.operationName("journalpost")
 				.variables(Collections.singletonMap("queryJournalpostId", journalpostid))
-				.build(), Optional.empty()).getJournalstatus();
+				.build()).getJournalstatus();
 	}
 
 	private static final String JOURNALPOST_QUERY =

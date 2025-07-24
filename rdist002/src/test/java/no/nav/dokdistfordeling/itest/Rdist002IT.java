@@ -93,6 +93,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@BeforeEach
 	public void setupBefore() {
 		stubAzureToken();
+		stubNaisTexasToken();
 	}
 
 	@Test
@@ -489,9 +490,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
 				createDistribuerJournalpostToBuilder().build(),
 				createHeaderWithoutAuth());
-		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
-
-		assertThat(restResponse).contains("Required header 'Authorization' is not present.");
+		callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, UNAUTHORIZED);
 	}
 
 	@Test
@@ -709,6 +708,15 @@ public class Rdist002IT extends AbstractOauth2Test {
 		assertThat(body).contains("Validering av distribusjonsforespørsel feilet med feilmelding: Feltet poststed kan ikke være null eller tomt. Fikk poststed=null");
 	}
 
+	@Test
+	public void shouldReturnUnauthorizedWhenInvalidToken() {
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHeadersWithInvalidAuth());
+
+		callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, UNAUTHORIZED);
+	}
+
 	private static Stream<Arguments> shouldReturnInternalServerErrorWhenBestemDistribusjonskanalResponseIsUnauthorizedOrInternalServerError() {
 		return Stream.of(
 				Arguments.of(UNAUTHORIZED, "bestemdistribusjonskanal/unauthorized.json"),
@@ -722,6 +730,14 @@ public class Rdist002IT extends AbstractOauth2Test {
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("azure/token_response.json")));
+	}
+
+	void stubNaisTexasToken() {
+		stubFor(post("/nais-texas")
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("nais-texas/token_response.json")));
 	}
 
 	private void stubSafGraphQl(String path) {
@@ -817,6 +833,12 @@ public class Rdist002IT extends AbstractOauth2Test {
 		return headers;
 	}
 
+	private HttpHeaders createHeadersWithInvalidAuth() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(APPLICATION_JSON);
+		headers.setBearerAuth(jwt("invalid-client-id"));
+		return headers;
+	}
 
 	private String extractHentDokumenterFraJoarkXmlString(Message message) throws JMSException {
 		return ((TextMessage) message).getText();

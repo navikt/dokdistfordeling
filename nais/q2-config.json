@@ -1,7 +1,10 @@
 {
   "APP_NAME": "dokdistfordeling",
   "ENVIRONMENT": "q2",
+  "DOKDISTFORDELING_NAIS_SECRETS": "dokdistfordeling-q2",
   "SECURITY_TOKEN_SERVICE_TOKEN_URL": "https://security-token-service.dev.adeo.no/rest/v1/sts",
+  "NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_DISCOVERYURL": "https://security-token-service.dev.adeo.no/rest/v1/sts/.well-known/openid-configuration",
+  "NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_ACCEPTED_AUDIENCE": "srvmelosys,srvarena-dokgen,srvdbarkiv,srvfamilie-ks-opps,srvccmarkivogdist",
   "MQGATEWAY01_CHANNEL_SECURENAME": "Q2_DOKDISTFORDEL_SEC",
   "MQGATEWAY01_HOSTNAME": "mqls01.preprod.local",
   "MQGATEWAY01_PORT": "1413",
@@ -41,5 +44,127 @@
     "https://dokdistfordeling-q2.dev.intern.nav.no",
     "https://dokdistfordeling.dev-fss-pub.nais.io",
     "https://dokdistfordeling.dev.intern.nav.no"
+  ],
+  "ENTRA_ID_PREAUTH": [
+    {
+      "app": "ida",
+      "namespace": "traktor",
+      "cluster": "prod-fss"
+    },
+    {
+      "app": "veilarbvedtaksstotte",
+      "namespace": "obo",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "fpformidling",
+      "namespace": "teamforeldrepenger",
+      "cluster": "dev-fss"
+    },
+    {
+      "app": "fptilbake",
+      "namespace": "teamforeldrepenger",
+      "cluster": "dev-fss"
+    },
+    {
+      "app": "pensjon-dokdist",
+      "namespace": "pensjonsbrev",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "pensjon-dokdist-lokal",
+      "namespace": "pensjonsbrev",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "yrkesskade-brevutsending",
+      "namespace": "yrkesskade",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "brev-administrasjon-q2",
+      "namespace": "isa",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "k9-formidling",
+      "namespace": "k9saksbehandling",
+      "cluster": "dev-fss"
+    },
+    {
+      "app": "k9-tilbake",
+      "namespace": "k9saksbehandling",
+      "cluster": "dev-fss"
+    },
+    {
+      "app": "pensjon-pen-q2",
+      "namespace": "pensjon-q2",
+      "cluster": "dev-fss"
+    },
+    {
+      "app": "su-se-bakover",
+      "namespace": "supstonad",
+      "cluster": "dev-fss"
+    },
+    {
+      "app": "etterlatte-brev-api",
+      "namespace": "etterlatte",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "kabal-document",
+      "namespace": "klage",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "tiltak-vedtaksbrev",
+      "namespace": "arbeidsgiver",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "amt-distribusjon",
+      "namespace": "amt",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "hm-saksbehandling",
+      "namespace": "teamdigihot",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "tilleggsstonader-integrasjoner",
+      "namespace": "tilleggsstonader",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "esyfovarsel",
+      "namespace": "team-esyfo",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "rpa-nos-robot1",
+      "namespace": "team-rpa",
+      "cluster": "dev-fss"
+    },
+    {
+      "app": "brev",
+      "namespace": "aap",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "familie-integrasjoner",
+      "namespace": "teamfamilie",
+      "cluster": "dev-fss"
+    },
+    {
+      "app": "ung-sak",
+      "namespace": "k9saksbehandling",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "tiltakspenger-saksbehandling-api",
+      "namespace": "tpts",
+      "cluster": "dev-gcp"
+    }
   ]
 }
