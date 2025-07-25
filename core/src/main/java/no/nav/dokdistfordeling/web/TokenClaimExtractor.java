@@ -1,6 +1,5 @@
 package no.nav.dokdistfordeling.web;
 
-import no.nav.security.token.support.core.context.TokenValidationContext;
 import no.nav.security.token.support.core.jwt.JwtToken;
 import no.nav.security.token.support.core.jwt.JwtTokenClaims;
 
@@ -28,19 +27,27 @@ public final class TokenClaimExtractor {
 		// ingen instansiering
 	}
 
-	public static String getConsumerId(TokenValidationContext tokenValidationContext, JwtToken jwtToken) {
-		if (isRestStsSystemToken(tokenValidationContext, jwtToken)) {
+	public static String getConsumerId(JwtToken jwtToken) {
+		if(jwtToken == null) {
+			return UKJENT_CONSUMER_ID;
+		}
+
+		if (isRestStsSystemToken(jwtToken)) {
 			return jwtToken.getSubject();
-		} else if (isClientCredentialFlowToken(tokenValidationContext, jwtToken) || isOnBehalfOfFlowToken(jwtToken)) {
+		} else if (isClientCredentialFlowToken(jwtToken) || isOnBehalfOfFlowToken(jwtToken)) {
 			return findAzureAppnameClaim(jwtToken.getJwtTokenClaims());
 		}
 		return UKJENT_CONSUMER_ID;
 	}
 
-	public static String getUserId(TokenValidationContext tokenValidationContext, JwtToken jwtToken) {
-		if (isRestStsSystemToken(tokenValidationContext, jwtToken)) {
+	public static String getUserId(JwtToken jwtToken) {
+		if(jwtToken == null) {
+			return UKJENT_USER_ID;
+		}
+
+		if (isRestStsSystemToken(jwtToken)) {
 			return jwtToken.getSubject();
-		} else if (isClientCredentialFlowToken(tokenValidationContext, jwtToken)) {
+		} else if (isClientCredentialFlowToken(jwtToken)) {
 			return findAzureAppnameClaim(jwtToken.getJwtTokenClaims());
 		} else if (isOnBehalfOfFlowToken(jwtToken)) {
 			if (jwtToken.getJwtTokenClaims().getAllClaims().containsKey(AZURE_NAV_CUSTOM_CLAIM_NAVIDENT)) {
@@ -52,9 +59,8 @@ public final class TokenClaimExtractor {
 		return UKJENT_USER_ID;
 	}
 
-	public static boolean isRestStsSystemToken(TokenValidationContext tokenValidationContext, JwtToken jwtToken) {
-		return tokenValidationContext.hasTokenFor(ISSUER_REST_STS)
-			   && jwtToken.getSubject().toLowerCase().startsWith(SERVICEUSER_PREFIX);
+	public static boolean isRestStsSystemToken(JwtToken jwtToken) {
+		return jwtToken.getSubject().toLowerCase().startsWith(SERVICEUSER_PREFIX);
 	}
 
 	public static boolean isOnBehalfOfFlowToken(JwtToken jwtToken) {
@@ -64,19 +70,11 @@ public final class TokenClaimExtractor {
 			   !jwtTokenClaims.getStringClaim(AZURE_CLAIM_SUB).equals(jwtTokenClaims.getStringClaim(AZURE_CLAIM_OID));
 	}
 
-	private static boolean isClientCredentialFlowToken(TokenValidationContext tokenValidationContext, JwtToken jwtToken) {
-		if (isJwtIssuedByAzure(tokenValidationContext)) {
-			final JwtTokenClaims jwtTokenClaims = jwtToken.getJwtTokenClaims();
-			return jwtTokenClaims.getStringClaim(AZURE_CLAIM_SUB) != null &&
-				   jwtTokenClaims.getStringClaim(AZURE_CLAIM_OID) != null &&
-				   jwtTokenClaims.getStringClaim(AZURE_CLAIM_SUB).equals(jwtTokenClaims.getStringClaim(AZURE_CLAIM_OID));
-		} else {
-			return false;
-		}
-	}
-
-	private static boolean isJwtIssuedByAzure(TokenValidationContext tokenValidationContext) {
-		return tokenValidationContext.hasTokenFor(ISSUER_ENTRA);
+	private static boolean isClientCredentialFlowToken(JwtToken jwtToken) {
+		final JwtTokenClaims jwtTokenClaims = jwtToken.getJwtTokenClaims();
+		return jwtTokenClaims.getStringClaim(AZURE_CLAIM_SUB) != null &&
+			   jwtTokenClaims.getStringClaim(AZURE_CLAIM_OID) != null &&
+			   jwtTokenClaims.getStringClaim(AZURE_CLAIM_SUB).equals(jwtTokenClaims.getStringClaim(AZURE_CLAIM_OID));
 	}
 
 	private static String findAzureAppnameClaim(JwtTokenClaims jwtTokenClaims) {
