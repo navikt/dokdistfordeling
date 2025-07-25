@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.azure.AzureProperties;
-import no.nav.dokdistfordeling.exception.functional.UnauthorizedException;
 import no.nav.security.token.support.core.context.TokenValidationContext;
 import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import no.nav.security.token.support.core.jwt.JwtToken;
@@ -26,9 +25,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Slf4j
 public class MDCHandlerInterceptor implements HandlerInterceptor {
-	private static final String AUTH_ERRORMESSAGE = "Tilgang er avvist. Ingen autorisert token på Authorization header. " +
-													"Token må være utsted av NAV onprem security-token-service eller Entra Id. " +
-													"Vi har endret dette fra 25.07.2025, hvis dere plutselig mangler tilgang: ta kontakt i #team_dokumentløsninger";
 	private final TokenValidationContextHolder tokenValidationContextHolder;
 	private final AzureProperties azureProperties;
 
@@ -44,7 +40,7 @@ public class MDCHandlerInterceptor implements HandlerInterceptor {
 
 		JwtToken jwtToken = tokenValidationContext.getFirstValidToken();
 		if (jwtToken == null) {
-			throw new UnauthorizedException(AUTH_ERRORMESSAGE);
+			return true;
 		}
 
 		populateCallId(request);
