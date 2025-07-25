@@ -26,8 +26,9 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Slf4j
 public class MDCHandlerInterceptor implements HandlerInterceptor {
-	private static final String AUTH_ERRORMESSAGE = "Tilgang er avvist. Ingen gyldig token på Authorization header. " +
-													"Token må være utsted av NAV onprem security-token-service eller Entra Id.";
+	private static final String AUTH_ERRORMESSAGE = "Tilgang er avvist. Ingen autorisert token på Authorization header. " +
+													"Token må være utsted av NAV onprem security-token-service eller Entra Id. " +
+													"Vi har endret dette fra 25.07.2025, hvis dere plutselig mangler tilgang: ta kontakt i #team_dokumentløsninger";
 	private final TokenValidationContextHolder tokenValidationContextHolder;
 	private final AzureProperties azureProperties;
 
@@ -86,6 +87,11 @@ public class MDCHandlerInterceptor implements HandlerInterceptor {
 		MDC.put(USER_ID, UKJENT_USER_ID);
 	}
 
+	/**
+	 * @deprecated Fjernes etter at alle klienter har gått over til å hente token
+	 * med dokdistfordeling-scope i stedet for saf-scope
+	 */
+	@Deprecated
 	private void markUsingSafClientId(JwtToken jwtToken) {
 		try {
 			List<String> aud = jwtToken.getJwtTokenClaims().getAsList("aud");
