@@ -16,12 +16,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 
-import java.util.Optional;
-
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.consumer.token.NaisTexasRequestInterceptor.TARGET_SCOPE;
-import static no.nav.dokdistfordeling.util.MappingUtil.splitBearerToken;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Component
@@ -46,20 +43,13 @@ public class SafGraphqlConsumer {
 	}
 
 	@Retryable(retryFor = SafJournalpostQueryTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
-	public SafJournalpostTo performQuery(GraphQLRequest graphQLRequest, Optional<String> authorizationHeader) {
+	public SafJournalpostTo performQuery(GraphQLRequest graphQLRequest) {
 		try {
 			SafJsonResponse result = restClientTexas.post()
 					.uri("/graphql")
 					.body(graphQLRequest)
-					.headers(httpHeaders -> {
-						httpHeaders.setContentType(APPLICATION_JSON);
-						authorizationHeader.ifPresent(bearerToken -> httpHeaders.setBearerAuth(splitBearerToken(bearerToken)));
-					})
-					.attributes(attributes -> {
-						if (authorizationHeader.isEmpty()) {
-							attributes.put(TARGET_SCOPE, safScope);
-						}
-					})
+					.contentType(APPLICATION_JSON)
+					.attribute(TARGET_SCOPE, safScope)
 					.retrieve()
 					.body(SafJsonResponse.class);
 

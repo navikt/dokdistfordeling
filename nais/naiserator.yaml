@@ -9,6 +9,10 @@ spec:
   env:
     - name: SECURITY_TOKEN_SERVICE_TOKEN_URL
       value: {{ SECURITY_TOKEN_SERVICE_TOKEN_URL }}
+    - name: NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_DISCOVERYURL
+      value: {{ NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_DISCOVERYURL }}
+    - name: NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_ACCEPTED_AUDIENCE
+      value: {{ NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_ACCEPTED_AUDIENCE }}
     - name: MQGATEWAY01_CHANNEL_SECURENAME
       value: {{ MQGATEWAY01_CHANNEL_SECURENAME }}
     - name: MQGATEWAY01_HOSTNAME
@@ -105,6 +109,8 @@ spec:
     paths:
       - kvPath: {{ SRVDOKDISTFORDELING }}
         mountPath: /var/run/secrets/nais.io/srvdokdistfordeling
+  envFrom:
+    - secret: {{ DOKDISTFORDELING_NAIS_SECRETS }}
   azure:
     application:
       enabled: true
@@ -113,6 +119,14 @@ spec:
         extra:
           - "NAVident"
           - "azp_name"
+  accessPolicy:
+    inbound:
+      rules:
+    {{#each ENTRA_ID_PREAUTH}}
+        - application: {{app}}
+          namespace: {{namespace}}
+          cluster: {{cluster}}
+    {{/each}}
   webproxy: true
   observability:
     logging:

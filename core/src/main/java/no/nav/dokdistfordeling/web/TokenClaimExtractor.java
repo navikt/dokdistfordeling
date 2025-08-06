@@ -10,6 +10,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * Ingen tilstand / trådsikker.
  */
 public final class TokenClaimExtractor {
+	public static final String ISSUER_REST_STS = "reststs";
+	public static final String ISSUER_ENTRA = "entra";
 	// Azure claims. https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens#payload-claims
 	static final String AZURE_CLAIM_AZP = "azp";
 	static final String AZURE_CLAIM_OID = "oid";
@@ -26,6 +28,10 @@ public final class TokenClaimExtractor {
 	}
 
 	public static String getConsumerId(JwtToken jwtToken) {
+		if(jwtToken == null) {
+			return UKJENT_CONSUMER_ID;
+		}
+
 		if (isRestStsSystemToken(jwtToken)) {
 			return jwtToken.getSubject();
 		} else if (isClientCredentialFlowToken(jwtToken) || isOnBehalfOfFlowToken(jwtToken)) {
@@ -35,6 +41,10 @@ public final class TokenClaimExtractor {
 	}
 
 	public static String getUserId(JwtToken jwtToken) {
+		if(jwtToken == null) {
+			return UKJENT_USER_ID;
+		}
+
 		if (isRestStsSystemToken(jwtToken)) {
 			return jwtToken.getSubject();
 		} else if (isClientCredentialFlowToken(jwtToken)) {

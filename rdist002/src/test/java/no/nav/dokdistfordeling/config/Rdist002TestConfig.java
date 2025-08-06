@@ -7,6 +7,7 @@ import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.config.props.NaisProperties;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
+import no.nav.security.token.support.spring.api.EnableJwtTokenValidation;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -29,6 +30,7 @@ import org.springframework.retry.annotation.EnableRetry;
 		JournalpostApi.class,
 		SecurityConfig.class
 })
+@EnableJwtTokenValidation(ignore = {"org.springframework", "org.springdoc"})
 public class Rdist002TestConfig {
 }
 
