@@ -163,6 +163,11 @@
       "app": "tiltakspenger-saksbehandling-api",
       "namespace": "tpts",
       "cluster": "prod-gcp"
+    },
+    {
+      "app": "melosys",
+      "namespace": "teammelosys",
+      "cluster": "prod-fss"
     }
   ]
 }

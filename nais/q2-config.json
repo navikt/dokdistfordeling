@@ -175,6 +175,11 @@
       "app": "historisk-helt-backend",
       "namespace": "historisk",
       "cluster": "dev-gcp"
+    },
+    {
+      "app": "melosys",
+      "namespace": "teammelosys",
+      "cluster": "dev-fss"
     }
   ]
 }
