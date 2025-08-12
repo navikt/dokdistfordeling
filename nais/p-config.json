@@ -135,7 +135,7 @@
       "cluster": "prod-gcp"
     },
     {
-      "app": "rpa-nos-robot1",
+      "app": "rpa-nos-robot",
       "namespace": "team-rpa",
       "cluster": "prod-fss"
     },
