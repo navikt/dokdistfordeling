@@ -39,7 +39,8 @@
   "MIN_REPLICAS": "1",
   "MAX_REPLICAS": "2",
   "INGRESSES": [
-    "https://dokdistfordeling-q5.dev.intern.nav.no"
+    "https://dokdistfordeling-q5.dev.intern.nav.no",
+    "https://dokdistfordeling-q5.intern.dev.nav.no"
   ],
   "ENTRA_ID_PREAUTH": [
     {
