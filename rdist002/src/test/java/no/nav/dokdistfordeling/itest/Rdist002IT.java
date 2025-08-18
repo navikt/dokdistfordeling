@@ -579,7 +579,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Test
 	void shouldReturnNotFoundWhenRequestHasNoAdresseAndAdresseIsUkjentInRegoppslag() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
+		stubNaisTexasToken();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		stubHentMottakerOgAdresse("", NOT_FOUND.value());

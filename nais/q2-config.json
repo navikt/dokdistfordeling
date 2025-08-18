@@ -30,6 +30,7 @@
   "DOKDISTFORDELING_ENDPOINTS_PDL_URL": "http://pdl-api.pdl.svc.nais.local/graphql",
   "DOKDISTFORDELING_ENDPOINTS_PDL_SCOPE": "api://dev-fss.pdl.pdl-api/.default",
   "DOKDISTFORDELING_ENDPOINTS_REGOPPSLAG_URL": "http://regoppslag.teamdokumenthandtering.svc.nais.local/rest",
+  "DOKDISTFORDELING_ENDPOINTS_REGOPPSLAG_SCOPE": "api://dev-fss.teamdokumenthandtering.regoppslag/.default",
   "DOKDISTFORDELING_ENDPOINTS_SAF_URL": "http://saf.teamdokumenthandtering.svc.nais.local",
   "DOKDISTFORDELING_ENDPOINTS_SAF_SCOPE": "api://dev-fss.teamdokumenthandtering.saf/.default",
   "DOKDISTMELLOMLAGER_PROJECTID": "teamdokumenthandteri-dev-2c5a",
