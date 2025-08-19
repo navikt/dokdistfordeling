@@ -7,8 +7,8 @@ import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseReque
 import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseResponseTo;
 import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseException;
 import no.nav.dokdistfordeling.exception.functional.UkjentAdresseException;
-import no.nav.dokdistfordeling.util.ProblemDetail;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -52,7 +52,7 @@ class RegoppslagRestConsumer {
 					switch (response.getStatusCode()) {
 						case UNAUTHORIZED -> {
 							ProblemDetail problemDetail = objectMapper.readValue(response.getBody(), ProblemDetail.class);
-							throw new RegoppslagHentAdresseSecurityException(format("Kall mot TREG002 feilet. Ingen tilgang. feilmelding=%s", problemDetail.getErrorMessage()));
+							throw new RegoppslagHentAdresseSecurityException(format("Kall mot TREG002 feilet. Ingen tilgang. feilmelding=%s", problemDetail));
 						}
 						case NOT_FOUND ->
 								throw new UkjentAdresseException("Fant ikke adresseinformasjon for mottaker i PDL. Mottaker har ukjent adresse.");
@@ -60,13 +60,13 @@ class RegoppslagRestConsumer {
 								throw new PersonErDoedUkjentAdresseException("Mottaker er død og har ukjent adresse.");
 						default -> {
 							ProblemDetail problemDetail = objectMapper.readValue(response.getBody(), ProblemDetail.class);
-							throw new RegoppslagHentAdresseFunctionalException(format("Henting av adresse for bruker feilet funksjonelt mot Regoppslag. status=%s, feilmelding=%s", response.getStatusCode(), problemDetail.getErrorMessage()));
+							throw new RegoppslagHentAdresseFunctionalException(format("Henting av adresse for bruker feilet funksjonelt mot Regoppslag. status=%s, feilmelding=%s", response.getStatusCode(), problemDetail));
 						}
 					}
 				})
 				.onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
 					ProblemDetail problemDetail = objectMapper.readValue(response.getBody(), ProblemDetail.class);
-					throw new RegoppslagHentAdresseTechnicalException(format("Kall mot TREG002 feilet teknisk. status=%s, feilmelding=%s", response.getStatusCode(), problemDetail.getErrorMessage()));
+					throw new RegoppslagHentAdresseTechnicalException(format("Kall mot TREG002 feilet teknisk. status=%s, feilmelding=%s", response.getStatusCode(), problemDetail));
 				})
 				.body(HentMottakerOgAdresseResponseTo.class).getAdresse();
 	}
