@@ -52,7 +52,7 @@ class RegoppslagRestConsumer {
 					switch (response.getStatusCode()) {
 						case UNAUTHORIZED -> {
 							ProblemDetail problemDetail = objectMapper.readValue(response.getBody(), ProblemDetail.class);
-							throw new RegoppslagHentAdresseSecurityException(format("Kall mot TREG002 feilet. Ingen tilgang. feilmelding=%s", problemDetail));
+							throw new RegoppslagHentAdresseSecurityException(format("Kall mot TREG002 feilet. Ingen tilgang. problemDetail=%s", problemDetail));
 						}
 						case NOT_FOUND ->
 								throw new UkjentAdresseException("Fant ikke adresseinformasjon for mottaker i PDL. Mottaker har ukjent adresse.");
@@ -66,7 +66,7 @@ class RegoppslagRestConsumer {
 				})
 				.onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
 					ProblemDetail problemDetail = objectMapper.readValue(response.getBody(), ProblemDetail.class);
-					throw new RegoppslagHentAdresseTechnicalException(format("Kall mot TREG002 feilet teknisk. status=%s, feilmelding=%s", response.getStatusCode(), problemDetail));
+					throw new RegoppslagHentAdresseTechnicalException(format("Kall mot TREG002 feilet teknisk. status=%s, problemDetail=%s", response.getStatusCode(), problemDetail));
 				})
 				.body(HentMottakerOgAdresseResponseTo.class).getAdresse();
 	}
