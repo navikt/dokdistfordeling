@@ -60,7 +60,7 @@ class RegoppslagRestConsumer {
 								throw new PersonErDoedUkjentAdresseException("Mottaker er død og har ukjent adresse.");
 						default -> {
 							ProblemDetail problemDetail = objectMapper.readValue(response.getBody(), ProblemDetail.class);
-							throw new RegoppslagHentAdresseFunctionalException(format("Henting av adresse for bruker feilet funksjonelt mot Regoppslag. status=%s, feilmelding=%s", response.getStatusCode(), problemDetail));
+							throw new RegoppslagHentAdresseFunctionalException(format("Henting av adresse for bruker feilet funksjonelt mot Regoppslag. status=%s, problemDetail=%s", response.getStatusCode(), problemDetail));
 						}
 					}
 				})
