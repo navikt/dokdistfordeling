@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.exception.functional.SafHentDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.SafHentDokumentTechnicalException;
-import no.nav.dokdistfordeling.util.ProblemDetail;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -39,12 +39,12 @@ public class SafHentDokumentConsumer {
 				.onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
 					ProblemDetail problemDetail = objectMapper.readValue(response.getBody(), ProblemDetail.class);
 					throw new SafHentDokumentFunctionalException(format("Kall mot saf hentdokument feilet funksjonelt med status=%s, feilmelding=%s",
-							response.getStatusCode(), problemDetail.getErrorMessage()));
+							response.getStatusCode(), problemDetail));
 				})
 				.onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
 					ProblemDetail problemDetail = objectMapper.readValue(response.getBody(), ProblemDetail.class);
 					throw new SafHentDokumentTechnicalException(format("Kall mot saf hentdokument feilet teknisk med status=%s, feilmelding=%s",
-							response.getStatusCode(), problemDetail.getErrorMessage()));
+							response.getStatusCode(), problemDetail));
 				})
 				.body(byte[].class);
 	}

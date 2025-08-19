@@ -687,7 +687,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 				createHappyPathHeaders());
 
 		String body = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
-		assertThat(body).contains("Henting av adresse for bruker feilet funksjonelt mot Regoppslag. status=400 BAD_REQUEST, feilmelding=Validering av feltet postnummer feilet pga. manglende data i PDL");
+		assertThat(body).contains("Henting av adresse for bruker feilet funksjonelt mot Regoppslag. status=400 BAD_REQUEST","Validering av feltet postnummer feilet pga. manglende data i PDL");
 	}
 
 	@Test
