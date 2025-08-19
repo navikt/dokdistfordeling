@@ -44,7 +44,9 @@
     "https://dokdistfordeling-q2.dev.adeo.no",
     "https://dokdistfordeling-q2.dev.intern.nav.no",
     "https://dokdistfordeling.dev-fss-pub.nais.io",
-    "https://dokdistfordeling.dev.intern.nav.no"
+    "https://dokdistfordeling.dev.intern.nav.no",
+    "https://dokdistfordeling.intern.dev.nav.no",
+    "https://dokdistfordeling-q2.intern.dev.nav.no"
   ],
   "ENTRA_ID_PREAUTH": [
     {
