@@ -7,8 +7,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ResponseStatus(BAD_REQUEST)
 public class UkjentAdresseException extends RegoppslagHentAdresseFunctionalException {
-
-	public UkjentAdresseException(String message, Throwable cause) {
-		super(message, cause);
+	public UkjentAdresseException(String message) {
+		super(message);
 	}
 }

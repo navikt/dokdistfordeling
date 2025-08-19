@@ -40,7 +40,7 @@ public class DokdistfordelingProperties {
 		 */
 		@Valid
 		@NotNull
-		private Endpoint regoppslag;
+		private AzureEndpoint regoppslag;
 
 		/**
 		 * URL til saf.
