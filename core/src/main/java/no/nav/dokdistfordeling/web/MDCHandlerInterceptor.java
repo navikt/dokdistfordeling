@@ -3,7 +3,6 @@ package no.nav.dokdistfordeling.web;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.config.azure.AzureProperties;
 import no.nav.security.token.support.core.context.TokenValidationContext;
 import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import no.nav.security.token.support.core.jwt.JwtToken;
@@ -11,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.MDC;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.util.List;
 import java.util.UUID;
 
 import static no.nav.dokdistfordeling.constants.Constants.BEARER_PREFIX;
@@ -30,12 +28,9 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @Slf4j
 public class MDCHandlerInterceptor implements HandlerInterceptor {
 	private final TokenValidationContextHolder tokenValidationContextHolder;
-	private final AzureProperties azureProperties;
 
-	public MDCHandlerInterceptor(TokenValidationContextHolder tokenValidationContextHolder,
-								 AzureProperties azureProperties) {
+	public MDCHandlerInterceptor(TokenValidationContextHolder tokenValidationContextHolder) {
 		this.tokenValidationContextHolder = tokenValidationContextHolder;
-		this.azureProperties = azureProperties;
 	}
 
 	@Override
@@ -50,7 +45,6 @@ public class MDCHandlerInterceptor implements HandlerInterceptor {
 		populateCallId(request);
 		populateConsumerId(jwtToken);
 		populateUserId(jwtToken);
-		markUsingSafClientId(jwtToken);
 		return true;
 	}
 
@@ -98,23 +92,5 @@ public class MDCHandlerInterceptor implements HandlerInterceptor {
 		}
 
 		MDC.put(USER_ID, UKJENT_USER_ID);
-	}
-
-	/**
-	 * @deprecated Fjernes etter at alle klienter har gått over til å hente token
-	 * med dokdistfordeling-scope i stedet for saf-scope
-	 */
-	@Deprecated
-	private void markUsingSafClientId(JwtToken jwtToken) {
-		try {
-			List<String> aud = jwtToken.getJwtTokenClaims().getAsList("aud");
-			if (aud.contains(azureProperties.appClientId())) {
-				MDC.put("saf_clientid", "false");
-			} else {
-				MDC.put("saf_clientid", "true");
-			}
-		} catch (Exception e) {
-			// noop
-		}
 	}
 }
