@@ -138,16 +138,6 @@
       "cluster": "dev-gcp"
     },
     {
-      "app": "ung-sak",
-      "namespace": "k9saksbehandling",
-      "cluster": "dev-gcp"
-    },
-    {
-      "app": "ung-tilbake",
-      "namespace": "k9saksbehandling",
-      "cluster": "dev-gcp"
-    },
-    {
       "app": "tiltakspenger-saksbehandling-api",
       "namespace": "tpts",
       "cluster": "dev-gcp"
