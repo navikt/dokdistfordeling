@@ -161,6 +161,11 @@
       "cluster": "prod-gcp"
     },
     {
+      "app": "ung-tilbake",
+      "namespace": "k9saksbehandling",
+      "cluster": "prod-gcp"
+    },
+    {
       "app": "tiltakspenger-saksbehandling-api",
       "namespace": "tpts",
       "cluster": "prod-gcp"
