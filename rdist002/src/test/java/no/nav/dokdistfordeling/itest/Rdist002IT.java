@@ -82,6 +82,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	private static final String DISTRIBUER_JOURNALPOST_URI = "/rest/v1/distribuerjournalpost";
 	private static final String SAF_GRAPHQL_URI = "/saf/graphql";
+	private static final String BESTEM_DISTRIBUSJONSKANAL_URI = "/rest/bestemDistribusjonskanal";
 
 	@Autowired
 	protected TestRestTemplate restTemplate;
@@ -122,6 +123,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoark-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
 		});
 
+		verify(exactly(1), postRequestedFor(urlEqualTo(BESTEM_DISTRIBUSJONSKANAL_URI)).withRequestBody(equalToJson(classpathToString("__files/distribuerjournalpost/distribuerjournalpostRequest-happy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
 	}
@@ -687,7 +689,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 				createHappyPathHeaders());
 
 		String body = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
-		assertThat(body).contains("Henting av adresse for bruker feilet funksjonelt mot Regoppslag. status=400 BAD_REQUEST","Validering av feltet postnummer feilet pga. manglende data i PDL");
+		assertThat(body).contains("Henting av adresse for bruker feilet funksjonelt mot Regoppslag. status=400 BAD_REQUEST", "Validering av feltet postnummer feilet pga. manglende data i PDL");
 	}
 
 	@Test
@@ -765,7 +767,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	private void stubBestemDistribusjonskanal(String path) {
-		stubFor(post("/rest/bestemDistribusjonskanal")
+		stubFor(post(BESTEM_DISTRIBUSJONSKANAL_URI)
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -773,7 +775,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	protected static void stubBestemDistribusjonskanal(HttpStatus httpStatus, String bodyFile) {
-		stubFor(post("/rest/bestemDistribusjonskanal")
+		stubFor(post(BESTEM_DISTRIBUSJONSKANAL_URI)
 				.willReturn(aResponse()
 						.withStatus(httpStatus.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_PROBLEM_JSON_VALUE)
