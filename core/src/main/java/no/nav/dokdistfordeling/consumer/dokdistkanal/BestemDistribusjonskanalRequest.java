@@ -9,6 +9,7 @@ public record BestemDistribusjonskanalRequest(
 		boolean erArkivert,
 		Integer forsendelseStoerrelse,
 		String mottakerId,
-		String tema
+		String tema,
+		Integer antallDokumenter
 ) {
 }

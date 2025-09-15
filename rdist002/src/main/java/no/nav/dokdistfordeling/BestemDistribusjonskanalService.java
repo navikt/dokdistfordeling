@@ -50,6 +50,7 @@ public class BestemDistribusjonskanalService {
 				.erArkivert(true)
 				.tema(journalpost.getTema())
 				.forsendelseStoerrelse(getFilstoerrelseMB(journalpost))
+				.antallDokumenter(journalpost.getDokumenter().size())
 				.build();
 
 		return dokdistkanalConsumer.bestemDistribusjonskanal(request);
@@ -81,10 +82,10 @@ public class BestemDistribusjonskanalService {
 
 	private int getFilstoerrelseMB(Journalpost journalpost) {
 		return journalpost.getDokumenter().stream()
-					   .map(Journalpost.DokumentInfo::getDokumentvarianter)
-					   .map(BestemDistribusjonskanalService::getSladdetOrArkivFilstoerrelse)
-					   .mapToInt(Integer::intValue)
-					   .sum() / (1024 * 1024);
+				.map(Journalpost.DokumentInfo::getDokumentvarianter)
+				.map(BestemDistribusjonskanalService::getSladdetOrArkivFilstoerrelse)
+				.mapToInt(Integer::intValue)
+				.sum() / (1024 * 1024);
 	}
 
 	private static Integer getSladdetOrArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
