@@ -15,7 +15,9 @@ public record DistribuerJournalpost(
 		DistribusjonstypeCode distribusjonstype,
 		DistribusjonstidspunktCode distribusjonstidspunkt,
 		boolean tvingSentralPrint,
-		TvingKanal tvingKanal) {
+		TvingKanal tvingKanal,
+		String forsendelseMetadata,
+		String forsendelseMetadataType) {
 
 	public boolean harPostadresse() {
 		return this.postadresse != null;

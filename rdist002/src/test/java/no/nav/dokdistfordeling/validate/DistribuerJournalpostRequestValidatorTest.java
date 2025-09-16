@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.validate;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
 import org.junit.jupiter.api.Test;
@@ -17,9 +18,11 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static java.math.BigInteger.ONE;
+import static no.nav.dokdistfordeling.TestData.FORSENDSELSE_METADATA;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostToBuilder;
 import static no.nav.dokdistfordeling.validate.DistribuerJournalpostRequestValidator.validateDistribuerJournalpostRequest;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.codehaus.plexus.util.StringUtils.isBlank;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class DistribuerJournalpostRequestValidatorTest {
@@ -152,5 +155,21 @@ class DistribuerJournalpostRequestValidatorTest {
 				.isThrownBy(() -> validateDistribuerJournalpostRequest(request))
 				.withMessage("Feltet distribusjonstidspunkt hadde en ugyldig verdi. Fikk distribusjonstidspunkt=Ugyldig. Gyldige verdier er %s",
 						Arrays.toString(DistribusjonstidspunktCode.values()));
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void shouldThrowValidationExceptionWhenEitherForsendelseMetaDataOrTypeIsGiven(DistribuerJournalpostRequestTo request) {
+		assertThatExceptionOfType(ValidationException.class)
+				.isThrownBy(() -> validateDistribuerJournalpostRequest(request))
+				.withMessage("forsendelsesMetadata og forsendelsesMetadataType må enten begge være satt, eller begge være null med forsendelsesmetadata=%s, forsendelsesmetadataType=%s",
+						isBlank(request.getForsendelseMetadata()) ? null : "****", request.getForsendelseMetadataType());
+	}
+
+	static Stream<Arguments> shouldThrowValidationExceptionWhenEitherForsendelseMetaDataOrTypeIsGiven() {
+		return Stream.of(
+				Arguments.of(createDistribuerJournalpostToBuilder().forsendelseMetadata(FORSENDSELSE_METADATA).build(), "forsendelseMetadata"),
+				Arguments.of(createDistribuerJournalpostToBuilder().forsendelseMetadataType(ForsendelseMetadataType.DPO_ARKIVMELDING.name()).build(), "forsendelseMetadataType")
+		);
 	}
 }

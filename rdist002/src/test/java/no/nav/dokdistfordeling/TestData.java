@@ -59,6 +59,7 @@ public class TestData {
 	public static final String DOK_INFO_ID_2 = "777777777";
 	public static final String BESTILLENDEFAGSYSTEM = "bestillendeFagsystem";
 	public static final String DOKUMENTPRODAPP = "dokumentprodapp";
+	public static final String FORSENDSELSE_METADATA = "<xml>Some metadata</xml>";
 
 	public static DistribuerJournalpost.DistribuerJournalpostBuilder createDistribuerJournalpostBuilder() {
 		return DistribuerJournalpost.builder()

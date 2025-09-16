@@ -27,6 +27,7 @@ public class DistribuerJournalpostRequestValidator {
 		assertNotNullAndValidValueIgnoreCase("distribusjonstype", distribuerJournalpostRequestTo.getDistribusjonstype(), DistribusjonstypeCode.values());
 		assertNotNullAndValidValueIgnoreCase("distribusjonstidspunkt", distribuerJournalpostRequestTo.getDistribusjonstidspunkt(), DistribusjonstidspunktCode.values());
 		assertNullOrValidValueIgnoreCase("tvingKanal", distribuerJournalpostRequestTo.getTvingKanal(), TvingKanal.values());
+		validateForsendelseMetadata(distribuerJournalpostRequestTo);
 	}
 
 	private static void validateJournalpostId(String journalpostId) {
@@ -39,5 +40,20 @@ public class DistribuerJournalpostRequestValidator {
 		} catch (NumberFormatException e) {
 			throw new ValidationException(format("Feltet journalpostId må være et ikke-negativt heltall. Fikk journalpostId=%s", journalpostId));
 		}
+	}
+
+	private static void validateForsendelseMetadata(DistribuerJournalpostRequestTo distribuerJournalpostRequest) {
+		if (isOnlyForsendelseMetadataSet(distribuerJournalpostRequest) || isOnlyForsendelseMetadataTypeSet(distribuerJournalpostRequest)) {
+			throw new ValidationException(format("forsendelsesMetadata og forsendelsesMetadataType må enten begge være satt, eller begge være null med forsendelsesmetadata=%s, forsendelsesmetadataType=%s",
+					isBlank(distribuerJournalpostRequest.getForsendelseMetadata()) ? null : "****", distribuerJournalpostRequest.getForsendelseMetadataType()));
+		}
+	}
+
+	private static boolean isOnlyForsendelseMetadataSet(DistribuerJournalpostRequestTo distribuerJournalpostRequest) {
+		return distribuerJournalpostRequest.getForsendelseMetadata() != null && distribuerJournalpostRequest.getForsendelseMetadataType() == null;
+	}
+
+	private static boolean isOnlyForsendelseMetadataTypeSet(DistribuerJournalpostRequestTo distribuerJournalpostRequest) {
+		return distribuerJournalpostRequest.getForsendelseMetadata() == null && distribuerJournalpostRequest.getForsendelseMetadataType() != null;
 	}
 }
