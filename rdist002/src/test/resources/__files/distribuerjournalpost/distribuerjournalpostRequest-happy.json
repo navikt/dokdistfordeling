@@ -5,5 +5,7 @@
   "forsendelseStoerrelse" : 3,
   "mottakerId" : "09876543210",
   "tema" : "OPP",
-  "antallDokumenter" : 2
+  "antallDokumenter" : 2,
+  "forsendelseMetadataType" : null
+
 }

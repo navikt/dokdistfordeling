@@ -17,6 +17,7 @@ import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.TRYGDERETTEN;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Slf4j
@@ -53,7 +54,10 @@ public class BestemDistribusjonskanalService {
 				.antallDokumenter(journalpost.getDokumenter().size())
 				.build();
 
-		return dokdistkanalConsumer.bestemDistribusjonskanal(request);
+		BestemDistribusjonskanalRequest bestemDistribusjonskanalRequest =
+				isBlank(distribuerJournalpost.forsendelseMetadataType()) ? request : request.withForsendelseMetadataType(distribuerJournalpost.forsendelseMetadataType());
+
+		return dokdistkanalConsumer.bestemDistribusjonskanal(bestemDistribusjonskanalRequest);
 	}
 
 	private static DistribusjonKanalCode utledTvingKanal(DistribuerJournalpost distribuerJournalpost) {

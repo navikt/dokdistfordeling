@@ -10,6 +10,12 @@ public record BestemDistribusjonskanalRequest(
 		Integer forsendelseStoerrelse,
 		String mottakerId,
 		String tema,
-		Integer antallDokumenter
+		Integer antallDokumenter,
+		String forsendelseMetadataType
 ) {
+
+	public BestemDistribusjonskanalRequest withForsendelseMetadataType(String forsendelseMetadataType) {
+		return new BestemDistribusjonskanalRequest(this.brukerId, this.dokumenttypeId, this.erArkivert, this.forsendelseStoerrelse,
+				this.mottakerId, this.tema, this.antallDokumenter, forsendelseMetadataType);
+	}
 }
