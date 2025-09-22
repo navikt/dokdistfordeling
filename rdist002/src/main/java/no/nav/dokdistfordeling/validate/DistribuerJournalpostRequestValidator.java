@@ -44,7 +44,7 @@ public class DistribuerJournalpostRequestValidator {
 
 	private static void validateForsendelseMetadata(DistribuerJournalpostRequestTo distribuerJournalpostRequest) {
 		if (isOnlyForsendelseMetadataSet(distribuerJournalpostRequest) || isOnlyForsendelseMetadataTypeSet(distribuerJournalpostRequest)) {
-			throw new ValidationException(format("forsendelsesMetadata og forsendelsesMetadataType må enten begge være satt, eller begge være null med forsendelsesmetadata=%s, forsendelsesmetadataType=%s",
+			throw new ValidationException(format("forsendelsesMetadata og forsendelsesMetadataType må enten begge være satt, eller begge være null. Fikk forsendelsesmetadata=%s, forsendelsesmetadataType=%s",
 					isBlank(distribuerJournalpostRequest.getForsendelseMetadata()) ? null : "****", distribuerJournalpostRequest.getForsendelseMetadataType()));
 		}
 	}

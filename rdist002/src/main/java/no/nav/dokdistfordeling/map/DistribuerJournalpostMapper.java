@@ -4,6 +4,7 @@ import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.domain.Postadresse;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
 
@@ -28,7 +29,7 @@ public class DistribuerJournalpostMapper {
 				request.isTvingSentralPrint(),
 				mapTvingKanal(request.getTvingKanal()),
 				encodeToBase64(request.getForsendelseMetadata()),
-				request.getForsendelseMetadataType());
+				mapForsendelseMetadataType(request));
 	}
 
 	private static Postadresse mapPostadresse(DistribuerJournalpostRequestTo.AdresseTo adresseTo) {
@@ -55,6 +56,10 @@ public class DistribuerJournalpostMapper {
 	}
 
 	private static String encodeToBase64(String forsendelseMetadata) {
-		return isBlank(forsendelseMetadata) ?  null : Base64.getEncoder().encodeToString(forsendelseMetadata.getBytes());
+		return isBlank(forsendelseMetadata) ? null : Base64.getEncoder().encodeToString(forsendelseMetadata.getBytes());
+	}
+
+	private static ForsendelseMetadataType mapForsendelseMetadataType(DistribuerJournalpostRequestTo distribuerJournalpost) {
+		return distribuerJournalpost.getForsendelseMetadataType() == null ? null : ForsendelseMetadataType.valueOf(distribuerJournalpost.getForsendelseMetadataType());
 	}
 }

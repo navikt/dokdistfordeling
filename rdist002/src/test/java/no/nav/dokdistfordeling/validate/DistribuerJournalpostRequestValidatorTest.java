@@ -159,14 +159,14 @@ class DistribuerJournalpostRequestValidatorTest {
 
 	@ParameterizedTest
 	@MethodSource
-	void shouldThrowValidationExceptionWhenEitherForsendelseMetaDataOrTypeIsGiven(DistribuerJournalpostRequestTo request) {
+	void shouldThrowValidationExceptionWhenOnlyOneOfForsendelseMetaDataOrTypeIsSet(DistribuerJournalpostRequestTo request) {
 		assertThatExceptionOfType(ValidationException.class)
 				.isThrownBy(() -> validateDistribuerJournalpostRequest(request))
-				.withMessage("forsendelsesMetadata og forsendelsesMetadataType må enten begge være satt, eller begge være null med forsendelsesmetadata=%s, forsendelsesmetadataType=%s",
+				.withMessage("forsendelsesMetadata og forsendelsesMetadataType må enten begge være satt, eller begge være null. Fikk forsendelsesmetadata=%s, forsendelsesmetadataType=%s",
 						isBlank(request.getForsendelseMetadata()) ? null : "****", request.getForsendelseMetadataType());
 	}
 
-	static Stream<Arguments> shouldThrowValidationExceptionWhenEitherForsendelseMetaDataOrTypeIsGiven() {
+	static Stream<Arguments> shouldThrowValidationExceptionWhenOnlyOneOfForsendelseMetaDataOrTypeIsSet() {
 		return Stream.of(
 				Arguments.of(createDistribuerJournalpostToBuilder().forsendelseMetadata(FORSENDSELSE_METADATA).build(), "forsendelseMetadata"),
 				Arguments.of(createDistribuerJournalpostToBuilder().forsendelseMetadataType(ForsendelseMetadataType.DPO_ARKIVMELDING.name()).build(), "forsendelseMetadataType")

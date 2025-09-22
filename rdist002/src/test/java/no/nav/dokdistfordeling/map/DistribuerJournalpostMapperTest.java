@@ -98,7 +98,7 @@ class DistribuerJournalpostMapperTest {
 	}
 
 	@Test
-	void shouldMapWhenForsendelseMetadataAndTypeIsGiven() {
+	void shouldMapWhenForsendelseMetadataAndTypeIsSett() {
 		var request = createDistribuerJournalpostToBuilder()
 				.forsendelseMetadata(FORSENDSELSE_METADATA)
 				.forsendelseMetadataType(DPO_ARKIVMELDING.name())
@@ -107,6 +107,6 @@ class DistribuerJournalpostMapperTest {
 		var result = DistribuerJournalpostMapper.map(request);
 
 		assertThat(result.forsendelseMetadata()).isEqualTo(getEncoder().encodeToString(FORSENDSELSE_METADATA.getBytes()));
-		assertThat(result.forsendelseMetadataType()).isEqualTo(DPO_ARKIVMELDING.name());
+		assertThat(result.forsendelseMetadataType()).isEqualTo(DPO_ARKIVMELDING);
 	}
 }
