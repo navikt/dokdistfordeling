@@ -17,8 +17,8 @@ import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.TRYGDERETTEN;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.logging.log4j.util.Strings.isBlank;
-import static org.apache.logging.log4j.util.Strings.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Slf4j
 @Component
@@ -33,7 +33,6 @@ public class BestemDistribusjonskanalService {
 	public DistribusjonKanalCode bestemDistribusjonskanal(DistribuerJournalpost distribuerJournalpost,
 														  Journalpost journalpost,
 														  String personnummer) {
-
 		DistribusjonKanalCode tvingKanal = utledTvingKanal(distribuerJournalpost);
 
 		if (tvingKanal != null) {
