@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.validate;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
 
@@ -27,6 +28,7 @@ public class DistribuerJournalpostRequestValidator {
 		assertNotNullAndValidValueIgnoreCase("distribusjonstype", distribuerJournalpostRequestTo.getDistribusjonstype(), DistribusjonstypeCode.values());
 		assertNotNullAndValidValueIgnoreCase("distribusjonstidspunkt", distribuerJournalpostRequestTo.getDistribusjonstidspunkt(), DistribusjonstidspunktCode.values());
 		assertNullOrValidValueIgnoreCase("tvingKanal", distribuerJournalpostRequestTo.getTvingKanal(), TvingKanal.values());
+		assertNullOrValidValueIgnoreCase("forsendelsesMetadataType", distribuerJournalpostRequestTo.getForsendelseMetadataType(), ForsendelseMetadataType.values());
 		validateForsendelseMetadata(distribuerJournalpostRequestTo);
 	}
 

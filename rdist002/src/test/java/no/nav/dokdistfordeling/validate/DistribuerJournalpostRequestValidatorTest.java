@@ -78,7 +78,6 @@ class DistribuerJournalpostRequestValidatorTest {
 	}
 
 
-
 	static Stream<String> shouldThrowValidationExceptionWhenJournalpostIdIsInvalid() {
 		return Stream.of(null, " ", "-1", "1.1", "1,1", "ikkeEttTall", BigInteger.valueOf(Long.MAX_VALUE).add(ONE).toString());
 	}
@@ -171,5 +170,14 @@ class DistribuerJournalpostRequestValidatorTest {
 				Arguments.of(createDistribuerJournalpostToBuilder().forsendelseMetadata(FORSENDSELSE_METADATA).build(), "forsendelseMetadata"),
 				Arguments.of(createDistribuerJournalpostToBuilder().forsendelseMetadataType(ForsendelseMetadataType.DPO_ARKIVMELDING.name()).build(), "forsendelseMetadataType")
 		);
+	}
+
+	@Test
+	void shouldThrowValidationExceptionWhenForsendelseMetadataTypeContainsInvalidValue() {
+		DistribuerJournalpostRequestTo request = createDistribuerJournalpostToBuilder().forsendelseMetadataType("ARKIVMELDING").build();
+		assertThatExceptionOfType(ValidationException.class)
+				.isThrownBy(() -> validateDistribuerJournalpostRequest(request))
+				.withMessage("Feltet forsendelsesMetadataType hadde en ugyldig verdi. Fikk forsendelsesMetadataType=%s. Gyldige verdier er [DPO_ARKIVMELDING, DPO_AVTALEMELDING]",
+						request.getForsendelseMetadataType());
 	}
 }
