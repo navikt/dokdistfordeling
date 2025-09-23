@@ -188,6 +188,11 @@
       "app": "melosys",
       "namespace": "teammelosys",
       "cluster": "dev-fss"
+    },
+    {
+      "app": "tilbakekreving-backend",
+      "namespace": "tilbake",
+      "cluster": "dev-gcp"
     }
   ]
 }
