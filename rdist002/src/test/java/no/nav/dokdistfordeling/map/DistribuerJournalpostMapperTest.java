@@ -7,10 +7,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 
+import static java.util.Base64.getEncoder;
+import static no.nav.dokdistfordeling.TestData.FORSENDSELSE_METADATA;
 import static no.nav.dokdistfordeling.TestData.createAdresseToBuilder;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostToBuilder;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode.VIKTIG;
+import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_ARKIVMELDING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DistribuerJournalpostMapperTest {
@@ -92,5 +95,18 @@ class DistribuerJournalpostMapperTest {
 		assertThat(result.postadresse())
 				.extracting("adresselinje1", "adresselinje2", "adresselinje3")
 				.containsExactly(null, null, null);
+	}
+
+	@Test
+	void shouldMapWhenForsendelseMetadataAndTypeIsSett() {
+		var request = createDistribuerJournalpostToBuilder()
+				.forsendelseMetadata(FORSENDSELSE_METADATA)
+				.forsendelseMetadataType(DPO_ARKIVMELDING.name())
+				.build();
+
+		var result = DistribuerJournalpostMapper.map(request);
+
+		assertThat(result.forsendelseMetadata()).isEqualTo(getEncoder().encodeToString(FORSENDSELSE_METADATA.getBytes()));
+		assertThat(result.forsendelseMetadataType()).isEqualTo(DPO_ARKIVMELDING);
 	}
 }

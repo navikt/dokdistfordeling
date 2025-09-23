@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.domain;
 import lombok.Builder;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonstypeCode;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 
 @Builder
@@ -15,7 +16,9 @@ public record DistribuerJournalpost(
 		DistribusjonstypeCode distribusjonstype,
 		DistribusjonstidspunktCode distribusjonstidspunkt,
 		boolean tvingSentralPrint,
-		TvingKanal tvingKanal) {
+		TvingKanal tvingKanal,
+		String forsendelseMetadata,
+		ForsendelseMetadataType forsendelseMetadataType) {
 
 	public boolean harPostadresse() {
 		return this.postadresse != null;

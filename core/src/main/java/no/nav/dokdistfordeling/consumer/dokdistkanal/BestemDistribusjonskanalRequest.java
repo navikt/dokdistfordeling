@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.consumer.dokdistkanal;
 
 import lombok.Builder;
+import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 
 @Builder
 public record BestemDistribusjonskanalRequest(
@@ -10,6 +11,7 @@ public record BestemDistribusjonskanalRequest(
 		Integer forsendelseStoerrelse,
 		String mottakerId,
 		String tema,
-		Integer antallDokumenter
+		Integer antallDokumenter,
+		ForsendelseMetadataType forsendelseMetadataType
 ) {
 }

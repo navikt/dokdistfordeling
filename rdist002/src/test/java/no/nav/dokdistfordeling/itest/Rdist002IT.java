@@ -50,9 +50,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
+import static no.nav.dokdistfordeling.TestData.FORSENDSELSE_METADATA;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostToBuilder;
 import static no.nav.dokdistfordeling.TestData.createUtenlandskAdresseTo;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_AVTALEMELDING;
 import static no.nav.dokdistfordeling.kodeverk.TvingKanal.TRYGDERETTEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -179,6 +181,39 @@ public class Rdist002IT extends AbstractOauth2Test {
 			assertNotNull(qdist012Result);
 			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
 			assertThat(classpathToString("__files/rdist002/rdist002IT-dokumenterFraJoak-dittnav.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
+		});
+
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
+	}
+
+	@Test
+	public void distribuerJournalpostToDPO() {
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+		stubStsToken();
+		stubPdl("pdl/pdl-happy.json");
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/dpo.json");
+		putStubOppdaterJournalpost();
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.forsendelseMetadata(FORSENDSELSE_METADATA)
+						.forsendelseMetadataType(DPO_AVTALEMELDING.name())
+						.build(),
+				createHappyPathHeaders());
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
+
+		assertEquals(36, restResponse.getBestillingsId().length());
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
+			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
+
+			assertNotNull(qdist012Result);
+			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
+			assertThat(classpathToString("__files/rdist002/rdist002IT-dokumenterFraJoak-dpo.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
 		});
 
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));

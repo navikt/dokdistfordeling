@@ -30,6 +30,10 @@ public class DistribuerJournalpostRequestTo {
 	boolean tvingSentralPrint;
 	@Schema(name = "tvingKanal", description = "Overstyr kanal forsendelsen skal distribueres gjennom. Verdi kan være en av følgende: \"PRINT\" eller \"TRYGDERETTEN\"", example = "PRINT")
 	String tvingKanal;
+	@Schema(name="forsendelseMetadata", description = "Metadata som følger forsendelsen. Påkrevd hvis forsendelseMetadataType er satt.")
+	String forsendelseMetadata;
+	@Schema(name="forsendelseMetadataType", description = "Type metadata som følger forsendelsen. Påkrevd hvis forsendelseMetadata er satt.", example = "DPO_AVTALEMELDING")
+	String forsendelseMetadataType;
 
 	@Builder
 	@Getter

@@ -1,0 +1,5 @@
+{
+  "distribusjonskanal": "DPO",
+  "regel": "ORGANISASJON_MED_SERVICE_REGISTRY_INFO",
+  "regelBegrunnelse": "Mottaker er organisasjon og har gyldig mottakerinfo i Service Registry"
+}

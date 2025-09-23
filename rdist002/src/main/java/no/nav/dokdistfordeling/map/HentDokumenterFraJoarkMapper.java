@@ -57,6 +57,8 @@ public class HentDokumenterFraJoarkMapper {
 		distribusjonbestilling.setBruker(mapBruker(journalpost.getBruker()));
 		distribusjonbestilling.setAdresse(mapPostadresse(postadresse));
 		distribusjonbestilling.setDokumentProdApp(distribuerJournalpost.dokumentProdApp());
+		distribusjonbestilling.setForsendelseMetadata(distribuerJournalpost.forsendelseMetadata());
+		distribusjonbestilling.setForsendelseMetadataType(distribuerJournalpost.forsendelseMetadataType() == null ? null : distribuerJournalpost.forsendelseMetadataType().name());
 
 		distribusjonbestilling.setDokumenter(IntStream
 				.range(0, dokumenter.size())
