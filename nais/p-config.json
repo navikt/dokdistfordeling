@@ -179,6 +179,11 @@
       "app": "historisk-helt-backend",
       "namespace": "historisk",
       "cluster": "prod-gcp"
+    },
+    {
+      "app": "eux-neessi",
+      "namespace": "eessibasis",
+      "cluster": "prod-gcp"
     }
   ]
 }
