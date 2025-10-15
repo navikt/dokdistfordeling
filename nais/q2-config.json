@@ -193,6 +193,11 @@
       "app": "tilbakekreving-backend",
       "namespace": "tilbake",
       "cluster": "dev-gcp"
+    },
+    {
+      "app": "eux-neessi-q2",
+      "namespace": "eessibasis",
+      "cluster": "dev-gcp"
     }
   ]
 }

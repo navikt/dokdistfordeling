@@ -146,6 +146,11 @@
       "app": "melosys-q1",
       "namespace": "teammelosys",
       "cluster": "dev-fss"
+    },
+    {
+      "app": "eux-neessi-q1",
+      "namespace": "eessibasis",
+      "cluster": "dev-gcp"
     }
   ]
 }
