@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.qdist012;
 import no.nav.dokdistfordeling.kodeverk.AktoerTypeCode;
 import no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.AdresseTo;
+import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.AktoerTo;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.DistribusjonbestillingTo;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.NorskPostadresseTo;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.UtenlandskPostadresseTo;
@@ -39,11 +40,6 @@ import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_ARKIV
 import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_AVTALEMELDING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HentDokumenterFraJoarkMapperTest {
 
@@ -102,9 +98,9 @@ class HentDokumenterFraJoarkMapperTest {
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
-		assertNotNull(hentDokumenterFraJoarkTo);
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
-		assertNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getBatchId());
+		assertThat(hentDokumenterFraJoarkTo).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling()).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getBatchId()).isNull();
 	}
 
 	@Test
@@ -114,7 +110,7 @@ class HentDokumenterFraJoarkMapperTest {
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
 		DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
-		assertEquals(distribusjonbestilling.getDistribusjonKanal(), DITTNAV.name());
+		assertThat(distribusjonbestilling.getDistribusjonKanal()).isEqualTo(DITTNAV.name());
 		assertThat(distribusjonbestilling.getAdresse()).isNotNull();
 	}
 
@@ -125,9 +121,9 @@ class HentDokumenterFraJoarkMapperTest {
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
-		assertNotNull(hentDokumenterFraJoarkTo);
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
-		assertNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getForsendelseTittel());
+		assertThat(hentDokumenterFraJoarkTo).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling()).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getForsendelseTittel()).isNull();
 	}
 
 	@Test
@@ -137,9 +133,9 @@ class HentDokumenterFraJoarkMapperTest {
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
-		assertNotNull(hentDokumenterFraJoarkTo);
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
-		assertNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getForsendelseMetadata());
+		assertThat(hentDokumenterFraJoarkTo).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling()).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getForsendelseMetadata()).isNull();
 	}
 
 	@ParameterizedTest
@@ -150,8 +146,8 @@ class HentDokumenterFraJoarkMapperTest {
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
-		assertNotNull(hentDokumenterFraJoarkTo);
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
+		assertThat(hentDokumenterFraJoarkTo).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling()).isNotNull();
 		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getForsendelseMetadataType()).isEqualTo(forventetForsendelseMetadataType);
 	}
 
@@ -172,8 +168,8 @@ class HentDokumenterFraJoarkMapperTest {
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
-		assertEquals(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstidspunkt(), UMIDDELBART);
-		assertNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstype());
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstidspunkt()).isEqualTo(UMIDDELBART);
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getDistribusjonstype()).isNull();
 	}
 
 	@Test
@@ -183,9 +179,9 @@ class HentDokumenterFraJoarkMapperTest {
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
-		assertNotNull(hentDokumenterFraJoarkTo);
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
-		assertNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getArkivInformasjon());
+		assertThat(hentDokumenterFraJoarkTo).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling()).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getArkivInformasjon()).isNull();
 	}
 
 	@Test
@@ -195,14 +191,15 @@ class HentDokumenterFraJoarkMapperTest {
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
-		assertNotNull(hentDokumenterFraJoarkTo);
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker());
-		final HentDokumenterFraJoarkTo.AktoerTo mottakerTo = hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker();
-		assertEquals(mottakerTo.getIdentifikator(), MOTTAKER_ID);
-		assertEquals(mottakerTo.getNavn(), MOTTAKER_ID_NAVN);
-		assertEquals(mottakerTo.getAktoerType(), PERSON);
-		assertTrue(mottakerTo.isIdentifikatorAktoerId());
+		assertThat(hentDokumenterFraJoarkTo).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling()).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker()).isNotNull();
+
+		final AktoerTo mottakerTo = hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker();
+		assertThat(mottakerTo.getIdentifikator()).isEqualTo(MOTTAKER_ID);
+		assertThat(mottakerTo.getNavn()).isEqualTo(MOTTAKER_ID_NAVN);
+		assertThat(mottakerTo.getAktoerType()).isEqualTo(PERSON);
+		assertThat(mottakerTo.isIdentifikatorAktoerId()).isTrue();
 	}
 
 	@Test
@@ -212,15 +209,16 @@ class HentDokumenterFraJoarkMapperTest {
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
-		assertNotNull(hentDokumenterFraJoarkTo);
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker());
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getBruker());
-		final HentDokumenterFraJoarkTo.AktoerTo mottakerTo = hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker();
-		assertEquals(mottakerTo.getIdentifikator(), ORGNUMMER);
-		assertEquals(mottakerTo.getNavn(), ORGANISASJON_NAVN);
-		assertEquals(mottakerTo.getAktoerType(), ORGANISASJON);
-		assertFalse(mottakerTo.isIdentifikatorAktoerId());
+		assertThat(hentDokumenterFraJoarkTo).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling()).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker()).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getBruker()).isNotNull();
+
+		final AktoerTo mottakerTo = hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker();
+		assertThat(mottakerTo.getIdentifikator()).isEqualTo(ORGNUMMER);
+		assertThat(mottakerTo.getNavn()).isEqualTo(ORGANISASJON_NAVN);
+		assertThat(mottakerTo.getAktoerType()).isEqualTo(ORGANISASJON);
+		assertThat(mottakerTo.isIdentifikatorAktoerId()).isFalse();
 	}
 
 	@ParameterizedTest
@@ -231,14 +229,15 @@ class HentDokumenterFraJoarkMapperTest {
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
-		assertNotNull(hentDokumenterFraJoarkTo);
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker());
-		final HentDokumenterFraJoarkTo.AktoerTo mottakerTo = hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker();
-		assertEquals(mottakerTo.getIdentifikator(), SAMHANDLER_IDENTIFIKATOR);
-		assertEquals(mottakerTo.getNavn(), SAMHANDLER_NAVN);
-		assertEquals(mottakerTo.getAktoerType(), aktoerTypeCode);
-		assertFalse(mottakerTo.isIdentifikatorAktoerId());
+		assertThat(hentDokumenterFraJoarkTo).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling()).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker()).isNotNull();
+
+		final AktoerTo mottakerTo = hentDokumenterFraJoarkTo.getDistribusjonbestilling().getMottaker();
+		assertThat(mottakerTo.getIdentifikator()).isEqualTo(SAMHANDLER_IDENTIFIKATOR);
+		assertThat(mottakerTo.getNavn()).isEqualTo(SAMHANDLER_NAVN);
+		assertThat(mottakerTo.getAktoerType()).isEqualTo(aktoerTypeCode);
+		assertThat(mottakerTo.isIdentifikatorAktoerId()).isFalse();
 	}
 
 	private static Stream<Arguments> shouldMapSamhandler() {
@@ -257,7 +256,7 @@ class HentDokumenterFraJoarkMapperTest {
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoarkDittNav);
 
 		DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
-		assertEquals(distribusjonbestilling.getDistribusjonKanal(), DITTNAV.name());
+		assertThat(distribusjonbestilling.getDistribusjonKanal()).isEqualTo(DITTNAV.name());
 		assertThat(distribusjonbestilling.getAdresse()).isNull();
 	}
 
@@ -268,44 +267,44 @@ class HentDokumenterFraJoarkMapperTest {
 
 		HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo = hentDokumenterFraJoarkMapper.map(hentDokumenterFraJoark);
 
-		assertNotNull(hentDokumenterFraJoarkTo);
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
+		assertThat(hentDokumenterFraJoarkTo).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling()).isNotNull();
 		assertUtenlandskPostadresseTo(hentDokumenterFraJoarkTo.getDistribusjonbestilling().getAdresse());
 	}
 
 	private void assertResponse(HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo) {
-		assertNotNull(hentDokumenterFraJoarkTo);
-		assertNotNull(hentDokumenterFraJoarkTo.getDistribusjonbestilling());
+		assertThat(hentDokumenterFraJoarkTo).isNotNull();
+		assertThat(hentDokumenterFraJoarkTo.getDistribusjonbestilling()).isNotNull();
 
 		//assert HentDokumenterFraJoarkTo
 		final DistribusjonbestillingTo distBestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
-		assertEquals(distBestilling.getBestillingsId(), BESTILLINGS_ID);
-		assertEquals(distBestilling.getBatchId(), BATCH_ID);
-		assertEquals(distBestilling.getBestillendeFagsystem(), BESTILLENDE_FAGSYSTEM);
-		assertEquals(distBestilling.getTema(), TEMA);
-		assertEquals(distBestilling.getForsendelseTittel(), FORSENDELSE_TITTEL);
-		assertEquals(distBestilling.getDokumentProdApp(), DOKUMENT_PROD_APP);
-		assertEquals(distBestilling.getDistribusjonstype(), VEDTAK);
-		assertEquals(distBestilling.getDistribusjonstidspunkt(), UMIDDELBART);
+		assertThat(distBestilling.getBestillingsId()).isEqualTo(BESTILLINGS_ID);
+		assertThat(distBestilling.getBatchId()).isEqualTo(BATCH_ID);
+		assertThat(distBestilling.getBestillendeFagsystem()).isEqualTo(BESTILLENDE_FAGSYSTEM);
+		assertThat(distBestilling.getTema()).isEqualTo(TEMA);
+		assertThat(distBestilling.getForsendelseTittel()).isEqualTo(FORSENDELSE_TITTEL);
+		assertThat(distBestilling.getDokumentProdApp()).isEqualTo(DOKUMENT_PROD_APP);
+		assertThat(distBestilling.getDistribusjonstype()).isEqualTo(VEDTAK);
+		assertThat(distBestilling.getDistribusjonstidspunkt()).isEqualTo(UMIDDELBART);
 
 		//assert Arkivinformasjon
-		assertNotNull(distBestilling.getArkivInformasjon());
-		assertEquals(distBestilling.getArkivInformasjon().getArkivId(), ARKIV_ID);
-		assertEquals(distBestilling.getArkivInformasjon().getArkivSystem(), ARKIV_SYSTEM);
+		assertThat(distBestilling.getArkivInformasjon()).isNotNull();
+		assertThat(distBestilling.getArkivInformasjon().getArkivId()).isEqualTo(ARKIV_ID);
+		assertThat(distBestilling.getArkivInformasjon().getArkivSystem()).isEqualTo(ARKIV_SYSTEM);
 
 		//assert mottaker Person
-		assertNotNull(distBestilling.getMottaker());
-		assertEquals(distBestilling.getMottaker().getIdentifikator(), PERSON_IDENTIFIKATOR_MOTTAKER);
-		assertEquals(distBestilling.getMottaker().getNavn(), PERSON_NAVN_MOTTAKER);
-		assertEquals(distBestilling.getMottaker().getAktoerType(), PERSON);
-		assertFalse(distBestilling.getMottaker().isIdentifikatorAktoerId());
+		assertThat(distBestilling.getMottaker()).isNotNull();
+		assertThat(distBestilling.getMottaker().getIdentifikator()).isEqualTo(PERSON_IDENTIFIKATOR_MOTTAKER);
+		assertThat(distBestilling.getMottaker().getNavn()).isEqualTo(PERSON_NAVN_MOTTAKER);
+		assertThat(distBestilling.getMottaker().getAktoerType()).isEqualTo(PERSON);
+		assertThat(distBestilling.getMottaker().isIdentifikatorAktoerId()).isFalse();
 
 		//assert bruker Person
-		assertNotNull(distBestilling.getBruker());
-		assertEquals(distBestilling.getBruker().getIdentifikator(), PERSON_IDENTIFIKATOR_BRUKER);
-		assertEquals(distBestilling.getBruker().getNavn(), PERSON_NAVN_BRUKER);
-		assertEquals(distBestilling.getBruker().getAktoerType(), PERSON);
-		assertFalse(distBestilling.getBruker().isIdentifikatorAktoerId());
+		assertThat(distBestilling.getBruker()).isNotNull();
+		assertThat(distBestilling.getBruker().getIdentifikator()).isEqualTo(PERSON_IDENTIFIKATOR_BRUKER);
+		assertThat(distBestilling.getBruker().getNavn()).isEqualTo(PERSON_NAVN_BRUKER);
+		assertThat(distBestilling.getBruker().getAktoerType()).isEqualTo(PERSON);
+		assertThat(distBestilling.getBruker().isIdentifikatorAktoerId()).isFalse();
 
 		//assert norsk postadresse
 		assertNorskPostadresseTo(distBestilling.getAdresse());
@@ -326,23 +325,25 @@ class HentDokumenterFraJoarkMapperTest {
 	}
 
 	private void assertNorskPostadresseTo(AdresseTo adresse) {
-		assertTrue(adresse instanceof NorskPostadresseTo);
+		assertThat(adresse).isInstanceOf(NorskPostadresseTo.class);
+
 		final NorskPostadresseTo postadresse = (NorskPostadresseTo) adresse;
-		assertEquals(postadresse.getAdresselinje1(), ADRESSELINJE_1);
-		assertEquals(postadresse.getAdresselinje2(), ADRESSELINJE_2);
-		assertEquals(postadresse.getAdresselinje3(), ADRESSELINJE_3);
-		assertEquals(postadresse.getPostnummer(), POSTNUMMER);
-		assertEquals(postadresse.getPoststed(), POSTSTED);
-		assertEquals(postadresse.getLand(), LAND);
+		assertThat(postadresse.getAdresselinje1()).isEqualTo(ADRESSELINJE_1);
+		assertThat(postadresse.getAdresselinje2()).isEqualTo(ADRESSELINJE_2);
+		assertThat(postadresse.getAdresselinje3()).isEqualTo(ADRESSELINJE_3);
+		assertThat(postadresse.getPostnummer()).isEqualTo(POSTNUMMER);
+		assertThat(postadresse.getPoststed()).isEqualTo(POSTSTED);
+		assertThat(postadresse.getLand()).isEqualTo(LAND);
 	}
 
 	private void assertUtenlandskPostadresseTo(AdresseTo adresse) {
-		assertTrue(adresse instanceof UtenlandskPostadresseTo);
+		assertThat(adresse).isInstanceOf(UtenlandskPostadresseTo.class);
+
 		final UtenlandskPostadresseTo postadresse = (UtenlandskPostadresseTo) adresse;
-		assertEquals(postadresse.getAdresselinje1(), ADRESSELINJE_1);
-		assertEquals(postadresse.getAdresselinje2(), ADRESSELINJE_2);
-		assertEquals(postadresse.getAdresselinje3(), ADRESSELINJE_3);
-		assertEquals(postadresse.getLand(), LAND);
+		assertThat(postadresse.getAdresselinje1()).isEqualTo(ADRESSELINJE_1);
+		assertThat(postadresse.getAdresselinje2()).isEqualTo(ADRESSELINJE_2);
+		assertThat(postadresse.getAdresselinje3()).isEqualTo(ADRESSELINJE_3);
+		assertThat(postadresse.getLand()).isEqualTo(LAND);
 	}
 
 	private HentDokumenterFraJoark createHentDokumenterFraJoark() {

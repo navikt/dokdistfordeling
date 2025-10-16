@@ -36,9 +36,9 @@
         <tink-gcpkms.version>1.10.0</tink-gcpkms.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.8.13</springdoc-openapi-starter-webmvc-ui.version>
         <context-propagation.version>1.1.3</context-propagation.version>
-        <token-support.version>5.0.30</token-support.version>
 
-        <dok-legacy-tjenestespesifikasjoner.version>41-d282678</dok-legacy-tjenestespesifikasjoner.version>
+        <token-support.version>5.0.37</token-support.version>
+        <dok-legacy-tjenestespesifikasjoner.version>44-7d14e70</dok-legacy-tjenestespesifikasjoner.version>
 
         <!-- Test -->
         <spring-cloud-contract-wiremock.version>4.3.0</spring-cloud-contract-wiremock.version>

@@ -66,7 +66,7 @@ public class SafGraphqlConsumer {
 					case FORBIDDEN ->
 							throw new SafJournalpostQueryUnauthorizedException("Saksbehandler har ikke tilgang til journalposten. Feilmelding fra SAF: " + safError.getMessage());
 					case SERVER_ERROR -> {
-						log.warn("Teknisk feil mot SAF. Feilmelding: " + safError.getMessage());
+						log.warn("Teknisk feil mot SAF. Feilmelding: {}", safError.getMessage());
 						throw new SafJournalpostQueryTechnicalException(safError.getMessage());
 					}
 					case BAD_REQUEST ->

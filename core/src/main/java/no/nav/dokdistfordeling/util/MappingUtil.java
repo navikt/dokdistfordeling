@@ -1,15 +1,11 @@
 package no.nav.dokdistfordeling.util;
 
-import static java.lang.String.format;
-import static no.nav.dokdistfordeling.constants.Constants.BEARER_PREFIX;
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.dokdistfordeling.exception.functional.InvalidMappingToEnumFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 
-import java.io.IOException;
+import static java.lang.String.format;
+import static no.nav.dokdistfordeling.constants.Constants.BEARER_PREFIX;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 public final class MappingUtil {
 
