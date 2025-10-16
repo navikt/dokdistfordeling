@@ -14,7 +14,6 @@ import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

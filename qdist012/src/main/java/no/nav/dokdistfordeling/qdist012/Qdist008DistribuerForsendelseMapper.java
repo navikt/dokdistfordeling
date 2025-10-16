@@ -29,7 +29,6 @@ import static java.util.Objects.nonNull;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.HPR;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UKJENT;
 import static no.nav.dokdistfordeling.kodeverk.SamhandlerKategoriCode.UTL_ORG;
-import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Component

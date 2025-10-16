@@ -41,7 +41,6 @@ import static no.nav.dokdistfordeling.kodeverk.AktoerTypeCode.SAMHANDLER_UTL_ORG
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.util.MappingUtil.stringToEnum;
 import static org.apache.commons.lang3.EnumUtils.getEnumIgnoreCase;
-import static org.apache.commons.lang3.EnumUtils.isValidEnum;
 import static org.apache.commons.lang3.EnumUtils.isValidEnumIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
