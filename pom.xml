@@ -28,7 +28,7 @@
 
         <camel.version>4.15.0</camel.version>
         <logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
-        <com.ibm.mq.jakarta.client.version>9.4.3.1</com.ibm.mq.jakarta.client.version>
+        <com.ibm.mq.jakarta.client.version>9.4.4.0</com.ibm.mq.jakarta.client.version>
         <commons-io.version>2.20.0</commons-io.version>
         <httpclient.version>4.5.14</httpclient.version>
         <libraries-bom.version>26.70.0</libraries-bom.version>
