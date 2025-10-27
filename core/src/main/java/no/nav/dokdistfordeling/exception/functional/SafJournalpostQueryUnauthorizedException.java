@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
-@ResponseStatus(value = UNAUTHORIZED)
+@ResponseStatus(UNAUTHORIZED)
 public class SafJournalpostQueryUnauthorizedException extends AbstractDokdistfordelingFunctionalException {
 
 	public SafJournalpostQueryUnauthorizedException(String message) {

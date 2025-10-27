@@ -1,5 +1,9 @@
 package no.nav.dokdistfordeling.itest;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryRegistry;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.Queue;
@@ -11,6 +15,7 @@ import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostResponseTo;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,6 +38,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -49,6 +57,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Objects.requireNonNull;
 import static no.nav.dokdistfordeling.TestData.FORSENDSELSE_METADATA;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostToBuilder;
@@ -57,6 +66,7 @@ import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_AVTALEMELDING;
 import static no.nav.dokdistfordeling.kodeverk.TvingKanal.TRYGDERETTEN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -93,10 +103,17 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Autowired
 	private Queue qdist012;
 
+	@Autowired
+	protected CircuitBreakerRegistry circuitBreakerRegistry;
+
+	@Autowired
+	protected RetryRegistry retryRegistry;
+
 	@BeforeEach
 	public void setupBefore() {
 		stubAzureToken();
 		stubNaisTexasToken();
+		circuitBreakerRegistry.getAllCircuitBreakers().forEach(CircuitBreaker::reset);
 	}
 
 	@Test
@@ -706,7 +723,55 @@ public class Rdist002IT extends AbstractOauth2Test {
 				createDistribuerJournalpostToBuilder().build(),
 				createHappyPathHeaders());
 
-		callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, INTERNAL_SERVER_ERROR);
+		ResponseEntity<String> responseEntity = restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, POST, requestEntity, String.class);
+
+		assertThat(responseEntity.getStatusCode()).isEqualTo(INTERNAL_SERVER_ERROR);
+	}
+
+	private static Stream<Arguments> shouldReturnInternalServerErrorWhenBestemDistribusjonskanalResponseIsUnauthorizedOrInternalServerError() {
+		return Stream.of(
+				Arguments.of(UNAUTHORIZED, "bestemdistribusjonskanal/unauthorized.json"),
+				Arguments.of(INTERNAL_SERVER_ERROR, "bestemdistribusjonskanal/internal_server_error.json")
+		);
+	}
+
+	@Test
+	void shouldReturnServiceUnavailableWhenCircuitbreakerIsOpenForDokdistkanal() {
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+		stubStsToken();
+		stubPdl("pdl/pdl-happy.json");
+		stubBestemDistribusjonskanal(INTERNAL_SERVER_ERROR, "bestemdistribusjonskanal/internal_server_error.json");
+
+		CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("dokdistkanal");
+		Retry retry = retryRegistry.retry("dokdistkanal");
+
+		var retries = retry.getRetryConfig().getMaxAttempts();
+		var slidingWindowSize = circuitBreaker.getCircuitBreakerConfig().getSlidingWindowSize();
+
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
+
+		// Maks antall kall må til for å flippe CLOSED -> OPEN før den sjekker om feilprosent er over 50
+		for (int i = 0; i < slidingWindowSize / retries; i++) {
+			assertThat(circuitBreaker.getState()).isEqualTo(CircuitBreaker.State.CLOSED);
+			System.out.println("Attempt " + (i));
+			restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, POST, requestEntity, String.class);
+		}
+
+		ResponseEntity<String> response = restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, POST, requestEntity, String.class);
+
+		var jsonResponse = new JSONObject(response.getBody());
+		ZonedDateTime timestampILokaltid = (OffsetDateTime.parse(jsonResponse.getString("timestamp"))
+				.atZoneSameInstant(ZoneId.of("UTC")));
+		ZonedDateTime tidNaa = ZonedDateTime.now(ZoneId.of("UTC"));
+		assertThat(timestampILokaltid).isCloseTo(tidNaa, within(1, SECONDS));
+
+		assertThat(jsonResponse.getInt("status")).isEqualTo(503);
+		assertThat(jsonResponse.getString("error")).isEqualTo("Service Unavailable");
+		assertThat(jsonResponse.getString("message")).isEqualTo("Teknisk feil ved kall mot ekstern tjeneste med feilmelding=CircuitBreaker 'dokdistkanal' is OPEN and does not permit further calls");
+		assertThat(jsonResponse.getString("path")).isEqualTo("/rest/v1/distribuerjournalpost");
 	}
 
 	@Test
@@ -752,13 +817,6 @@ public class Rdist002IT extends AbstractOauth2Test {
 				createHeadersWithInvalidAuth());
 
 		callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, UNAUTHORIZED);
-	}
-
-	private static Stream<Arguments> shouldReturnInternalServerErrorWhenBestemDistribusjonskanalResponseIsUnauthorizedOrInternalServerError() {
-		return Stream.of(
-				Arguments.of(UNAUTHORIZED, "bestemdistribusjonskanal/unauthorized.json"),
-				Arguments.of(UNAUTHORIZED, "bestemdistribusjonskanal/internal_server_error.json")
-		);
 	}
 
 	private void stubAzureToken() {

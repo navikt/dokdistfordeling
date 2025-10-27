@@ -5,8 +5,4 @@ public class SafHentDokumentTechnicalException extends AbstractDokdistfordelingT
 	public SafHentDokumentTechnicalException(String message) {
 		super(message);
 	}
-
-	public SafHentDokumentTechnicalException(String message, Throwable cause) {
-		super(message, cause);
-	}
 }

@@ -36,6 +36,7 @@
         <tink-gcpkms.version>1.10.0</tink-gcpkms.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.8.13</springdoc-openapi-starter-webmvc-ui.version>
         <context-propagation.version>1.1.3</context-propagation.version>
+        <resilience4j.version>2.3.0</resilience4j.version>
 
         <token-support.version>5.0.37</token-support.version>
         <dok-legacy-tjenestespesifikasjoner.version>44-7d14e70</dok-legacy-tjenestespesifikasjoner.version>
@@ -128,6 +129,14 @@
                 <artifactId>context-propagation</artifactId>
                 <version>${context-propagation.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-bom</artifactId>
+                <version>${resilience4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <dependency>
                 <groupId>no.nav.meldinger.virksomhet</groupId>
                 <artifactId>dok-melding-virksomhet-dokdistfordeling</artifactId>

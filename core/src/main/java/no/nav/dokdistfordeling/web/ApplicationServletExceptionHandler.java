@@ -1,5 +1,6 @@
 package no.nav.dokdistfordeling.web;
 
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException;
 import org.slf4j.MDC;
@@ -15,12 +16,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.Map;
 
 import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Slf4j
 @RestControllerAdvice
 public class ApplicationServletExceptionHandler extends ResponseEntityExceptionHandler {
 
+	private static final String CONSUMER_TEKNISK_FEIL_MESSAGE = "Teknisk feil ved kall mot ekstern tjeneste med feilmelding=%s";
 	private static final String UNAUTHORIZED_MESSAGE = "Token er ikke autorisert for denne tjenesten. " +
 													   "Token må være utsted av NAV onprem security-token-service eller Entra Id. " +
 													   "Vi har endret dette fra 25.07.2025, hvis dere plutselig mangler tilgang: ta kontakt i #team_dokumentløsninger";
@@ -37,4 +40,20 @@ public class ApplicationServletExceptionHandler extends ResponseEntityExceptionH
 		body.put("path", ((ServletWebRequest) webRequest).getRequest().getRequestURI());
 		return new ResponseEntity<>(body, UNAUTHORIZED);
 	}
+
+	@ExceptionHandler({CallNotPermittedException.class})
+	ResponseEntity<Object> handleCallNotPermittedException(Exception ex, WebRequest webRequest) {
+		var feilmelding = CONSUMER_TEKNISK_FEIL_MESSAGE.formatted(ex.getMessage());
+		log.warn(feilmelding, ex);
+
+		DefaultErrorAttributes errorAttributes = new DefaultErrorAttributes();
+		Map<String, Object> body = errorAttributes.getErrorAttributes(webRequest, ErrorAttributeOptions.defaults());
+		body.put("status", SERVICE_UNAVAILABLE.value());
+		body.put("error", SERVICE_UNAVAILABLE.getReasonPhrase());
+		body.put("message", feilmelding);
+		body.put("path", ((ServletWebRequest) webRequest).getRequest().getRequestURI());
+
+		return new ResponseEntity<>(body, SERVICE_UNAVAILABLE);
+	}
+
 }

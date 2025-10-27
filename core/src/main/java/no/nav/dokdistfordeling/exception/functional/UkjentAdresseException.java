@@ -1,12 +1,13 @@
 package no.nav.dokdistfordeling.exception.functional;
 
-import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagHentAdresseFunctionalException;
+import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagFunctionalException;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ResponseStatus(BAD_REQUEST)
-public class UkjentAdresseException extends RegoppslagHentAdresseFunctionalException {
+public class UkjentAdresseException extends RegoppslagFunctionalException {
+
 	public UkjentAdresseException(String message) {
 		super(message);
 	}
