@@ -6,6 +6,7 @@ import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnaut
 import org.slf4j.MDC;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,29 +32,31 @@ public class ApplicationServletExceptionHandler extends ResponseEntityExceptionH
 	@ExceptionHandler({JwtTokenUnauthorizedException.class})
 	public ResponseEntity<Object> handleUnauthorized(WebRequest webRequest) {
 		log.error("System consumerId={}, sender token som ikke er autorisert. Dette kan være en tilgang som ikke er lagt til i config.", MDC.get(CONSUMER_ID));
+		HttpStatus returnertHttpStatus = UNAUTHORIZED;
 
-		DefaultErrorAttributes errorAttributes = new DefaultErrorAttributes();
-		Map<String, Object> body = errorAttributes.getErrorAttributes(webRequest, ErrorAttributeOptions.defaults());
-		body.put("status", UNAUTHORIZED.value());
-		body.put("error", UNAUTHORIZED.getReasonPhrase());
-		body.put("message", UNAUTHORIZED_MESSAGE);
-		body.put("path", ((ServletWebRequest) webRequest).getRequest().getRequestURI());
-		return new ResponseEntity<>(body, UNAUTHORIZED);
+		return new ResponseEntity<>(formaterBody(returnertHttpStatus, UNAUTHORIZED_MESSAGE, webRequest), returnertHttpStatus);
 	}
 
 	@ExceptionHandler({CallNotPermittedException.class})
 	ResponseEntity<Object> handleCallNotPermittedException(Exception ex, WebRequest webRequest) {
 		var feilmelding = CONSUMER_TEKNISK_FEIL_MESSAGE.formatted(ex.getMessage());
-		log.warn(feilmelding, ex);
 
+		log.warn(feilmelding, ex);
+		HttpStatus returnertHttpStatus = SERVICE_UNAVAILABLE;
+
+		return new ResponseEntity<>(formaterBody(returnertHttpStatus, feilmelding, webRequest), returnertHttpStatus);
+	}
+
+	private Map<String, Object> formaterBody(HttpStatus httpStatus, String feilmelding, WebRequest webRequest) {
 		DefaultErrorAttributes errorAttributes = new DefaultErrorAttributes();
 		Map<String, Object> body = errorAttributes.getErrorAttributes(webRequest, ErrorAttributeOptions.defaults());
-		body.put("status", SERVICE_UNAVAILABLE.value());
-		body.put("error", SERVICE_UNAVAILABLE.getReasonPhrase());
+
+		body.put("status", httpStatus.value());
+		body.put("error", httpStatus.getReasonPhrase());
 		body.put("message", feilmelding);
 		body.put("path", ((ServletWebRequest) webRequest).getRequest().getRequestURI());
 
-		return new ResponseEntity<>(body, SERVICE_UNAVAILABLE);
+		return body;
 	}
 
 }
