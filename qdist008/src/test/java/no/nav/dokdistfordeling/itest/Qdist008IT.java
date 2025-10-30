@@ -554,44 +554,50 @@ public class Qdist008IT {
 
 	@Test
 	public void shouldThrowJournalpostFeilregistrertException() throws Exception {
-		Logger logger = (Logger) LoggerFactory.getLogger(Qdist008Route.class);
-		ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
-		listAppender.start();
-		logger.addAppender(listAppender);
+		ListAppender<ILoggingEvent> listAppender = setupAndReturnListAppender();
 
 		stubGetDokumenttypeInfo();
 		stubNaisTexasToken();
 		stubAzure();
-		stubFor(post(SAF_GRAPHQL_URL)
-				.willReturn(aResponse()
-						.withStatus(OK.value())
-						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("saf/safGraphQlResponse-FEILREGISTRERT.json")));
+		stubSafGraphQl("saf/safGraphQlResponse-FEILREGISTRERT.json");
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
 		await().atMost(10, SECONDS).untilAsserted(() ->
 				assertTrue(listAppender.list.stream().map(ILoggingEvent::getMessage).toList()
-						.contains("Forkaster melding på qdist008 for bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 og forsendelseId= grunnet=no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException: journalpostId=1234 er feilregistrert og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes")));
+						.contains("Forkaster melding på qdist008 grunnet=no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException: journalpostId=1234 er feilregistrert og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes"))
+		);
+
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
+	}
+
+	@Test
+	public void shouldThrowJournalpostErAlleredeEkspedertException() throws Exception {
+		ListAppender<ILoggingEvent> listAppender = setupAndReturnListAppender();
+
+		stubGetDokumenttypeInfo();
+		stubNaisTexasToken();
+		stubAzure();
+		stubSafGraphQl("saf/safGraphQlResponse-EKSPEDERT.json");
+
+		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
+
+		await().atMost(10, SECONDS).untilAsserted(() ->
+				assertTrue(listAppender.list.stream().map(ILoggingEvent::getMessage).toList()
+						.contains("Forkaster melding på qdist008 grunnet=no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException: journalpostId=1234 er allerede distribuert og distribusjon av bestillingsId=7882d37e-34f7-11e9-b210-d663bd873d93 avbrytes"))
+		);
 
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
 	}
 
 	@Test
 	public void shouldThrowValidationExceptionForJournalpostUnderArbeid() throws Exception {
-		Logger logger = (Logger) LoggerFactory.getLogger(Qdist008Route.class);
-		ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
-		listAppender.start();
-		logger.addAppender(listAppender);
+		ListAppender<ILoggingEvent> listAppender = setupAndReturnListAppender();
 
-		stubFor(post(SAF_GRAPHQL_URL)
-				.willReturn(aResponse()
-						.withStatus(OK.value())
-						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("saf/safGraphQlResponse-UNDER_ARBEID.json")));
 		stubGetDokumenttypeInfo();
 		stubNaisTexasToken();
 		stubAzure();
+		stubSafGraphQl("saf/safGraphQlResponse-UNDER_ARBEID.json");
 
 		sendStringMessage(qdist008, classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 
@@ -859,6 +865,14 @@ public class Qdist008IT {
 						.withStatus(OK.value())));
 	}
 
+	private void stubSafGraphQl(String bodyFile) {
+		stubFor(post(SAF_GRAPHQL_URL)
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile(bodyFile)));
+	}
+
 	private void sendStringMessage(Queue queue, final String message) {
 		sendStringMessage(queue, message, null);
 	}
@@ -897,4 +911,13 @@ public class Qdist008IT {
 	private String getRequestAsJson(String filename) throws IOException {
 		return IOUtils.toString(requireNonNull(this.getClass().getResourceAsStream("/" + filename)), UTF_8);
 	}
+
+	private ListAppender<ILoggingEvent> setupAndReturnListAppender() {
+		Logger logger = (Logger) LoggerFactory.getLogger(Qdist008Route.class);
+		ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+		listAppender.start();
+		logger.addAppender(listAppender);
+		return listAppender;
+	}
+
 }

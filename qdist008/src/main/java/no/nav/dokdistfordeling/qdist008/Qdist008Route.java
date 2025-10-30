@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.qdist008;
 import jakarta.jms.Queue;
 import jakarta.xml.bind.JAXBContext;
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException;
 import no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.out.DistribuerTilKanal;
@@ -91,10 +92,12 @@ public class Qdist008Route extends RouteBuilder {
 				.log(WARN, log, "Legger melding på funksjonell backoutkø for qdist008 for " + getIdsForLogging() + " grunnet=${exception}")
 				.to("jms:" + qdist008FunksjonellFeil.getQueueName());
 
-		//Om journalposten er feilregistrert skal den forkastes og ikke forsøkes distribuert
-		onException(JournalpostFeilregistrertException.class)
+		// Journalposten skal ikke forsøkes distribuert, og meldingen blir forkastet, dersom
+		//	- den er feilregistrert
+		//	- den har blitt distribuert tidligere (status EKSPEDERT)
+		onException(JournalpostFeilregistrertException.class, JournalpostErAlleredeDistribuertException.class)
 				.handled(true)
-				.log(WARN, log, "Forkaster melding på qdist008 for " + getIdsForLogging() + " grunnet=${exception}")
+				.log(WARN, log, "Forkaster melding på qdist008 grunnet=${exception}")
 				.end();
 
 		from("jms:" + qdist008.getQueueName() +

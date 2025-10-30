@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.qdist008;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostQueryService;
 import no.nav.dokdistfordeling.exception.functional.BestillingsIdInvalidUuidFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException;
 import no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException;
 import no.nav.dokdistfordeling.exception.functional.OjectNotFoundInBucketFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static no.nav.dokdistfordeling.util.Qdist008Util.countHoveddokument;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -54,6 +56,8 @@ public class ForsendelseValidator {
 
 		if (FEILREGISTRERT.equals(journalpostStatus)) {
 			throw new JournalpostFeilregistrertException(format("journalpostId=%s er feilregistrert og distribusjon av bestillingsId=%s avbrytes", journalpostid, bestillingsId));
+		} else if (EKSPEDERT.equals(journalpostStatus)) {
+			throw new JournalpostErAlleredeDistribuertException(format("journalpostId=%s er allerede distribuert og distribusjon av bestillingsId=%s avbrytes", journalpostid, bestillingsId));
 		} else if (!FERDIGSTILT.equals(journalpostStatus)) {
 			throw new ValidationException(format("journalpostId=%s har ugyldig status=%s og distribusjon av bestillingsId=%s avbrytes", journalpostid, journalpostStatus, bestillingsId));
 		}
