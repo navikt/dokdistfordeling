@@ -1,5 +1,7 @@
 package no.nav.dokdistfordeling.consumer.saf.graphql;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
@@ -9,21 +11,20 @@ import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthori
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostIkkeFunnetTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostQueryTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafUkjentErrorCodeException;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 
 import static java.lang.String.format;
-import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
 import static no.nav.dokdistfordeling.consumer.token.NaisTexasRequestInterceptor.TARGET_SCOPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Component
 @Slf4j
 public class SafGraphqlConsumer {
+
+	private static final String RESILIENCE4J_INSTANCE = "safgraphql";
 
 	private static final String NOT_FOUND = "not_found";
 	private static final String FORBIDDEN = "forbidden";
@@ -42,7 +43,8 @@ public class SafGraphqlConsumer {
 		this.safScope = dokdistfordelingProperties.getEndpoints().getSaf().getScope();
 	}
 
-	@Retryable(retryFor = SafJournalpostQueryTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT))
+	@Retry(name = RESILIENCE4J_INSTANCE)
+	@CircuitBreaker(name = RESILIENCE4J_INSTANCE)
 	public SafJournalpostTo performQuery(GraphQLRequest graphQLRequest) {
 		try {
 			SafJsonResponse result = restClientTexas.post()
@@ -61,18 +63,14 @@ public class SafGraphqlConsumer {
 				String safErrorCode = safError.getExtensions().getCode();
 
 				switch (safErrorCode) {
-					case NOT_FOUND ->
-							throw new SafJournalpostIkkeFunnetTechnicalException("Fant ikke journalposten i fagarkivet");
-					case FORBIDDEN ->
-							throw new SafJournalpostQueryUnauthorizedException("Saksbehandler har ikke tilgang til journalposten. Feilmelding fra SAF: " + safError.getMessage());
+					case NOT_FOUND -> throw new SafJournalpostIkkeFunnetTechnicalException("Fant ikke journalposten i fagarkivet");
+					case FORBIDDEN -> throw new SafJournalpostQueryUnauthorizedException("Saksbehandler har ikke tilgang til journalposten. Feilmelding fra SAF: " + safError.getMessage());
 					case SERVER_ERROR -> {
 						log.warn("Teknisk feil mot SAF. Feilmelding: {}", safError.getMessage());
 						throw new SafJournalpostQueryTechnicalException(safError.getMessage());
 					}
-					case BAD_REQUEST ->
-							throw new SafBadRequestException("Bad request mot SAF: " + safError.getMessage());
-					default ->
-							throw new SafUkjentErrorCodeException("Ukjent error code fra SAF. Håndtering av ny feilkode må legges inn her. Feilmelding: " + safError.getMessage());
+					case BAD_REQUEST -> throw new SafBadRequestException("Bad request mot SAF: " + safError.getMessage());
+					default -> throw new SafUkjentErrorCodeException("Ukjent error code fra SAF. Håndtering av ny feilkode må legges inn her. Feilmelding: " + safError.getMessage());
 				}
 			}
 
@@ -84,8 +82,8 @@ public class SafGraphqlConsumer {
 						   "For å få tilgang må appen som kaller dokdistfordeling legges til i SAF sin <env-config.json>. Feilmelding: %s", e.getStatusCode(), e.getMessage()),
 					e);
 		} catch (HttpServerErrorException e) {
-			throw new SafJournalpostQueryTechnicalException(format("Tjenesten SAF (graphQL) feilet med status: %s, feilmelding: %s", e
-					.getStatusCode(), e.getMessage()), e);
+			throw new SafJournalpostQueryTechnicalException(format("Tjenesten SAF (graphQL) feilet med status: %s, feilmelding: %s",
+					e.getStatusCode(), e.getMessage()), e);
 		}
 	}
 }

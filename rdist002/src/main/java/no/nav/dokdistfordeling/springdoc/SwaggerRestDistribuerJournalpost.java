@@ -24,8 +24,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 		@ApiResponse(responseCode = "404", description = "Journalposten ble ikke funnet.", content = @Content),
 		@ApiResponse(responseCode = "409", description = "Journalposten er allerede distribuert."),
 		@ApiResponse(responseCode = "410", description = "Journalpost kan ikke distribueres. Bruker er død og har ukjent postadresse.", content = @Content),
-		@ApiResponse(responseCode = "500", description = "Teknisk feil under prosessering av forsendelse.", content = @Content)
-}
+		@ApiResponse(responseCode = "500", description = "Teknisk feil under prosessering av forsendelse.", content = @Content),
+		@ApiResponse(responseCode = "503", description = "Teknisk feil ved kall mot ekstern tjeneste.", content = @Content)
+	}
 )
 public @interface SwaggerRestDistribuerJournalpost {
 }

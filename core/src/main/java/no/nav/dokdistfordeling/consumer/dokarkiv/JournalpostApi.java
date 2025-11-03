@@ -1,13 +1,16 @@
 package no.nav.dokdistfordeling.consumer.dokarkiv;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
+import io.github.resilience4j.reactor.retry.RetryOperator;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryRegistry;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.exception.functional.JournalpostApiFunctionalException;
-import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.JournalpostApiTechnicalException;
 import org.slf4j.MDC;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -16,8 +19,6 @@ import reactor.core.publisher.Mono;
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.config.azure.OAuthEnabledWebClientConfig.CLIENT_REGISTRATION_DOKARKIV;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -27,20 +28,25 @@ import static org.springframework.security.oauth2.client.web.reactive.function.c
 @Component
 public class JournalpostApi {
 
+	private static final String RESILIENCE4J_INSTANCE = "dokarkiv";
+
 	private final WebClient webClient;
+	private final CircuitBreaker circuitBreaker;
+	private final Retry retry;
 
 	public JournalpostApi(DokdistfordelingProperties dokdistfordelingProperties,
-						  WebClient webClient) {
-		this.webClient = webClient
-				.mutate()
+						  WebClient webClient,
+						  CircuitBreakerRegistry circuitBreakerRegistry,
+						  RetryRegistry retryRegistry) {
+		this.webClient = webClient.mutate()
 				.defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.baseUrl(dokdistfordelingProperties.getEndpoints().getDokarkiv().getUrl())
 				.build();
+		this.circuitBreaker = circuitBreakerRegistry.circuitBreaker(RESILIENCE4J_INSTANCE);
+		this.retry = retryRegistry.retry(RESILIENCE4J_INSTANCE);
 	}
 
-	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void oppdaterDistribusjonsinfo(String journalpostId, OppdaterDistribusjonsinfoTo oppdaterDistibusjonsinfoTo) {
-
 		webClient.patch()
 				.uri("/{journalpostId}/oppdaterDistribusjonsinfo", validateJournalpostId(journalpostId))
 				.header(NAV_CALL_ID, MDC.get(CALL_ID))
@@ -49,12 +55,12 @@ public class JournalpostApi {
 				.retrieve()
 				.toBodilessEntity()
 				.onErrorMap(this::mapError)
+				.transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
+				.transformDeferred(RetryOperator.of(retry))
 				.block();
 	}
 
-	@Retryable(retryFor = AbstractDokdistfordelingTechnicalException.class, backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public OppdaterJournalpostResponse oppdaterJournalpost(long journalpostId, OppdaterJournalpostRequest oppdaterJournalpostRequest) {
-
 		return webClient.put()
 				.uri("/{journalpostId}", journalpostId)
 				.header(NAV_CALL_ID, MDC.get(CALL_ID))
@@ -63,6 +69,8 @@ public class JournalpostApi {
 				.retrieve()
 				.bodyToMono(OppdaterJournalpostResponse.class)
 				.onErrorMap(this::mapError)
+				.transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
+				.transformDeferred(RetryOperator.of(retry))
 				.block();
 	}
 

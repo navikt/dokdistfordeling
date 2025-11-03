@@ -1,16 +1,20 @@
 package no.nav.dokdistfordeling.consumer.dokdistkanal;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
+import io.github.resilience4j.reactor.retry.RetryOperator;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryRegistry;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.exception.functional.DokdistkanalFunctionalException;
-import no.nav.dokdistfordeling.exception.functional.DokdistkanalUnauthorizedException;
 import no.nav.dokdistfordeling.exception.functional.DokdistkanalMappingException;
+import no.nav.dokdistfordeling.exception.functional.DokdistkanalUnauthorizedException;
 import no.nav.dokdistfordeling.exception.technical.DokdistkanalTechnicalException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import org.slf4j.MDC;
 import org.springframework.http.ProblemDetail;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -18,8 +22,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import static no.nav.dokdistfordeling.config.azure.OAuthEnabledWebClientConfig.CLIENT_REGISTRATION_DOKDISTKANAL;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.Constants.DITT_NAV;
-import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.DITTNAV;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -30,19 +32,24 @@ import static org.springframework.security.oauth2.client.web.reactive.function.c
 @Component
 public class DokdistkanalConsumer {
 
-	private final WebClient webClient;
+	private static final String RESILIENCE4J_INSTANCE = "dokdistkanal";
 
-	public DokdistkanalConsumer(final DokdistfordelingProperties dokdistfordelingProperties,
-								WebClient webClient) {
+	private final WebClient webClient;
+	private final CircuitBreaker circuitBreaker;
+	private final Retry retry;
+
+	public DokdistkanalConsumer(DokdistfordelingProperties dokdistfordelingProperties,
+								WebClient webClient,
+								CircuitBreakerRegistry circuitBreakerRegistry,
+								RetryRegistry retryRegistry) {
 		this.webClient = webClient.mutate()
 				.baseUrl(dokdistfordelingProperties.getEndpoints().getDokdistkanal().getUrl())
 				.defaultHeaders(httpHeaders -> httpHeaders.setContentType(APPLICATION_JSON))
 				.build();
+		this.circuitBreaker = circuitBreakerRegistry.circuitBreaker(RESILIENCE4J_INSTANCE);
+		this.retry = retryRegistry.retry(RESILIENCE4J_INSTANCE);
 	}
 
-	@Retryable(retryFor = DokdistkanalTechnicalException.class,
-			noRetryFor = DokdistkanalMappingException.class,
-			backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public DistribusjonKanalCode bestemDistribusjonskanal(BestemDistribusjonskanalRequest request) {
 		return webClient.post()
 				.uri(uriBuilder -> uriBuilder.path("/rest/bestemDistribusjonskanal").build())
@@ -53,6 +60,8 @@ public class DokdistkanalConsumer {
 				.bodyToMono(BestemDistribusjonskanalResponse.class)
 				.map(this::mapToDistribusjonKanalCode)
 				.onErrorMap(this::mapError)
+				.transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
+				.transformDeferred(RetryOperator.of(retry))
 				.block();
 	}
 

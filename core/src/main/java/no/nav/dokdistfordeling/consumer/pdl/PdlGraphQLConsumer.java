@@ -1,10 +1,16 @@
 package no.nav.dokdistfordeling.consumer.pdl;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
+import io.github.resilience4j.reactor.retry.RetryOperator;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryRegistry;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
-import no.nav.dokdistfordeling.exception.functional.PdlHentFolkeregisteridentForAktoerIdFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.PdlFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.PdlPersonIkkeFunnetFunctionalException;
-import no.nav.dokdistfordeling.exception.technical.PdlHentFolkeregisteridentForAktoerIdTechnicalException;
+import no.nav.dokdistfordeling.exception.technical.PdlTechnicalException;
 import org.slf4j.MDC;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -26,18 +32,22 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Component
 public class PdlGraphQLConsumer {
 
-	private static final String PERSON_IKKE_FUNNET_CODE = "not_found";
+	private static final String RESILIENCE4J_INSTANCE = "pdl";
 
+	private static final String PERSON_IKKE_FUNNET_CODE = "not_found";
 	// https://pdldocs-navno.msappproxy.net/ekstern/index.html#_dokumenter_hjemmel
 	private static final String HEADER_PDL_BEHANDLINGSNUMMER = "behandlingsnummer";
-
 	// https://behandlingskatalog.nais.adeo.no/process/purpose/ARKIVPLEIE/756fd557-b95e-4b20-9de9-6179fb8317e6
 	private static final String ARKIVPLEIE_BEHANDLINGSNUMMER = "B315";
 
 	private final WebClient webClient;
+	private final CircuitBreaker circuitBreaker;
+	private final Retry retry;
 
 	public PdlGraphQLConsumer(WebClient webClient,
-							  DokdistfordelingProperties dokdistfordelingProperties) {
+							  DokdistfordelingProperties dokdistfordelingProperties,
+							  CircuitBreakerRegistry circuitBreakerRegistry,
+							  RetryRegistry retryRegistry) {
 		this.webClient = webClient.mutate()
 				.baseUrl(dokdistfordelingProperties.getEndpoints().getPdl().getUrl())
 				.defaultHeaders(httpHeaders -> {
@@ -45,9 +55,11 @@ public class PdlGraphQLConsumer {
 					httpHeaders.set(HEADER_PDL_BEHANDLINGSNUMMER, ARKIVPLEIE_BEHANDLINGSNUMMER);
 				})
 				.build();
+		this.circuitBreaker = circuitBreakerRegistry.circuitBreaker(RESILIENCE4J_INSTANCE);
+		this.retry = retryRegistry.retry(RESILIENCE4J_INSTANCE);
 	}
 
-	@Retryable(retryFor = PdlHentFolkeregisteridentForAktoerIdTechnicalException.class)
+	@Retryable(retryFor = PdlTechnicalException.class)
 	public String hentFolkeregisteridentForAktoerId(final String aktorId) {
 
 		var pdlHentIdenterResponse = webClient.post()
@@ -57,6 +69,8 @@ public class PdlGraphQLConsumer {
 				.retrieve()
 				.bodyToMono(PdlHentIdenterResponse.class)
 				.onErrorMap(this::mapError)
+				.transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
+				.transformDeferred(RetryOperator.of(retry))
 				.block();
 
 		if (isEmpty(pdlHentIdenterResponse.getErrors())) {
@@ -65,7 +79,7 @@ public class PdlGraphQLConsumer {
 			if (PERSON_IKKE_FUNNET_CODE.equals(pdlHentIdenterResponse.getErrors().get(0).getExtensions().getCode())) {
 				throw new PdlPersonIkkeFunnetFunctionalException("Fant ikke folkeregisterident for person i PDL.");
 			}
-			throw new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Kunne ikke hente folkeregisterident fra PDL pga følgende feilmeldinger:" + pdlHentIdenterResponse.getErrors());
+			throw new PdlFunctionalException("Kunne ikke hente folkeregisterident fra PDL pga følgende feilmeldinger:" + pdlHentIdenterResponse.getErrors());
 		}
 	}
 
@@ -78,7 +92,7 @@ public class PdlGraphQLConsumer {
 						.filter(it -> !it.isHistorisk())
 						.map(PdlHentIdenterResponse.PdlIdentTo::getIdent)
 						.findFirst())
-				.orElseThrow(() -> new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Kunne ikke hente folkeregisterident fra PDL. Respons fra PDL inneholdt ikke gjeldende folkeregisterident"));
+				.orElseThrow(() -> new PdlFunctionalException("Kunne ikke hente folkeregisterident fra PDL. Respons fra PDL inneholdt ikke gjeldende folkeregisterident"));
 	}
 
 	private PdlRequest mapRequest(final String aktoerId) {
@@ -102,9 +116,9 @@ public class PdlGraphQLConsumer {
 
 	private Throwable mapError(Throwable error) {
 		if (error instanceof WebClientResponseException webException && webException.getStatusCode().is4xxClientError()) {
-			return new PdlHentFolkeregisteridentForAktoerIdFunctionalException("Funksjonell feil ved kall mot PDL, feilmelding=" + webException.getMessage());
+			return new PdlFunctionalException("Funksjonell feil ved kall mot PDL, feilmelding=" + webException.getMessage());
 		} else {
-			return new PdlHentFolkeregisteridentForAktoerIdTechnicalException("Teknisk feil ved kall mot PDL, feilmelding=" + error.getMessage(), error);
+			return new PdlTechnicalException("Teknisk feil ved kall mot PDL, feilmelding=" + error.getMessage(), error);
 		}
 	}
 }

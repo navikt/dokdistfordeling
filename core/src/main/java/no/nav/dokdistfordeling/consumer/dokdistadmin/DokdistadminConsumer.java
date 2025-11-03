@@ -1,5 +1,11 @@
 package no.nav.dokdistfordeling.consumer.dokdistadmin;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
+import io.github.resilience4j.reactor.retry.RetryOperator;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryRegistry;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.exception.functional.DokdistadminFunctionalException;
@@ -7,8 +13,6 @@ import no.nav.dokdistfordeling.exception.technical.DokdistadminTechnicalExceptio
 import org.slf4j.MDC;
 import org.springframework.boot.autoconfigure.http.codec.HttpCodecsProperties;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,8 +24,6 @@ import java.time.Duration;
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.config.azure.OAuthEnabledWebClientConfig.CLIENT_REGISTRATION_DOKDISTADMIN;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-import static no.nav.dokdistfordeling.constants.RetryConstants.DELAY_SHORT;
-import static no.nav.dokdistfordeling.constants.RetryConstants.MULTIPLIER_SHORT;
 import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -31,17 +33,22 @@ import static org.springframework.security.oauth2.client.web.reactive.function.c
 @Component
 public class DokdistadminConsumer {
 
+	private static final String RESILIENCE4J_INSTANCE = "dokdistadmin";
+
 	private final WebClient webClient;
+	private final CircuitBreaker circuitBreaker;
+	private final Retry retry;
 
-	public DokdistadminConsumer(final DokdistfordelingProperties dokdistfordelingProperties,
-								WebClient webClient, HttpCodecsProperties codecProperties) {
-
+	public DokdistadminConsumer(DokdistfordelingProperties dokdistfordelingProperties,
+								WebClient webClient,
+								HttpCodecsProperties codecProperties,
+								CircuitBreakerRegistry circuitBreakerRegistry,
+								RetryRegistry retryRegistry) {
 		var clientHttpConnector = new ReactorClientHttpConnector(HttpClient.create()
 				.proxyWithSystemProperties()
 				.responseTimeout(Duration.ofSeconds(60)));
 
-		this.webClient = webClient
-				.mutate()
+		this.webClient = webClient.mutate()
 				.defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.baseUrl(dokdistfordelingProperties.getEndpoints().getDokdistadmin().getUrl())
 				.exchangeStrategies(ExchangeStrategies.builder()
@@ -50,10 +57,10 @@ public class DokdistadminConsumer {
 						.build())
 				.clientConnector(clientHttpConnector)
 				.build();
+		this.circuitBreaker = circuitBreakerRegistry.circuitBreaker(RESILIENCE4J_INSTANCE);
+		this.retry = retryRegistry.retry(RESILIENCE4J_INSTANCE);
 	}
 
-	@Retryable(retryFor = DokdistadminTechnicalException.class,
-			backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public String opprettForsendelse(final OpprettForsendelseRequestTo opprettForsendelseRequestTo) {
 		var bestillingsId = opprettForsendelseRequestTo.getBestillingsId();
 
@@ -67,6 +74,8 @@ public class DokdistadminConsumer {
 				.bodyToMono(OpprettForsendelseResponseTo.class)
 				.onErrorMap(this::mapError)
 				.map(response -> new Forsendelse(response.forsendelseId()).getForsendelseId())
+				.transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
+				.transformDeferred(RetryOperator.of(retry))
 				.block();
 
 		log.info("opprettForsendelse har opprettet forsendelse med forsendelseId={} og bestillingsId={}", forsendelseId, bestillingsId);
@@ -74,8 +83,6 @@ public class DokdistadminConsumer {
 		return forsendelseId;
 	}
 
-	@Retryable(retryFor = DokdistadminTechnicalException.class,
-			backoff = @Backoff(delay = DELAY_SHORT, multiplier = MULTIPLIER_SHORT))
 	public void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelse) {
 		log.info("oppdaterForsendelse oppdaterer forsendelse med forsendelseId={}", oppdaterForsendelse.forsendelseId());
 
@@ -87,6 +94,8 @@ public class DokdistadminConsumer {
 				.retrieve()
 				.toBodilessEntity()
 				.onErrorMap(this::mapError)
+				.transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
+				.transformDeferred(RetryOperator.of(retry))
 				.block();
 
 		log.info("oppdaterForsendelse har oppdatert forsendelse med forsendelseId={} til forsendelseStatus={}",

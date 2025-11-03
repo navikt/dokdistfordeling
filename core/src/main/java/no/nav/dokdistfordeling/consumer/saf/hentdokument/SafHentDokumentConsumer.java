@@ -1,12 +1,13 @@
 package no.nav.dokdistfordeling.consumer.saf.hentdokument;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.exception.functional.SafHentDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.SafHentDokumentTechnicalException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -15,6 +16,8 @@ import static no.nav.dokdistfordeling.consumer.token.NaisTexasRequestInterceptor
 
 @Component
 public class SafHentDokumentConsumer {
+
+	private static final String RESILIENCE4J_INSTANCE = "safhentdokument";
 
 	private final RestClient restClientTexas;
 	private final String safScope;
@@ -30,7 +33,8 @@ public class SafHentDokumentConsumer {
 		this.objectMapper = objectMapper;
 	}
 
-	@Retryable(retryFor = SafHentDokumentTechnicalException.class)
+	@Retry(name = RESILIENCE4J_INSTANCE)
+	@CircuitBreaker(name = RESILIENCE4J_INSTANCE)
 	public byte[] hentDokument(String journalpostId, String dokumentInfoId, String variantFormat) {
 		return restClientTexas.get()
 				.uri("/rest/hentdokument/{journalpostId}/{dokumentInfoId}/{variantFormat}", journalpostId, dokumentInfoId, variantFormat)

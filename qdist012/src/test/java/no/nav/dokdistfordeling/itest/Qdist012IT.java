@@ -1,5 +1,8 @@
 package no.nav.dokdistfordeling.itest;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.retry.RetryRegistry;
 import jakarta.jms.JMSException;
 import jakarta.jms.Queue;
 import jakarta.jms.TextMessage;
@@ -45,7 +48,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
-import static no.nav.dokdistfordeling.constants.RetryConstants.MAX_ATTEMPTS_SHORT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -94,8 +96,16 @@ public class Qdist012IT {
 	@Autowired
 	private BucketStorage bucketStorage;
 
+	@Autowired
+	protected CircuitBreakerRegistry circuitBreakerRegistry;
+
+	@Autowired
+	protected RetryRegistry retryRegistry;
+
 	@BeforeEach
 	public void setupBefore() {
+		circuitBreakerRegistry.getAllCircuitBreakers().forEach(CircuitBreaker::reset);
+
 		stubNaisTexasToken();
 		Mockito.reset(bucketStorage);
 	}
@@ -346,7 +356,7 @@ public class Qdist012IT {
 			assertEquals(message, response);
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
-		verify(exactly(MAX_ATTEMPTS_SHORT), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
+		verify(exactly(3), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
 		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
@@ -391,7 +401,7 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
-		verify(exactly(MAX_ATTEMPTS_SHORT), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
+		verify(exactly(3), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
 		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
 	}
 

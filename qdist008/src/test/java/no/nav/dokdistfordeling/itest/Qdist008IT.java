@@ -3,6 +3,9 @@ package no.nav.dokdistfordeling.itest;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.retry.RetryRegistry;
 import jakarta.jms.Queue;
 import jakarta.jms.TextMessage;
 import jakarta.xml.bind.JAXBElement;
@@ -115,9 +118,17 @@ public class Qdist008IT {
 	@Autowired
 	public CacheManager cacheManager;
 
+	@Autowired
+	protected CircuitBreakerRegistry circuitBreakerRegistry;
+
+	@Autowired
+	protected RetryRegistry retryRegistry;
+
 	@BeforeEach
 	public void setupBefore() {
 		cacheManager.getCache(DOKMET_CACHE).clear();
+		circuitBreakerRegistry.getAllCircuitBreakers().forEach(CircuitBreaker::reset);
+
 		reset(bucketStorage);
 		when(bucketStorage.exists(anyString())).thenReturn(true);
 
@@ -526,7 +537,7 @@ public class Qdist008IT {
 			assertThat(resultOnQdist008BackoutQueue).isEqualToIgnoringWhitespace(classpathToString("qdist008/distribuerforsendelse_example_happypath.xml"));
 		});
 
-		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
+		verify(exactly(3), getRequestedFor(urlEqualTo(DOKMET_URL)));
 	}
 
 	@Test
@@ -629,7 +640,7 @@ public class Qdist008IT {
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
-		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
+		verify(exactly(3), postRequestedFor(urlEqualTo(PDL_URL)));
 	}
 
 	@Test
@@ -726,7 +737,7 @@ public class Qdist008IT {
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
-		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
+		verify(exactly(3), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilPrintOutputHappy.json"))));
 	}
 
@@ -750,7 +761,7 @@ public class Qdist008IT {
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(PDL_URL)));
-		verify(exactly(1), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
+		verify(exactly(3), patchRequestedFor(urlPathMatching(OPPDATERDISTRIBUSJONSINFO_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilPrintOutputHappy.json"))));
@@ -809,7 +820,7 @@ public class Qdist008IT {
 				.withRequestBody(equalToJson(getRequestAsJson("__files/journalpostapi/oppdaterDistribusjonsinfoSHappy.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
 				.withRequestBody(equalToJson(getRequestAsJson("__files/rdist001/administrerForsendelseTilPrintOutputHappy.json"))));
-		verify(exactly(1), putRequestedFor(urlEqualTo((OPPDATERFORSENDELSE_URL))));
+		verify(exactly(3), putRequestedFor(urlEqualTo((OPPDATERFORSENDELSE_URL))));
 	}
 
 	private void stubPostRdist001() {
