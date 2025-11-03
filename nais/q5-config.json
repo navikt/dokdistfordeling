@@ -1,7 +1,7 @@
 {
   "APP_NAME": "dokdistfordeling-q5",
   "ENVIRONMENT": "q5",
-  "DOKDISTFORDELING_NAIS_SECRETS": "dokdistfordeling-q5",
+  "DOKDISTFORDELING_SECRETS": "dokdistfordeling-q5",
   "NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_DISCOVERYURL": "https://security-token-service.dev.adeo.no/rest/v1/sts/.well-known/openid-configuration",
   "NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_ACCEPTED_AUDIENCE": "srvmelosys,srvarena-dokgen,srvbdarkiv,srvfamilie-ks-opps",
   "MQGATEWAY01_CHANNEL_SECURENAME": "Q2_DOKDISTFORDEL_SEC",
@@ -18,7 +18,6 @@
   "DOKDISTEFORMIDLING_QDIST013_DIST_TRYGDERETTEN_QUEUENAME": "QA.Q_TRASH",
   "DOKDISTDPO_QDIST015_DIST_TIL_DPO_QUEUENAME": "QA.Q_TRASH",
   "DOKDISTDPV_QDIST016_DIST_TIL_DPV_QUEUENAME": "QA.Q_TRASH",
-  "SRVDOKDISTFORDELING": "/serviceuser/data/dev/srvdokdistfordeling",
   "DOKDISTFORDELING_ENDPOINTS_DOKARKIV_URL": "http://dokarkiv-q5.teamdokumenthandtering.svc.nais.local/rest/journalpostapi/v1/journalpost",
   "DOKDISTFORDELING_ENDPOINTS_DOKARKIV_SCOPE": "api://dev-fss.teamdokumenthandtering.dokarkiv-q5/.default",
   "DOKDISTFORDELING_ENDPOINTS_DOKMET_URL": "http://dokmet-q5.teamdokumenthandtering.svc.nais.local/rest/dokumenttypeinfo",
