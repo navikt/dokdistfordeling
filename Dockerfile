@@ -1,20 +1,13 @@
-FROM eclipse-temurin:21-jre AS builder
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-25-dev AS builder
 WORKDIR /build
 COPY app/target/app.jar app.jar
-RUN java -Djarmode=layertools -jar app.jar extract
+RUN java -Djarmode=tools -jar app.jar extract --launcher --layers --destination extracted
 
-FROM ghcr.io/navikt/baseimages/temurin:21
-WORKDIR /app
-COPY --from=builder /build/dependencies/ ./
-COPY --from=builder /build/snapshot-dependencies/ ./
-COPY --from=builder /build/spring-boot-loader/ ./
-COPY --from=builder /build/application/ ./
-COPY export-vault-secrets.sh /init-scripts/10-export-vault-secrets.sh
-COPY dokdistfordeling-java-opts.sh /init-scripts/20-dokdistfordeling-java-opts.sh
-COPY run-java.sh /
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jre:openjdk-21
+COPY --from=builder --chown=1069:1069 /build/extracted/snapshot-dependencies/ ./
+COPY --from=builder --chown=1069:1069 /build/extracted/spring-boot-loader/ ./
+COPY --from=builder --chown=1069:1069 /build/extracted/dependencies/ ./
+COPY --from=builder --chown=1069:1069 /build/extracted/application/ ./
 
-USER root
-RUN chmod +x /run-java.sh
-USER apprunner
-
-ENV MAIN_CLASS="org.springframework.boot.loader.launch.JarLauncher"
+ENV TZ="Europe/Oslo"
+CMD ["-Dspring.profiles.active=nais", "-server", "-cp", ".", "org.springframework.boot.loader.launch.JarLauncher"]

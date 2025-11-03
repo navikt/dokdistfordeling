@@ -6,7 +6,21 @@ metadata:
   labels:
     team: teamdokumenthandtering
 spec:
+  filesFrom:
+    - secret: {{ DOKDISTFORDELING_SECRETS }}
+      mountPath: /var/run/secrets/nais_secrets
+  envFrom:
+    - secret: {{ DOKDISTFORDELING_SECRETS }}
   env:
+    - name: JAVA_TRUSTSTORE_OPTIONS
+      value: "-Djavax.net.ssl.trustStore=$(NAV_TRUSTSTORE_PATH)
+              -Djavax.net.ssl.trustStorePassword=$(NAV_TRUSTSTORE_PASSWORD)"
+    - name: JDK_JAVA_OPTIONS
+      value: "-XX:MaxRAMPercentage=75
+              -Djavax.net.ssl.keyStore=$(NAV_TRUSTSTORE_PATH)
+              -Djavax.net.ssl.keyStorePassword=$(NAV_TRUSTSTORE_PASSWORD)
+              -Djavax.net.ssl.keyStoreType=jks
+              $(JAVA_PROXY_OPTIONS) $(JAVA_TRUSTSTORE_OPTIONS)"
     - name: NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_DISCOVERYURL
       value: {{ NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_DISCOVERYURL }}
     - name: NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_ACCEPTED_AUDIENCE
@@ -75,6 +89,8 @@ spec:
       value: {{ DOKDISTMELLOMLAGER_KEYRING }}
     - name: DOKDISTMELLOMLAGER_KEYID
       value: {{ DOKDISTMELLOMLAGER_KEYID }}
+    - name: GOOGLE_APPLICATION_CREDENTIALS
+      value: "/var/run/secrets/nais_secrets/gcloud_serviceaccount.json"
   image: {{ image }}
   ingresses:
     {{#each INGRESSES}}
@@ -104,13 +120,6 @@ spec:
     requests:
       cpu: 20m
       memory: 1Gi
-  vault:
-    enabled: true
-    paths:
-      - kvPath: {{ SRVDOKDISTFORDELING }}
-        mountPath: /var/run/secrets/nais.io/srvdokdistfordeling
-  envFrom:
-    - secret: {{ DOKDISTFORDELING_NAIS_SECRETS }}
   azure:
     application:
       enabled: true
