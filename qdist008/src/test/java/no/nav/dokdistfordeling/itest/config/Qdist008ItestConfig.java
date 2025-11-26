@@ -28,7 +28,8 @@ import static org.mockito.Mockito.mock;
 		Qdist008JmsItestConfig.class,
 		LokalTestCacheConfig.class,
 		CoreConfig.class,
-		JournalpostApi.class
+		JournalpostApi.class,
+		AbstractRepositoryTest.class
 })
 @EnableJwtTokenValidation(ignore = {"org.springframework", "org.springdoc"})
 public class Qdist008ItestConfig {

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostQueryService;
+import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoResponse;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.map.DistribuerJournalpostMapper;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static no.nav.dokdistfordeling.validate.DistribuerJournalpostRequestValidator.validateDistribuerJournalpostRequest;
+import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 import static org.springframework.http.HttpStatus.CONFLICT;
 
 @Slf4j
@@ -51,6 +53,14 @@ public class DistribuerJournalpostController {
 		try {
 			validateDistribuerJournalpostRequest(distribuerJournalpostRequestTo);
 			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId());
+
+			DistribuerJournalpostInfoResponse distribuerJournalpostInfo = distribuerJournalpostService.hentDistribuerJournalpostInfo(journalpostId);
+
+			if (distribuerJournalpostInfo != null) {
+				log.warn("Journalpost med journalpostId={} er distribuert med bestillingsId={}", journalpostId, distribuerJournalpostInfo.bestillingsId());
+				return ResponseEntity.ok()
+						.body(new DistribuerJournalpostResponseTo(distribuerJournalpostInfo.bestillingsId()));
+			}
 
 			if (journalpost.erDistribuert()) {
 				final var bestillingsId = journalpost.getTilleggsopplysninger().getVerdi();

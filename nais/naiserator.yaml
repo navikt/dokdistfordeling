@@ -11,6 +11,7 @@ spec:
       mountPath: /var/run/secrets/nais_secrets
   envFrom:
     - secret: {{ DOKDISTFORDELING_SECRETS }}
+    - secret: {{ DOKDISTADMIN_SECRET }}
   env:
     - name: JAVA_TRUSTSTORE_OPTIONS
       value: "-Djavax.net.ssl.trustStore=$(NAV_TRUSTSTORE_PATH)
@@ -91,6 +92,8 @@ spec:
       value: {{ DOKDISTMELLOMLAGER_KEYID }}
     - name: GOOGLE_APPLICATION_CREDENTIALS
       value: "/var/run/secrets/nais_secrets/gcloud_serviceaccount.json"
+    - name: DOKDISTADMIN_DATABASE_SCHEMA
+      value: {{ DOKDISTADMIN_DATABASE_SCHEMA }}
   image: {{ image }}
   ingresses:
     {{#each INGRESSES}}

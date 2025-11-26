@@ -6,6 +6,8 @@ import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostRequest;
 import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoResponse;
+import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoService;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.domain.Postadresse;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
@@ -24,23 +26,27 @@ import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.validate.JournalpostValidator.validateJournalpostAndDokumenter;
 import static no.nav.dokdistfordeling.validate.PostadresseValidator.validatePostdresse;
 import static no.nav.dokdistfordeling.validate.TvingKanalValidator.validateTvingKanal;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Component
 @Slf4j
 public class DistribuerJournalpostService {
 
 	private final DistribuerForsendelseProducer distribuerForsendelseProducer;
+	private final DistribuerJournalpostInfoService distribuerJournalpostInfoService;
 	private final RegoppslagService regoppslag;
 	private final BestemDistribusjonskanalService bestemDistribusjonskanalService;
 	private final JournalpostApi journalpostApi;
 	private final PersonnummerService personnummerService;
 
 	public DistribuerJournalpostService(DistribuerForsendelseProducer distribuerForsendelseProducer,
+										DistribuerJournalpostInfoService distribuerJournalpostInfoService,
 										RegoppslagService regoppslag,
 										BestemDistribusjonskanalService bestemDistribusjonskanalService,
 										JournalpostApi journalpostApi,
 										PersonnummerService personnummerService) {
 		this.distribuerForsendelseProducer = distribuerForsendelseProducer;
+		this.distribuerJournalpostInfoService = distribuerJournalpostInfoService;
 		this.regoppslag = regoppslag;
 		this.bestemDistribusjonskanalService = bestemDistribusjonskanalService;
 		this.journalpostApi = journalpostApi;
@@ -66,6 +72,7 @@ public class DistribuerJournalpostService {
 		validatePostdresse(postadresse, mottaker);
 
 		distribuerForsendelse(distribuerJournalpost, postadresse, bestillingsId, journalpost, mottaker, distribusjonKanalCode);
+		distribuerJournalpostInfoService.opprettDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), bestillingsId);
 
 		oppdaterJournalpostMedTilleggsopplysninger(distribuerJournalpost.journalpostId(), bestillingsId);
 
@@ -91,6 +98,13 @@ public class DistribuerJournalpostService {
 				hentDokumenterFraJoark,
 				bestillingsId,
 				String.valueOf(distribuerJournalpost.journalpostId()));
+	}
+
+
+	public DistribuerJournalpostInfoResponse hentDistribuerJournalpostInfo(String journalpostId) {
+		DistribuerJournalpostInfoResponse distribuerInfo = distribuerJournalpostInfoService.hentDistribuerJournalpostInfo(Long.parseLong(journalpostId));
+		return distribuerInfo == null || isBlank(distribuerInfo.bestillingsId()) ? null : distribuerInfo;
+
 	}
 
 	private void oppdaterJournalpostMedTilleggsopplysninger(Long journalpostId,
@@ -127,10 +141,8 @@ public class DistribuerJournalpostService {
 		var tema = journalpost.getTema();
 
 		return switch (avsenderMottaker.getType()) {
-			case FNR ->
-					RegoppslagAdresseMapper.map(regoppslag.hentPersonAdresse(avsenderMottaker.getId(), tema));
-			case ORGNR ->
-					RegoppslagAdresseMapper.map(regoppslag.hentOrganisasjonAdresse(avsenderMottaker.getId()));
+			case FNR -> RegoppslagAdresseMapper.map(regoppslag.hentPersonAdresse(avsenderMottaker.getId(), tema));
+			case ORGNR -> RegoppslagAdresseMapper.map(regoppslag.hentOrganisasjonAdresse(avsenderMottaker.getId()));
 			default ->
 					throw new ValidationException("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis postadresse ikke oppgis i request.");
 		};

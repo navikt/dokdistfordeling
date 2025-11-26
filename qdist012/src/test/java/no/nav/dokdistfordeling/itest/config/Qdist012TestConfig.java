@@ -29,7 +29,8 @@ import static org.mockito.Mockito.mock;
 @Import({
 		Qdist012JmsItestConfig.class,
 		CoreConfig.class,
-		JournalpostApi.class
+		JournalpostApi.class,
+		AbstractRepositoryTest.class
 })
 @EnableJwtTokenValidation(ignore = {"org.springframework", "org.springdoc"})
 public class Qdist012TestConfig {
