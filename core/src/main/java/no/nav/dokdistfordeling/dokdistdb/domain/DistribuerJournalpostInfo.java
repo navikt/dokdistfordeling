@@ -23,11 +23,11 @@ import java.time.LocalDateTime;
 public class DistribuerJournalpostInfo {
 
 	@Id
-	@Column(name = "arkivkode", nullable = false, length = 40)
-	private Long arkivkode;
+	@Column(name = "journalpost_id", nullable = false, length = 40)
+	private Long journalpostId;
 
-	@Column(name = "dokument_id", nullable = false, length = 40)
-	private String dokumentId;
+	@Column(name = "bestilling_id", nullable = false, length = 40)
+	private String bestillingsId;
 
 	@Column(name = "opprettet_av", nullable = false, length = 100)
 	private String opprettetAv;

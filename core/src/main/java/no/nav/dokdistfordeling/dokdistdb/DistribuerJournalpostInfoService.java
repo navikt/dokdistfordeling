@@ -27,8 +27,8 @@ public class DistribuerJournalpostInfoService {
 
 		log.info("opprettDistribuerJournalpostInfo har mottatt kall om å persistere distribuerJournalpostInfo for journalpostId={}", journalpostId);
 		DistribuerJournalpostInfo distribuerJournalpostInfo = DistribuerJournalpostInfo.builder()
-				.arkivkode(journalpostId)
-				.dokumentId(bestillingsId)
+				.journalpostId(journalpostId)
+				.bestillingsId(bestillingsId)
 				.opprettetAv(getUserId())
 				.opprettetDato(LocalDateTime.now())
 				.build();
@@ -38,10 +38,10 @@ public class DistribuerJournalpostInfoService {
 	}
 
 	public DistribuerJournalpostInfoResponse hentDistribuerJournalpostInfo(Long journalpostId) {
-		DistribuerJournalpostInfo distribuerJournalpost = distribuerJournalpostInfoRepository.findDistribuerJournalpostInfoByArkivkode(journalpostId);
+		DistribuerJournalpostInfo distribuerJournalpost = distribuerJournalpostInfoRepository.findDistribuerJournalpostInfoByJournalpostId(journalpostId);
 		return distribuerJournalpost == null ? null : DistribuerJournalpostInfoResponse.builder()
-				.journalpostId(distribuerJournalpost.getArkivkode())
-				.bestillingsId(distribuerJournalpost.getDokumentId())
+				.journalpostId(distribuerJournalpost.getJournalpostId())
+				.bestillingsId(distribuerJournalpost.getBestillingsId())
 				.build();
 	}
 

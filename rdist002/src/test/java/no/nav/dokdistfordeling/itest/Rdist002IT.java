@@ -973,8 +973,8 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	private DistribuerJournalpostInfo setupDatabase() {
 		DistribuerJournalpostInfo distribuerJournalpostInfo = DistribuerJournalpostInfo.builder()
-				.arkivkode(111111111L)
-				.dokumentId(UUID.randomUUID().toString())
+				.journalpostId(111111111L)
+				.bestillingsId(UUID.randomUUID().toString())
 				.opprettetDato(LocalDateTime.now().minusDays(2))
 				.opprettetAv(MDC.get(USER_ID))
 				.build();

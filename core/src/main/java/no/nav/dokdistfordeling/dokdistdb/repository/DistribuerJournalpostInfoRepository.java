@@ -4,5 +4,5 @@ import no.nav.dokdistfordeling.dokdistdb.domain.DistribuerJournalpostInfo;
 import org.springframework.data.repository.CrudRepository;
 
 public interface DistribuerJournalpostInfoRepository extends CrudRepository<DistribuerJournalpostInfo, Long> {
-	DistribuerJournalpostInfo findDistribuerJournalpostInfoByArkivkode(Long arkivkode);
+	DistribuerJournalpostInfo findDistribuerJournalpostInfoByJournalpostId(Long journalpostId);
 }
