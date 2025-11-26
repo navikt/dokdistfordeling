@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-@ConfigurationProperties("dokdistadmindb")
+@ConfigurationProperties("dokdistadmin")
 public record DokdistadmindbProperties(
 		@Valid
 		Database database) {
@@ -15,9 +15,13 @@ public record DokdistadmindbProperties(
 	public record Database(
 			@Positive
 			int poolsize,
-
 			@NotEmpty
 			String schema,
 			String onshosts) {
+
+		public Database {
+			poolsize = 80;
+		}
 	}
+
 }
