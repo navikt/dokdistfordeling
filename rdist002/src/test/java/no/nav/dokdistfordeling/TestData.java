@@ -11,6 +11,7 @@ import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Person;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static java.util.Collections.singletonList;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
@@ -60,6 +61,8 @@ public class TestData {
 	public static final String BESTILLENDEFAGSYSTEM = "bestillendeFagsystem";
 	public static final String DOKUMENTPRODAPP = "dokumentprodapp";
 	public static final String FORSENDSELSE_METADATA = "<xml>Some metadata</xml>";
+	public static final Long DISTRIBUERT_JOURNALPOST_ID = 111111111L;
+	public static final String DISTRIBUERT_BESTILLINGS_ID = UUID.randomUUID().toString();
 
 	public static DistribuerJournalpost.DistribuerJournalpostBuilder createDistribuerJournalpostBuilder() {
 		return DistribuerJournalpost.builder()
@@ -124,7 +127,7 @@ public class TestData {
 				.dokumentstatus(FERDIGSTILT)
 				.dokumentvarianter(Arrays.asList(Journalpost.Dokumentvariant.builder()
 								.saksbehandlerHarTilgang(false)
-										.filtype(PDFA)
+								.filtype(PDFA)
 								.variantformat(Variantformat.ARKIV).build(),
 						Journalpost.Dokumentvariant.builder()
 								.saksbehandlerHarTilgang(true)
@@ -158,6 +161,7 @@ public class TestData {
 				.poststed(POSTSTED)
 				.land(LANDKODE_NORGE);
 	}
+
 	public static Postadresse.PostadresseBuilder createUtenlandskPostadresseBuilder() {
 		return createPostadresseBuilder()
 				.adressetype(UTENLANDSK_POSTADRESSE)
@@ -169,6 +173,18 @@ public class TestData {
 		person.setNavn(MOTTAKER_NAVN);
 		person.setPersonidentifikator(MOTTAKER_ID);
 		return person;
+	}
+
+	public static DistribuerJournalpostRequestTo createDistribuerJournalpostTo() {
+		return DistribuerJournalpostRequestTo.builder()
+				.journalpostId(String.valueOf(DISTRIBUERT_JOURNALPOST_ID))
+				.batchId(BATCH_ID)
+				.bestillendeFagsystem(BESTILLENDEFAGSYSTEM)
+				.adresse(createNorskAdresseTo())
+				.dokumentProdApp(DOKUMENTPRODAPP)
+				.distribusjonstidspunkt(KJERNETID.name())
+				.distribusjonstype(VIKTIG.name())
+				.build();
 	}
 
 	public static DistribuerJournalpostRequestTo.DistribuerJournalpostRequestToBuilder createDistribuerJournalpostToBuilder() {

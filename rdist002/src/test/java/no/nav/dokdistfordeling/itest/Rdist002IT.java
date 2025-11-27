@@ -49,7 +49,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -67,7 +66,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Objects.requireNonNull;
+import static no.nav.dokdistfordeling.TestData.DISTRIBUERT_BESTILLINGS_ID;
+import static no.nav.dokdistfordeling.TestData.DISTRIBUERT_JOURNALPOST_ID;
 import static no.nav.dokdistfordeling.TestData.FORSENDSELSE_METADATA;
+import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostTo;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostToBuilder;
 import static no.nav.dokdistfordeling.TestData.createUtenlandskAdresseTo;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
@@ -230,7 +232,6 @@ public class Rdist002IT extends AbstractOauth2Test {
 	public void distribuerJournalpostToDPO() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/dpo.json");
 		putStubOppdaterJournalpost();
@@ -352,10 +353,25 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
+	public void shouldNotRedistributeButReturnOkWhenJournalpostIsAlreadyDistributed() {
+		setupDatabase();
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostTo(),
+				createHappyPathHeaders());
+
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = terminateDistribuerJournalpostAndAssertResponseCode(requestEntity);
+
+		assertEquals(OK, responseEntity.getStatusCode());
+
+		verify(1, postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)));
+	}
+
+	@Test
 	public void journalpostAlleredeDistribuertOgReturnStatusConflict() {
 		setupDatabase();
 		stubSafGraphQl("saf/safgraphql-with-tilleggsopplysninger.json");
-		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
@@ -375,7 +391,6 @@ public class Rdist002IT extends AbstractOauth2Test {
 	public void distribuerJournalpostAsPrintWhenMappingInPdlFailsWithAdresse() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		setupDatabase();
 		stubPdl("pdl/pdl-npid.json");
 		putStubOppdaterJournalpost();
 
@@ -423,7 +438,6 @@ public class Rdist002IT extends AbstractOauth2Test {
 	public void distribuerJournalpostHappyPathWithDistribusjontypeIsNull() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
@@ -681,7 +695,6 @@ public class Rdist002IT extends AbstractOauth2Test {
 	void shouldReturnGoneWhenRequestHasNoAdresseAndMottakerErDoed() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		stubHentMottakerOgAdresse("", GONE.value());
@@ -914,7 +927,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	private DistribuerJournalpostResponseTo callDistribuerJournalpostAndAssertResponseCode(HttpEntity<DistribuerJournalpostRequestTo> requestEntity) {
 		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, POST, requestEntity, DistribuerJournalpostResponseTo.class);
-		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertEquals(OK, responseEntity.getStatusCode());
 		return responseEntity.getBody();
 	}
 
@@ -973,8 +986,8 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	private DistribuerJournalpostInfo setupDatabase() {
 		DistribuerJournalpostInfo distribuerJournalpostInfo = DistribuerJournalpostInfo.builder()
-				.journalpostId(111111111L)
-				.bestillingsId(UUID.randomUUID().toString())
+				.journalpostId(DISTRIBUERT_JOURNALPOST_ID)
+				.bestillingsId(DISTRIBUERT_BESTILLINGS_ID)
 				.opprettetDato(LocalDateTime.now().minusDays(2))
 				.opprettetAv(MDC.get(USER_ID))
 				.build();
