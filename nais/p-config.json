@@ -94,6 +94,11 @@
       "cluster": "prod-fss"
     },
     {
+      "app": "su-se-bakover",
+      "namespace": "supstonad",
+      "cluster": "prod-gcp"
+    },
+    {
       "app": "etterlatte-brev-api",
       "namespace": "etterlatte",
       "cluster": "prod-gcp"
