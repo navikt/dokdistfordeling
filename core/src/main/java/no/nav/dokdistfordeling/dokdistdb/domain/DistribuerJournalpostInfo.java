@@ -23,10 +23,10 @@ import java.time.LocalDateTime;
 public class DistribuerJournalpostInfo {
 
 	@Id
-	@Column(name = "journalpost_id", nullable = false, length = 40)
+	@Column(name = "journalpost_id")
 	private Long journalpostId;
 
-	@Column(name = "bestilling_id", nullable = false, length = 40)
+	@Column(name = "bestilling_id", nullable = false, length = 128)
 	private String bestillingsId;
 
 	@Column(name = "opprettet_av", nullable = false, length = 100)

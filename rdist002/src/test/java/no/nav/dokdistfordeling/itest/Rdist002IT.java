@@ -65,7 +65,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.temporal.ChronoUnit.SECONDS;
-import static java.util.Objects.requireNonNull;
 import static no.nav.dokdistfordeling.TestData.DISTRIBUERT_BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.TestData.DISTRIBUERT_JOURNALPOST_ID;
 import static no.nav.dokdistfordeling.TestData.FORSENDSELSE_METADATA;
@@ -366,25 +365,6 @@ public class Rdist002IT extends AbstractOauth2Test {
 		assertEquals(OK, responseEntity.getStatusCode());
 
 		verify(1, postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)));
-	}
-
-	@Test
-	public void journalpostAlleredeDistribuertOgReturnStatusConflict() {
-		setupDatabase();
-		stubSafGraphQl("saf/safgraphql-with-tilleggsopplysninger.json");
-		stubPdl("pdl/pdl-happy.json");
-		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
-		putStubOppdaterJournalpost();
-
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
-				createDistribuerJournalpostToBuilder().build(),
-				createHappyPathHeaders());
-		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = terminateDistribuerJournalpostAndAssertResponseCode(requestEntity);
-
-		assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
-		assertEquals("1ad212d2-d46d-4e73-bf6c-c1c60382da44", requireNonNull(responseEntity.getBody()).getBestillingsId());
-
-		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 	}
 
 	@Test

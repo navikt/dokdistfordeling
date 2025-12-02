@@ -26,7 +26,6 @@ import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.validate.JournalpostValidator.validateJournalpostAndDokumenter;
 import static no.nav.dokdistfordeling.validate.PostadresseValidator.validatePostdresse;
 import static no.nav.dokdistfordeling.validate.TvingKanalValidator.validateTvingKanal;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Component
 @Slf4j
@@ -102,9 +101,7 @@ public class DistribuerJournalpostService {
 
 
 	public DistribuerJournalpostInfoResponse hentDistribuerJournalpostInfo(String journalpostId) {
-		DistribuerJournalpostInfoResponse distribuerInfo = distribuerJournalpostInfoService.hentDistribuerJournalpostInfo(Long.parseLong(journalpostId));
-		return distribuerInfo == null || isBlank(distribuerInfo.bestillingsId()) ? null : distribuerInfo;
-
+		return distribuerJournalpostInfoService.hentDistribuerJournalpostInfo(Long.parseLong(journalpostId));
 	}
 
 	private void oppdaterJournalpostMedTilleggsopplysninger(Long journalpostId,

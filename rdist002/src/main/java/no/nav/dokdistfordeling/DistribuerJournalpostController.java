@@ -57,17 +57,11 @@ public class DistribuerJournalpostController {
 			DistribuerJournalpostInfoResponse distribuerJournalpostInfo = distribuerJournalpostService.hentDistribuerJournalpostInfo(journalpostId);
 
 			if (distribuerJournalpostInfo != null) {
-				log.warn("Journalpost med journalpostId={} er distribuert med bestillingsId={}", journalpostId, distribuerJournalpostInfo.bestillingsId());
+				log.info("Journalpost med journalpostId={} er allerede distribuert med bestillingsId={}", journalpostId, distribuerJournalpostInfo.bestillingsId());
 				return ResponseEntity.ok()
 						.body(new DistribuerJournalpostResponseTo(distribuerJournalpostInfo.bestillingsId()));
 			}
 
-			if (journalpost.erDistribuert()) {
-				final var bestillingsId = journalpost.getTilleggsopplysninger().getVerdi();
-				log.info("Journalpost med journalpostId={} og bestillingsId={} er allerede distribuert", journalpostId, bestillingsId);
-				return ResponseEntity.status(CONFLICT)
-						.body(new DistribuerJournalpostResponseTo(bestillingsId));
-			}
 
 			DistribuerJournalpost distribuerJournalpost = DistribuerJournalpostMapper.map(distribuerJournalpostRequestTo);
 
