@@ -187,6 +187,11 @@
       "app": "eux-neessi",
       "namespace": "eessibasis",
       "cluster": "prod-gcp"
+    },
+    {
+      "app": "tilbakekreving-backend",
+      "namespace": "tilbake",
+      "cluster": "prod-gcp"
     }
   ]
 }
