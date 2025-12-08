@@ -110,6 +110,11 @@
       "cluster": "dev-fss"
     },
     {
+      "app": "su-se-bakover",
+      "namespace": "supstonad",
+      "cluster": "dev-gcp"
+    },
+    {
       "app": "etterlatte-brev-api",
       "namespace": "etterlatte",
       "cluster": "dev-gcp"
@@ -197,6 +202,11 @@
     {
       "app": "eux-neessi-q2",
       "namespace": "eessibasis",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "orkivar",
+      "namespace": "dab",
       "cluster": "dev-gcp"
     }
   ]
