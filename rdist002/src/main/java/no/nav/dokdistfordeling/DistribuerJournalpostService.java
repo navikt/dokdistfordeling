@@ -7,7 +7,7 @@ import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostRequest;
 import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoResponse;
-import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoService;
+import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostIdempotencyHandler;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.domain.Postadresse;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
@@ -32,20 +32,20 @@ import static no.nav.dokdistfordeling.validate.TvingKanalValidator.validateTving
 public class DistribuerJournalpostService {
 
 	private final DistribuerForsendelseProducer distribuerForsendelseProducer;
-	private final DistribuerJournalpostInfoService distribuerJournalpostInfoService;
+	private final DistribuerJournalpostIdempotencyHandler distribuerJournalpostIdempotencyHandler;
 	private final RegoppslagService regoppslag;
 	private final BestemDistribusjonskanalService bestemDistribusjonskanalService;
 	private final JournalpostApi journalpostApi;
 	private final PersonnummerService personnummerService;
 
 	public DistribuerJournalpostService(DistribuerForsendelseProducer distribuerForsendelseProducer,
-										DistribuerJournalpostInfoService distribuerJournalpostInfoService,
+										DistribuerJournalpostIdempotencyHandler distribuerJournalpostIdempotencyHandler,
 										RegoppslagService regoppslag,
 										BestemDistribusjonskanalService bestemDistribusjonskanalService,
 										JournalpostApi journalpostApi,
 										PersonnummerService personnummerService) {
 		this.distribuerForsendelseProducer = distribuerForsendelseProducer;
-		this.distribuerJournalpostInfoService = distribuerJournalpostInfoService;
+		this.distribuerJournalpostIdempotencyHandler = distribuerJournalpostIdempotencyHandler;
 		this.regoppslag = regoppslag;
 		this.bestemDistribusjonskanalService = bestemDistribusjonskanalService;
 		this.journalpostApi = journalpostApi;
@@ -71,7 +71,7 @@ public class DistribuerJournalpostService {
 		validatePostdresse(postadresse, mottaker);
 
 		distribuerForsendelse(distribuerJournalpost, postadresse, bestillingsId, journalpost, mottaker, distribusjonKanalCode);
-		distribuerJournalpostInfoService.opprettDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), bestillingsId);
+		distribuerJournalpostIdempotencyHandler.opprettDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), bestillingsId);
 
 		oppdaterJournalpostMedTilleggsopplysninger(distribuerJournalpost.journalpostId(), bestillingsId);
 
@@ -101,7 +101,7 @@ public class DistribuerJournalpostService {
 
 
 	public DistribuerJournalpostInfoResponse hentDistribuerJournalpostInfo(String journalpostId) {
-		return distribuerJournalpostInfoService.hentDistribuerJournalpostInfo(Long.parseLong(journalpostId));
+		return distribuerJournalpostIdempotencyHandler.hentDistribuerJournalpostInfo(Long.parseLong(journalpostId));
 	}
 
 	private void oppdaterJournalpostMedTilleggsopplysninger(Long journalpostId,

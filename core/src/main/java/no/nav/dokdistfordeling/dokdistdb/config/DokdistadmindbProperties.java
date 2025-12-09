@@ -20,7 +20,7 @@ public record DokdistadmindbProperties(
 			String onshosts) {
 
 		public Database {
-			poolsize = 80;
+			poolsize = 10;
 		}
 	}
 

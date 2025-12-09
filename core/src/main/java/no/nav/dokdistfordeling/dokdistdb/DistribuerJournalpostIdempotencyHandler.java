@@ -16,11 +16,11 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-public class DistribuerJournalpostInfoService {
+public class DistribuerJournalpostIdempotencyHandler {
 
 	private final DistribuerJournalpostInfoRepository distribuerJournalpostInfoRepository;
 
-	public DistribuerJournalpostInfoService(DistribuerJournalpostInfoRepository distribuerJournalpostInfoRepository) {
+	public DistribuerJournalpostIdempotencyHandler(DistribuerJournalpostInfoRepository distribuerJournalpostInfoRepository) {
 		this.distribuerJournalpostInfoRepository = distribuerJournalpostInfoRepository;
 	}
 
@@ -37,7 +37,6 @@ public class DistribuerJournalpostInfoService {
 				.build();
 
 		distribuerJournalpostInfoRepository.save(distribuerJournalpostInfo);
-		log.info("Laget distribuerJournalpostInfo for journalpostId={}", journalpostId);
 	}
 
 	public DistribuerJournalpostInfoResponse hentDistribuerJournalpostInfo(Long journalpostId) {
