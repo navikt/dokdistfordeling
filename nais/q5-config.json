@@ -2,7 +2,6 @@
   "APP_NAME": "dokdistfordeling-q5",
   "ENVIRONMENT": "q5",
   "DOKDISTFORDELING_SECRETS": "dokdistfordeling-q5",
-  "DOKDISTADMIN_SECRET": "dokdistadmin-q5",
   "DOKDISTADMIN_DATABASE_SCHEMA": "dokumentdistribusjon",
   "NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_DISCOVERYURL": "https://security-token-service.dev.adeo.no/rest/v1/sts/.well-known/openid-configuration",
   "NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_ACCEPTED_AUDIENCE": "srvmelosys,srvarena-dokgen,srvbdarkiv,srvfamilie-ks-opps",
