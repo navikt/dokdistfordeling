@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
@@ -71,6 +72,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @SpringBootTest(classes = {Qdist008ItestConfig.class},
 		webEnvironment = RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
+@AutoConfigureTestDatabase
 @ActiveProfiles("itest")
 public class Qdist008IT {
 	private static final String DOKUMENTTYPE_ID = "1111111";

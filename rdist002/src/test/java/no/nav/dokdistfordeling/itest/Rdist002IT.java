@@ -10,6 +10,8 @@ import jakarta.jms.Queue;
 import jakarta.jms.TextMessage;
 import no.nav.dokdistfordeling.config.AbstractOauth2Test;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
+import no.nav.dokdistfordeling.dokdistdb.domain.DistribuerJournalpostInfo;
+import no.nav.dokdistfordeling.dokdistdb.repository.DistribuerJournalpostInfoRepository;
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
@@ -23,8 +25,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
@@ -35,9 +39,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.transaction.TestTransaction;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -47,7 +55,6 @@ import java.util.stream.Stream;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
@@ -58,11 +65,14 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.temporal.ChronoUnit.SECONDS;
-import static java.util.Objects.requireNonNull;
+import static no.nav.dokdistfordeling.TestData.DISTRIBUERT_BESTILLINGS_ID;
+import static no.nav.dokdistfordeling.TestData.DISTRIBUERT_JOURNALPOST_ID;
 import static no.nav.dokdistfordeling.TestData.FORSENDSELSE_METADATA;
+import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostTo;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostToBuilder;
 import static no.nav.dokdistfordeling.TestData.createUtenlandskAdresseTo;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
+import static no.nav.dokdistfordeling.constants.Constants.USER_ID;
 import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_AVTALEMELDING;
 import static no.nav.dokdistfordeling.kodeverk.TvingKanal.TRYGDERETTEN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,11 +94,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 
+@Transactional
 @EnableAutoConfiguration
 @SpringBootTest(
 		classes = Rdist002TestConfig.class,
 		webEnvironment = RANDOM_PORT)
 @AutoConfigureWireMock(port = 0)
+@AutoConfigureTestDatabase
 @ActiveProfiles("itest")
 public class Rdist002IT extends AbstractOauth2Test {
 
@@ -98,8 +110,13 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Autowired
 	protected TestRestTemplate restTemplate;
+
+	@Autowired
+	protected DistribuerJournalpostInfoRepository distribuerJournalpostInfoRepository;
+
 	@Autowired
 	private JmsTemplate jmsTemplate;
+
 	@Autowired
 	private Queue qdist012;
 
@@ -108,18 +125,24 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Autowired
 	protected RetryRegistry retryRegistry;
+	@Autowired
+	private DataSource dataSource;
 
 	@BeforeEach
 	public void setupBefore() {
 		stubAzureToken();
 		stubNaisTexasToken();
 		circuitBreakerRegistry.getAllCircuitBreakers().forEach(CircuitBreaker::reset);
+		if (MDC.get(USER_ID) == null) {
+			MDC.put(USER_ID, "dokdistfordeling-test");
+		}
+		distribuerJournalpostInfoRepository.deleteAll();
 	}
 
 	@Test
 	public void distribuerJournalpostHappyPath() {
+		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
@@ -153,7 +176,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Test
 	public void distribuerJournalpostHappyPathJsonCaseInsensitive() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
@@ -177,7 +200,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Test
 	public void distribuerJournalpostToDittNAV() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/dittNav.json");
 		putStubOppdaterJournalpost();
@@ -206,8 +229,8 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Test
 	public void distribuerJournalpostToDPO() {
+		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/dpo.json");
 		putStubOppdaterJournalpost();
@@ -240,7 +263,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Test
 	public void shouldDistribuerJournalpostToPrintWhenTvingSentralPrintSetToTrue() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		putStubOppdaterJournalpost();
 
@@ -272,7 +295,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@EnumSource(TvingKanal.class)
 	public void shouldDistribuerJournalpostToKanalWhenTvingKanalIsSet(TvingKanal tvingKanal) {
 		stubSafGraphQl(tvingKanal.equals(TRYGDERETTEN) ? "saf/safGraphQlResponse-happy-trygderetten.json" : "saf/safGraphQlResponse-happy.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		putStubOppdaterJournalpost();
 
@@ -302,7 +325,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Test
 	public void distribuerJournalpostHappyPathMinimalAvsenderMottaker() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy-minimal-avsendermottaker.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
@@ -329,28 +352,25 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void journalpostAlleredeDistribuertOgReturnStatusConflict() {
-		stubSafGraphQl("saf/safgraphql-with-tilleggsopplysninger.json");
-		stubStsToken();
-		stubPdl("pdl/pdl-happy.json");
-		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
-		putStubOppdaterJournalpost();
+	public void shouldNotRedistributeButReturnOkWhenJournalpostIsAlreadyDistributed() {
+		setupDatabase();
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
-				createDistribuerJournalpostToBuilder().build(),
+				createDistribuerJournalpostTo(),
 				createHappyPathHeaders());
+
 		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = terminateDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
-		assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
-		assertEquals("1ad212d2-d46d-4e73-bf6c-c1c60382da44", requireNonNull(responseEntity.getBody()).getBestillingsId());
+		assertEquals(OK, responseEntity.getStatusCode());
 
-		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(1, postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)));
 	}
 
 	@Test
 	public void distribuerJournalpostAsPrintWhenMappingInPdlFailsWithAdresse() {
+		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
 		stubPdl("pdl/pdl-npid.json");
 		putStubOppdaterJournalpost();
 
@@ -378,7 +398,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Test
 	public void throwExceptionInDistribuerJournalpostWhenMappingInPdlFailsWithoutAdresse() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-npid.json");
 		putStubOppdaterJournalpost();
 
@@ -396,8 +416,8 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Test
 	public void distribuerJournalpostHappyPathWithDistribusjontypeIsNull() {
+		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
@@ -425,7 +445,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Test
 	public void distribuerJournalpostWithUkjentAvsenderMottakerIdHappyPath() {
 		stubSafGraphQl("saf/safGraphQlResponse-TSS-happy.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/sdp.json");
 		putStubOppdaterJournalpost();
@@ -453,7 +473,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Test
 	public void distribuerJournalpostWithoutAdresseHappyPath() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		stubHentMottakerOgAdresse("regoppslag/treg002-hentadresse-person-happy.json", OK.value());
@@ -485,7 +505,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Test
 	public void distribuerJournalpostWithUtenlandskAdresseHappyPath() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
@@ -514,8 +534,8 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Test
 	public void shouldDistribuerAdressetypeWithCaseInsensitiveHappy() {
+		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
@@ -606,6 +626,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			"safgraphql-with-variant-original-xml-json.json, Systembruker eller saksbehandler har ikke tilgang til dokumentInfoId=666666666 og kan derfor ikke bestille distribusjon,401"
 	})
 	void shouldReturnCorrecteErrorTypeWhenSafRequestFails(String filename, String errorMessage, int httpErrorCode) {
+		setupDatabase();
 		stubSafGraphQl("saf/" + filename);
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
@@ -632,6 +653,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Test
 	void shouldReturnNotFoundWhenRequestHasNoAdresseAndAdresseIsUkjentInRegoppslag() {
+		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		stubNaisTexasToken();
 		stubPdl("pdl/pdl-happy.json");
@@ -651,8 +673,8 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Test
 	void shouldReturnGoneWhenRequestHasNoAdresseAndMottakerErDoed() {
+		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		stubHentMottakerOgAdresse("", GONE.value());
@@ -685,8 +707,8 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Test
 	void shouldReturnInternalServerErrorWhenBestemDistribusjonskanalResponseIsInvalid() {
+		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/ugyldig.json");
 
@@ -700,7 +722,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Test
 	void shouldReturnBadRequestWhenBestemDistribusjonskanalResponseIsBadRequest() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal(BAD_REQUEST, "bestemdistribusjonskanal/bad_request.json");
 
@@ -715,7 +737,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@MethodSource
 	void shouldReturnInternalServerErrorWhenBestemDistribusjonskanalResponseIsUnauthorizedOrInternalServerError(HttpStatus httpStatus, String response) {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal(httpStatus, response);
 
@@ -737,8 +759,8 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Test
 	void shouldReturnServiceUnavailableWhenCircuitbreakerIsOpenForDokdistkanal() {
+		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal(INTERNAL_SERVER_ERROR, "bestemdistribusjonskanal/internal_server_error.json");
 
@@ -777,7 +799,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Test
 	public void shouldReturnBadRequestIfAddressIsInvalidInRegoppslag() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		stubHentMottakerOgAdresse("regoppslag/treg002-hentadresse-person-invalid-address.json", BAD_REQUEST.value());
@@ -795,7 +817,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	@Test
 	public void shouldReturnBadRequestIfAddressFromRegoppslagContainsOnlyLandkode() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubStsToken();
+		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		stubHentMottakerOgAdresse("regoppslag/treg002-hentadresse-person-only-landkode.json", OK.value());
@@ -843,14 +865,6 @@ public class Rdist002IT extends AbstractOauth2Test {
 						.withBodyFile(path)));
 	}
 
-	private void stubStsToken() {
-		stubFor(get("/stsRest/token?grant_type=client_credentials&scope=openid")
-				.willReturn(aResponse()
-						.withStatus(OK.value())
-						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-						.withBodyFile("sts/stsResponse_happy.json")));
-	}
-
 	private void stubPdl(String path) {
 		stubFor(post("/pdl")
 				.willReturn(aResponse()
@@ -893,7 +907,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	private DistribuerJournalpostResponseTo callDistribuerJournalpostAndAssertResponseCode(HttpEntity<DistribuerJournalpostRequestTo> requestEntity) {
 		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, POST, requestEntity, DistribuerJournalpostResponseTo.class);
-		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertEquals(OK, responseEntity.getStatusCode());
 		return responseEntity.getBody();
 	}
 
@@ -950,4 +964,24 @@ public class Rdist002IT extends AbstractOauth2Test {
 		}
 	}
 
+	private DistribuerJournalpostInfo setupDatabase() {
+		DistribuerJournalpostInfo distribuerJournalpostInfo = DistribuerJournalpostInfo.builder()
+				.journalpostId(DISTRIBUERT_JOURNALPOST_ID)
+				.bestillingsId(DISTRIBUERT_BESTILLINGS_ID)
+				.opprettetDato(LocalDateTime.now().minusDays(2))
+				.opprettetAv(MDC.get(USER_ID))
+				.build();
+		var distribusjonInfo = distribuerJournalpostInfoRepository.save(distribuerJournalpostInfo);
+
+
+		commitAndBeginNewTransaction();
+
+		return distribusjonInfo;
+	}
+
+	public void commitAndBeginNewTransaction() {
+		TestTransaction.flagForCommit();
+		TestTransaction.end();
+		TestTransaction.start();
+	}
 }

@@ -91,6 +91,8 @@ spec:
       value: {{ DOKDISTMELLOMLAGER_KEYID }}
     - name: GOOGLE_APPLICATION_CREDENTIALS
       value: "/var/run/secrets/nais_secrets/gcloud_serviceaccount.json"
+    - name: DOKDISTADMIN_DATABASE_SCHEMA
+      value: {{ DOKDISTADMIN_DATABASE_SCHEMA }}
   image: {{ image }}
   ingresses:
     {{#each INGRESSES}}

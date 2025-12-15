@@ -27,6 +27,7 @@ public class Journalpost {
 	@Builder.Default
 	List<DokumentInfo> dokumenter = new ArrayList<>();
 
+	@Deprecated
 	public boolean erDistribuert() {
 		return tilleggsopplysninger != null && DOKDISTBESTILLINGS_ID.equals(tilleggsopplysninger.getNokkel());
 	}
