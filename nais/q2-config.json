@@ -124,6 +124,21 @@
       "cluster": "dev-gcp"
     },
     {
+      "app": "kabal-document-neon",
+      "namespace": "klage",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "kabal-document-argon",
+      "namespace": "klage",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "kabal-document-e2e",
+      "namespace": "klage",
+      "cluster": "dev-gcp"
+    },
+    {
       "app": "tiltak-vedtaksbrev",
       "namespace": "arbeidsgiver",
       "cluster": "dev-gcp"
