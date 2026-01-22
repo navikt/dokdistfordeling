@@ -155,7 +155,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			String response = receive(qdist009);
-			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
+			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.xml"));
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
@@ -181,7 +181,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			String response = receive(qdist010);
-			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
+			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.xml"));
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
@@ -207,7 +207,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			String response = receive(qdist011);
-			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
+			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.xml"));
 		});
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
@@ -235,7 +235,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			String response = receive(qdist013);
-			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
+			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.xml"));
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
@@ -261,7 +261,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			String response = receive(qdist015);
-			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
+			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.xml"));
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
@@ -286,7 +286,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			String response = receive(qdist016);
-			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
+			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.xml"));
 		});
 
 		verify(exactly(1), postRequestedFor(urlEqualTo(DOKDISTADMIN_URL))
@@ -351,7 +351,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			String response = receive(qdist009);
-			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
+			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.xml"));
 		});
 	}
 
@@ -371,7 +371,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			String response = receive(qdist009);
-			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
+			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.xml"));
 		});
 
 		verify(exactly(0), getRequestedFor(urlEqualTo(DOKMET_URL)));
@@ -396,7 +396,7 @@ public class Qdist008IT {
 
 		await().atMost(10, SECONDS).untilAsserted(() -> {
 			String response = receive(qdist009);
-			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.txt"));
+			assertThat(response).isEqualToIgnoringWhitespace(classpathToString("out/out-happy.xml"));
 		});
 
 		verify(exactly(1), getRequestedFor(urlEqualTo(DOKMET_URL)));
