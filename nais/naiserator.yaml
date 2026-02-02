@@ -5,6 +5,8 @@ metadata:
   namespace: teamdokumenthandtering
   labels:
     team: teamdokumenthandtering
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "5m"
 spec:
   filesFrom:
     - secret: {{ DOKDISTFORDELING_SECRETS }}
