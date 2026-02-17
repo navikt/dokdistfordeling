@@ -227,6 +227,11 @@
       "app": "orkivar",
       "namespace": "dab",
       "cluster": "dev-gcp"
+    },
+    {
+      "app": "mulighetsrommet-api",
+      "namespace": "team-mulighetsrommet",
+      "cluster": "dev-gcp"
     }
   ]
 }
