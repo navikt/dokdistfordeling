@@ -18,13 +18,15 @@ import no.nav.dokdistfordeling.map.RegoppslagAdresseMapper;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
 import org.springframework.stereotype.Component;
 
+import org.springframework.dao.DataIntegrityViolationException;
+
 import java.util.List;
 import java.util.UUID;
 
 import static no.nav.dokdistfordeling.constants.Constants.DOKDISTBESTILLINGS_ID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.validate.JournalpostValidator.validateJournalpostAndDokumenter;
-import static no.nav.dokdistfordeling.validate.PostadresseValidator.validatePostdresse;
+import static no.nav.dokdistfordeling.validate.PostadresseValidator.validatePostadresse;
 import static no.nav.dokdistfordeling.validate.TvingKanalValidator.validateTvingKanal;
 
 @Component
@@ -68,14 +70,19 @@ public class DistribuerJournalpostService {
 
 		Postadresse postadresse = utledPostadresse(distribuerJournalpost, distribusjonKanalCode, journalpost);
 
-		validatePostdresse(postadresse, mottaker);
+		validatePostadresse(postadresse, mottaker);
 
 		distribuerForsendelse(distribuerJournalpost, postadresse, bestillingsId, journalpost, mottaker, distribusjonKanalCode);
-		distribuerJournalpostIdempotencyHandler.opprettDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), bestillingsId);
 
-		oppdaterJournalpostMedTilleggsopplysninger(distribuerJournalpost.journalpostId(), bestillingsId);
+		String persistertBestillingsId = lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), bestillingsId);
 
-		return bestillingsId;
+		if (!bestillingsId.equals(persistertBestillingsId)) {
+			return persistertBestillingsId;
+		}
+
+		oppdaterJournalpostMedTilleggsopplysninger(distribuerJournalpost.journalpostId(), persistertBestillingsId);
+
+		return persistertBestillingsId;
 	}
 
 	private void distribuerForsendelse(DistribuerJournalpost distribuerJournalpost,
@@ -102,6 +109,18 @@ public class DistribuerJournalpostService {
 
 	public DistribuerJournalpostInfoResponse hentDistribuerJournalpostInfo(String journalpostId) {
 		return distribuerJournalpostIdempotencyHandler.hentDistribuerJournalpostInfo(Long.parseLong(journalpostId));
+	}
+
+	private String lagreDistribuerJournalpostInfo(Long journalpostId, String bestillingsId) {
+		try {
+			distribuerJournalpostIdempotencyHandler.opprettDistribuerJournalpostInfo(journalpostId, bestillingsId);
+			return bestillingsId;
+		} catch (DataIntegrityViolationException e) {
+			log.warn("Samtidig distribusjon av journalpostId={}. En annen request har allerede persistert distribuerJournalpostInfo.", journalpostId);
+			DistribuerJournalpostInfoResponse eksisterende = distribuerJournalpostIdempotencyHandler.hentDistribuerJournalpostInfo(journalpostId);
+
+			return eksisterende != null ? eksisterende.bestillingsId() : bestillingsId;
+		}
 	}
 
 	private void oppdaterJournalpostMedTilleggsopplysninger(Long journalpostId,

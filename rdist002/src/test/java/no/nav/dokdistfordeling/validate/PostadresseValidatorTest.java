@@ -19,7 +19,7 @@ import static no.nav.dokdistfordeling.TestData.createNorskPostadresseBuilder;
 import static no.nav.dokdistfordeling.TestData.createUtenlandskPostadresseBuilder;
 import static no.nav.dokdistfordeling.validate.PostadresseValidator.ISO3166_TWO_LETTER_CODES;
 import static no.nav.dokdistfordeling.validate.PostadresseValidator.KOSOVO_LAND_KODE;
-import static no.nav.dokdistfordeling.validate.PostadresseValidator.validatePostdresse;
+import static no.nav.dokdistfordeling.validate.PostadresseValidator.validatePostadresse;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -29,17 +29,17 @@ class PostadresseValidatorTest {
 
 	@Test
 	void shouldValidateNorskPostadresse() {
-		assertDoesNotThrow(() -> validatePostdresse(createNorskPostadresseBuilder().build(), MOTTAKER));
+		assertDoesNotThrow(() -> validatePostadresse(createNorskPostadresseBuilder().build(), MOTTAKER));
 	}
 
 	@Test
 	void shouldValidateUtenlandskPostadresse() {
-		assertDoesNotThrow(() -> validatePostdresse(createUtenlandskPostadresseBuilder().build(), MOTTAKER));
+		assertDoesNotThrow(() -> validatePostadresse(createUtenlandskPostadresseBuilder().build(), MOTTAKER));
 	}
 
 	@Test
 	void shouldValidateAdresseWhenPostdresseIsNull() {
-		assertDoesNotThrow(() -> validatePostdresse(null, MOTTAKER));
+		assertDoesNotThrow(() -> validatePostadresse(null, MOTTAKER));
 	}
 
 	@ParameterizedTest
@@ -49,7 +49,7 @@ class PostadresseValidatorTest {
 				.land(landkode)
 				.build();
 
-		assertDoesNotThrow(() -> validatePostdresse(adresse, MOTTAKER));
+		assertDoesNotThrow(() -> validatePostadresse(adresse, MOTTAKER));
 	}
 
 	static Stream<String> shouldValidateLandkode() {
@@ -58,7 +58,7 @@ class PostadresseValidatorTest {
 	
 	@Test
 	void shouldValidateKosovoLandkode() {
-		assertDoesNotThrow(() -> validatePostdresse(createUtenlandskPostadresseBuilder().land(KOSOVO_LAND_KODE).build(), MOTTAKER));
+		assertDoesNotThrow(() -> validatePostadresse(createUtenlandskPostadresseBuilder().land(KOSOVO_LAND_KODE).build(), MOTTAKER));
 	}
 
 	@Test
@@ -68,7 +68,7 @@ class PostadresseValidatorTest {
 		samhandler.setSamhandleridentifikator(MOTTAKER_ID);
 
 		assertThatExceptionOfType(ValidationException.class)
-				.isThrownBy(() -> validatePostdresse(null, samhandler))
+				.isThrownBy(() -> validatePostadresse(null, samhandler))
 				.withMessage("For mottaker av type samhandler kan ikke postadresse være null");
 	}
 
@@ -78,7 +78,7 @@ class PostadresseValidatorTest {
 	void shouldThrowValdationExceptionWhenPoststedForNorskPostadresseIsNullOrEmpty(String poststed) {
 
 		assertThatExceptionOfType(ValidationException.class)
-				.isThrownBy(() -> validatePostdresse(createNorskPostadresseBuilder().poststed(poststed).build(), MOTTAKER))
+				.isThrownBy(() -> validatePostadresse(createNorskPostadresseBuilder().poststed(poststed).build(), MOTTAKER))
 				.withMessage("Feltet poststed kan ikke være null eller tomt. Fikk poststed=%s", poststed);
 	}
 
@@ -88,7 +88,7 @@ class PostadresseValidatorTest {
 	void shouldThrowValdationExceptionWhenPostnummerForNorskPostadresseIsNullOrEmpty(String postnummer) {
 
 		assertThatExceptionOfType(ValidationException.class)
-				.isThrownBy(() -> validatePostdresse(createNorskPostadresseBuilder().postnummer(postnummer).build(), MOTTAKER))
+				.isThrownBy(() -> validatePostadresse(createNorskPostadresseBuilder().postnummer(postnummer).build(), MOTTAKER))
 				.withMessage("Feltet postnummer kan ikke være null eller tomt. Fikk postnummer=%s", postnummer);
 	}
 
@@ -97,7 +97,7 @@ class PostadresseValidatorTest {
 	void shouldThrowValidationExceptionWhenPostnummerForNorskPostadresseIsInvalid(String postnummer) {
 
 		assertThatExceptionOfType(ValidationException.class)
-				.isThrownBy(() -> validatePostdresse(createNorskPostadresseBuilder().postnummer(postnummer).build(), MOTTAKER))
+				.isThrownBy(() -> validatePostadresse(createNorskPostadresseBuilder().postnummer(postnummer).build(), MOTTAKER))
 				.withMessage("Feltet postnummer må være et gyldig tall med 4 siffer. Fikk postnummer=%s", postnummer);
 	}
 
@@ -107,7 +107,7 @@ class PostadresseValidatorTest {
 	void shouldThrowValidationExceptionWhenUtenlandskAdresseIsMissingAdresselinje1(String adresselinje1) {
 
 		assertThatExceptionOfType(ValidationException.class)
-				.isThrownBy(() -> validatePostdresse(createUtenlandskPostadresseBuilder().adresselinje1(adresselinje1).build(), MOTTAKER))
+				.isThrownBy(() -> validatePostadresse(createUtenlandskPostadresseBuilder().adresselinje1(adresselinje1).build(), MOTTAKER))
 				.withMessage("Feltet adresselinje1 kan ikke være null eller tomt. Fikk adresselinje1=%s", adresselinje1);
 
 	}
@@ -126,7 +126,7 @@ class PostadresseValidatorTest {
 				.build();
 
 		assertThatExceptionOfType(ValidationException.class)
-				.isThrownBy(() -> validatePostdresse(adresse, MOTTAKER))
+				.isThrownBy(() -> validatePostadresse(adresse, MOTTAKER))
 				.withMessage("Feltene postnummer og poststed kan ikke være satt når adressetype=utenlandskPostadresse. Fikk postnummer=%s og poststed=%s", postnummer, poststed);
 	}
 
@@ -137,7 +137,7 @@ class PostadresseValidatorTest {
 	void shouldThrowValidationExceptionWhenLandkodeIsInvalid(String landkode) {
 
 		assertThatExceptionOfType(ValidationException.class)
-				.isThrownBy(() -> validatePostdresse(createUtenlandskPostadresseBuilder().land(landkode).build(), MOTTAKER))
+				.isThrownBy(() -> validatePostadresse(createUtenlandskPostadresseBuilder().land(landkode).build(), MOTTAKER))
 				.withMessage("Land må være en gyldig iso3166-2 landkode på 2 bokstaver. Fikk=%s", landkode);
 	}
 
@@ -147,7 +147,7 @@ class PostadresseValidatorTest {
 	void shouldThrowValidationExceptionForMissingAdresseType(String adresseType) {
 
 		assertThatExceptionOfType(ValidationException.class)
-				.isThrownBy(() -> validatePostdresse(createNorskPostadresseBuilder().adressetype(adresseType).build(), MOTTAKER))
+				.isThrownBy(() -> validatePostadresse(createNorskPostadresseBuilder().adressetype(adresseType).build(), MOTTAKER))
 				.withMessage("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, adresseType=%s", adresseType);
 	}
 

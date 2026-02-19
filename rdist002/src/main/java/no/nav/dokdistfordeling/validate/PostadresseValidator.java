@@ -29,7 +29,7 @@ public class PostadresseValidator {
 	private PostadresseValidator() {
 	}
 
-	public static void validatePostdresse(Postadresse postadresse, Aktoer mottaker) {
+	public static void validatePostadresse(Postadresse postadresse, Aktoer mottaker) {
 		if (mottaker instanceof Samhandler && postadresse == null) {
 			throw new ValidationException("For mottaker av type samhandler kan ikke postadresse være null");
 		}
