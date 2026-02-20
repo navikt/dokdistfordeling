@@ -6,19 +6,19 @@ import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostRequest;
 import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
-import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoResponse;
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostIdempotencyHandler;
+import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoResponse;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.domain.Postadresse;
+import no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.map.HentDokumenterFraJoarkMapper;
 import no.nav.dokdistfordeling.map.MottakerMapper;
 import no.nav.dokdistfordeling.map.RegoppslagAdresseMapper;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.Aktoer;
-import org.springframework.stereotype.Component;
-
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
@@ -119,7 +119,12 @@ public class DistribuerJournalpostService {
 			log.warn("Samtidig distribusjon av journalpostId={}. En annen request har allerede persistert distribuerJournalpostInfo.", journalpostId);
 			DistribuerJournalpostInfoResponse eksisterende = distribuerJournalpostIdempotencyHandler.hentDistribuerJournalpostInfo(journalpostId);
 
-			return eksisterende != null ? eksisterende.bestillingsId() : bestillingsId;
+			if (eksisterende == null) {
+				throw new JournalpostErAlleredeDistribuertException(
+						"Journalpost er allerede distribuert, men fant ikke eksisterende distribuerJournalpostInfo for journalpostId=%s".formatted(journalpostId));
+			}
+
+			return eksisterende.bestillingsId();
 		}
 	}
 

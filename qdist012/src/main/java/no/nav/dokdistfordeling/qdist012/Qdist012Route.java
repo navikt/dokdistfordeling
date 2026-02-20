@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.qdist012;
 import jakarta.jms.Queue;
 import jakarta.xml.bind.JAXBContext;
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException;
 import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
@@ -51,7 +52,7 @@ public class Qdist012Route extends RouteBuilder {
 				.logExhaustedMessageBody(false)
 				.loggingLevel(ERROR));
 
-		onException(PersonErDoedUkjentAdresseException.class)
+		onException(PersonErDoedUkjentAdresseException.class, JournalpostErAlleredeDistribuertException.class)
 				.handled(true)
 				.useOriginalMessage()
 				.log(WARN, log, "Forkaster melding på qdist012 for " + getIdsForLogging() + " grunnet=${exception}");

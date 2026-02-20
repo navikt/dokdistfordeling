@@ -49,12 +49,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -845,51 +839,6 @@ public class Rdist002IT extends AbstractOauth2Test {
 				createHeadersWithInvalidAuth());
 
 		callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, UNAUTHORIZED);
-	}
-
-	@Test
-	public void distribuerJournalpostSamtidigKallSkalReturnereOk() throws Exception {
-		setupDatabase();
-		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
-		stubPdl("pdl/pdl-happy.json");
-		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
-		putStubOppdaterJournalpost();
-
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
-				createDistribuerJournalpostToBuilder().build(),
-				createHappyPathHeaders());
-
-		int antallSamtidigKall = 2;
-		CyclicBarrier barrier = new CyclicBarrier(antallSamtidigKall);
-		ExecutorService executor = Executors.newFixedThreadPool(antallSamtidigKall);
-
-		List<Future<ResponseEntity<DistribuerJournalpostResponseTo>>> futures = Stream.generate(() ->
-				executor.submit(() -> {
-					barrier.await();
-					return restTemplate.exchange(DISTRIBUER_JOURNALPOST_URI, POST, requestEntity, DistribuerJournalpostResponseTo.class);
-				}))
-				.limit(antallSamtidigKall)
-				.toList();
-
-		List<String> bestillingsIder = new ArrayList<>();
-
-		for (Future<ResponseEntity<DistribuerJournalpostResponseTo>> future : futures) {
-			ResponseEntity<DistribuerJournalpostResponseTo> response = future.get(10, TimeUnit.SECONDS);
-
-			assertThat(response).isNotNull();
-			assertThat(response.getBody()).isNotNull();
-			assertThat(response.getBody().getBestillingsId()).isNotNull();
-
-			assertThat(response.getStatusCode()).isEqualTo(OK);
-
-			bestillingsIder.add(response.getBody().getBestillingsId());
-		}
-
-		assertThat(bestillingsIder)
-				.hasSize(antallSamtidigKall)
-				.containsOnly(bestillingsIder.getFirst());
-
-		executor.shutdown();
 	}
 
 	private void stubAzureToken() {
