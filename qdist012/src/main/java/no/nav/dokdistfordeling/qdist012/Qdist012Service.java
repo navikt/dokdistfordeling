@@ -1,8 +1,12 @@
 package no.nav.dokdistfordeling.qdist012;
 
-import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostQueryService;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.consumer.saf.hentdokument.SafHentDokumentConsumer;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
+import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostQueryService;
+import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostIdempotencyHandler;
+import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoResponse;
+import no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException;
 import no.nav.dokdistfordeling.qdist012.HentDokumenterFraJoarkTo.DistribusjonbestillingTo;
 import no.nav.dokdistfordeling.storage.BucketStorage;
 import no.nav.dokdistfordeling.storage.DokdistDokument;
@@ -23,6 +27,7 @@ import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+@Slf4j
 @Service
 public class Qdist012Service {
 
@@ -30,15 +35,18 @@ public class Qdist012Service {
 	private final BucketStorage bucketStorage;
 	private final Qdist008DistribuerForsendelseMapper qdist008DistribuerForsendelseMapper;
 	private final SafJournalpostQueryService safJournalpostQueryService;
+	private final DistribuerJournalpostIdempotencyHandler distribuerJournalpostIdempotencyHandler;
 
 	public Qdist012Service(SafHentDokumentConsumer safHentDokumentConsumer,
 						   BucketStorage bucketStorage,
 						   Qdist008DistribuerForsendelseMapper qdist008DistribuerForsendelseMapper,
-						   SafJournalpostQueryService safJournalpostQueryService) {
+						   SafJournalpostQueryService safJournalpostQueryService,
+						   DistribuerJournalpostIdempotencyHandler distribuerJournalpostIdempotencyHandler) {
 		this.safHentDokumentConsumer = safHentDokumentConsumer;
 		this.bucketStorage = bucketStorage;
 		this.qdist008DistribuerForsendelseMapper = qdist008DistribuerForsendelseMapper;
 		this.safJournalpostQueryService = safJournalpostQueryService;
+		this.distribuerJournalpostIdempotencyHandler = distribuerJournalpostIdempotencyHandler;
 	}
 
 	@SuppressWarnings("unused")
@@ -46,6 +54,8 @@ public class Qdist012Service {
 	public DistribuerForsendelse copyDocumentsFromJoarkToDokdistmellomlagerBucketStorage(HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo) {
 		final DistribusjonbestillingTo distribusjonbestilling = hentDokumenterFraJoarkTo.getDistribusjonbestilling();
 		final String arkivId = distribusjonbestilling.getArkivInformasjon().getArkivId();
+
+		avvisAlleredeDistribuertForsendelse(distribusjonbestilling.getBestillingsId(), arkivId);
 
 		// tilknyttVedlegg legger til vedlegg etter at dokprod forsendelse er opprettet, så legg på evt. manglende vedlegg her
 		addMissingVedlegg(arkivId, hentDokumenterFraJoarkTo);
@@ -58,6 +68,16 @@ public class Qdist012Service {
 				});
 
 		return qdist008DistribuerForsendelseMapper.map(hentDokumenterFraJoarkTo);
+	}
+
+	private void avvisAlleredeDistribuertForsendelse(String bestillingsId, String journalpostId) {
+		DistribuerJournalpostInfoResponse eksisterende = distribuerJournalpostIdempotencyHandler.hentDistribuerJournalpostInfo(Long.parseLong(journalpostId));
+
+		if (eksisterende != null && !eksisterende.bestillingsId().equals(bestillingsId)) {
+			throw new JournalpostErAlleredeDistribuertException(
+					"Journalpost med journalpostId=%s er allerede distribuert i distribusjon med bestillingsId=%s, avbryter behandling."
+							.formatted(journalpostId, eksisterende.bestillingsId()));
+		}
 	}
 
 	private void addMissingVedlegg(String journalpostId, HentDokumenterFraJoarkTo hentDokumenterFraJoarkTo) {

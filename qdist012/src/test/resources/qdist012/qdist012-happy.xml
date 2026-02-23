@@ -11,7 +11,7 @@
 		<forsendelseMetadataType>DPO_ARKIVMELDING</forsendelseMetadataType>
 		<arkivInformasjon>
 			<arkivSystem>JOARK</arkivSystem>
-			<arkivId>arkivId</arkivId>
+			<arkivId>1234</arkivId>
 		</arkivInformasjon>
 		<mottaker xsi:type="ns2:Person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 			<personidentifikator>12345678910</personidentifikator>

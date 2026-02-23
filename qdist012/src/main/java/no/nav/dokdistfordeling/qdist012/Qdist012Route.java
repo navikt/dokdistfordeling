@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.qdist012;
 import jakarta.jms.Queue;
 import jakarta.xml.bind.JAXBContext;
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
+import no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException;
 import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
@@ -56,10 +57,10 @@ public class Qdist012Route extends RouteBuilder {
 				.useOriginalMessage()
 				.log(WARN, log, "Forkaster melding på qdist012 for " + getIdsForLogging() + " grunnet=${exception}");
 
-		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
+		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class, JournalpostErAlleredeDistribuertException.class)
 				.handled(true)
 				.useOriginalMessage()
-				.log(WARN, log, "Legger melding på funksjonell backoutkø for qdist012 for " + getIdsForLogging() + " grunnet=${exception}")
+				.log(WARN, log, "Legger melding på funksjonell feilkø for qdist012 for " + getIdsForLogging() + " grunnet=${exception}")
 				.to("jms:" + qdist012FunksjonellFeil.getQueueName());
 
 		from("jms:" + qdist012.getQueueName() +

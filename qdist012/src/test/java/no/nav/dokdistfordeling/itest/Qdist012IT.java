@@ -9,6 +9,8 @@ import jakarta.jms.TextMessage;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import no.nav.dokdistfordeling.dokdistdb.domain.DistribuerJournalpostInfo;
+import no.nav.dokdistfordeling.dokdistdb.repository.DistribuerJournalpostInfoRepository;
 import no.nav.dokdistfordeling.exception.technical.FailedBucketUploadTechnicalException;
 import no.nav.dokdistfordeling.itest.config.Qdist012TestConfig;
 import no.nav.dokdistfordeling.storage.BucketStorage;
@@ -34,6 +36,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -75,10 +78,12 @@ public class Qdist012IT {
 	private static final byte[] TEST_FILE_BYTES3 = "TestThis3".getBytes();
 	private static final String BESTILLINGS_ID = "4a7d638a-6a63-11e9-a923-1681be663d3e";
 	private static final String BESTILLINGS_ID_ATTRIBUTE = "bestillingsId";
-	private static final String JOURNALPOST_ID = "arkivId";
+	private static final String JOURNALPOST_ID = "1234";
 	private static final String JOURNALPOST_ID_ATTRIBUTE = "journalpostId";
 	private static final String SAF_GRAPHQL_URL = "/saf/graphql";
 	private static final String SAF_HENTDOKUMENT_URL = "/saf/rest/hentdokument";
+	private static final String SAF_HENT_DOKUMENT_SLADDET = SAF_HENTDOKUMENT_URL + "/" + JOURNALPOST_ID + "/arkivDokumentInfoIdVedlegg/SLADDET";
+	private static final String SAF_HENT_DOKUMENT_ARKIV = SAF_HENTDOKUMENT_URL + "/" + JOURNALPOST_ID + "/arkivDokumentInfoIdHoveddok/ARKIV";
 
 	@Autowired
 	private JmsTemplate jmsTemplate;
@@ -99,6 +104,9 @@ public class Qdist012IT {
 	private BucketStorage bucketStorage;
 
 	@Autowired
+	private DistribuerJournalpostInfoRepository distribuerJournalpostInfoRepository;
+
+	@Autowired
 	protected CircuitBreakerRegistry circuitBreakerRegistry;
 
 	@Autowired
@@ -117,11 +125,11 @@ public class Qdist012IT {
 		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
-		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
+		stubFor(get(SAF_HENT_DOKUMENT_ARKIV).willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(TEST_FILE_BYTES1)));
-		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET").willReturn(
+		stubFor(get(SAF_HENT_DOKUMENT_SLADDET).willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(TEST_FILE_BYTES2)));
@@ -171,15 +179,15 @@ public class Qdist012IT {
 		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happyMedVedlegg.json")));
-		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
+		stubFor(get(SAF_HENT_DOKUMENT_ARKIV).willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(TEST_FILE_BYTES1)));
-		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET").willReturn(
+		stubFor(get(SAF_HENT_DOKUMENT_SLADDET).willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(TEST_FILE_BYTES2)));
-		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg2/ARKIV").willReturn(
+		stubFor(get(SAF_HENTDOKUMENT_URL + "/" + JOURNALPOST_ID + "/arkivDokumentInfoIdVedlegg2/ARKIV").willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(TEST_FILE_BYTES3)));
@@ -248,8 +256,8 @@ public class Qdist012IT {
 			assertEquals(JOURNALPOST_ID, responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE));
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo("/hentdokument/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
 	}
 
 	@Test
@@ -271,8 +279,8 @@ public class Qdist012IT {
 			assertEquals(JOURNALPOST_ID, responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE));
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
 	}
 
 	@Test
@@ -291,8 +299,8 @@ public class Qdist012IT {
 			assertEquals(BESTILLINGS_ID, responseTextMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE));
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
 	}
 
 	@Test
@@ -314,8 +322,8 @@ public class Qdist012IT {
 			assertEquals("", responseTextMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE));
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), eq(BESTILLINGS_ID));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
 	}
 
 	@Test
@@ -325,7 +333,7 @@ public class Qdist012IT {
 		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
-		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
+		stubFor(get(SAF_HENT_DOKUMENT_ARKIV).willReturn(
 				aResponse().withStatus(HttpStatus.OK.value())
 						.withHeader(org.springframework.http.HttpHeaders.CONTENT_TYPE, APPLICATION_PDF_VALUE)
 						.withBody(Base64.getEncoder().encode(TEST_FILE_BYTES1))));
@@ -334,14 +342,14 @@ public class Qdist012IT {
 		sendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(qdist012Bq);
+			String response = receiveFromQueueAndAssertHeaders(qdist012Bq);
 			assertNotNull(response);
 			assertEquals(message, response);
 		});
 		Mockito.verify(bucketStorage, times(1)).upload(any(), any(), any());
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(1), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
 	}
 
 	@Test
@@ -353,14 +361,14 @@ public class Qdist012IT {
 		sendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(qdist012Bq);
+			String response = receiveFromQueueAndAssertHeaders(qdist012Bq);
 			assertNotNull(response);
 			assertEquals(message, response);
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(3), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
 	}
 
 	@Test
@@ -372,14 +380,14 @@ public class Qdist012IT {
 		sendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(qdist012FunksjonellFeil);
+			String response = receiveFromQueueAndAssertHeaders(qdist012FunksjonellFeil);
 			assertNotNull(response);
 			assertEquals(message, response);
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
 	}
 
 	@Test
@@ -387,7 +395,7 @@ public class Qdist012IT {
 		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
-		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
+		stubFor(get(SAF_HENT_DOKUMENT_ARKIV).willReturn(
 				aResponse().withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
 						.withBody("""
 								{"timestamp":"2025-07-21T07:45:37.626+00:00","status":500,"error":"Internal Server Error","message":"No message available","path":"/rest/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV"}
@@ -397,14 +405,14 @@ public class Qdist012IT {
 		sendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(15, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(qdist012Bq);
+			String response = receiveFromQueueAndAssertHeaders(qdist012Bq);
 			assertNotNull(response);
 			assertEquals(message, response);
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
-		verify(exactly(3), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(3), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
 	}
 
 	@Test
@@ -412,7 +420,7 @@ public class Qdist012IT {
 		stubFor(post(SAF_GRAPHQL_URL).willReturn(aResponse().withStatus(HttpStatus.OK.value())
 				.withHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.withBodyFile("saf/safGraphQlResponse-happy.json")));
-		stubFor(get(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV").willReturn(
+		stubFor(get(SAF_HENT_DOKUMENT_ARKIV).willReturn(
 				aResponse().withStatus(HttpStatus.NOT_FOUND.value()).withBody("""
 						{"timestamp":"2025-07-21T07:45:37.626+00:00","status":401,"error":"Unauthorized","message":"No message available","path":"/rest/hentdokument/arkivId/arkivDokumentInfoIdHoveddok/ARKIV"}
 						""")));
@@ -421,14 +429,45 @@ public class Qdist012IT {
 		sendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(qdist012FunksjonellFeil);
+			String response = receiveFromQueueAndAssertHeaders(qdist012FunksjonellFeil);
 			assertNotNull(response);
 			assertEquals(message, response);
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
-		verify(exactly(1), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdHoveddok/ARKIV")));
-		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENTDOKUMENT_URL + "/arkivId/arkivDokumentInfoIdVedlegg/SLADDET")));
+		verify(exactly(1), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
+	}
+
+	@Test
+	public void skalForkasteDuplikatForsendelse() throws Exception {
+		// Forsendelse for gitt journalpostId eksisterer allerede, men med en annen bestillingsId.
+		// Dette kan skje dersom en race condition oppstår i rdist002, hvor to forsendelser for samme
+		// journalpostId opprettes samtidig, og begge havner på qdist012 med forskjellig bestillingsId.
+		distribuerJournalpostInfoRepository.save(DistribuerJournalpostInfo.builder()
+				.journalpostId(Long.parseLong(JOURNALPOST_ID))
+				.bestillingsId("en-annen-bestillings-id")
+				.opprettetAv("test")
+				.opprettetDato(LocalDateTime.now())
+				.build());
+
+		String message = classpathToString("qdist012/qdist012-happy.xml");
+		sendStringMessageWithHeaders(qdist012, message);
+
+		await().atMost(4, TimeUnit.SECONDS).untilAsserted(() -> {
+			await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+				String response = receiveFromQueueAndAssertHeaders(qdist012FunksjonellFeil);
+				assertNotNull(response);
+				assertEquals(message, response);
+			});
+		});
+
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
+		verify(exactly(0), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
+
+		distribuerJournalpostInfoRepository.deleteAll();
 	}
 
 	private void sendStringMessageWithHeaders(Queue queue, final String message) {
@@ -459,7 +498,7 @@ public class Qdist012IT {
 	}
 
 	@SuppressWarnings("unchecked")
-	private String receiveFromBoqAndAssertHeaders(Queue queue) throws JMSException {
+	private String receiveFromQueueAndAssertHeaders(Queue queue) throws JMSException {
 		TextMessage textMessage = (TextMessage) jmsTemplate.receive(queue);
 		assertEquals(BESTILLINGS_ID, textMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE));
 		assertEquals(JOURNALPOST_ID, textMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE));
