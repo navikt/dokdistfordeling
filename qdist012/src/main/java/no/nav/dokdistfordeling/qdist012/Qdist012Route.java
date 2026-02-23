@@ -52,15 +52,15 @@ public class Qdist012Route extends RouteBuilder {
 				.logExhaustedMessageBody(false)
 				.loggingLevel(ERROR));
 
-		onException(PersonErDoedUkjentAdresseException.class, JournalpostErAlleredeDistribuertException.class)
+		onException(PersonErDoedUkjentAdresseException.class)
 				.handled(true)
 				.useOriginalMessage()
 				.log(WARN, log, "Forkaster melding på qdist012 for " + getIdsForLogging() + " grunnet=${exception}");
 
-		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
+		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class, JournalpostErAlleredeDistribuertException.class)
 				.handled(true)
 				.useOriginalMessage()
-				.log(WARN, log, "Legger melding på funksjonell backoutkø for qdist012 for " + getIdsForLogging() + " grunnet=${exception}")
+				.log(WARN, log, "Legger melding på funksjonell feilkø for qdist012 for " + getIdsForLogging() + " grunnet=${exception}")
 				.to("jms:" + qdist012FunksjonellFeil.getQueueName());
 
 		from("jms:" + qdist012.getQueueName() +

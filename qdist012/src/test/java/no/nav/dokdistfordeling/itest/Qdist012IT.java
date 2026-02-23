@@ -342,7 +342,7 @@ public class Qdist012IT {
 		sendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(qdist012Bq);
+			String response = receiveFromQueueAndAssertHeaders(qdist012Bq);
 			assertNotNull(response);
 			assertEquals(message, response);
 		});
@@ -361,7 +361,7 @@ public class Qdist012IT {
 		sendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(qdist012Bq);
+			String response = receiveFromQueueAndAssertHeaders(qdist012Bq);
 			assertNotNull(response);
 			assertEquals(message, response);
 		});
@@ -380,7 +380,7 @@ public class Qdist012IT {
 		sendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(qdist012FunksjonellFeil);
+			String response = receiveFromQueueAndAssertHeaders(qdist012FunksjonellFeil);
 			assertNotNull(response);
 			assertEquals(message, response);
 		});
@@ -405,7 +405,7 @@ public class Qdist012IT {
 		sendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(15, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(qdist012Bq);
+			String response = receiveFromQueueAndAssertHeaders(qdist012Bq);
 			assertNotNull(response);
 			assertEquals(message, response);
 		});
@@ -429,7 +429,7 @@ public class Qdist012IT {
 		sendStringMessageWithHeaders(qdist012, message);
 
 		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-			String response = receiveFromBoqAndAssertHeaders(qdist012FunksjonellFeil);
+			String response = receiveFromQueueAndAssertHeaders(qdist012FunksjonellFeil);
 			assertNotNull(response);
 			assertEquals(message, response);
 		});
@@ -443,7 +443,7 @@ public class Qdist012IT {
 	public void skalForkasteDuplikatForsendelse() throws Exception {
 		// Forsendelse for gitt journalpostId eksisterer allerede, men med en annen bestillingsId.
 		// Dette kan skje dersom en race condition oppstår i rdist002, hvor to forsendelser for samme
-		// journalpostId opprettes samtidig, og begge havner på qdist012 med forskjellig bestillings-id.
+		// journalpostId opprettes samtidig, og begge havner på qdist012 med forskjellig bestillingsId.
 		distribuerJournalpostInfoRepository.save(DistribuerJournalpostInfo.builder()
 				.journalpostId(Long.parseLong(JOURNALPOST_ID))
 				.bestillingsId("en-annen-bestillings-id")
@@ -451,14 +451,21 @@ public class Qdist012IT {
 				.opprettetDato(LocalDateTime.now())
 				.build());
 
-		sendStringMessageWithHeaders(qdist012, classpathToString("qdist012/qdist012-happy.xml"));
+		String message = classpathToString("qdist012/qdist012-happy.xml");
+		sendStringMessageWithHeaders(qdist012, message);
 
-		await().during(2, TimeUnit.SECONDS).atMost(4, TimeUnit.SECONDS).untilAsserted(() -> {
-			Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
-			verify(exactly(0), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
-			verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
-			verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
+		await().atMost(4, TimeUnit.SECONDS).untilAsserted(() -> {
+			await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+				String response = receiveFromQueueAndAssertHeaders(qdist012FunksjonellFeil);
+				assertNotNull(response);
+				assertEquals(message, response);
+			});
 		});
+
+		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
+		verify(exactly(0), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
+		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
 
 		distribuerJournalpostInfoRepository.deleteAll();
 	}
@@ -491,7 +498,7 @@ public class Qdist012IT {
 	}
 
 	@SuppressWarnings("unchecked")
-	private String receiveFromBoqAndAssertHeaders(Queue queue) throws JMSException {
+	private String receiveFromQueueAndAssertHeaders(Queue queue) throws JMSException {
 		TextMessage textMessage = (TextMessage) jmsTemplate.receive(queue);
 		assertEquals(BESTILLINGS_ID, textMessage.getStringProperty(BESTILLINGS_ID_ATTRIBUTE));
 		assertEquals(JOURNALPOST_ID, textMessage.getStringProperty(JOURNALPOST_ID_ATTRIBUTE));
