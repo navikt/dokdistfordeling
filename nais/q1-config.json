@@ -5,7 +5,7 @@
   "DOKDISTADMIN_DATABASE_SCHEMA": "dkomp",
   "NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_DISCOVERYURL": "https://security-token-service.dev.adeo.no/rest/v1/sts/.well-known/openid-configuration",
   "NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_ACCEPTED_AUDIENCE": "srvmelosys,srvarena-dokgen,srvbdarkiv,srvfamilie-ks-opps,srvccmarkivogdist",
-  "MQGATEWAY01_CHANNEL_SECURENAME": "Q2_DOKDISTFORDEL_SEC",
+  "MQGATEWAY01_CHANNEL_SECURENAME": "Q1_DOKDISTFORDEL_SEC",
   "MQGATEWAY01_HOSTNAME": "mqls01.preprod.local",
   "MQGATEWAY01_PORT": "1413",
   "MQGATEWAY01_NAME": "MQLS01",
