@@ -232,6 +232,11 @@
       "app": "mulighetsrommet-api",
       "namespace": "team-mulighetsrommet",
       "cluster": "dev-gcp"
+    },
+    {
+      "app": "dp-behov-distribuering",
+      "namespace": "teamdagpenger",
+      "cluster": "dev-gcp"
     }
   ]
 }
