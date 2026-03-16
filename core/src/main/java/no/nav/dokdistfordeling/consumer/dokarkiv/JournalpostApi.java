@@ -21,6 +21,7 @@ import static no.nav.dokdistfordeling.config.azure.OAuthEnabledWebClientConfig.C
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.consumer.NavHeaders.NAV_CALL_ID;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
 
@@ -75,7 +76,8 @@ public class JournalpostApi {
 	}
 
 	private Throwable mapError(Throwable error) {
-		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()) {
+		if (error instanceof WebClientResponseException response && response.getStatusCode().is4xxClientError()
+			&& !TOO_MANY_REQUESTS.isSameCodeAs(response.getStatusCode())) {
 			return new JournalpostApiFunctionalException(
 					format("Kall mot JournalpostAPI feilet med status=%s, feilmelding=%s", response.getStatusCode(), response.getMessage()),
 					error);
