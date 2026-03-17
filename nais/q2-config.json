@@ -119,6 +119,11 @@
       "cluster": "dev-gcp"
     },
     {
+      "app": "gjenlevende-bs-sak",
+      "namespace": "etterlatte",
+      "cluster": "dev-gcp"
+    },
+    {
       "app": "kabal-document",
       "namespace": "klage",
       "cluster": "dev-gcp"
