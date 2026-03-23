@@ -4,6 +4,7 @@ import jakarta.jms.Queue;
 import jakarta.xml.bind.JAXBContext;
 import no.nav.dokdistfordeling.exception.functional.AbstractDokdistfordelingFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException;
+import no.nav.dokdistfordeling.exception.functional.JournalpostFeilregistrertException;
 import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseException;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist008.in.DistribuerForsendelse;
 import no.nav.meldinger.virksomhet.dokdistfordeling.qdist012.HentDokumenterFraJoark;
@@ -52,12 +53,12 @@ public class Qdist012Route extends RouteBuilder {
 				.logExhaustedMessageBody(false)
 				.loggingLevel(ERROR));
 
-		onException(PersonErDoedUkjentAdresseException.class)
+		onException(PersonErDoedUkjentAdresseException.class, JournalpostFeilregistrertException.class, JournalpostErAlleredeDistribuertException.class)
 				.handled(true)
 				.useOriginalMessage()
 				.log(WARN, log, "Forkaster melding på qdist012 for " + getIdsForLogging() + " grunnet=${exception}");
 
-		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class, JournalpostErAlleredeDistribuertException.class)
+		onException(AbstractDokdistfordelingFunctionalException.class, ValidationException.class)
 				.handled(true)
 				.useOriginalMessage()
 				.log(WARN, log, "Legger melding på funksjonell feilkø for qdist012 for " + getIdsForLogging() + " grunnet=${exception}")

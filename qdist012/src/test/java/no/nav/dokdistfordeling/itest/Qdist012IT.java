@@ -454,14 +454,6 @@ public class Qdist012IT {
 		String message = classpathToString("qdist012/qdist012-happy.xml");
 		sendStringMessageWithHeaders(qdist012, message);
 
-		await().atMost(4, TimeUnit.SECONDS).untilAsserted(() -> {
-			await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-				String response = receiveFromQueueAndAssertHeaders(qdist012FunksjonellFeil);
-				assertNotNull(response);
-				assertEquals(message, response);
-			});
-		});
-
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(0), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
 		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
