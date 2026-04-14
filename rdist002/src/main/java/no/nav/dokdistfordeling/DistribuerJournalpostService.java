@@ -67,7 +67,7 @@ public class DistribuerJournalpostService {
 
 		if (EKSPEDERT.equals(journalpost.getJournalstatus())) {
 			log.info("Journalpost med journalpostId={} har journalstatus EKSPEDERT. Henter bestillingsId fra dokdistadmin.", distribuerJournalpost.journalpostId());
-			FinnForsendelseResponseTo forsendelse = dokdistadminConsumer.finnForsendelse(String.valueOf(distribuerJournalpost.journalpostId()));
+			FinnForsendelseResponseTo forsendelse = dokdistadminConsumer.finnForsendelse(distribuerJournalpost.journalpostId());
 			String eksisterendeBestillingsId = forsendelse.bestillingsId();
 			return lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), eksisterendeBestillingsId);
 		}

@@ -116,7 +116,7 @@ class DistribuerJournalpostServiceTest {
 				.journalstatus(EKSPEDERT)
 				.build();
 
-		when(dokdistadminConsumer.finnForsendelse(String.valueOf(JOURNALPOST_ID)))
+		when(dokdistadminConsumer.finnForsendelse(JOURNALPOST_ID))
 				.thenReturn(new FinnForsendelseResponseTo(99999L, eksisterendeBestillingsId));
 
 		String resultat = distribuerJournalpostService.distribuerForsendelse(distribuerJournalpost, journalpost);

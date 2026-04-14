@@ -83,7 +83,7 @@ public class DokdistadminConsumer {
 		return forsendelseId;
 	}
 
-	public FinnForsendelseResponseTo finnForsendelse(String journalpostId) {
+	public FinnForsendelseResponseTo finnForsendelse(long journalpostId) {
 		log.info("finnForsendelse henter forsendelse for journalpostId={}", journalpostId);
 
 		return webClient.get()
