@@ -3,7 +3,6 @@ package no.nav.dokdistfordeling.validate;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.InvalidFiltypeException;
-import no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 
 import static java.lang.String.format;
-import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.ARKIV;
 import static no.nav.dokdistfordeling.kodeverk.Variantformat.SLADDET;
@@ -38,10 +36,6 @@ public class JournalpostValidator {
 	public static void validateJournalpostAndDokumenter(Journalpost journalpost) {
 		assertJournalpostFieldNotNull(Journalposttype.class, journalpost.getJournalposttype());
 		assertJournalpostParameterIsAsExpected("journalposttype", journalpost.getJournalposttype().name(), UTGAAENDE);
-		if (EKSPEDERT.equals(journalpost.getJournalstatus())) {
-			throw new JournalpostErAlleredeDistribuertException(
-					"Journalpost er allerede distribuert med journalstatus=%s".formatted(EKSPEDERT));
-		}
 		assertJournalpostParameterIsAsExpected("journalpoststatus", journalpost.getJournalstatus(), FERDIGSTILT);
 
 		assertJournalpostFieldNotNull(Journalpost.Bruker.class, journalpost.getBruker());

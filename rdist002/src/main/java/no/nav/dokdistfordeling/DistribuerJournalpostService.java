@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static no.nav.dokdistfordeling.constants.Constants.DOKDISTBESTILLINGS_ID;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.validate.JournalpostValidator.validateJournalpostAndDokumenter;
 import static no.nav.dokdistfordeling.validate.PostadresseValidator.validatePostadresse;
@@ -64,15 +65,14 @@ public class DistribuerJournalpostService {
 
 		final String bestillingsId = UUID.randomUUID().toString();
 
-		try {
-			validateJournalpostAndDokumenter(journalpost);
-		} catch (JournalpostErAlleredeDistribuertException e) {
+		if (EKSPEDERT.equals(journalpost.getJournalstatus())) {
 			log.info("Journalpost med journalpostId={} har journalstatus EKSPEDERT. Henter bestillingsId fra dokdistadmin.", distribuerJournalpost.journalpostId());
 			FinnForsendelseResponseTo forsendelse = dokdistadminConsumer.finnForsendelse(String.valueOf(distribuerJournalpost.journalpostId()));
 			String eksisterendeBestillingsId = forsendelse.bestillingsId();
 			return lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), eksisterendeBestillingsId);
 		}
 
+		validateJournalpostAndDokumenter(journalpost);
 		validateTvingKanal(distribuerJournalpost, journalpost);
 
 		Aktoer mottaker = MottakerMapper.map(journalpost.getAvsenderMottaker());
