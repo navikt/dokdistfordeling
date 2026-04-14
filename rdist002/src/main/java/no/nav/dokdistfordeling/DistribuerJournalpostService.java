@@ -5,6 +5,7 @@ import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostRequest;
 import no.nav.dokdistfordeling.consumer.dokdistadmin.DokdistadminConsumer;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.FinnForsendelseResponseTo;
 import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostIdempotencyHandler;
@@ -67,7 +68,8 @@ public class DistribuerJournalpostService {
 			validateJournalpostAndDokumenter(journalpost);
 		} catch (JournalpostErAlleredeDistribuertException e) {
 			log.info("Journalpost med journalpostId={} har journalstatus EKSPEDERT. Henter bestillingsId fra dokdistadmin.", distribuerJournalpost.journalpostId());
-			String eksisterendeBestillingsId = dokdistadminConsumer.finnForsendelse(String.valueOf(distribuerJournalpost.journalpostId())).bestillingsId();
+			FinnForsendelseResponseTo forsendelse = dokdistadminConsumer.finnForsendelse(String.valueOf(distribuerJournalpost.journalpostId()));
+			String eksisterendeBestillingsId = forsendelse.bestillingsId();
 			return lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), eksisterendeBestillingsId);
 		}
 
