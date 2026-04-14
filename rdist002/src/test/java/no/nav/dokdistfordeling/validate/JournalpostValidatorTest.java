@@ -3,6 +3,7 @@ package no.nav.dokdistfordeling.validate;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.exception.functional.BrukerManglerTilgangTilDokumentFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.InvalidFiltypeException;
+import no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.BrukerIdType;
 import no.nav.dokdistfordeling.kodeverk.Journalposttype;
@@ -80,14 +81,25 @@ class JournalpostValidatorTest {
 	}
 
 	@Test
-	void shouldThrowValidationExceptionWhenJournalstatustypeIsNotFerdigstilt() {
+	void shouldThrowJournalpostErAlleredeDistribuertExceptionWhenJournalstatusIsEkspedert() {
 		Journalpost journalpost = createJournalpostBuilder()
 				.journalstatus(EKSPEDERT)
 				.build();
 
+		assertThatExceptionOfType(JournalpostErAlleredeDistribuertException.class)
+				.isThrownBy(() -> validateJournalpostAndDokumenter(journalpost))
+				.withMessage("Journalpost er allerede distribuert med journalstatus=%s", EKSPEDERT);
+	}
+
+	@Test
+	void shouldThrowValidationExceptionWhenJournalstatustypeIsNotFerdigstilt() {
+		Journalpost journalpost = createJournalpostBuilder()
+				.journalstatus("JOURNALFOERT")
+				.build();
+
 		assertThatExceptionOfType(ValidationException.class)
 				.isThrownBy(() -> validateJournalpostAndDokumenter(journalpost))
-				.withMessage("Journalpostfeltet journalpoststatus er ikke som forventet, fikk: %s, men forventet %s", EKSPEDERT , FERDIGSTILT);
+				.withMessage("Journalpostfeltet journalpoststatus er ikke som forventet, fikk: %s, men forventet %s", "JOURNALFOERT", FERDIGSTILT);
 	}
 
 	@ParameterizedTest

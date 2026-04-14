@@ -2,6 +2,8 @@ package no.nav.dokdistfordeling;
 
 import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.DokdistadminConsumer;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.FinnForsendelseResponseTo;
 import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostIdempotencyHandler;
@@ -20,6 +22,7 @@ import static no.nav.dokdistfordeling.TestData.BRUKER_ID;
 import static no.nav.dokdistfordeling.TestData.JOURNALPOST_ID;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostBuilder;
 import static no.nav.dokdistfordeling.TestData.createJournalpostBuilder;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,6 +55,9 @@ class DistribuerJournalpostServiceTest {
 	@Mock
 	@SuppressWarnings("unused")
 	private RegoppslagService regoppslag;
+
+	@Mock
+	private DokdistadminConsumer dokdistadminConsumer;
 
 	@InjectMocks
 	private DistribuerJournalpostService distribuerJournalpostService;
@@ -100,5 +106,24 @@ class DistribuerJournalpostServiceTest {
 				.withMessage("Journalpost er allerede distribuert, men fant ikke eksisterende distribuerJournalpostInfo for journalpostId=%s", JOURNALPOST_ID);
 
 		verify(journalpostApi, never()).oppdaterJournalpost(anyLong(), any());
+	}
+
+	@Test
+	void skalHenteBestillingsIdFraDokdistadminOgPersistereNaarJournalpostErEkspedert() {
+		String eksisterendeBestillingsId = "bestillingsid-fra-dokdistadmin";
+		DistribuerJournalpost distribuerJournalpost = createDistribuerJournalpostBuilder().build();
+		Journalpost journalpost = createJournalpostBuilder()
+				.journalstatus(EKSPEDERT)
+				.build();
+
+		when(dokdistadminConsumer.finnForsendelse(String.valueOf(JOURNALPOST_ID)))
+				.thenReturn(new FinnForsendelseResponseTo(99999L, eksisterendeBestillingsId));
+
+		String resultat = distribuerJournalpostService.distribuerForsendelse(distribuerJournalpost, journalpost);
+
+		assertThat(resultat).isEqualTo(eksisterendeBestillingsId);
+		verify(distribuerJournalpostIdempotencyHandler).opprettDistribuerJournalpostInfo(JOURNALPOST_ID, eksisterendeBestillingsId);
+		verify(journalpostApi, never()).oppdaterJournalpost(anyLong(), any());
+		verify(distribuerForsendelseProducer, never()).produce(any(), any(), any());
 	}
 }

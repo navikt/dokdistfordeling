@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostRequest;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.DokdistadminConsumer;
 import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostIdempotencyHandler;
@@ -39,19 +40,22 @@ public class DistribuerJournalpostService {
 	private final BestemDistribusjonskanalService bestemDistribusjonskanalService;
 	private final JournalpostApi journalpostApi;
 	private final PersonnummerService personnummerService;
+	private final DokdistadminConsumer dokdistadminConsumer;
 
 	public DistribuerJournalpostService(DistribuerForsendelseProducer distribuerForsendelseProducer,
 										DistribuerJournalpostIdempotencyHandler distribuerJournalpostIdempotencyHandler,
 										RegoppslagService regoppslag,
 										BestemDistribusjonskanalService bestemDistribusjonskanalService,
 										JournalpostApi journalpostApi,
-										PersonnummerService personnummerService) {
+										PersonnummerService personnummerService,
+										DokdistadminConsumer dokdistadminConsumer) {
 		this.distribuerForsendelseProducer = distribuerForsendelseProducer;
 		this.distribuerJournalpostIdempotencyHandler = distribuerJournalpostIdempotencyHandler;
 		this.regoppslag = regoppslag;
 		this.bestemDistribusjonskanalService = bestemDistribusjonskanalService;
 		this.journalpostApi = journalpostApi;
 		this.personnummerService = personnummerService;
+		this.dokdistadminConsumer = dokdistadminConsumer;
 	}
 
 	public String distribuerForsendelse(DistribuerJournalpost distribuerJournalpost,
@@ -59,7 +63,14 @@ public class DistribuerJournalpostService {
 
 		final String bestillingsId = UUID.randomUUID().toString();
 
-		validateJournalpostAndDokumenter(journalpost);
+		try {
+			validateJournalpostAndDokumenter(journalpost);
+		} catch (JournalpostErAlleredeDistribuertException e) {
+			log.info("Journalpost med journalpostId={} har journalstatus EKSPEDERT. Henter bestillingsId fra dokdistadmin.", distribuerJournalpost.journalpostId());
+			String eksisterendeBestillingsId = dokdistadminConsumer.finnForsendelse(String.valueOf(distribuerJournalpost.journalpostId())).bestillingsId();
+			return lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), eksisterendeBestillingsId);
+		}
+
 		validateTvingKanal(distribuerJournalpost, journalpost);
 
 		Aktoer mottaker = MottakerMapper.map(journalpost.getAvsenderMottaker());
