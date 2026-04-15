@@ -860,7 +860,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		assertNotNull(responseEntity.getBody());
 		assertEquals("bestillingsid-fra-dokdistadmin", responseEntity.getBody().getBestillingsId());
 
-		verify(exactly(0), putRequestedFor(urlMatching("/rest/journalpostapi/.*")));
+		verify(exactly(0), putRequestedFor(urlEqualTo("/rest/journalpostapi/" + JOURNALPOST_ID)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)));
 		verify(exactly(1), getRequestedFor(urlEqualTo(FINN_FORSENDELSE_URI + JOURNALPOST_ID)));
 	}

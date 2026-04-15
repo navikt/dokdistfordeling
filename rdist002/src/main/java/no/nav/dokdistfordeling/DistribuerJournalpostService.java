@@ -66,10 +66,7 @@ public class DistribuerJournalpostService {
 		final String bestillingsId = UUID.randomUUID().toString();
 
 		if (EKSPEDERT.equals(journalpost.getJournalstatus())) {
-			log.info("Journalpost med journalpostId={} har journalstatus EKSPEDERT. Henter bestillingsId fra dokdistadmin.", distribuerJournalpost.journalpostId());
-			FinnForsendelseResponseTo forsendelse = dokdistadminConsumer.finnForsendelse(distribuerJournalpost.journalpostId());
-			String eksisterendeBestillingsId = forsendelse.bestillingsId();
-			return lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), eksisterendeBestillingsId);
+			return haandterEkspedertJournalpost(distribuerJournalpost);
 		}
 
 		validateJournalpostAndDokumenter(journalpost);
@@ -153,6 +150,13 @@ public class DistribuerJournalpostService {
 				.build();
 
 		journalpostApi.oppdaterJournalpost(journalpostId, request);
+	}
+
+	private String haandterEkspedertJournalpost(DistribuerJournalpost distribuerJournalpost) {
+		log.info("Journalpost med journalpostId={} har journalstatus EKSPEDERT. Henter bestillingsId fra dokdistadmin.", distribuerJournalpost.journalpostId());
+		FinnForsendelseResponseTo forsendelse = dokdistadminConsumer.finnForsendelse(distribuerJournalpost.journalpostId());
+		String eksisterendeBestillingsId = forsendelse.bestillingsId();
+		return lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), eksisterendeBestillingsId);
 	}
 
 	private Postadresse utledPostadresse(DistribuerJournalpost distribuerJournalpost,

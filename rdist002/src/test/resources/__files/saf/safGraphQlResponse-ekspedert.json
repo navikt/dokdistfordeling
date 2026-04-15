@@ -5,11 +5,11 @@
       "journalstatus": "EKSPEDERT",
       "tema": "OPP",
       "bruker": {
-        "id": "12345678901",
+        "id": "2000000000000",
         "type": "AKTOERID"
       },
       "avsenderMottaker": {
-        "id": "09876543210",
+        "id": "01010000000",
         "type": "FNR",
         "navn": "Jan Neimansen"
       },
