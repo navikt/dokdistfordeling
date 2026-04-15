@@ -98,6 +98,21 @@ public class DokdistadminConsumer {
 				.block();
 	}
 
+	public HentForsendelseResponseTo hentForsendelse(long forsendelseId) {
+		log.info("hentForsendelse henter forsendelse for forsendelseId={}", forsendelseId);
+
+		return webClient.get()
+				.uri("/{forsendelseId}", forsendelseId)
+				.headers(httpHeaders -> httpHeaders.set(NAV_CALL_ID, MDC.get(CALL_ID)))
+				.attributes(clientRegistrationId(CLIENT_REGISTRATION_DOKDISTADMIN))
+				.retrieve()
+				.bodyToMono(HentForsendelseResponseTo.class)
+				.onErrorMap(this::mapError)
+				.transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
+				.transformDeferred(RetryOperator.of(retry))
+				.block();
+	}
+
 	public void oppdaterForsendelse(OppdaterForsendelseRequest oppdaterForsendelse) {
 		log.info("oppdaterForsendelse oppdaterer forsendelse med forsendelseId={}", oppdaterForsendelse.forsendelseId());
 
