@@ -111,6 +111,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	private static final String SAF_GRAPHQL_URI = "/saf/graphql";
 	private static final String BESTEM_DISTRIBUSJONSKANAL_URI = "/rest/bestemDistribusjonskanal";
 	private static final String FINN_FORSENDELSE_URI = "/rest/v1/administrerforsendelse/finnforsendelse/JOURNALPOSTID/";
+	private static final String HENT_FORSENDELSE_URI = "/rest/v1/administrerforsendelse/";
 
 	@Autowired
 	protected TestRestTemplate restTemplate;
@@ -864,7 +865,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		verify(exactly(0), putRequestedFor(urlEqualTo("/rest/journalpostapi/" + JOURNALPOST_ID)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)));
 		verify(exactly(1), getRequestedFor(urlEqualTo(FINN_FORSENDELSE_URI + JOURNALPOST_ID)));
-		verify(exactly(1), getRequestedFor(urlEqualTo("/rest/v1/administrerforsendelse/99999999")));
+		verify(exactly(1), getRequestedFor(urlEqualTo(HENT_FORSENDELSE_URI + "99999999")));
 	}
 
 	private void stubFinnForsendelse() {
@@ -876,7 +877,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	private void stubHentForsendelse() {
-		stubFor(get(urlEqualTo("/rest/v1/administrerforsendelse/99999999"))
+		stubFor(get(urlEqualTo(HENT_FORSENDELSE_URI + "99999999"))
 				.willReturn(aResponse()
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)

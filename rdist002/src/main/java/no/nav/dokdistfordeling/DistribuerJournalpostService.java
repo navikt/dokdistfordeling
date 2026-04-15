@@ -157,8 +157,7 @@ public class DistribuerJournalpostService {
 		log.info("Journalpost med journalpostId={} har journalstatus EKSPEDERT. Henter bestillingsId fra dokdistadmin.", distribuerJournalpost.journalpostId());
 		FinnForsendelseResponseTo finnForsendelseResponse = dokdistadminConsumer.finnForsendelse(distribuerJournalpost.journalpostId());
 		HentForsendelseResponseTo hentForsendelseResponse = dokdistadminConsumer.hentForsendelse(finnForsendelseResponse.forsendelseId());
-		String eksisterendeBestillingsId = hentForsendelseResponse.bestillingsId();
-		return lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), eksisterendeBestillingsId);
+		return lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), hentForsendelseResponse.bestillingsId());
 	}
 
 	private Postadresse utledPostadresse(DistribuerJournalpost distribuerJournalpost,
