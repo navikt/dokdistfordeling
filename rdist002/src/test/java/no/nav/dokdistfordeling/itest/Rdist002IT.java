@@ -850,6 +850,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	public void shouldReturnIdempotentResponseWhenJournalpostStatusIsEkspedert() {
 		stubSafGraphQl("saf/safGraphQlResponse-ekspedert.json");
 		stubFinnForsendelse();
+		stubHentForsendelse();
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
 				createDistribuerJournalpostToBuilder().build(),
@@ -864,7 +865,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		verify(exactly(0), putRequestedFor(urlEqualTo("/rest/journalpostapi/" + JOURNALPOST_ID)));
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)));
 		verify(exactly(1), getRequestedFor(urlEqualTo(FINN_FORSENDELSE_URI + JOURNALPOST_ID)));
-		verify(exactly(0), getRequestedFor(urlEqualTo(HENT_FORSENDELSE_URI + "99999999")));
+		verify(exactly(1), getRequestedFor(urlEqualTo(HENT_FORSENDELSE_URI + "99999999")));
 	}
 
 	private void stubFinnForsendelse() {
@@ -873,6 +874,14 @@ public class Rdist002IT extends AbstractOauth2Test {
 						.withStatus(OK.value())
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 						.withBodyFile("dokdistadmin/finnForsendelse-response.json")));
+	}
+
+	private void stubHentForsendelse() {
+		stubFor(get(urlEqualTo(HENT_FORSENDELSE_URI + "99999999"))
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("dokdistadmin/hentForsendelse-response.json")));
 	}
 
 	private void stubAzureToken() {

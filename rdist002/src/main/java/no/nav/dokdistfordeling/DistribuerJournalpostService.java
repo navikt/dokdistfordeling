@@ -6,6 +6,7 @@ import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostRequest;
 import no.nav.dokdistfordeling.consumer.dokdistadmin.DokdistadminConsumer;
 import no.nav.dokdistfordeling.consumer.dokdistadmin.FinnForsendelseResponseTo;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.HentForsendelseResponseTo;
 import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostIdempotencyHandler;
@@ -155,7 +156,8 @@ public class DistribuerJournalpostService {
 	private String haandterEkspedertJournalpost(DistribuerJournalpost distribuerJournalpost) {
 		log.info("Journalpost med journalpostId={} har journalstatus EKSPEDERT. Forsøker å lagre distribuerJournalpostInfo.", distribuerJournalpost.journalpostId());
 		FinnForsendelseResponseTo finnForsendelseResponse = dokdistadminConsumer.finnForsendelse(distribuerJournalpost.journalpostId());
-		return lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), finnForsendelseResponse.bestillingsId());
+		HentForsendelseResponseTo hentForsendelseResponse = dokdistadminConsumer.hentForsendelse(finnForsendelseResponse.forsendelseId());
+		return lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), hentForsendelseResponse.bestillingsId());
 	}
 
 	private Postadresse utledPostadresse(DistribuerJournalpost distribuerJournalpost,
