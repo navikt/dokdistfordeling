@@ -110,7 +110,7 @@ class DistribuerJournalpostServiceTest {
 	}
 
 	@Test
-	void skalHenteBestillingsIdFraDokdistadminOgPersistereNaarJournalpostErEkspedert() {
+	void skalForsoekePersisteringAvDistribuerJournalpostInfoNaarJournalpostErEkspedert() {
 		String eksisterendeBestillingsId = "bestillingsid-fra-dokdistadmin";
 		long forsendelseId = 99999L;
 		DistribuerJournalpost distribuerJournalpost = createDistribuerJournalpostBuilder().build();

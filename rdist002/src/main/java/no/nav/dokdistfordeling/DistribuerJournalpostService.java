@@ -154,7 +154,7 @@ public class DistribuerJournalpostService {
 	}
 
 	private String haandterEkspedertJournalpost(DistribuerJournalpost distribuerJournalpost) {
-		log.info("Journalpost med journalpostId={} har journalstatus EKSPEDERT. Henter bestillingsId fra dokdistadmin.", distribuerJournalpost.journalpostId());
+		log.info("Journalpost med journalpostId={} har journalstatus EKSPEDERT. Forsøker å lagre distribuerJournalpostInfo.", distribuerJournalpost.journalpostId());
 		FinnForsendelseResponseTo finnForsendelseResponse = dokdistadminConsumer.finnForsendelse(distribuerJournalpost.journalpostId());
 		HentForsendelseResponseTo hentForsendelseResponse = dokdistadminConsumer.hentForsendelse(finnForsendelseResponse.forsendelseId());
 		return lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), hentForsendelseResponse.bestillingsId());
