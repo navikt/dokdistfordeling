@@ -4,7 +4,6 @@ import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokdistadmin.DokdistadminConsumer;
 import no.nav.dokdistfordeling.consumer.dokdistadmin.FinnForsendelseResponseTo;
-import no.nav.dokdistfordeling.consumer.dokdistadmin.HentForsendelseResponseTo;
 import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostIdempotencyHandler;
@@ -119,9 +118,7 @@ class DistribuerJournalpostServiceTest {
 				.build();
 
 		when(dokdistadminConsumer.finnForsendelse(JOURNALPOST_ID))
-				.thenReturn(new FinnForsendelseResponseTo(forsendelseId));
-		when(dokdistadminConsumer.hentForsendelse(forsendelseId))
-				.thenReturn(new HentForsendelseResponseTo(forsendelseId, eksisterendeBestillingsId));
+				.thenReturn(new FinnForsendelseResponseTo(forsendelseId, eksisterendeBestillingsId));
 
 		String resultat = distribuerJournalpostService.distribuerForsendelse(distribuerJournalpost, journalpost);
 

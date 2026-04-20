@@ -1,4 +1,4 @@
 package no.nav.dokdistfordeling.consumer.dokdistadmin;
 
-public record FinnForsendelseResponseTo(Long forsendelseId) {
+public record FinnForsendelseResponseTo(Long forsendelseId, String bestillingsId) {
 }
