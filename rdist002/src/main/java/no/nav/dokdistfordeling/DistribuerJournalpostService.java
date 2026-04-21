@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostRequest;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.DokdistadminConsumer;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.FinnForsendelseResponseTo;
+import no.nav.dokdistfordeling.consumer.dokdistadmin.HentForsendelseResponseTo;
 import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostIdempotencyHandler;
@@ -24,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static no.nav.dokdistfordeling.constants.Constants.DOKDISTBESTILLINGS_ID;
+import static no.nav.dokdistfordeling.constants.ValidationConstants.EKSPEDERT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.validate.JournalpostValidator.validateJournalpostAndDokumenter;
 import static no.nav.dokdistfordeling.validate.PostadresseValidator.validatePostadresse;
@@ -39,25 +43,32 @@ public class DistribuerJournalpostService {
 	private final BestemDistribusjonskanalService bestemDistribusjonskanalService;
 	private final JournalpostApi journalpostApi;
 	private final PersonnummerService personnummerService;
+	private final DokdistadminConsumer dokdistadminConsumer;
 
 	public DistribuerJournalpostService(DistribuerForsendelseProducer distribuerForsendelseProducer,
 										DistribuerJournalpostIdempotencyHandler distribuerJournalpostIdempotencyHandler,
 										RegoppslagService regoppslag,
 										BestemDistribusjonskanalService bestemDistribusjonskanalService,
 										JournalpostApi journalpostApi,
-										PersonnummerService personnummerService) {
+										PersonnummerService personnummerService,
+										DokdistadminConsumer dokdistadminConsumer) {
 		this.distribuerForsendelseProducer = distribuerForsendelseProducer;
 		this.distribuerJournalpostIdempotencyHandler = distribuerJournalpostIdempotencyHandler;
 		this.regoppslag = regoppslag;
 		this.bestemDistribusjonskanalService = bestemDistribusjonskanalService;
 		this.journalpostApi = journalpostApi;
 		this.personnummerService = personnummerService;
+		this.dokdistadminConsumer = dokdistadminConsumer;
 	}
 
 	public String distribuerForsendelse(DistribuerJournalpost distribuerJournalpost,
 										Journalpost journalpost) {
 
 		final String bestillingsId = UUID.randomUUID().toString();
+
+		if (EKSPEDERT.equals(journalpost.getJournalstatus())) {
+			return haandterEkspedertJournalpost(distribuerJournalpost);
+		}
 
 		validateJournalpostAndDokumenter(journalpost);
 		validateTvingKanal(distribuerJournalpost, journalpost);
@@ -140,6 +151,13 @@ public class DistribuerJournalpostService {
 				.build();
 
 		journalpostApi.oppdaterJournalpost(journalpostId, request);
+	}
+
+	private String haandterEkspedertJournalpost(DistribuerJournalpost distribuerJournalpost) {
+		log.info("Journalpost med journalpostId={} har journalstatus EKSPEDERT. Forsøker å lagre distribuerJournalpostInfo.", distribuerJournalpost.journalpostId());
+		FinnForsendelseResponseTo finnForsendelseResponse = dokdistadminConsumer.finnForsendelse(distribuerJournalpost.journalpostId());
+		HentForsendelseResponseTo hentForsendelseResponse = dokdistadminConsumer.hentForsendelse(finnForsendelseResponse.forsendelseId());
+		return lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), hentForsendelseResponse.bestillingsId());
 	}
 
 	private Postadresse utledPostadresse(DistribuerJournalpost distribuerJournalpost,

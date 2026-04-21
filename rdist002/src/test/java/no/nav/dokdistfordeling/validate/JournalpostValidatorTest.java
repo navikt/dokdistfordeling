@@ -87,7 +87,7 @@ class JournalpostValidatorTest {
 
 		assertThatExceptionOfType(ValidationException.class)
 				.isThrownBy(() -> validateJournalpostAndDokumenter(journalpost))
-				.withMessage("Journalpostfeltet journalpoststatus er ikke som forventet, fikk: %s, men forventet %s", EKSPEDERT , FERDIGSTILT);
+				.withMessage("Journalpostfeltet journalpoststatus er ikke som forventet, fikk: %s, men forventet %s", EKSPEDERT, FERDIGSTILT);
 	}
 
 	@ParameterizedTest

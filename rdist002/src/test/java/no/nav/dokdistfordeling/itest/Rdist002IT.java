@@ -55,6 +55,8 @@ import java.util.stream.Stream;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
@@ -68,6 +70,7 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import static no.nav.dokdistfordeling.TestData.DISTRIBUERT_BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.TestData.DISTRIBUERT_JOURNALPOST_ID;
 import static no.nav.dokdistfordeling.TestData.FORSENDSELSE_METADATA;
+import static no.nav.dokdistfordeling.TestData.JOURNALPOST_ID;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostTo;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostToBuilder;
 import static no.nav.dokdistfordeling.TestData.createUtenlandskAdresseTo;
@@ -107,6 +110,8 @@ public class Rdist002IT extends AbstractOauth2Test {
 	private static final String DISTRIBUER_JOURNALPOST_URI = "/rest/v1/distribuerjournalpost";
 	private static final String SAF_GRAPHQL_URI = "/saf/graphql";
 	private static final String BESTEM_DISTRIBUSJONSKANAL_URI = "/rest/bestemDistribusjonskanal";
+	private static final String FINN_FORSENDELSE_URI = "/rest/v1/administrerforsendelse/finnforsendelse/JOURNALPOSTID/";
+	private static final String HENT_FORSENDELSE_URI = "/rest/v1/administrerforsendelse/";
 
 	@Autowired
 	protected TestRestTemplate restTemplate;
@@ -839,6 +844,44 @@ public class Rdist002IT extends AbstractOauth2Test {
 				createHeadersWithInvalidAuth());
 
 		callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, UNAUTHORIZED);
+	}
+
+	@Test
+	public void shouldReturnIdempotentResponseWhenJournalpostStatusIsEkspedert() {
+		stubSafGraphQl("saf/safGraphQlResponse-ekspedert.json");
+		stubFinnForsendelse();
+		stubHentForsendelse();
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
+
+		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = terminateDistribuerJournalpostAndAssertResponseCode(requestEntity);
+
+		assertEquals(OK, responseEntity.getStatusCode());
+		assertNotNull(responseEntity.getBody());
+		assertEquals("bestillingsid-fra-dokdistadmin", responseEntity.getBody().getBestillingsId());
+
+		verify(exactly(0), putRequestedFor(urlEqualTo("/rest/journalpostapi/" + JOURNALPOST_ID)));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(FINN_FORSENDELSE_URI + JOURNALPOST_ID)));
+		verify(exactly(1), getRequestedFor(urlEqualTo(HENT_FORSENDELSE_URI + "99999999")));
+	}
+
+	private void stubFinnForsendelse() {
+		stubFor(get(urlEqualTo(FINN_FORSENDELSE_URI + JOURNALPOST_ID))
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("dokdistadmin/finnForsendelse-response.json")));
+	}
+
+	private void stubHentForsendelse() {
+		stubFor(get(urlEqualTo(HENT_FORSENDELSE_URI + "99999999"))
+				.willReturn(aResponse()
+						.withStatus(OK.value())
+						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+						.withBodyFile("dokdistadmin/hentForsendelse-response.json")));
 	}
 
 	private void stubAzureToken() {
