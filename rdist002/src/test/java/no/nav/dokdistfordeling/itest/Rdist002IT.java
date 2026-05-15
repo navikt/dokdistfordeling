@@ -13,7 +13,6 @@ import no.nav.dokdistfordeling.config.Rdist002TestConfig;
 import no.nav.dokdistfordeling.dokdistdb.domain.DistribuerJournalpostInfo;
 import no.nav.dokdistfordeling.dokdistdb.repository.DistribuerJournalpostInfoRepository;
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
-import no.nav.dokdistfordeling.storage.JsonSerializer;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostResponseTo;
 import org.apache.commons.io.IOUtils;
@@ -28,10 +27,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -41,6 +40,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
+import org.wiremock.spring.EnableWireMock;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -102,7 +102,8 @@ import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 @SpringBootTest(
 		classes = Rdist002TestConfig.class,
 		webEnvironment = RANDOM_PORT)
-@AutoConfigureWireMock(port = 0)
+@AutoConfigureTestRestTemplate
+@EnableWireMock
 @AutoConfigureTestDatabase
 @ActiveProfiles("itest")
 public class Rdist002IT extends AbstractOauth2Test {
@@ -545,9 +546,8 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		putStubOppdaterJournalpost();
 
-		DistribuerJournalpostRequestTo distribuerJournalpostRequestTo = JsonSerializer.deserialize(classpathToString("__files/rdist002/rdist002-happy-adressetype.json"), DistribuerJournalpostRequestTo.class);
-		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(distribuerJournalpostRequestTo, createHappyPathHeaders());
-		DistribuerJournalpostResponseTo response = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
+		HttpEntity<String> requestEntity = new HttpEntity<>(classpathToString("__files/rdist002/rdist002-happy-adressetype.json"), createHappyPathHeaders());
+		DistribuerJournalpostResponseTo response = callDistribuerJournalpostJson(requestEntity).getBody();
 
 		assertEquals(36, response.getBestillingsId().length());
 
@@ -616,7 +616,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, INTERNAL_SERVER_ERROR);
 
 		assertThat(restResponse).contains("Tjenesten SAF (graphQL) feilet med status: 500 INTERNAL_SERVER_ERROR");
-		verify(exactly(3), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(4), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 	}
 
 	@ParameterizedTest

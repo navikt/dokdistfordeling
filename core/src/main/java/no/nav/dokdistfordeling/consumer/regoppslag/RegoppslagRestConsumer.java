@@ -1,19 +1,20 @@
 package no.nav.dokdistfordeling.consumer.regoppslag;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseRequestTo;
 import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseResponseTo;
 import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseResponseTo.AdresseTo;
+import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseException;
 import no.nav.dokdistfordeling.exception.functional.UkjentAdresseException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import tools.jackson.databind.json.JsonMapper;
 
 import static java.lang.String.format;
 import static no.nav.dokdistfordeling.consumer.token.NaisTexasRequestInterceptor.TARGET_SCOPE;
@@ -28,12 +29,12 @@ class RegoppslagRestConsumer {
 	private static final String RESILIENCE4J_INSTANCE = "regoppslag";
 
 	private final RestClient restClientTexas;
-	private final ObjectMapper objectMapper;
+	private final JsonMapper objectMapper;
 	private final String regoppslagScope;
 
 	RegoppslagRestConsumer(RestClient restClientTexas,
 						   DokdistfordelingProperties dokdistfordelingProperties,
-						   ObjectMapper objectMapper) {
+						   JsonMapper objectMapper) {
 		this.objectMapper = objectMapper;
 		this.regoppslagScope = dokdistfordelingProperties.getEndpoints().getRegoppslag().getScope();
 		this.restClientTexas = restClientTexas.mutate()
@@ -41,7 +42,7 @@ class RegoppslagRestConsumer {
 				.build();
 	}
 
-	@Retry(name = RESILIENCE4J_INSTANCE)
+	@Retryable(includes = AbstractDokdistfordelingTechnicalException.class)
 	@CircuitBreaker(name = RESILIENCE4J_INSTANCE)
 	public AdresseTo hentAdresse(HentMottakerOgAdresseRequestTo hentMottakerOgAdresseRequest) {
 		return restClientTexas.post()

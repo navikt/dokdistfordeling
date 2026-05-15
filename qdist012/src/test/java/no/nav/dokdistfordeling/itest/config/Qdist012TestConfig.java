@@ -13,13 +13,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
-import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.resilience.annotation.EnableResilientMethods;
 
 import static org.mockito.Mockito.mock;
 
 @Configuration
 @Profile("itest")
-@EnableRetry
+@EnableResilientMethods
 @EnableConfigurationProperties({
 		DokdistfordelingProperties.class,
 		MqProperties.class,
@@ -40,4 +40,3 @@ public class Qdist012TestConfig {
 		return mock(BucketStorage.class);
 	}
 }
-

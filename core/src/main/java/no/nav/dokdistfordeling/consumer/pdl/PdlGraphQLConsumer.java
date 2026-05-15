@@ -12,7 +12,7 @@ import no.nav.dokdistfordeling.exception.functional.PdlFunctionalException;
 import no.nav.dokdistfordeling.exception.functional.PdlPersonIkkeFunnetFunctionalException;
 import no.nav.dokdistfordeling.exception.technical.PdlTechnicalException;
 import org.slf4j.MDC;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -59,7 +59,7 @@ public class PdlGraphQLConsumer {
 		this.retry = retryRegistry.retry(RESILIENCE4J_INSTANCE);
 	}
 
-	@Retryable(retryFor = PdlTechnicalException.class)
+	@Retryable(includes = PdlTechnicalException.class)
 	public String hentFolkeregisteridentForAktoerId(final String aktorId) {
 
 		var pdlHentIdenterResponse = webClient.post()

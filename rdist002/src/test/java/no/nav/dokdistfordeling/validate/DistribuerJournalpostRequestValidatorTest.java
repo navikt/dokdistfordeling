@@ -21,8 +21,8 @@ import static java.math.BigInteger.ONE;
 import static no.nav.dokdistfordeling.TestData.FORSENDSELSE_METADATA;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostToBuilder;
 import static no.nav.dokdistfordeling.validate.DistribuerJournalpostRequestValidator.validateDistribuerJournalpostRequest;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.codehaus.plexus.util.StringUtils.isBlank;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class DistribuerJournalpostRequestValidatorTest {
