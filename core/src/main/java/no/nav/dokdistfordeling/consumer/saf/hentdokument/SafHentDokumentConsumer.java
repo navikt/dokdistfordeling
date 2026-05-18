@@ -26,12 +26,12 @@ public class SafHentDokumentConsumer {
 
 	public SafHentDokumentConsumer(RestClient restClientTexas,
 								   DokdistfordelingProperties dokdistfordelingProperties,
-								   JsonMapper objectMapper) {
+								   JsonMapper jsonMapper) {
 		this.restClientTexas = restClientTexas.mutate()
 				.baseUrl(dokdistfordelingProperties.getEndpoints().getSaf().getUrl())
 				.build();
 		this.safScope = dokdistfordelingProperties.getEndpoints().getSaf().getScope();
-		this.objectMapper = objectMapper;
+		this.objectMapper = jsonMapper;
 	}
 
 	@Retryable(includes = AbstractDokdistfordelingTechnicalException.class)
