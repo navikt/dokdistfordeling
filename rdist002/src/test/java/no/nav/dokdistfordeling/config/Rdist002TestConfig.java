@@ -13,7 +13,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
-import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.resilience.annotation.EnableResilientMethods;
 import org.springframework.test.context.ContextConfiguration;
 
 @Configuration
@@ -24,7 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 		AzureProperties.class,
 		NaisProperties.class
 })
-@EnableRetry
+@EnableResilientMethods
 @Import({
 		Rdist002JmsItestConfig.class,
 		DistribuerJournalpostConfig.class,
@@ -36,6 +36,5 @@ import org.springframework.test.context.ContextConfiguration;
 @EnableJwtTokenValidation(ignore = {"org.springframework", "org.springdoc"})
 public class Rdist002TestConfig {
 }
-
 
 

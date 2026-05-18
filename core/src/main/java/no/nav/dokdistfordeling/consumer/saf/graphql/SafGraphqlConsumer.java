@@ -1,16 +1,17 @@
 package no.nav.dokdistfordeling.consumer.saf.graphql;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJournalpostTo;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.SafJsonResponse;
 import no.nav.dokdistfordeling.exception.functional.SafBadRequestException;
 import no.nav.dokdistfordeling.exception.functional.SafJournalpostQueryUnauthorizedException;
+import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostIkkeFunnetTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafJournalpostQueryTechnicalException;
 import no.nav.dokdistfordeling.exception.technical.SafUkjentErrorCodeException;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -43,7 +44,7 @@ public class SafGraphqlConsumer {
 		this.safScope = dokdistfordelingProperties.getEndpoints().getSaf().getScope();
 	}
 
-	@Retry(name = RESILIENCE4J_INSTANCE)
+	@Retryable(includes = AbstractDokdistfordelingTechnicalException.class)
 	@CircuitBreaker(name = RESILIENCE4J_INSTANCE)
 	public SafJournalpostTo performQuery(GraphQLRequest graphQLRequest) {
 		try {

@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
+import org.springframework.jms.core.JmsTemplate;
 
 import javax.net.ssl.SSLSocketFactory;
 
@@ -108,5 +109,10 @@ public class JmsConfig {
 		pooledFactory.setMaxConnections(10);
 		pooledFactory.setMaxSessionsPerConnection(10);
 		return pooledFactory;
+	}
+
+	@Bean
+	public JmsTemplate jmsTemplate(ConnectionFactory connectionFactory) {
+		return new JmsTemplate(connectionFactory);
 	}
 }

@@ -25,13 +25,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.wiremock.spring.EnableWireMock;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,7 +68,7 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 @EnableAutoConfiguration
 @SpringBootTest(classes = {Qdist012TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWireMock(port = 0)
+@EnableWireMock
 @AutoConfigureTestDatabase
 @ActiveProfiles("itest")
 public class Qdist012IT {
@@ -366,7 +366,7 @@ public class Qdist012IT {
 			assertEquals(message, response);
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
-		verify(exactly(3), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
+		verify(exactly(4), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
 		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
 		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
 	}
@@ -411,7 +411,7 @@ public class Qdist012IT {
 		});
 		Mockito.verify(bucketStorage, times(0)).upload(any(), any(), any());
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URL)));
-		verify(exactly(3), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
+		verify(exactly(4), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_ARKIV)));
 		verify(exactly(0), getRequestedFor(urlEqualTo(SAF_HENT_DOKUMENT_SLADDET)));
 	}
 
@@ -519,6 +519,4 @@ public class Qdist012IT {
 						.withBodyFile("nais-texas/token_response.json")));
 	}
 }
-
-
 

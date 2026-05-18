@@ -9,14 +9,13 @@ import no.nav.dokdistfordeling.config.props.NaisProperties;
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Import;
-import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.resilience.annotation.EnableResilientMethods;
 
 @EnableCaching
-@EnableRetry
+@EnableResilientMethods
 @EnableConfigurationProperties({
 		MqProperties.class,
 		AzureProperties.class,
@@ -30,7 +29,7 @@ import org.springframework.retry.annotation.EnableRetry;
 		SecurityConfig.class
 })
 @EnableJwtTokenValidation(ignore = {"org.springframework", "org.springdoc"})
-@SpringBootApplication(exclude = UserDetailsServiceAutoConfiguration.class)
+@SpringBootApplication
 public class Application {
 
 	public static void main(String[] args) {
@@ -38,4 +37,3 @@ public class Application {
 	}
 
 }
-
