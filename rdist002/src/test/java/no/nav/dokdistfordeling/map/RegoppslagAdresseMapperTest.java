@@ -10,17 +10,21 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static no.nav.dokdistfordeling.TestData.ADRESSELINJE1;
 import static no.nav.dokdistfordeling.TestData.ADRESSELINJE2;
 import static no.nav.dokdistfordeling.TestData.ADRESSELINJE3;
+import static no.nav.dokdistfordeling.TestData.LANDKODE_NORGE;
 import static no.nav.dokdistfordeling.TestData.LANDKODE_US;
 import static no.nav.dokdistfordeling.TestData.POSTNUMMER;
 import static no.nav.dokdistfordeling.TestData.POSTSTED;
-import static no.nav.dokdistfordeling.domain.Postadresse.LANDKODE_NORGE;
+import static no.nav.dokdistfordeling.consumer.regoppslag.to.PostadresseResponse.PostadresseType.NORSKPOSTADRESSE;
+import static no.nav.dokdistfordeling.consumer.regoppslag.to.PostadresseResponse.PostadresseType.UTENLANDSKPOSTADRESSE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RegoppslagAdresseMapperTest {
 
 	@Test
 	void shouldMapNorskAdresse() {
-		PostadresseResponse.Adresse postadresse = createNorskAdresseBuilder().build();
+		PostadresseResponse.Adresse postadresse = createNorskAdresseBuilder()
+				.type(NORSKPOSTADRESSE)
+				.build();
 
         Postadresse adresse = RegoppslagAdresseMapper.map(postadresse);
 
@@ -39,6 +43,7 @@ class RegoppslagAdresseMapperTest {
 	void shouldMapBlankNorskAdresselinje1ToNull(String adresselinje1) {
 		PostadresseResponse.Adresse postadresse = createNorskAdresseBuilder()
 				.adresselinje1(adresselinje1)
+				.type(NORSKPOSTADRESSE)
 				.build();
 
 		Postadresse adresse = RegoppslagAdresseMapper.map(postadresse);
@@ -75,6 +80,7 @@ class RegoppslagAdresseMapperTest {
 				.adresselinje2(ADRESSELINJE2)
 				.adresselinje3(ADRESSELINJE3)
 				.landkode(LANDKODE_US)
+				.type(UTENLANDSKPOSTADRESSE)
 				.build();
 	}
 }

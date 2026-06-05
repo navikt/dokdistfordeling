@@ -12,7 +12,7 @@ public record PostadresseResponse(
 
 	@Builder
 	public record Adresse(
-			PostadresseType postadresseType,
+			PostadresseType type,
 			String adresselinje1,
 			String adresselinje2,
 			String adresselinje3,

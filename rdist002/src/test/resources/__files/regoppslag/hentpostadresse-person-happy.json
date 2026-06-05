@@ -2,6 +2,7 @@
   "identifikator": "09876543210",
   "navn": "Jan Neimansen",
   "adresse": {
+    "type": "NORSKPOSTADRESSE",
     "adresselinje1": "eksempelveien 23 A",
     "adresselinje2": "eksempelveien 24 A",
     "adresselinje3": "eksempelveien 25 A",
