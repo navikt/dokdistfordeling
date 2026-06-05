@@ -42,7 +42,6 @@ import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 import org.wiremock.spring.EnableWireMock;
 
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -131,8 +130,6 @@ class Rdist002IT extends AbstractOauth2Test {
 
 	@Autowired
 	protected RetryRegistry retryRegistry;
-	@Autowired
-	private DataSource dataSource;
 
 	@BeforeEach
 	void setupBefore() {

@@ -72,7 +72,8 @@ public class TestData {
 				.postadresse(createNorskPostadresseBuilder().build())
 				.dokumentProdApp(DOKUMENTPRODAPP)
 				.distribusjonstype(VEDTAK)
-				.distribusjonstidspunkt(UMIDDELBART);
+				.distribusjonstidspunkt(UMIDDELBART)
+				.tvingSentralPrint(false);
 	}
 
 	public static Journalpost.JournalpostBuilder createJournalpostBuilder() {
