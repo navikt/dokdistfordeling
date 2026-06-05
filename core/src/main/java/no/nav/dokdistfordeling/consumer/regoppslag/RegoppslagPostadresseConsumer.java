@@ -3,9 +3,8 @@ package no.nav.dokdistfordeling.consumer.regoppslag;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
-import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseRequestTo;
-import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseResponseTo;
-import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseResponseTo.AdresseTo;
+import no.nav.dokdistfordeling.consumer.regoppslag.to.PostadresseRequest;
+import no.nav.dokdistfordeling.consumer.regoppslag.to.PostadresseResponse;
 import no.nav.dokdistfordeling.exception.technical.AbstractDokdistfordelingTechnicalException;
 import no.nav.dokdistfordeling.exception.functional.PersonErDoedUkjentAdresseException;
 import no.nav.dokdistfordeling.exception.functional.UkjentAdresseException;
@@ -24,7 +23,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Slf4j
 @Component
-class RegoppslagRestConsumer {
+class RegoppslagPostadresseConsumer {
 
 	private static final String RESILIENCE4J_INSTANCE = "regoppslag";
 
@@ -32,9 +31,9 @@ class RegoppslagRestConsumer {
 	private final JsonMapper objectMapper;
 	private final String regoppslagScope;
 
-	RegoppslagRestConsumer(RestClient restClientTexas,
-						   DokdistfordelingProperties dokdistfordelingProperties,
-						   JsonMapper objectMapper) {
+	RegoppslagPostadresseConsumer(RestClient restClientTexas,
+								  DokdistfordelingProperties dokdistfordelingProperties,
+								  JsonMapper objectMapper) {
 		this.objectMapper = objectMapper;
 		this.regoppslagScope = dokdistfordelingProperties.getEndpoints().getRegoppslag().getScope();
 		this.restClientTexas = restClientTexas.mutate()
@@ -44,10 +43,10 @@ class RegoppslagRestConsumer {
 
 	@Retryable(includes = AbstractDokdistfordelingTechnicalException.class)
 	@CircuitBreaker(name = RESILIENCE4J_INSTANCE)
-	public AdresseTo hentAdresse(HentMottakerOgAdresseRequestTo hentMottakerOgAdresseRequest) {
+	public PostadresseResponse hentPostadresse(PostadresseRequest postadresseRequest) {
 		return restClientTexas.post()
-				.uri("/hentMottakerOgAdresse")
-				.body(hentMottakerOgAdresseRequest)
+				.uri("/postadresse")
+				.body(postadresseRequest)
 				.attribute(TARGET_SCOPE, regoppslagScope)
 				.retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
@@ -68,6 +67,6 @@ class RegoppslagRestConsumer {
 					ProblemDetail problemDetail = objectMapper.readValue(response.getBody(), ProblemDetail.class);
 					throw new RegoppslagTechnicalException(format("Kall mot TREG002 feilet teknisk. status=%s, problemDetail=%s", response.getStatusCode(), problemDetail));
 				})
-				.body(HentMottakerOgAdresseResponseTo.class).getAdresse();
+				.body(PostadresseResponse.class);
 	}
 }

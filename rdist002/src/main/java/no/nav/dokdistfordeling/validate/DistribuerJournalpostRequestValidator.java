@@ -39,23 +39,23 @@ public class DistribuerJournalpostRequestValidator {
 
 		try {
 			Long.parseLong(journalpostId);
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException _) {
 			throw new ValidationException(format("Feltet journalpostId må være et ikke-negativt heltall. Fikk journalpostId=%s", journalpostId));
 		}
 	}
 
-	private static void validateForsendelseMetadata(DistribuerJournalpostRequestTo distribuerJournalpostRequest) {
-		if (isOnlyForsendelseMetadataSet(distribuerJournalpostRequest) || isOnlyForsendelseMetadataTypeSet(distribuerJournalpostRequest)) {
+	private static void validateForsendelseMetadata(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
+		if (isOnlyForsendelseMetadataSet(distribuerJournalpostRequestTo) || isOnlyForsendelseMetadataTypeSet(distribuerJournalpostRequestTo)) {
 			throw new ValidationException(format("forsendelsesMetadata og forsendelsesMetadataType må enten begge være satt, eller begge være null. Fikk forsendelsesmetadata=%s, forsendelsesmetadataType=%s",
-					isBlank(distribuerJournalpostRequest.getForsendelseMetadata()) ? null : "****", distribuerJournalpostRequest.getForsendelseMetadataType()));
+					isBlank(distribuerJournalpostRequestTo.getForsendelseMetadata()) ? null : "****", distribuerJournalpostRequestTo.getForsendelseMetadataType()));
 		}
 	}
 
-	private static boolean isOnlyForsendelseMetadataSet(DistribuerJournalpostRequestTo distribuerJournalpostRequest) {
-		return distribuerJournalpostRequest.getForsendelseMetadata() != null && distribuerJournalpostRequest.getForsendelseMetadataType() == null;
+	private static boolean isOnlyForsendelseMetadataSet(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
+		return distribuerJournalpostRequestTo.getForsendelseMetadata() != null && distribuerJournalpostRequestTo.getForsendelseMetadataType() == null;
 	}
 
-	private static boolean isOnlyForsendelseMetadataTypeSet(DistribuerJournalpostRequestTo distribuerJournalpostRequest) {
-		return distribuerJournalpostRequest.getForsendelseMetadata() == null && distribuerJournalpostRequest.getForsendelseMetadataType() != null;
+	private static boolean isOnlyForsendelseMetadataTypeSet(DistribuerJournalpostRequestTo distribuerJournalpostRequestTo) {
+		return distribuerJournalpostRequestTo.getForsendelseMetadata() == null && distribuerJournalpostRequestTo.getForsendelseMetadataType() != null;
 	}
 }

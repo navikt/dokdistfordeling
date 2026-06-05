@@ -25,7 +25,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-class DistribuerJournalpostRequestValidatorTest {
+class DistribuerJournalpostRequestToValidatorTest {
 
 	@Test
 	void shouldValidateDistribuerJournalpostRequest() {

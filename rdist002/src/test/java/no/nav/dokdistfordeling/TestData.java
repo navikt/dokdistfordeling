@@ -184,6 +184,7 @@ public class TestData {
 				.dokumentProdApp(DOKUMENTPRODAPP)
 				.distribusjonstidspunkt(KJERNETID.name())
 				.distribusjonstype(VIKTIG.name())
+				.tvingSentralPrint(false)
 				.build();
 	}
 
@@ -195,7 +196,8 @@ public class TestData {
 				.adresse(createNorskAdresseTo())
 				.dokumentProdApp(DOKUMENTPRODAPP)
 				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name());
+				.distribusjonstype(VIKTIG.name())
+				.tvingSentralPrint(false);
 	}
 
 	public static DistribuerJournalpostRequestTo.AdresseTo.AdresseToBuilder createAdresseToBuilder() {

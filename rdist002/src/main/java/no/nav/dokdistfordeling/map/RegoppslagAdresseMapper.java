@@ -1,6 +1,6 @@
 package no.nav.dokdistfordeling.map;
 
-import no.nav.dokdistfordeling.consumer.regoppslag.to.HentMottakerOgAdresseResponseTo;
+import no.nav.dokdistfordeling.consumer.regoppslag.to.PostadresseResponse;
 import no.nav.dokdistfordeling.domain.Postadresse;
 
 import static no.nav.dokdistfordeling.domain.Postadresse.LANDKODE_NORGE;
@@ -11,21 +11,21 @@ public class RegoppslagAdresseMapper {
     private RegoppslagAdresseMapper() {
     }
 
-    public static Postadresse map(HentMottakerOgAdresseResponseTo.AdresseTo regoppslagAdresseTo) {
-        if (LANDKODE_NORGE.equals(regoppslagAdresseTo.getLandkode())) {
+    public static Postadresse map(PostadresseResponse.Adresse postadresse) {
+        if (LANDKODE_NORGE.equals(postadresse.landkode())) {
             return Postadresse.norsk(
-					regoppslagAdresseTo.getPostnummer(),
-					regoppslagAdresseTo.getPoststed(),
-					isBlank(regoppslagAdresseTo.getAdresselinje1()) ? null : regoppslagAdresseTo.getAdresselinje1(),
-					regoppslagAdresseTo.getAdresselinje2(),
-					regoppslagAdresseTo.getAdresselinje3()
+					postadresse.postnummer(),
+					postadresse.poststed(),
+					isBlank(postadresse.adresselinje1()) ? null : postadresse.adresselinje1(),
+					postadresse.adresselinje2(),
+					postadresse.adresselinje3()
 			);
         } else {
             return Postadresse.utenlandsk(
-                    regoppslagAdresseTo.getAdresselinje1(),
-                    regoppslagAdresseTo.getAdresselinje2(),
-                    regoppslagAdresseTo.getAdresselinje3(),
-                    regoppslagAdresseTo.getLandkode()
+                    postadresse.adresselinje1(),
+                    postadresse.adresselinje2(),
+                    postadresse.adresselinje3(),
+                    postadresse.landkode()
             );
         }
     }
