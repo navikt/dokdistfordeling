@@ -15,7 +15,6 @@ import java.util.UUID;
 
 import static java.util.Collections.singletonList;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.FERDIGSTILT;
-import static no.nav.dokdistfordeling.domain.Postadresse.LANDKODE_NORGE;
 import static no.nav.dokdistfordeling.domain.Postadresse.NORSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.domain.Postadresse.UTENLANDSK_POSTADRESSE;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonstidspunktCode.KJERNETID;
@@ -63,6 +62,7 @@ public class TestData {
 	public static final String FORSENDSELSE_METADATA = "<xml>Some metadata</xml>";
 	public static final Long DISTRIBUERT_JOURNALPOST_ID = 111111111L;
 	public static final String DISTRIBUERT_BESTILLINGS_ID = UUID.randomUUID().toString();
+	public static final String LANDKODE_NORGE = "NO";
 
 	public static DistribuerJournalpost.DistribuerJournalpostBuilder createDistribuerJournalpostBuilder() {
 		return DistribuerJournalpost.builder()
@@ -72,7 +72,8 @@ public class TestData {
 				.postadresse(createNorskPostadresseBuilder().build())
 				.dokumentProdApp(DOKUMENTPRODAPP)
 				.distribusjonstype(VEDTAK)
-				.distribusjonstidspunkt(UMIDDELBART);
+				.distribusjonstidspunkt(UMIDDELBART)
+				.tvingSentralPrint(false);
 	}
 
 	public static Journalpost.JournalpostBuilder createJournalpostBuilder() {
@@ -184,6 +185,7 @@ public class TestData {
 				.dokumentProdApp(DOKUMENTPRODAPP)
 				.distribusjonstidspunkt(KJERNETID.name())
 				.distribusjonstype(VIKTIG.name())
+				.tvingSentralPrint(false)
 				.build();
 	}
 
@@ -195,7 +197,8 @@ public class TestData {
 				.adresse(createNorskAdresseTo())
 				.dokumentProdApp(DOKUMENTPRODAPP)
 				.distribusjonstidspunkt(KJERNETID.name())
-				.distribusjonstype(VIKTIG.name());
+				.distribusjonstype(VIKTIG.name())
+				.tvingSentralPrint(false);
 	}
 
 	public static DistribuerJournalpostRequestTo.AdresseTo.AdresseToBuilder createAdresseToBuilder() {

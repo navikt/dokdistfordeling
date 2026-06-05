@@ -2,6 +2,7 @@
   "identifikator": "09876543210",
   "navn": "Jan Neimansen",
   "adresse": {
+    "type": "NORSKPOSTADRESSE",
     "landkode": "NO"
   }
 }

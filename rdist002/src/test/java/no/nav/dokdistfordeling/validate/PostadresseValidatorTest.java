@@ -127,7 +127,7 @@ class PostadresseValidatorTest {
 
 		assertThatExceptionOfType(ValidationException.class)
 				.isThrownBy(() -> validatePostadresse(adresse, MOTTAKER))
-				.withMessage("Feltene postnummer og poststed kan ikke være satt når adressetype=utenlandskPostadresse. Fikk postnummer=%s og poststed=%s", postnummer, poststed);
+				.withMessage("Feltene postnummer og poststed kan ikke være satt når adressetype=UtenlandskPostadresse. Fikk postnummer=%s og poststed=%s", postnummer, poststed);
 	}
 
 
@@ -148,7 +148,7 @@ class PostadresseValidatorTest {
 
 		assertThatExceptionOfType(ValidationException.class)
 				.isThrownBy(() -> validatePostadresse(createNorskPostadresseBuilder().adressetype(adresseType).build(), MOTTAKER))
-				.withMessage("AdresseType må være enten norskPostadresse eller utenlandskPostadresse, adresseType=%s", adresseType);
+				.withMessage("AdresseType må være enten NorskPostadresse eller UtenlandskPostadresse, adresseType=%s", adresseType);
 	}
 
 }

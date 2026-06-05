@@ -5,7 +5,7 @@ import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokdistadmin.DokdistadminConsumer;
 import no.nav.dokdistfordeling.consumer.dokdistadmin.FinnForsendelseResponseTo;
 import no.nav.dokdistfordeling.consumer.dokdistadmin.HentForsendelseResponseTo;
-import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagService;
+import no.nav.dokdistfordeling.consumer.regoppslag.PostadresseService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostIdempotencyHandler;
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoResponse;
@@ -55,7 +55,7 @@ class DistribuerJournalpostServiceTest {
 
 	@Mock
 	@SuppressWarnings("unused")
-	private RegoppslagService regoppslag;
+	private PostadresseService regoppslag;
 
 	@Mock
 	private DokdistadminConsumer dokdistadminConsumer;

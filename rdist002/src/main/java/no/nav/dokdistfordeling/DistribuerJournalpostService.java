@@ -7,14 +7,13 @@ import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostRequest;
 import no.nav.dokdistfordeling.consumer.dokdistadmin.DokdistadminConsumer;
 import no.nav.dokdistfordeling.consumer.dokdistadmin.FinnForsendelseResponseTo;
 import no.nav.dokdistfordeling.consumer.dokdistadmin.HentForsendelseResponseTo;
-import no.nav.dokdistfordeling.consumer.regoppslag.RegoppslagService;
+import no.nav.dokdistfordeling.consumer.regoppslag.PostadresseService;
 import no.nav.dokdistfordeling.consumer.saf.journalpost.Journalpost;
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostIdempotencyHandler;
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoResponse;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.domain.Postadresse;
 import no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException;
-import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.map.HentDokumenterFraJoarkMapper;
 import no.nav.dokdistfordeling.map.MottakerMapper;
@@ -39,7 +38,7 @@ public class DistribuerJournalpostService {
 
 	private final DistribuerForsendelseProducer distribuerForsendelseProducer;
 	private final DistribuerJournalpostIdempotencyHandler distribuerJournalpostIdempotencyHandler;
-	private final RegoppslagService regoppslag;
+	private final PostadresseService postadresseService;
 	private final BestemDistribusjonskanalService bestemDistribusjonskanalService;
 	private final JournalpostApi journalpostApi;
 	private final PersonnummerService personnummerService;
@@ -47,14 +46,14 @@ public class DistribuerJournalpostService {
 
 	public DistribuerJournalpostService(DistribuerForsendelseProducer distribuerForsendelseProducer,
 										DistribuerJournalpostIdempotencyHandler distribuerJournalpostIdempotencyHandler,
-										RegoppslagService regoppslag,
+										PostadresseService postadresseService,
 										BestemDistribusjonskanalService bestemDistribusjonskanalService,
 										JournalpostApi journalpostApi,
 										PersonnummerService personnummerService,
 										DokdistadminConsumer dokdistadminConsumer) {
 		this.distribuerForsendelseProducer = distribuerForsendelseProducer;
 		this.distribuerJournalpostIdempotencyHandler = distribuerJournalpostIdempotencyHandler;
-		this.regoppslag = regoppslag;
+		this.postadresseService = postadresseService;
 		this.bestemDistribusjonskanalService = bestemDistribusjonskanalService;
 		this.journalpostApi = journalpostApi;
 		this.personnummerService = personnummerService;
@@ -126,7 +125,7 @@ public class DistribuerJournalpostService {
 		try {
 			distribuerJournalpostIdempotencyHandler.opprettDistribuerJournalpostInfo(journalpostId, bestillingsId);
 			return bestillingsId;
-		} catch (DataIntegrityViolationException e) {
+		} catch (DataIntegrityViolationException _) {
 			log.warn("Samtidig distribusjon av journalpostId={}. En annen request har allerede persistert distribuerJournalpostInfo.", journalpostId);
 			DistribuerJournalpostInfoResponse eksisterende = distribuerJournalpostIdempotencyHandler.hentDistribuerJournalpostInfo(journalpostId);
 
@@ -173,18 +172,11 @@ public class DistribuerJournalpostService {
 
 	private Postadresse hentPostadresse(DistribuerJournalpost distribuerJournalpost,
 										Journalpost journalpost) {
-
 		log.info("rdist002 request mangler postadresse. Henter postadresse fra regoppslag for mottaker på journalpostId={}", distribuerJournalpost.journalpostId());
 
 		var avsenderMottaker = journalpost.getAvsenderMottaker();
-		var tema = journalpost.getTema();
 
-		return switch (avsenderMottaker.getType()) {
-			case FNR -> RegoppslagAdresseMapper.map(regoppslag.hentPersonAdresse(avsenderMottaker.getId(), tema));
-			case ORGNR -> RegoppslagAdresseMapper.map(regoppslag.hentOrganisasjonAdresse(avsenderMottaker.getId()));
-			default ->
-					throw new ValidationException("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis postadresse ikke oppgis i request.");
-		};
+		return RegoppslagAdresseMapper.map(postadresseService.hentAdresse(avsenderMottaker.getId()));
 	}
 
 }

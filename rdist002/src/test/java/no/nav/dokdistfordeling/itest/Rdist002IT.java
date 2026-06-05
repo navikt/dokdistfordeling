@@ -42,7 +42,6 @@ import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 import org.wiremock.spring.EnableWireMock;
 
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -106,7 +105,7 @@ import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 @EnableWireMock
 @AutoConfigureTestDatabase
 @ActiveProfiles("itest")
-public class Rdist002IT extends AbstractOauth2Test {
+class Rdist002IT extends AbstractOauth2Test {
 
 	private static final String DISTRIBUER_JOURNALPOST_URI = "/rest/v1/distribuerjournalpost";
 	private static final String SAF_GRAPHQL_URI = "/saf/graphql";
@@ -131,11 +130,9 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@Autowired
 	protected RetryRegistry retryRegistry;
-	@Autowired
-	private DataSource dataSource;
 
 	@BeforeEach
-	public void setupBefore() {
+	void setupBefore() {
 		stubAzureToken();
 		stubNaisTexasToken();
 		circuitBreakerRegistry.getAllCircuitBreakers().forEach(CircuitBreaker::reset);
@@ -146,7 +143,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostHappyPath() {
+	void distribuerJournalpostHappyPath() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		stubPdl("pdl/pdl-happy.json");
@@ -180,7 +177,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	 * DistribuerJournalpost kall skal takle json requests på en case insensitive måte
 	 */
 	@Test
-	public void distribuerJournalpostHappyPathJsonCaseInsensitive() {
+	void distribuerJournalpostHappyPathJsonCaseInsensitive() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
@@ -204,7 +201,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostToDittNAV() {
+	void distribuerJournalpostToDittNAV() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
@@ -234,7 +231,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostToDPO() {
+	void distribuerJournalpostToDPO() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		stubPdl("pdl/pdl-happy.json");
@@ -267,7 +264,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void shouldDistribuerJournalpostToPrintWhenTvingSentralPrintSetToTrue() {
+	void shouldDistribuerJournalpostToPrintWhenTvingSentralPrintSetToTrue() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
@@ -299,7 +296,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 
 	@ParameterizedTest
 	@EnumSource(TvingKanal.class)
-	public void shouldDistribuerJournalpostToKanalWhenTvingKanalIsSet(TvingKanal tvingKanal) {
+	void shouldDistribuerJournalpostToKanalWhenTvingKanalIsSet(TvingKanal tvingKanal) {
 		stubSafGraphQl(tvingKanal.equals(TRYGDERETTEN) ? "saf/safGraphQlResponse-happy-trygderetten.json" : "saf/safGraphQlResponse-happy.json");
 		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
@@ -329,7 +326,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostHappyPathMinimalAvsenderMottaker() {
+	void distribuerJournalpostHappyPathMinimalAvsenderMottaker() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy-minimal-avsendermottaker.json");
 		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
@@ -358,7 +355,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void shouldNotRedistributeButReturnOkWhenJournalpostIsAlreadyDistributed() {
+	void shouldNotRedistributeButReturnOkWhenJournalpostIsAlreadyDistributed() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 
@@ -374,7 +371,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostAsPrintWhenMappingInPdlFailsWithAdresse() {
+	void distribuerJournalpostAsPrintWhenMappingInPdlFailsWithAdresse() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		stubPdl("pdl/pdl-npid.json");
@@ -402,7 +399,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void throwExceptionInDistribuerJournalpostWhenMappingInPdlFailsWithoutAdresse() {
+	void throwExceptionInDistribuerJournalpostWhenMappingInPdlFailsWithoutAdresse() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		setupDatabase();
 		stubPdl("pdl/pdl-npid.json");
@@ -421,7 +418,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostHappyPathWithDistribusjontypeIsNull() {
+	void distribuerJournalpostHappyPathWithDistribusjontypeIsNull() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		stubPdl("pdl/pdl-happy.json");
@@ -449,7 +446,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostWithUkjentAvsenderMottakerIdHappyPath() {
+	void distribuerJournalpostWithUkjentAvsenderMottakerIdHappyPath() {
 		stubSafGraphQl("saf/safGraphQlResponse-TSS-happy.json");
 		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
@@ -477,12 +474,12 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostWithoutAdresseHappyPath() {
+	void distribuerJournalpostWithoutAdresseHappyPath() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
-		stubHentMottakerOgAdresse("regoppslag/treg002-hentadresse-person-happy.json", OK.value());
+		stubGetPostadresse("regoppslag/hentpostadresse-person-happy.json", OK.value());
 		putStubOppdaterJournalpost();
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
@@ -509,7 +506,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostWithUtenlandskAdresseHappyPath() {
+	void distribuerJournalpostWithUtenlandskAdresseHappyPath() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
@@ -539,7 +536,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void shouldDistribuerAdressetypeWithCaseInsensitiveHappy() {
+	void shouldDistribuerAdressetypeWithCaseInsensitiveHappy() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		stubPdl("pdl/pdl-happy.json");
@@ -565,7 +562,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostWithoutAuthHeader() {
+	void distribuerJournalpostWithoutAuthHeader() {
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
 				createDistribuerJournalpostToBuilder().build(),
 				createHeaderWithoutAuth());
@@ -573,7 +570,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostWithoutJournalpostId() {
+	void distribuerJournalpostWithoutJournalpostId() {
 		putStubOppdaterJournalpost();
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
@@ -587,7 +584,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostThrowsSafJournalpostQueryUnauthorizedException() {
+	void distribuerJournalpostThrowsSafJournalpostQueryUnauthorizedException() {
 		stubFor(post(urlMatching(SAF_GRAPHQL_URI))
 				.willReturn(aResponse()
 						.withStatus(UNAUTHORIZED.value())
@@ -604,7 +601,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostThrowsSafJournalpostQueryTechnicalException() {
+	void distribuerJournalpostThrowsSafJournalpostQueryTechnicalException() {
 		stubFor(post(urlMatching(SAF_GRAPHQL_URI))
 				.willReturn(aResponse()
 						.withStatus(INTERNAL_SERVER_ERROR.value())
@@ -644,7 +641,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void distribuerJournalpostWithInngaaendeJournalposttype() {
+	void distribuerJournalpostWithInngaaendeJournalposttype() {
 		stubSafGraphQl("saf/safGraphQlResponse-inngaaendeJournalpostType.json");
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
@@ -663,7 +660,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubNaisTexasToken();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
-		stubHentMottakerOgAdresse("", NOT_FOUND.value());
+		stubGetPostadresse("", NOT_FOUND.value());
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
 				createDistribuerJournalpostToBuilder()
@@ -682,7 +679,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
-		stubHentMottakerOgAdresse("", GONE.value());
+		stubGetPostadresse("", GONE.value());
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
 				createDistribuerJournalpostToBuilder()
@@ -802,12 +799,12 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void shouldReturnBadRequestIfAddressIsInvalidInRegoppslag() {
+	void shouldReturnBadRequestIfAddressIsInvalidInRegoppslag() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
-		stubHentMottakerOgAdresse("regoppslag/treg002-hentadresse-person-invalid-address.json", BAD_REQUEST.value());
+		stubGetPostadresse("regoppslag/hentpostadresse-person-invalid-address.json", BAD_REQUEST.value());
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
 				createDistribuerJournalpostToBuilder()
@@ -820,12 +817,12 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void shouldReturnBadRequestIfAddressFromRegoppslagContainsOnlyLandkode() {
+	void shouldReturnBadRequestIfAddressFromRegoppslagContainsOnlyLandkode() {
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		setupDatabase();
 		stubPdl("pdl/pdl-happy.json");
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
-		stubHentMottakerOgAdresse("regoppslag/treg002-hentadresse-person-only-landkode.json", OK.value());
+		stubGetPostadresse("regoppslag/hentpostadresse-person-only-landkode.json", OK.value());
 
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
 				createDistribuerJournalpostToBuilder()
@@ -838,7 +835,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void shouldReturnUnauthorizedWhenInvalidToken() {
+	void shouldReturnUnauthorizedWhenInvalidToken() {
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
 				createDistribuerJournalpostToBuilder().build(),
 				createHeadersWithInvalidAuth());
@@ -847,7 +844,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	public void shouldReturnIdempotentResponseWhenJournalpostStatusIsEkspedert() {
+	void shouldReturnIdempotentResponseWhenJournalpostStatusIsEkspedert() {
 		stubSafGraphQl("saf/safGraphQlResponse-ekspedert.json");
 		stubFinnForsendelse();
 		stubHentForsendelse();
@@ -932,8 +929,8 @@ public class Rdist002IT extends AbstractOauth2Test {
 						.withBodyFile(bodyFile)));
 	}
 
-	private void stubHentMottakerOgAdresse(String path, int status) {
-		stubFor(post(urlMatching("/regoppslag/hentMottakerOgAdresse"))
+	private void stubGetPostadresse(String path, int status) {
+		stubFor(post(urlMatching("/regoppslag/postadresse"))
 				.willReturn(aResponse()
 						.withStatus(status)
 						.withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -1002,7 +999,7 @@ public class Rdist002IT extends AbstractOauth2Test {
 			String message = IOUtils.toString(inputStream, UTF_8);
 			IOUtils.closeQuietly(inputStream);
 			return message;
-		} catch (IOException e) {
+		} catch (IOException _) {
 			return "Failed to load file";
 		}
 	}

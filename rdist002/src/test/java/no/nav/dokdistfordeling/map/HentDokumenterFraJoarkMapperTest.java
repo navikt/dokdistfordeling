@@ -33,6 +33,7 @@ import static no.nav.dokdistfordeling.TestData.DOKUMENTPRODAPP;
 import static no.nav.dokdistfordeling.TestData.DOK_INFO_ID_1;
 import static no.nav.dokdistfordeling.TestData.DOK_INFO_ID_2;
 import static no.nav.dokdistfordeling.TestData.JOURNALPOST_ID;
+import static no.nav.dokdistfordeling.TestData.LANDKODE_NORGE;
 import static no.nav.dokdistfordeling.TestData.LANDKODE_US;
 import static no.nav.dokdistfordeling.TestData.MOTTAKER_ID;
 import static no.nav.dokdistfordeling.TestData.MOTTAKER_NAVN;
@@ -57,7 +58,6 @@ import static no.nav.dokdistfordeling.TestData.createUtenlandskPostadresseBuilde
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.ARKIV;
 import static no.nav.dokdistfordeling.constants.ValidationConstants.SLADDET;
-import static no.nav.dokdistfordeling.domain.Postadresse.LANDKODE_NORGE;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.DITTNAV;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.SDP;
@@ -67,7 +67,7 @@ import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.HOVEDDOKUMENT;
 import static no.nav.dokdistfordeling.kodeverk.TilknyttetSomCode.VEDLEGG;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HentDokumenterFraJoarkMapperTest {
+class HentDokumenterFraJoarkMapperTest {
 
 	private static final String BESTILLINGS_ID = "7cc280ce-4168-4204-8d03-8dbdc3c4fc32";
 	private static final Postadresse ADRESSE = createNorskPostadresseBuilder().build();
