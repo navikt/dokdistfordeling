@@ -247,6 +247,11 @@
       "app": "dp-behov-distribuering",
       "namespace": "teamdagpenger",
       "cluster": "dev-gcp"
+    },
+    {
+      "app": "helse-spredning",
+      "namespace": "tbd",
+      "cluster": "dev-gcp"
     }
   ]
 }
