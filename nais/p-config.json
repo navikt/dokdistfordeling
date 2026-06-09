@@ -208,6 +208,11 @@
       "app": "orkivar",
       "namespace": "dab",
       "cluster": "prod-gcp"
+    },
+    {
+      "app": "helse-spredning",
+      "namespace": "tbd",
+      "cluster": "prod-gcp"
     }
   ]
 }
