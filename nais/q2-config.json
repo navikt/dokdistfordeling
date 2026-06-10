@@ -249,7 +249,7 @@
       "cluster": "dev-gcp"
     },
     {
-      "app": "helse-spredning",
+      "app": "spredning",
       "namespace": "tbd",
       "cluster": "dev-gcp"
     }
