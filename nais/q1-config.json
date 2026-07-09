@@ -112,6 +112,11 @@
       "cluster": "dev-gcp"
     },
     {
+      "app": "isutenlandsopphold",
+      "namespace": "teamsykefravr",
+      "cluster": "dev-gcp"
+    },
+    {
       "app": "rpa-nos-robot",
       "namespace": "team-rpa",
       "cluster": "dev-fss"
