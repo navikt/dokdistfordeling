@@ -34,7 +34,7 @@
         <libraries-bom.version>26.86.0</libraries-bom.version>
         <tink.version>1.23.0</tink.version>
         <tink-gcpkms.version>1.11.0</tink-gcpkms.version>
-        <springdoc-openapi-starter-webmvc-ui.version>3.0.3</springdoc-openapi-starter-webmvc-ui.version>
+        <springdoc-openapi-starter-webmvc-ui.version>3.1.0</springdoc-openapi-starter-webmvc-ui.version>
         <context-propagation.version>1.2.1</context-propagation.version>
         <resilience4j.version>2.4.0</resilience4j.version>
 
