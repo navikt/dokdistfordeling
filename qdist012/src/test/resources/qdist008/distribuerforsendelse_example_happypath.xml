@@ -18,7 +18,7 @@
 			<navn>Ola-Johnny</navn>
 		</mottaker>
 		<bruker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns2:Person">
-			<personidentifikator>22104248784</personidentifikator>
+			<personidentifikator>11111111111</personidentifikator>
 			<navn>Roy Roger Testersen</navn>
 		</bruker>
 		<adresse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns2:NorskPostadresse">
