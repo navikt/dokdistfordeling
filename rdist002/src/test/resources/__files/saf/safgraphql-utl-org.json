@@ -1,0 +1,54 @@
+{
+  "data": {
+    "journalpost": {
+      "journalposttype": "U",
+      "journalstatus": "FERDIGSTILT",
+      "tema": "OPP",
+      "bruker": {
+        "id": "11111111111",
+        "type": "FNR"
+      },
+      "avsenderMottaker": {
+        "id": "SE:00001",
+        "type": "UTL_ORG",
+        "navn": "Sveriges Rikstrygdeverk"
+      },
+      "dokumenter": [
+        {
+          "dokumentInfoId": "666666666",
+          "tittel": "MASKERT_FELT",
+          "brevkode": "000001",
+          "dokumentstatus": "FERDIGSTILT",
+          "dokumentvarianter": [
+            {
+              "saksbehandlerHarTilgang": true,
+              "variantformat": "SLADDET",
+              "filtype": "PDFA",
+              "filstoerrelse": 1205634
+            },
+            {
+              "saksbehandlerHarTilgang": false,
+              "variantformat": "ARKIV",
+              "filtype": "PDF",
+              "filstoerrelse": 259863
+            }
+          ]
+        },
+        {
+          "dokumentInfoId": "777777777",
+          "tittel": "MASKERT_FELT",
+          "brevkode": "000001",
+          "dokumentstatus": "FERDIGSTILT",
+          "dokumentvarianter": [
+            {
+              "saksbehandlerHarTilgang": true,
+              "variantformat": "ARKIV",
+              "filtype": "PDF",
+              "filstoerrelse": 2598637
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

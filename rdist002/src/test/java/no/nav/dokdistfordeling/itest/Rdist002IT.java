@@ -24,6 +24,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -832,6 +833,23 @@ class Rdist002IT extends AbstractOauth2Test {
 
 		String body = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
 		assertThat(body).contains("Validering av distribusjonsforespørsel feilet med feilmelding: Feltet poststed kan ikke være null eller tomt. Fikk poststed=null");
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {"safgraphql-hprnr.json", "safgraphql-utl-org.json", "safgraphql-ukjent.json"})
+	void shouldReturnBadRequestIfJournalpostMottakerTypeNotOrgnrFnr(String safFile) {
+		stubSafGraphQl("saf/" + safFile);
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
+		setupDatabase();
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.adresse(null)
+						.build(),
+				createHappyPathHeaders());
+
+		String body = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
+		assertThat(body).contains("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis postadresse ikke oppgis i request.");
 	}
 
 	@Test

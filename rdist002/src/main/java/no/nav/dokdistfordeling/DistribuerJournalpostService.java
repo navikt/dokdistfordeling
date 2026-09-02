@@ -14,6 +14,7 @@ import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoResponse;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.domain.Postadresse;
 import no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException;
+import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.map.HentDokumenterFraJoarkMapper;
 import no.nav.dokdistfordeling.map.MottakerMapper;
@@ -176,7 +177,11 @@ public class DistribuerJournalpostService {
 
 		var avsenderMottaker = journalpost.getAvsenderMottaker();
 
-		return RegoppslagAdresseMapper.map(postadresseService.hentAdresse(avsenderMottaker.getId()));
+		return switch (avsenderMottaker.getType()) {
+			case FNR, ORGNR -> RegoppslagAdresseMapper.map(postadresseService.hentAdresse(avsenderMottaker.getId()));
+			default ->
+					throw new ValidationException("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis postadresse ikke oppgis i request.");
+		};
 	}
 
 }
