@@ -24,6 +24,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -834,9 +835,10 @@ class Rdist002IT extends AbstractOauth2Test {
 		assertThat(body).contains("Validering av distribusjonsforespørsel feilet med feilmelding: Feltet poststed kan ikke være null eller tomt. Fikk poststed=null");
 	}
 
-	@Test
-	void shouldReturnBadRequestIfJournalpostMottakerHprnr() {
-		stubSafGraphQl("saf/safgraphql-hprnr.json");
+	@ParameterizedTest
+	@ValueSource(strings = {"safgraphql-hprnr.json", "safgraphql-utl-org.json", "safgraphql-ukjent.json"})
+	void shouldReturnBadRequestIfJournalpostMottakerTypeNotOrgnrFnr(String safFile) {
+		stubSafGraphQl("saf/" + safFile);
 		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
 		setupDatabase();
 
