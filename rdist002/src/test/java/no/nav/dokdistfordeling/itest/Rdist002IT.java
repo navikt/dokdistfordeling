@@ -835,6 +835,22 @@ class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
+	void shouldReturnBadRequestIfJournalpostMottakerHprnr() {
+		stubSafGraphQl("saf/safgraphql-hprnr.json");
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
+		setupDatabase();
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder()
+						.adresse(null)
+						.build(),
+				createHappyPathHeaders());
+
+		String body = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, BAD_REQUEST);
+		assertThat(body).contains("Journalpost.avsenderMottaker.idType må være FNR eller ORGNR hvis postadresse ikke oppgis i request.");
+	}
+
+	@Test
 	void shouldReturnUnauthorizedWhenInvalidToken() {
 		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
 				createDistribuerJournalpostToBuilder().build(),
