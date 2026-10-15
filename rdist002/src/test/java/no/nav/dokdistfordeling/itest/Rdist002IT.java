@@ -144,7 +144,7 @@ class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	void distribuerJournalpostHappyPath() {
+	void skalDistribuereJournalpostHappyPath() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 		stubPdl("pdl/pdl-happy.json");
@@ -170,6 +170,38 @@ class Rdist002IT extends AbstractOauth2Test {
 		});
 
 		verify(exactly(1), postRequestedFor(urlEqualTo(BESTEM_DISTRIBUSJONSKANAL_URI)).withRequestBody(equalToJson(classpathToString("__files/distribuerjournalpost/distribuerjournalpostRequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
+	}
+
+	@Test
+	void skalDistribuereJournalpostMedEkstraStoreDokumenter() {
+		setupDatabase();
+		stubSafGraphQl("saf/safGraphQlResponse-stor-filstoerrelse.json");
+		stubPdl("pdl/pdl-happy.json");
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
+		putStubOppdaterJournalpost();
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
+
+		DistribuerJournalpostResponseTo restResponse = callDistribuerJournalpostAndAssertResponseCode(requestEntity);
+
+		assertEquals(36, restResponse.getBestillingsId().length());
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
+			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
+
+			assertNotNull(qdist012Result);
+			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
+			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoark-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
+		});
+
+		verify(exactly(1), postRequestedFor(urlEqualTo(BESTEM_DISTRIBUSJONSKANAL_URI)).withRequestBody(equalToJson(classpathToString("__files/distribuerjournalpost/distribuerjournalpostRequest-stor-forsendelse.json"))));
 		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
 		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
 	}

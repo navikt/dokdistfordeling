@@ -48,7 +48,7 @@ public class BestemDistribusjonskanalService {
 				.mottakerId(utledMottakerId(journalpost.getAvsenderMottaker().getId()))
 				.erArkivert(true)
 				.tema(journalpost.getTema())
-				.forsendelseStoerrelse(getFilstoerrelseMB(journalpost))
+				.forsendelseStoerrelse(summerForsendelsestoerrelseMB(journalpost))
 				.antallDokumenter(journalpost.getDokumenter().size())
 				.forsendelseMetadataType(distribuerJournalpost.forsendelseMetadataType())
 				.build();
@@ -80,12 +80,15 @@ public class BestemDistribusjonskanalService {
 		return isEmpty(mottakerId) ? "0" : mottakerId;
 	}
 
-	private int getFilstoerrelseMB(Journalpost journalpost) {
-		return journalpost.getDokumenter().stream()
+	private int summerForsendelsestoerrelseMB(Journalpost journalpost) {
+		// regnestykket deles opp i to for å unngå overflow-problemer for regning med int
+		long forsendelsestoerrelseBytes = journalpost.getDokumenter().stream()
 				.map(Journalpost.DokumentInfo::getDokumentvarianter)
 				.map(BestemDistribusjonskanalService::getSladdetOrArkivFilstoerrelse)
-				.mapToInt(Integer::intValue)
-				.sum() / (1024 * 1024);
+				.mapToLong(Integer::longValue)
+				.sum();
+
+		return  Math.toIntExact(forsendelsestoerrelseBytes / (1024 * 1024));
 	}
 
 	private static Integer getSladdetOrArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
