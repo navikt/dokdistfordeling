@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
@@ -84,19 +85,20 @@ public class BestemDistribusjonskanalService {
 		// regnestykket deles opp i to for å unngå overflow-problemer for regning med int
 		long forsendelsestoerrelseBytes = journalpost.getDokumenter().stream()
 				.map(Journalpost.DokumentInfo::getDokumentvarianter)
-				.map(BestemDistribusjonskanalService::getSladdetOrArkivFilstoerrelse)
-				.mapToLong(Integer::longValue)
+				.mapToLong(BestemDistribusjonskanalService::getSladdetOrArkivFilstoerrelse)
 				.sum();
 
-		return  Math.toIntExact(forsendelsestoerrelseBytes / (1024 * 1024));
+		return Math.toIntExact(forsendelsestoerrelseBytes / (1024 * 1024));
 	}
 
-	private static Integer getSladdetOrArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
+	private static Long getSladdetOrArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
 		return dokumentvariants.stream()
 				.sorted(sortSladdetFirstComparator)
 				.map(Journalpost.Dokumentvariant::getFilstoerrelse)
+				.filter(Objects::nonNull)
+				.filter(filstoerrelse -> filstoerrelse > 0L)
 				.findFirst()
-				.orElse(0);
+				.orElse(0L);
 	}
 
 	private static final Comparator<Journalpost.Dokumentvariant> sortSladdetFirstComparator = (dokA, dokB) -> {
