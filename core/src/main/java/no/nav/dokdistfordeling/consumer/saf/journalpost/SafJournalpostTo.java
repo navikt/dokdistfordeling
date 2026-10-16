@@ -60,6 +60,6 @@ public class SafJournalpostTo {
 		String variantformat;
 		String filtype;
 		boolean saksbehandlerHarTilgang;
-		int filstoerrelse;
+		Long filstoerrelse;
 	}
 }

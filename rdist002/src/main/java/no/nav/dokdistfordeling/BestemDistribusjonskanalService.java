@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import static no.nav.dokdistfordeling.constants.Constants.DEFAULT_UTGAAENDE_DOKUMENTTYPE_ID;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.PRINT;
@@ -48,7 +49,7 @@ public class BestemDistribusjonskanalService {
 				.mottakerId(utledMottakerId(journalpost.getAvsenderMottaker().getId()))
 				.erArkivert(true)
 				.tema(journalpost.getTema())
-				.forsendelseStoerrelse(getFilstoerrelseMB(journalpost))
+				.forsendelseStoerrelse(summerForsendelsestoerrelseMB(journalpost))
 				.antallDokumenter(journalpost.getDokumenter().size())
 				.forsendelseMetadataType(distribuerJournalpost.forsendelseMetadataType())
 				.build();
@@ -80,20 +81,24 @@ public class BestemDistribusjonskanalService {
 		return isEmpty(mottakerId) ? "0" : mottakerId;
 	}
 
-	private int getFilstoerrelseMB(Journalpost journalpost) {
-		return journalpost.getDokumenter().stream()
+	private int summerForsendelsestoerrelseMB(Journalpost journalpost) {
+		// regnestykket deles opp i to for å unngå overflow-problemer for regning med int
+		long forsendelsestoerrelseBytes = journalpost.getDokumenter().stream()
 				.map(Journalpost.DokumentInfo::getDokumentvarianter)
-				.map(BestemDistribusjonskanalService::getSladdetOrArkivFilstoerrelse)
-				.mapToInt(Integer::intValue)
-				.sum() / (1024 * 1024);
+				.mapToLong(BestemDistribusjonskanalService::getSladdetOrArkivFilstoerrelse)
+				.sum();
+
+		return Math.toIntExact(forsendelsestoerrelseBytes / (1024 * 1024));
 	}
 
-	private static Integer getSladdetOrArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
+	private static Long getSladdetOrArkivFilstoerrelse(List<Journalpost.Dokumentvariant> dokumentvariants) {
 		return dokumentvariants.stream()
 				.sorted(sortSladdetFirstComparator)
 				.map(Journalpost.Dokumentvariant::getFilstoerrelse)
+				.filter(Objects::nonNull)
+				.filter(filstoerrelse -> filstoerrelse > 0L)
 				.findFirst()
-				.orElse(0);
+				.orElse(0L);
 	}
 
 	private static final Comparator<Journalpost.Dokumentvariant> sortSladdetFirstComparator = (dokA, dokB) -> {

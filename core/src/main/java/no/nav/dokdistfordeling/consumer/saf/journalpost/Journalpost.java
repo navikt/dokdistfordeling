@@ -76,7 +76,7 @@ public class Journalpost {
 		Variantformat variantformat;
 		String filtype;
 		boolean saksbehandlerHarTilgang;
-		Integer filstoerrelse;
+		Long filstoerrelse;
 	}
 
 }
