@@ -155,6 +155,11 @@
       "cluster": "prod-fss"
     },
     {
+      "app": "familie-integrasjoner",
+      "namespace": "teamfamilie",
+      "cluster": "prod-gcp"
+    },
+    {
       "app": "brev",
       "namespace": "aap",
       "cluster": "prod-gcp"

@@ -189,6 +189,11 @@
       "cluster": "dev-fss"
     },
     {
+      "app": "familie-integrasjoner",
+      "namespace": "teamfamilie",
+      "cluster": "dev-gcp"
+    },
+    {
       "app": "ung-sak",
       "namespace": "k9saksbehandling",
       "cluster": "dev-gcp"
