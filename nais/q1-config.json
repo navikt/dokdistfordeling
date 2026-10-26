@@ -117,6 +117,21 @@
       "cluster": "dev-gcp"
     },
     {
+      "app": "isarbeidsuforhet",
+      "namespace": "teamsykefravr",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "isfrisktilarbeid",
+      "namespace": "teamsykefravr",
+      "cluster": "dev-gcp"
+    },
+    {
+      "app": "ismanglendemedvirkning",
+      "namespace": "teamsykefravr",
+      "cluster": "dev-gcp"
+    },
+    {
       "app": "rpa-nos-robot",
       "namespace": "team-rpa",
       "cluster": "dev-fss"
