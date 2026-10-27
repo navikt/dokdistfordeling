@@ -23,6 +23,9 @@ spec:
               -Djavax.net.ssl.keyStorePassword=$(NAV_TRUSTSTORE_PASSWORD)
               -Djavax.net.ssl.keyStoreType=jks
               -Dio.netty.allocator.type=pooled
+              -Dcom.ibm.mq.cfg.TCP.ClntSndBuffSize=32768
+              -Dcom.ibm.mq.cfg.TCP.ClntRcvBuffSize=32768
+              -Dcom.ibm.msg.client.commonservices.log.outputName=System.out
               $(JAVA_PROXY_OPTIONS) $(JAVA_TRUSTSTORE_OPTIONS)"
     - name: NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_DISCOVERYURL
       value: {{ NO_NAV_SECURITY_JWT_ISSUER_RESTSTS_DISCOVERYURL }}
