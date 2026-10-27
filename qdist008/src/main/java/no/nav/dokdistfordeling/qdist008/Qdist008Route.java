@@ -13,6 +13,7 @@ import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
+import static com.ibm.msg.client.jakarta.jms.JmsConstants.JMS_IBM_MSGTOKEN;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode.DITTNAV;
@@ -117,6 +118,7 @@ public class Qdist008Route extends RouteBuilder {
 				.bean(qdist008Service)
 				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerTilKanal.class)))
 				.convertBodyTo(String.class, UTF_8.toString())
+				.removeHeader(JMS_IBM_MSGTOKEN)
 				.choice()
 				.when(exchangeProperty(PROPERTY_DISTRIBUSJONSKANAL).isEqualTo(LOKAL_PRINT))
 					.log(INFO, log, format("avslutter behandling av forsendelse med %s. Distribusjonskanal=LOKAL_PRINT", getIdsForLogging()))

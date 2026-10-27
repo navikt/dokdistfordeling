@@ -14,6 +14,7 @@ import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
+import static com.ibm.msg.client.jakarta.jms.JmsConstants.JMS_IBM_MSGTOKEN;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.camel.ExchangePattern.InOnly;
 import static org.apache.camel.LoggingLevel.ERROR;
@@ -79,6 +80,7 @@ public class Qdist012Route extends RouteBuilder {
 				.bean(qdist012Service)
 				.marshal(new JaxbDataFormat(JAXBContext.newInstance(DistribuerForsendelse.class)))
 				.convertBodyTo(String.class, UTF_8.toString())
+				.removeHeader(JMS_IBM_MSGTOKEN)
 				.to(InOnly, "jms:" + qdist008.getQueueName())
 				.log(INFO, log, "qdist012 har lagt forsendelse med " + getIdsForLogging() + " på kø til qdist008 for distribusjon av forsendelse");
 	}
