@@ -239,6 +239,11 @@
       "cluster": "dev-gcp"
     },
     {
+      "app": "genie",
+      "namespace": "infotek",
+      "cluster": "dev-gcp"
+    },
+    {
       "app": "melosys",
       "namespace": "teammelosys",
       "cluster": "dev-fss"
