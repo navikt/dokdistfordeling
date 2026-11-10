@@ -233,6 +233,11 @@
       "app": "spredning",
       "namespace": "tbd",
       "cluster": "prod-gcp"
+    },
+    {
+      "app": "ekspertbistand-backend",
+      "namespace": "fager",
+      "cluster": "prod-gcp"
     }
   ]
 }

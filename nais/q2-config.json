@@ -277,6 +277,11 @@
       "app": "spredning",
       "namespace": "tbd",
       "cluster": "dev-gcp"
+    },
+    {
+      "app": "ekspertbistand-backend",
+      "namespace": "fager",
+      "cluster": "dev-gcp"
     }
   ]
 }
