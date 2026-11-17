@@ -8,8 +8,10 @@ import com.ibm.msg.client.jakarta.wmq.WMQConstants;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
 import jakarta.jms.Queue;
-import no.nav.dokdistfordeling.config.props.MqProperties;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokdistfordeling.config.props.DokdistfordelingProperties;
+import no.nav.dokdistfordeling.config.props.MqProperties;
+import no.nav.dokdistfordeling.exception.technical.MQConnectionException;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +22,9 @@ import org.springframework.jms.core.JmsTemplate;
 
 import javax.net.ssl.SSLSocketFactory;
 
+import static java.lang.String.format;
+
+@Slf4j
 @Profile({"nais", "local"})
 @Configuration
 public class JmsConfig {
@@ -79,25 +84,15 @@ public class JmsConfig {
 
 	@Bean
 	public ConnectionFactory connectionFactory(final MqProperties mqProperties,
-											   final DokdistfordelingProperties dokdistfordelingProperties) throws JMSException {
-		return createConnectionFactory(mqProperties, dokdistfordelingProperties.getServiceuser());
+											   final DokdistfordelingProperties dokdistfordelingProperties) {
+		return createConnectionPoolFactory(mqProperties, dokdistfordelingProperties.getServiceuser());
+
 	}
 
-	private JmsPoolConnectionFactory createConnectionFactory(final MqProperties mqProperties,
-															 final DokdistfordelingProperties.Serviceuser serviceuser) throws JMSException {
-		MQConnectionFactory connectionFactory = new MQConnectionFactory();
-		connectionFactory.setHostName(mqProperties.getHostname());
-		connectionFactory.setPort(mqProperties.getPort());
-		connectionFactory.setQueueManager(mqProperties.getName());
-		connectionFactory.setTransportType(WMQConstants.WMQ_CM_CLIENT);
-		connectionFactory.setCCSID(UTF_8_WITH_PUA);
-		connectionFactory.setIntProperty(WMQConstants.JMS_IBM_ENCODING, MQConstants.MQENC_NATIVE);
-		connectionFactory.setIntProperty(WMQConstants.JMS_IBM_CHARACTER_SET, UTF_8_WITH_PUA);
+	private JmsPoolConnectionFactory createConnectionPoolFactory(final MqProperties mqProperties,
+																 final DokdistfordelingProperties.Serviceuser serviceuser) {
 
-		connectionFactory.setSSLCipherSuite(ANY_TLS13_OR_HIGHER);
-		SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-		connectionFactory.setSSLSocketFactory(factory);
-		connectionFactory.setChannel(mqProperties.getChannel().getSecurename());
+		MQConnectionFactory connectionFactory = createConnectionFactory(mqProperties);
 
 		UserCredentialsConnectionFactoryAdapter adapter = new UserCredentialsConnectionFactoryAdapter();
 		adapter.setTargetConnectionFactory(connectionFactory);
@@ -109,6 +104,28 @@ public class JmsConfig {
 		pooledFactory.setMaxConnections(10);
 		pooledFactory.setMaxSessionsPerConnection(10);
 		return pooledFactory;
+	}
+
+	private MQConnectionFactory createConnectionFactory(MqProperties mqProperties) {
+		try {
+			MQConnectionFactory connectionFactory = new MQConnectionFactory();
+			connectionFactory.setHostName(mqProperties.getHostname());
+			connectionFactory.setPort(mqProperties.getPort());
+			connectionFactory.setQueueManager(mqProperties.getName());
+			connectionFactory.setTransportType(WMQConstants.WMQ_CM_CLIENT);
+			connectionFactory.setCCSID(UTF_8_WITH_PUA);
+			connectionFactory.setIntProperty(WMQConstants.JMS_IBM_ENCODING, MQConstants.MQENC_NATIVE);
+			connectionFactory.setIntProperty(WMQConstants.JMS_IBM_CHARACTER_SET, UTF_8_WITH_PUA);
+
+			connectionFactory.setSSLCipherSuite(ANY_TLS13_OR_HIGHER);
+			SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+			connectionFactory.setSSLSocketFactory(factory);
+			connectionFactory.setChannel(mqProperties.getChannel().getSecurename());
+			return connectionFactory;
+		} catch (JMSException e) {
+			log.error("Kunne ikke koble til MQ. Feilmelding={}", e.getMessage());
+			throw new MQConnectionException(format("Kunne ikke koble til MQ. Feilmelding=%s", e.getMessage()), e);
+		}
 	}
 
 	@Bean

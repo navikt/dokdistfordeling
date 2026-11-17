@@ -15,6 +15,7 @@ import no.nav.dokdistfordeling.dokdistdb.repository.DistribuerJournalpostInfoRep
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostResponseTo;
+import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,6 +82,7 @@ import static no.nav.dokdistfordeling.constants.Constants.USER_ID;
 import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_AVTALEMELDING;
 import static no.nav.dokdistfordeling.kodeverk.TvingKanal.TRYGDERETTEN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -96,6 +100,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
+import static org.springframework.test.annotation.DirtiesContext.MethodMode.AFTER_METHOD;
 
 @Transactional
 @EnableAutoConfiguration
@@ -121,6 +126,9 @@ class Rdist002IT extends AbstractOauth2Test {
 	protected DistribuerJournalpostInfoRepository distribuerJournalpostInfoRepository;
 
 	@Autowired
+	private EmbeddedActiveMQ activeMQServer;
+
+	@Autowired
 	private JmsTemplate jmsTemplate;
 
 	@Autowired
@@ -141,6 +149,38 @@ class Rdist002IT extends AbstractOauth2Test {
 			MDC.put(USER_ID, "dokdistfordeling-test");
 		}
 		distribuerJournalpostInfoRepository.deleteAll();
+	}
+
+	@Test
+	@DirtiesContext(methodMode = AFTER_METHOD)
+	void skalReturnereInternalServerErrorNaarMqErUtilgjengelig() throws Exception {
+		activeMQServer.stop();
+		setupDatabase();
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+		stubPdl("pdl/pdl-happy.json");
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
+		putStubOppdaterJournalpost();
+
+		assertThat(activeMQServer.getActiveMQServer().isStarted()).isFalse();
+		assertThatThrownBy(() -> jmsTemplate.send(qdist012, session -> session.createTextMessage("test")))
+				.isInstanceOf(JmsException.class)
+				.hasCauseInstanceOf(JMSException.class);
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
+		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, INTERNAL_SERVER_ERROR);
+
+		JSONObject errorResponse = new JSONObject(restResponse);
+		assertThat(errorResponse.getInt("status")).isEqualTo(INTERNAL_SERVER_ERROR.value());
+		assertThat(errorResponse.getString("error")).isEqualTo(INTERNAL_SERVER_ERROR.getReasonPhrase());
+		assertThat(errorResponse.getString("path")).isEqualTo(DISTRIBUER_JOURNALPOST_URI);
+		assertThat(distribuerJournalpostInfoRepository.findAll())
+				.noneMatch(info -> JOURNALPOST_ID.equals(info.getJournalpostId()));
+
+		verify(exactly(1), postRequestedFor(urlEqualTo(BESTEM_DISTRIBUSJONSKANAL_URI)).withRequestBody(equalToJson(classpathToString("__files/distribuerjournalpost/distribuerjournalpostRequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(0), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
 	}
 
 	@Test

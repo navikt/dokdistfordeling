@@ -34,7 +34,6 @@ public class DistribuerJournalpostController {
 	private final SafJournalpostQueryService safJournalpostQueryService;
 	private final DistribuerJournalpostService distribuerJournalpostService;
 
-
 	public DistribuerJournalpostController(SafJournalpostQueryService safJournalpostQueryService,
 										   DistribuerJournalpostService distribuerJournalpostService) {
 		this.safJournalpostQueryService = safJournalpostQueryService;
@@ -54,7 +53,6 @@ public class DistribuerJournalpostController {
 			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId());
 
 			DistribuerJournalpostInfoResponse distribuerJournalpostInfo = distribuerJournalpostService.hentDistribuerJournalpostInfo(journalpostId);
-
 			if (distribuerJournalpostInfo != null) {
 				log.info("Journalpost med journalpostId={} er allerede distribuert med bestillingsId={}", journalpostId, distribuerJournalpostInfo.bestillingsId());
 				return ResponseEntity.ok()
