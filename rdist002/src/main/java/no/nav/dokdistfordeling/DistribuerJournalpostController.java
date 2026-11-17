@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static no.nav.dokdistfordeling.validate.DistribuerJournalpostRequestValidator.validateDistribuerJournalpostRequest;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.http.HttpStatus.CONFLICT;
 
 @Slf4j
@@ -70,18 +71,19 @@ public class DistribuerJournalpostController {
 
 			String bestillingsId = distribuerJournalpostService.distribuerForsendelse(distribuerJournalpost, journalpost);
 
-			DistribuerJournalpostResponseTo response = new DistribuerJournalpostResponseTo(bestillingsId);
+			if (isBlank(bestillingsId)) {
+				log.error("rdist002 mangler bestillingsId for journalpostId={}", journalpostId);
+				return ResponseEntity.internalServerError().build();
+			}
 
-			log.info("rdist002 har distribuert journalpost med journalpostId={} og bestillingsId={}", journalpostId, bestillingsId);
-
-			return ResponseEntity.ok().body(response);
+			log.info("rdist002 returnerer bestillingsId={} for journalpostId={}", bestillingsId, journalpostId);
+			return ResponseEntity.ok(new DistribuerJournalpostResponseTo(bestillingsId));
 		} catch (Exception e) {
 			log.warn("rdist002 distribusjon feilet for journalpostId={}. Feilmelding={}", journalpostId, e.getMessage(), e);
 			if (e instanceof ValidationException validationException) {
 				throw new ValidationException("Validering av distribusjonsforespørsel feilet med feilmelding: " + validationException.getMessage());
-			} else {
-				throw e;
 			}
+			throw e;
 		} finally {
 			MDC.clear();
 		}

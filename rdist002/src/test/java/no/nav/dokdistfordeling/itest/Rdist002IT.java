@@ -8,6 +8,7 @@ import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.Queue;
 import jakarta.jms.TextMessage;
+import no.nav.dokdistfordeling.DistribuerJournalpostService;
 import no.nav.dokdistfordeling.config.AbstractOauth2Test;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
 import no.nav.dokdistfordeling.dokdistdb.domain.DistribuerJournalpostInfo;
@@ -25,6 +26,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,7 @@ import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 import org.wiremock.spring.EnableWireMock;
@@ -88,6 +91,9 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpMethod.POST;
@@ -125,6 +131,9 @@ class Rdist002IT extends AbstractOauth2Test {
 	@Autowired
 	protected DistribuerJournalpostInfoRepository distribuerJournalpostInfoRepository;
 
+	@MockitoSpyBean
+	private DistribuerJournalpostService distribuerJournalpostService;
+
 	@Autowired
 	private EmbeddedActiveMQ activeMQServer;
 
@@ -149,6 +158,24 @@ class Rdist002IT extends AbstractOauth2Test {
 			MDC.put(USER_ID, "dokdistfordeling-test");
 		}
 		distribuerJournalpostInfoRepository.deleteAll();
+	}
+
+	@ParameterizedTest
+	@NullAndEmptySource
+	@ValueSource(strings = {" ", "\t\n"})
+	void skalReturnereInternalServerErrorNaarNyBestillingsIdMangler(String bestillingsId) {
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+		doReturn(bestillingsId).when(distribuerJournalpostService).distribuerForsendelse(any(), any());
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
+
+		ResponseEntity<String> response = callDistribuerJournalpost(requestEntity);
+
+		assertThat(response.getStatusCode()).isEqualTo(INTERNAL_SERVER_ERROR);
+		assertThat(response.getBody()).isNull();
+		verify(distribuerJournalpostService).distribuerForsendelse(any(), any());
 	}
 
 	@Test
