@@ -1,7 +1,6 @@
 package no.nav.dokdistfordeling;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokdistfordeling.config.jms.DistribuerForsendelseProducer;
 import no.nav.dokdistfordeling.consumer.dokarkiv.JournalpostApi;
 import no.nav.dokdistfordeling.consumer.dokarkiv.OppdaterJournalpostRequest;
 import no.nav.dokdistfordeling.consumer.dokdistadmin.DokdistadminConsumer;
@@ -13,7 +12,6 @@ import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostIdempotencyHandler
 import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoResponse;
 import no.nav.dokdistfordeling.domain.DistribuerJournalpost;
 import no.nav.dokdistfordeling.domain.Postadresse;
-import no.nav.dokdistfordeling.exception.functional.JournalpostErAlleredeDistribuertException;
 import no.nav.dokdistfordeling.exception.functional.ValidationException;
 import no.nav.dokdistfordeling.kodeverk.DistribusjonKanalCode;
 import no.nav.dokdistfordeling.map.HentDokumenterFraJoarkMapper;
@@ -37,7 +35,7 @@ import static no.nav.dokdistfordeling.validate.TvingKanalValidator.validateTving
 @Slf4j
 public class DistribuerJournalpostService {
 
-	private final DistribuerForsendelseProducer distribuerForsendelseProducer;
+	private final DistribuerJournalpostTransaksjon distribuerJournalpostTransaksjon;
 	private final DistribuerJournalpostIdempotencyHandler distribuerJournalpostIdempotencyHandler;
 	private final PostadresseService postadresseService;
 	private final BestemDistribusjonskanalService bestemDistribusjonskanalService;
@@ -45,14 +43,14 @@ public class DistribuerJournalpostService {
 	private final PersonnummerService personnummerService;
 	private final DokdistadminConsumer dokdistadminConsumer;
 
-	public DistribuerJournalpostService(DistribuerForsendelseProducer distribuerForsendelseProducer,
+	public DistribuerJournalpostService(DistribuerJournalpostTransaksjon distribuerJournalpostTransaksjon,
 										DistribuerJournalpostIdempotencyHandler distribuerJournalpostIdempotencyHandler,
 										PostadresseService postadresseService,
 										BestemDistribusjonskanalService bestemDistribusjonskanalService,
 										JournalpostApi journalpostApi,
 										PersonnummerService personnummerService,
 										DokdistadminConsumer dokdistadminConsumer) {
-		this.distribuerForsendelseProducer = distribuerForsendelseProducer;
+		this.distribuerJournalpostTransaksjon = distribuerJournalpostTransaksjon;
 		this.distribuerJournalpostIdempotencyHandler = distribuerJournalpostIdempotencyHandler;
 		this.postadresseService = postadresseService;
 		this.bestemDistribusjonskanalService = bestemDistribusjonskanalService;
@@ -83,17 +81,15 @@ public class DistribuerJournalpostService {
 
 		validatePostadresse(postadresse, mottaker);
 
-		distribuerForsendelse(distribuerJournalpost, postadresse, bestillingsId, journalpost, mottaker, distribusjonKanalCode);
-
-		String persistertBestillingsId = lagreDistribuerJournalpostInfo(distribuerJournalpost.journalpostId(), bestillingsId);
-
-		if (!bestillingsId.equals(persistertBestillingsId)) {
-			return persistertBestillingsId;
+		try {
+			distribuerForsendelse(distribuerJournalpost, postadresse, bestillingsId, journalpost, mottaker, distribusjonKanalCode);
+		} catch (DataIntegrityViolationException e) {
+			return hentEksisterendeBestillingsId(distribuerJournalpost.journalpostId(), e);
 		}
 
-		oppdaterJournalpostMedTilleggsopplysninger(distribuerJournalpost.journalpostId(), persistertBestillingsId);
+		oppdaterJournalpostMedTilleggsopplysninger(distribuerJournalpost.journalpostId(), bestillingsId);
 
-		return persistertBestillingsId;
+		return bestillingsId;
 	}
 
 	private void distribuerForsendelse(DistribuerJournalpost distribuerJournalpost,
@@ -111,10 +107,10 @@ public class DistribuerJournalpostService {
 				bestillingsId,
 				distribusjonKanalCode);
 
-		distribuerForsendelseProducer.produce(
-				hentDokumenterFraJoark,
+		distribuerJournalpostTransaksjon.distribuer(
+				distribuerJournalpost.journalpostId(),
 				bestillingsId,
-				String.valueOf(distribuerJournalpost.journalpostId()));
+				hentDokumenterFraJoark);
 	}
 
 
@@ -126,17 +122,18 @@ public class DistribuerJournalpostService {
 		try {
 			distribuerJournalpostIdempotencyHandler.opprettDistribuerJournalpostInfo(journalpostId, bestillingsId);
 			return bestillingsId;
-		} catch (DataIntegrityViolationException _) {
-			log.warn("Samtidig distribusjon av journalpostId={}. En annen request har allerede persistert distribuerJournalpostInfo.", journalpostId);
-			DistribuerJournalpostInfoResponse eksisterende = distribuerJournalpostIdempotencyHandler.hentDistribuerJournalpostInfo(journalpostId);
-
-			if (eksisterende == null) {
-				throw new JournalpostErAlleredeDistribuertException(
-						"Journalpost er allerede distribuert, men fant ikke eksisterende distribuerJournalpostInfo for journalpostId=%s".formatted(journalpostId));
-			}
-
-			return eksisterende.bestillingsId();
+		} catch (DataIntegrityViolationException e) {
+			return hentEksisterendeBestillingsId(journalpostId, e);
 		}
+	}
+
+	private String hentEksisterendeBestillingsId(Long journalpostId, DataIntegrityViolationException exception) {
+		DistribuerJournalpostInfoResponse eksisterende = distribuerJournalpostIdempotencyHandler.hentDistribuerJournalpostInfo(journalpostId);
+		if (eksisterende == null) {
+			throw exception;
+		}
+		log.info("JournalpostId={} er allerede under distribusjon med bestillingId={}.", journalpostId, eksisterende.bestillingsId());
+		return eksisterende.bestillingsId();
 	}
 
 	private void oppdaterJournalpostMedTilleggsopplysninger(Long journalpostId,

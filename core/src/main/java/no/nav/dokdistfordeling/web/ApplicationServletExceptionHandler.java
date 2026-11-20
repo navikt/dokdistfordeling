@@ -1,6 +1,7 @@
 package no.nav.dokdistfordeling.web;
 
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import jakarta.jms.JMSException;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException;
 import org.slf4j.MDC;
@@ -8,6 +9,7 @@ import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.webmvc.error.DefaultErrorAttributes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.JmsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -17,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.Map;
 
 import static no.nav.dokdistfordeling.constants.Constants.CONSUMER_ID;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
@@ -26,8 +29,8 @@ public class ApplicationServletExceptionHandler extends ResponseEntityExceptionH
 
 	private static final String CONSUMER_TEKNISK_FEIL_MESSAGE = "Teknisk feil ved kall mot ekstern tjeneste med feilmelding=%s";
 	private static final String UNAUTHORIZED_MESSAGE = "Token er ikke autorisert for denne tjenesten. " +
-													   "Token må være utsted av NAV onprem security-token-service eller Entra Id. " +
-													   "Vi har endret dette fra 25.07.2025, hvis dere plutselig mangler tilgang: ta kontakt i #team_dokumentløsninger";
+			"Token må være utsted av NAV onprem security-token-service eller Entra Id. " +
+			"Vi har endret dette fra 25.07.2025, hvis dere plutselig mangler tilgang: ta kontakt i #team_dokumentløsninger";
 
 	@ExceptionHandler({JwtTokenUnauthorizedException.class})
 	public ResponseEntity<Object> handleUnauthorized(WebRequest webRequest) {
@@ -45,6 +48,13 @@ public class ApplicationServletExceptionHandler extends ResponseEntityExceptionH
 		HttpStatus returnertHttpStatus = SERVICE_UNAVAILABLE;
 
 		return new ResponseEntity<>(formaterBody(returnertHttpStatus, feilmelding, webRequest), returnertHttpStatus);
+	}
+
+	@ExceptionHandler({JmsException.class, JMSException.class})
+	public ResponseEntity<Object> handleJmsException(Exception ex, WebRequest webRequest) {
+		log.error("Kunne ikke sende melding til MQ", ex);
+		return ResponseEntity.status(INTERNAL_SERVER_ERROR)
+				.body(formaterBody(INTERNAL_SERVER_ERROR, "Kunne ikke sende melding til MQ", webRequest));
 	}
 
 	private Map<String, Object> formaterBody(HttpStatus httpStatus, String feilmelding, WebRequest webRequest) {
