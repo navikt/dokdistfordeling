@@ -41,9 +41,7 @@ public class DistribuerJournalpostIdempotencyHandler {
 
 	public DistribuerJournalpostInfoResponse hentDistribuerJournalpostInfo(Long journalpostId) {
 		DistribuerJournalpostInfo distribuerJournalpost = distribuerJournalpostInfoRepository.findDistribuerJournalpostInfoByJournalpostId(journalpostId);
-		if (distribuerJournalpost != null && isBlank(distribuerJournalpost.getBestillingsId())) {
-			throw new IllegalStateException("Kunne ikke distribuere journalpostId=%s. BestillingsId mangler. ".formatted(journalpostId));
-		}
+
 		return distribuerJournalpost == null ? null : DistribuerJournalpostInfoResponse.builder()
 				.journalpostId(distribuerJournalpost.getJournalpostId())
 				.bestillingsId(distribuerJournalpost.getBestillingsId())

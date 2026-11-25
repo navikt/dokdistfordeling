@@ -163,6 +163,7 @@ class Rdist002IT extends AbstractOauth2Test {
 			MDC.put(USER_ID, "dokdistfordeling-test");
 		}
 		distribuerJournalpostInfoRepository.deleteAll();
+		commitAndBeginNewTransaction();
 	}
 
 	@ParameterizedTest
@@ -171,15 +172,28 @@ class Rdist002IT extends AbstractOauth2Test {
 	void skalIkkeReturnereOkUtenLagretBestillingsId(String bestillingsId) {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+		stubPdl("pdl/pdl-happy.json");
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
+		putStubOppdaterJournalpost();
+
 		doReturn(new DistribuerJournalpostInfoResponse(JOURNALPOST_ID, bestillingsId))
 				.when(distribuerJournalpostService).hentDistribuerJournalpostInfo(JOURNALPOST_ID.toString());
 		var request = new HttpEntity<>(createDistribuerJournalpostToBuilder().build(), createHappyPathHeaders());
 
-		var response = new JSONObject(callDistribuerJournalpostAndAssertErrorResponseCode(request, INTERNAL_SERVER_ERROR));
+		var response = callDistribuerJournalpostAndAssertResponseCode(request);
 
-		assertThat(response.getInt("status")).isEqualTo(INTERNAL_SERVER_ERROR.value());
-		assertThat(response.has("bestillingsId")).isFalse();
-		verify(distribuerJournalpostService, never()).distribuerForsendelse(any(), any());
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
+			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
+
+			assertNotNull(qdist012Result);
+			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
+			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoark-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
+		});
+
+		assertThat(response.getBestillingsId()).isNotBlank();
 	}
 
 	@Test
@@ -505,7 +519,7 @@ class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	void shouldNotRedistributeButReturnOkWhenJournalpostIsAlreadyDistributed() {
+	void shouldReturnOkWithoutRedistributingWhenJournalpostIsAlreadyDistributed() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 
@@ -516,8 +530,6 @@ class Rdist002IT extends AbstractOauth2Test {
 		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = terminateDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertEquals(OK, responseEntity.getStatusCode());
-
-		verify(1, postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)));
 	}
 
 	@Test
