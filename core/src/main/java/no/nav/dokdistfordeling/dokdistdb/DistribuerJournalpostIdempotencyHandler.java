@@ -41,6 +41,7 @@ public class DistribuerJournalpostIdempotencyHandler {
 
 	public DistribuerJournalpostInfoResponse hentDistribuerJournalpostInfo(Long journalpostId) {
 		DistribuerJournalpostInfo distribuerJournalpost = distribuerJournalpostInfoRepository.findDistribuerJournalpostInfoByJournalpostId(journalpostId);
+
 		return distribuerJournalpost == null ? null : DistribuerJournalpostInfoResponse.builder()
 				.journalpostId(distribuerJournalpost.getJournalpostId())
 				.bestillingsId(distribuerJournalpost.getBestillingsId())

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static no.nav.dokdistfordeling.validate.DistribuerJournalpostRequestValidator.validateDistribuerJournalpostRequest;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.HttpStatus.CONFLICT;
 
 @Slf4j
@@ -51,15 +52,16 @@ public class DistribuerJournalpostController {
 
 		try {
 			validateDistribuerJournalpostRequest(distribuerJournalpostRequestTo);
-			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(distribuerJournalpostRequestTo.getJournalpostId());
 
 			DistribuerJournalpostInfoResponse distribuerJournalpostInfo = distribuerJournalpostService.hentDistribuerJournalpostInfo(journalpostId);
 
-			if (distribuerJournalpostInfo != null) {
+			if (distribuerJournalpostInfo != null && isNotBlank(distribuerJournalpostInfo.bestillingsId())) {
 				log.info("Journalpost med journalpostId={} er allerede distribuert med bestillingsId={}", journalpostId, distribuerJournalpostInfo.bestillingsId());
 				return ResponseEntity.ok()
 						.body(new DistribuerJournalpostResponseTo(distribuerJournalpostInfo.bestillingsId()));
 			}
+
+			Journalpost journalpost = safJournalpostQueryService.hentJournalpost(journalpostId);
 
 			if (journalpost.erDistribuert()) {
 				final var bestillingsId = journalpost.getTilleggsopplysninger().getVerdi();

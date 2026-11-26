@@ -8,13 +8,16 @@ import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.Queue;
 import jakarta.jms.TextMessage;
+import no.nav.dokdistfordeling.DistribuerJournalpostService;
 import no.nav.dokdistfordeling.config.AbstractOauth2Test;
 import no.nav.dokdistfordeling.config.Rdist002TestConfig;
+import no.nav.dokdistfordeling.dokdistdb.DistribuerJournalpostInfoResponse;
 import no.nav.dokdistfordeling.dokdistdb.domain.DistribuerJournalpostInfo;
 import no.nav.dokdistfordeling.dokdistdb.repository.DistribuerJournalpostInfoRepository;
 import no.nav.dokdistfordeling.kodeverk.TvingKanal;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostRequestTo;
 import no.nav.dokdistfordeling.to.DistribuerJournalpostResponseTo;
+import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +27,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +41,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 import org.wiremock.spring.EnableWireMock;
@@ -49,6 +56,8 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -74,16 +83,22 @@ import static no.nav.dokdistfordeling.TestData.JOURNALPOST_ID;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostTo;
 import static no.nav.dokdistfordeling.TestData.createDistribuerJournalpostToBuilder;
 import static no.nav.dokdistfordeling.TestData.createUtenlandskAdresseTo;
+import static no.nav.dokdistfordeling.constants.Constants.BESTILLINGS_ID;
 import static no.nav.dokdistfordeling.constants.Constants.CALL_ID;
 import static no.nav.dokdistfordeling.constants.Constants.USER_ID;
 import static no.nav.dokdistfordeling.kodeverk.ForsendelseMetadataType.DPO_AVTALEMELDING;
 import static no.nav.dokdistfordeling.kodeverk.TvingKanal.TRYGDERETTEN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpMethod.POST;
@@ -96,6 +111,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
+import static org.springframework.test.annotation.DirtiesContext.MethodMode.AFTER_METHOD;
 
 @Transactional
 @EnableAutoConfiguration
@@ -120,6 +136,12 @@ class Rdist002IT extends AbstractOauth2Test {
 	@Autowired
 	protected DistribuerJournalpostInfoRepository distribuerJournalpostInfoRepository;
 
+	@MockitoSpyBean
+	private DistribuerJournalpostService distribuerJournalpostService;
+
+	@Autowired
+	private EmbeddedActiveMQ activeMQServer;
+
 	@Autowired
 	private JmsTemplate jmsTemplate;
 
@@ -141,6 +163,115 @@ class Rdist002IT extends AbstractOauth2Test {
 			MDC.put(USER_ID, "dokdistfordeling-test");
 		}
 		distribuerJournalpostInfoRepository.deleteAll();
+		commitAndBeginNewTransaction();
+	}
+
+	@ParameterizedTest
+	@NullAndEmptySource
+	@ValueSource(strings = " ")
+	void skalIkkeReturnereOkUtenLagretBestillingsId(String bestillingsId) {
+		setupDatabase();
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+		stubPdl("pdl/pdl-happy.json");
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
+		putStubOppdaterJournalpost();
+
+		doReturn(new DistribuerJournalpostInfoResponse(JOURNALPOST_ID, bestillingsId))
+				.when(distribuerJournalpostService).hentDistribuerJournalpostInfo(JOURNALPOST_ID.toString());
+		var request = new HttpEntity<>(createDistribuerJournalpostToBuilder().build(), createHappyPathHeaders());
+
+		var response = callDistribuerJournalpostAndAssertResponseCode(request);
+
+		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+			Message qdist012ResultMessage = jmsTemplate.receive(qdist012);
+			assertNotNull(qdist012ResultMessage);
+			String qdist012Result = extractHentDokumenterFraJoarkXmlString(qdist012ResultMessage);
+			assertNotNull(qdist012ResultMessage.getStringProperty(CALL_ID));
+
+			assertNotNull(qdist012Result);
+			String qdist012ResultWithoutBestillingsId = qdist012Result.replaceAll("(<bestillingsId>)[^&]*(</bestillingsId>)", "");
+			assertThat(classpathToString("__files/rdist002/rdist002IT-hentDokumenterFraJoark-happy.xml")).isEqualToIgnoringWhitespace(qdist012ResultWithoutBestillingsId);
+		});
+
+		assertThat(response.getBestillingsId()).isNotBlank();
+	}
+
+	@Test
+	@DirtiesContext(methodMode = AFTER_METHOD)
+	void skalReturnereInternalServerErrorNaarMqErUtilgjengelig() throws Exception {
+		activeMQServer.stop();
+		setupDatabase();
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+		stubPdl("pdl/pdl-happy.json");
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
+		putStubOppdaterJournalpost();
+
+		assertThat(activeMQServer.getActiveMQServer().isStarted()).isFalse();
+		assertThatThrownBy(() -> jmsTemplate.send(qdist012, session -> session.createTextMessage("test")))
+				.isInstanceOf(JmsException.class)
+				.hasCauseInstanceOf(JMSException.class);
+
+		HttpEntity<DistribuerJournalpostRequestTo> requestEntity = new HttpEntity<>(
+				createDistribuerJournalpostToBuilder().build(),
+				createHappyPathHeaders());
+		String restResponse = callDistribuerJournalpostAndAssertErrorResponseCode(requestEntity, INTERNAL_SERVER_ERROR);
+
+		JSONObject errorResponse = new JSONObject(restResponse);
+		assertThat(errorResponse.getInt("status")).isEqualTo(INTERNAL_SERVER_ERROR.value());
+		assertThat(errorResponse.getString("error")).isEqualTo(INTERNAL_SERVER_ERROR.getReasonPhrase());
+		assertThat(errorResponse.getString("path")).isEqualTo(DISTRIBUER_JOURNALPOST_URI);
+		assertThat(errorResponse.getString("message")).isEqualTo("Kunne ikke sende melding til MQ");
+		assertThat(errorResponse.has("bestillingsId")).isFalse();
+		assertThat(distribuerJournalpostInfoRepository.findAll())
+				.noneMatch(info -> JOURNALPOST_ID.equals(info.getJournalpostId()));
+
+		verify(exactly(1), postRequestedFor(urlEqualTo(BESTEM_DISTRIBUSJONSKANAL_URI)).withRequestBody(equalToJson(classpathToString("__files/distribuerjournalpost/distribuerjournalpostRequest-happy.json"))));
+		verify(exactly(1), postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)).withRequestBody(equalToJson(classpathToString("__files/saf/safrequest-happy.json"))));
+		verify(exactly(0), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
+	}
+
+	@Test
+	void skalReturnereSammeBestillingsIdOgSendeEnMeldingVedSamtidigeKallOgRetry() throws Exception {
+		setupDatabase();
+		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
+		stubPdl("pdl/pdl-happy.json");
+		stubBestemDistribusjonskanal("bestemdistribusjonskanal/print.json");
+		putStubOppdaterJournalpost();
+
+		var request = new HttpEntity<>(createDistribuerJournalpostToBuilder().build(), createHappyPathHeaders());
+		var start = new CyclicBarrier(2);
+		String bestillingsId;
+		try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+			var first = executor.submit(() -> {
+				start.await(10, TimeUnit.SECONDS);
+				return callDistribuerJournalpostAndAssertResponseCode(request);
+			});
+			var second = executor.submit(() -> {
+				start.await(10, TimeUnit.SECONDS);
+				return callDistribuerJournalpostAndAssertResponseCode(request);
+			});
+			bestillingsId = first.get(30, TimeUnit.SECONDS).getBestillingsId();
+			assertThat(bestillingsId).isNotBlank();
+			assertThat(second.get(30, TimeUnit.SECONDS).getBestillingsId()).isEqualTo(bestillingsId);
+		}
+
+		assertThat(callDistribuerJournalpostAndAssertResponseCode(request).getBestillingsId()).isEqualTo(bestillingsId);
+		assertThat(distribuerJournalpostInfoRepository.findById(JOURNALPOST_ID).orElseThrow().getBestillingsId())
+				.isEqualTo(bestillingsId);
+
+		String selector = BESTILLINGS_ID + " = '" + bestillingsId + "'";
+		int messageCount = jmsTemplate.browseSelected(qdist012, selector, (_, browser) -> {
+			int count = 0;
+			var messages = browser.getEnumeration();
+			while (messages.hasMoreElements()) {
+				messages.nextElement();
+				count++;
+			}
+			return count;
+		});
+		assertThat(messageCount).isEqualTo(1);
+		assertThat(jmsTemplate.receiveSelected(qdist012, selector)).isNotNull();
+		verify(exactly(1), putRequestedFor(urlEqualTo("/rest/journalpostapi/555555555")));
 	}
 
 	@Test
@@ -388,7 +519,7 @@ class Rdist002IT extends AbstractOauth2Test {
 	}
 
 	@Test
-	void shouldNotRedistributeButReturnOkWhenJournalpostIsAlreadyDistributed() {
+	void shouldReturnOkWithoutRedistributingWhenJournalpostIsAlreadyDistributed() {
 		setupDatabase();
 		stubSafGraphQl("saf/safGraphQlResponse-happy.json");
 
@@ -399,8 +530,6 @@ class Rdist002IT extends AbstractOauth2Test {
 		ResponseEntity<DistribuerJournalpostResponseTo> responseEntity = terminateDistribuerJournalpostAndAssertResponseCode(requestEntity);
 
 		assertEquals(OK, responseEntity.getStatusCode());
-
-		verify(1, postRequestedFor(urlEqualTo(SAF_GRAPHQL_URI)));
 	}
 
 	@Test
